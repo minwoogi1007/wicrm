@@ -2,6 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.wio.crm.mapper.MenuMapper">
     <select id="findMenusByRole" resultType="Map">
+    select * from (
         SELECT DISTINCT
             MENU_CD
                       ,MENU_NM
@@ -90,5 +91,9 @@
         WHERE MENU_CD IS NOT NULL
             CONNECT BY nocycle MENU_REF = PRIOR MENU_CD
         ORDER SIBLINGS BY SEQ, MENU_IDX
+            )
+        WHERE 1=1
+        START WITH MENU_DIV ='M'
+    CONNECT BY PRIOR MENU_CD = MENU_REF
     </select>
 </mapper>
