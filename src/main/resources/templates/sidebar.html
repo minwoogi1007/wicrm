@@ -31,96 +31,96 @@
                     <!--begin:Menu item-->
                     <div id="menuList"></div>
 
-                        <script th:inline="javascript">
-                            /*<![CDATA[*/
-                            var menuList = [[${userMenus}]];
-                            /*]]>*/
+                    <script th:inline="javascript">
+                        /*<![CDATA[*/
+                        var menuList = [[${userMenus}]];
+                        /*]]>*/
 
-                            let html = '';
-                            menuList.forEach(function(item,index) {
+                        let html = '';
+                        menuList.forEach(function(item,index) {
 
-                                 if( item.MENU_DIV =='M'){
-                                     if(index !== 0 ){
-                                         html +='</div></div></div></div>';
-                                     }
-                                     html +='<div  data-kt-menu-trigger="click" class="menu-item menu-accordion">';
+                            if( item.MENU_DIV =='M'){
+                                if(index !== 0 ){
+                                    html +='</div></div></div></div>';
+                                }
+                                html +='<div  data-kt-menu-trigger="click" class="menu-item menu-accordion">';
 
-                                     html +='<span class="menu-link">\n';
-                                     html +='<span class="menu-icon">\n';
-                                        if(item.MENU_CD =='1000'){
-                                            html +='<i class="ki-duotone ki-code fs-2">\n' ;
-                                        }else if(item.MENU_CD =='1106'){
-                                            html +='<i class="ki-duotone ki-user fs-2">\n' ;
-                                        }else if(item.MENU_CD =='1107'){
-                                            html +='<i class="ki-duotone ki-bank fs-2">\n' ;
-                                        }else if(item.MENU_CD =='1108'){
-                                            html +='<i class="ki-duotone ki-abstract-36 fs-2">\n' ;
-                                        }else if(item.MENU_CD =='1109'){
-                                            html +='<i class="ki-duotone ki-profile-user fs-2">\n' ;
-                                        }else if(item.MENU_CD =='1110'){
-                                            html +='<i class="ki-duotone ki-lock-2 fs-2">\n' ;
-                                        }else if(item.MENU_CD =='1111'){
-                                            html +='<i class="ki-duotone ki-phone fs-2">\n' ;
-                                        }else if(item.MENU_CD =='1112'){
-                                            html +='<i class="ki-duotone ki-chart-simple-3 fs-2">\n' ;
-                                        }else if(item.MENU_CD =='1135'){
-                                            html +='<i class="ki-duotone ki-user-edit  fs-2">\n' ;
-                                        }else if(item.MENU_CD =='1164'){
-                                            html +='<i class="ki-duotone ki-subtitle fs-2">\n' ;
-                                        }else if(item.MENU_CD =='1186'){
-                                            html +='<i class="ki-duotone ki-abstract-11 fs-2">\n' ;
-                                        }
+                                html +='<span class="menu-link">\n';
+                                html +='<span class="menu-icon">\n';
+                                if(item.MENU_CD =='1000'){
+                                    html +='<i class="ki-duotone ki-code fs-2">\n' ;
+                                }else if(item.MENU_CD =='1106'){
+                                    html +='<i class="ki-duotone ki-user fs-2">\n' ;
+                                }else if(item.MENU_CD =='1107'){
+                                    html +='<i class="ki-duotone ki-bank fs-2">\n' ;
+                                }else if(item.MENU_CD =='1108'){
+                                    html +='<i class="ki-duotone ki-abstract-36 fs-2">\n' ;
+                                }else if(item.MENU_CD =='1109'){
+                                    html +='<i class="ki-duotone ki-profile-user fs-2">\n' ;
+                                }else if(item.MENU_CD =='1110'){
+                                    html +='<i class="ki-duotone ki-lock-2 fs-2">\n' ;
+                                }else if(item.MENU_CD =='1111'){
+                                    html +='<i class="ki-duotone ki-phone fs-2">\n' ;
+                                }else if(item.MENU_CD =='1112'){
+                                    html +='<i class="ki-duotone ki-chart-simple-3 fs-2">\n' ;
+                                }else if(item.MENU_CD =='1135'){
+                                    html +='<i class="ki-duotone ki-user-edit  fs-2">\n' ;
+                                }else if(item.MENU_CD =='1164'){
+                                    html +='<i class="ki-duotone ki-subtitle fs-2">\n' ;
+                                }else if(item.MENU_CD =='1186'){
+                                    html +='<i class="ki-duotone ki-abstract-11 fs-2">\n' ;
+                                }
 
-                                     html +='<span class="path1"></span>\n' +
-                                        '<span class="path2"></span>\n' +
-                                        '<span class="path3"></span>\n' +
-                                        '<span class="path4"></span>\n' +
-                                        '</i>\n' +
-                                        '</span>\n' +
-                                        '<span class="menu-title">'+item.MENU_NM+'</span>\n' +
-                                        '<span class="menu-arrow"></span>\n' +
-                                        '</span>\n' +
-                                        '<div class="menu-sub menu-sub-accordion">';
-                                }else if(item.MENU_DIV=='L'){
-                                     if(item.MENU_IDX=='0'){
-                                         html +='<div data-kt-menu-trigger="click" class="menu-item menu-accordion">';
-                                     }else{
-                                         html +='</div></div><div data-kt-menu-trigger="click" class="menu-item menu-accordion">';
-                                     }
-                                    html +='<span class="menu-link">\n' +
+                                html +='<span class="path1"></span>\n' +
+                                    '<span class="path2"></span>\n' +
+                                    '<span class="path3"></span>\n' +
+                                    '<span class="path4"></span>\n' +
+                                    '</i>\n' +
+                                    '</span>\n' +
+                                    '<span class="menu-title">'+item.MENU_NM+'</span>\n' +
+                                    '<span class="menu-arrow"></span>\n' +
+                                    '</span>\n' +
+                                    '<div class="menu-sub menu-sub-accordion">';
+                            }else if(item.MENU_DIV=='L'){
+                                if(item.MENU_IDX=='0'){
+                                    html +='<div data-kt-menu-trigger="click" class="menu-item menu-accordion">';
+                                }else{
+                                    html +='</div></div><div data-kt-menu-trigger="click" class="menu-item menu-accordion">';
+                                }
+                                html +='<span class="menu-link">\n' +
 
-                                        '<span class="menu-bullet">\n' +
-                                        '<span class="bullet bullet-dot"></span>\n' +
-                                        '</span>\n' +
-                                        '<span class="menu-title">'+item.MENU_NM+'</span>\n' +
-                                        '<span class="menu-arrow"></span>'+
-                                        '</span>';
+                                    '<span class="menu-bullet">\n' +
+                                    '<span class="bullet bullet-dot"></span>\n' +
+                                    '</span>\n' +
+                                    '<span class="menu-title">'+item.MENU_NM+'</span>\n' +
+                                    '<span class="menu-arrow"></span>'+
+                                    '</span>';
 
-                                }else if(item.MENU_DIV=='C'){
+                            }else if(item.MENU_DIV=='C'){
 
-                                     if(item.MENU_IDX=='0'){
+                                if(item.MENU_IDX=='0'){
 
-                                         html +='<div class="menu-sub menu-sub-accordion">';
-                                     }else{
-                                         html +='</div><div class="menu-sub menu-sub-accordion">';
-                                     }
-                                     html +='<div class="menu-item">\n'+
-                                         '<a class="menu-link" href="apps/ecommerce/catalog/products.html">\n' +
-                                         '<span class="menu-bullet">\n' +
-                                         '<span class="bullet bullet-dot"></span>\n' +
-                                         '</span>\n' +
-                                         '<span class="menu-title">'+item.MENU_NM+'</span>\n' +
-                                         '</a>\n' +
-                                         '</div>';
-                                 }
+                                    html +='<div class="menu-sub menu-sub-accordion">';
+                                }else{
+                                    html +='</div><div class="menu-sub menu-sub-accordion">';
+                                }
+                                html +='<div class="menu-item">\n'+
+                                    '<a class="menu-link" href="apps/ecommerce/catalog/products.html">\n' +
+                                    '<span class="menu-bullet">\n' +
+                                    '<span class="bullet bullet-dot"></span>\n' +
+                                    '</span>\n' +
+                                    '<span class="menu-title">'+item.MENU_NM+'</span>\n' +
+                                    '</a>\n' +
+                                    '</div>';
+                            }
 
-                            });
+                        });
 
-                            html +='</div></div></div></div>';
-                            console.log(html);
-                            document.getElementById('menuList').innerHTML = html;
+                        html +='</div></div></div></div>';
+                        console.log(html);
+                        document.getElementById('menuList').innerHTML = html;
 
-                        </script>
+                    </script>
 
 
 
