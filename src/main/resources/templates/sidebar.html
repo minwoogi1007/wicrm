@@ -35,13 +35,16 @@
                         /*<![CDATA[*/
                         var menuList = [[${userMenus}]];
                         /*]]>*/
+                        var menu_s=0;
+                        var menu_b=0;
+
 
                         let html = '';
                         menuList.forEach(function(item,index) {
 
                             if( item.MENU_DIV =='M'){
                                 if(index !== 0 ){
-                                    html +='</div></div></div></div>';
+                                    html +='</div></div></div></div></div>\n';
                                 }
                                 html +='<div  data-kt-menu-trigger="click" class="menu-item menu-accordion">';
 
@@ -81,28 +84,29 @@
                                     '<span class="menu-arrow"></span>\n' +
                                     '</span>\n' +
                                     '<div class="menu-sub menu-sub-accordion">';
+                                menu_s=0;
                             }else if(item.MENU_DIV=='L'){
-                                if(item.MENU_IDX=='0'){
+
+                                if(menu_s==0){
                                     html +='<div data-kt-menu-trigger="click" class="menu-item menu-accordion">';
                                 }else{
-                                    html +='</div></div><div data-kt-menu-trigger="click" class="menu-item menu-accordion">';
+                                    html +='</div><div data-kt-menu-trigger="click" class="menu-item menu-accordion">';
                                 }
                                 html +='<span class="menu-link">\n' +
 
                                     '<span class="menu-bullet">\n' +
                                     '<span class="bullet bullet-dot"></span>\n' +
                                     '</span>\n' +
-                                    '<span class="menu-title">'+item.MENU_NM+'</span>\n' +
+                                    '<span class="menu-title">'+item.MENU_NM+menu_s+'</span>\n' +
                                     '<span class="menu-arrow"></span>'+
                                     '</span>';
-
+                                menu_s++;
+                                menu_b=0;
                             }else if(item.MENU_DIV=='C'){
 
-                                if(item.MENU_IDX=='0'){
+                                if(menu_b==0){
 
                                     html +='<div class="menu-sub menu-sub-accordion">';
-                                }else{
-                                    html +='</div><div class="menu-sub menu-sub-accordion">';
                                 }
                                 html +='<div class="menu-item">\n'+
                                     '<a class="menu-link" href="apps/ecommerce/catalog/products.html">\n' +
@@ -112,10 +116,12 @@
                                     '<span class="menu-title">'+item.MENU_NM+'</span>\n' +
                                     '</a>\n' +
                                     '</div>';
+                                menu_b++;
                             }
 
                         });
-
+                        menu_s=0;
+                        menu_b=0;
                         html +='</div></div></div></div>';
                         console.log(html);
                         document.getElementById('menuList').innerHTML = html;
