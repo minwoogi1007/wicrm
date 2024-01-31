@@ -14,7 +14,6 @@ public class MenuService {
     private MenuMapper menuMapper;
 
 
-
     public List<Menu> getMenusByPosition(String userid) {
         return menuMapper.findMenusByRole(userid);
     }
