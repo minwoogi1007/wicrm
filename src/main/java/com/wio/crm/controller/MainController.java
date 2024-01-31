@@ -35,6 +35,7 @@ public class MainController {
     public String getContentFragment(Model model) {
         // 이 메소드는 AJAX 요청에 응답하여 필요한 데이터를 모델에 추가하고,
         // 해당 fragment의 뷰 이름을 반환합니다.
+        System.out.println("여기 맞어?");
         return "list/list :: list";
     }
 }

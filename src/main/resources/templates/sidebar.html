@@ -33,7 +33,7 @@
 
                     <script th:inline="javascript">
                         /*<![CDATA[*/
-                        var menuList = [[${userMenus}]];
+                        const menuList = [[${userMenus}]];
                         /*]]>*/
                         let menu_s=0;
                         let menu_b=0;
@@ -125,7 +125,7 @@
                         menu_s=0;
                         menu_b=0;
                         html +='</div></div></div></div>';
-                        console.log(html);
+
                         document.getElementById('menuList').innerHTML = html;
 
 
@@ -133,12 +133,14 @@
                         $(document).ready(function() {
                             $(".menu-link").click(function(e) {
                                 e.preventDefault(); // 기본 링크 동작을 방지
-                                var url = $(this).attr("href"); // 클릭된 링크의 href 속성 값을 가져옴
+                                let url = $(this).attr("href"); // 클릭된 링크의 href 속성 값을 가져옴
 
                                 $.ajax({
                                     url: url,
                                     success: function(response) {
-                                        $("#contents").html($(response).find("#contents").html());
+
+                                        //$("#contents").html($(response).find("#contents").html());
+                                        $("#contents").html(response);
                                     }
                                 });
                             });
