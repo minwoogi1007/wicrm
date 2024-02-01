@@ -27,15 +27,10 @@ public class MainController {
         }
         String userid = authentication.getName(); // 현재 인증된 사용자의 ID를 가져옵니다.
         model.addAttribute("userMenus", menuService.getCompanyUserMenus(userid));
-
+        model.addAttribute("content", "contents"); // Initial content
         return "main";
     }
 
-    @GetMapping("/list")
-    public String getContentFragment(Model model) {
-        // 이 메소드는 AJAX 요청에 응답하여 필요한 데이터를 모델에 추가하고,
-        // 해당 fragment의 뷰 이름을 반환합니다.
-        System.out.println("여기 맞어?");
-        return "list/list :: list";
-    }
+
+
 }

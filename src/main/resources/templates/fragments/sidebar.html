@@ -111,7 +111,7 @@
                                     html +='<div class="menu-sub menu-sub-accordion">';
                                 }
                                 html +='<div class="menu-item">\n'+
-                                    '<a class="menu-link" href="'+item.PROG_NM+'">\n' +
+                                    '<a class="menu-link" href="javascript:loadContent(\'' + item.PROG_NM + '\')">\n' +
                                     '<span class="menu-bullet">\n' +
                                     '<span class="bullet bullet-dot"></span>\n' +
                                     '</span>\n' +
@@ -130,21 +130,7 @@
 
 
 
-                        $(document).ready(function() {
-                            $(".menu-link").click(function(e) {
-                                e.preventDefault(); // 기본 링크 동작을 방지
-                                let url = $(this).attr("href"); // 클릭된 링크의 href 속성 값을 가져옴
 
-                                $.ajax({
-                                    url: url,
-                                    success: function(response) {
-
-                                        //$("#contents").html($(response).find("#contents").html());
-                                        $("#contents").html(response);
-                                    }
-                                });
-                            });
-                        });
                     </script>
 
 
