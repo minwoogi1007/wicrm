@@ -32,23 +32,23 @@
 <!--begin::App-->
 <div class="d-flex flex-column flex-root app-root" id="kt_app_root">
 	<!--begin::Page-->
-	<div class="app-page flex-column flex-column-fluid" id="kt_app_page">
+	<th:block class="app-page flex-column flex-column-fluid" id="kt_app_page">
 		<!--begin::Header-->
 		<!--HEAD.HTML-->
-		<div th:replace="~{/fragments/head :: head}"></div>
+		<th:block th:replace="~{/fragments/head :: head}"></th:block>
 		<!--end::Header-->
 		<!--begin::Wrapper-->
 		<div class="app-wrapper flex-column flex-row-fluid" id="kt_app_wrapper">
 			<!--begin::Sidebar-->
 			<!--sidebar.HTML-->
-			<div th:replace="~{/fragments/sidebar :: sidebar}"></div>
+			<th:block th:replace="~{/fragments/sidebar :: sidebar}"></th:block>
 			<!--end::Sidebar-->
 			<!--begin::Main-->
 			<!--contents.HTML-->
 			<!--/*@thymesVar id="contents" type=""*/-->
-			<div id="content">
-				<div  th:replace="~{${content}}"></div>
-			</div>
+
+				<th:block  layout:fragment="content"></th:block>
+
 			<!--end:::Main-->
 		</div>
 		<!--end::Wrapper-->
@@ -119,25 +119,6 @@
 <script src="/assets/js/custom/utilities/modals/create-campaign.js"></script>
 <script src="/assets/js/custom/utilities/modals/users-search.js"></script>
 <script>
-	// 컨텐츠를 로드하고 히스토리에 상태를 추가하는 함수
-	function loadContent(url, pushState = true) {
-		fetch(url)
-				.then(response => response.text())
-				.then(html => {
-					document.getElementById('content').innerHTML = html;
-					if (pushState) {
-						history.pushState({ contentUrl: url }, '', url);
-					}
-				})
-				.catch(err => console.log(err));
-	}
-
-	window.addEventListener('popstate', function(event) {
-		// URL이 변경되어 '뒤로 가기' 또는 '앞으로 가기'를 했을 때 컨텐츠 다시 로드
-		if(event.state && event.state.path) {
-			navigateToContent(event.state.path);
-		}
-	});
 
 </script>
 <!--end::Custom Javascript-->

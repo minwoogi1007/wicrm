@@ -15,6 +15,8 @@ public class SecurityConfig {
     private AjaxAuthenticationFailureHandler ajaxAuthenticationFailureHandler;
     @Autowired
     private CustomAuthenticationFailureHandler  customAuthenticationFailureHandler ;
+    @Autowired
+    private CustomSuccessHandler  customSuccessHandler ;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -34,6 +36,7 @@ public class SecurityConfig {
                         .usernameParameter("userId")  // 'userId'로 사용자 이름 파라미터 설정
                         .failureHandler(ajaxAuthenticationFailureHandler)  // 여기에 핸들러 추가
                         .failureHandler(customAuthenticationFailureHandler)
+                        .successHandler(customSuccessHandler) // 로그인 성공 핸들러
                         .permitAll())
 
 

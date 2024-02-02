@@ -25,11 +25,12 @@ public class MainController {
             logger.info("No authentication information available.");
             return "sign-in";
         }
-        String userid = authentication.getName(); // 현재 인증된 사용자의 ID를 가져옵니다.
-        model.addAttribute("userMenus", menuService.getCompanyUserMenus(userid));
+       // String userid = authentication.getName(); // 현재 인증된 사용자의 ID를 가져옵니다.
+       // model.addAttribute("userMenus", menuService.getCompanyUserMenus(userid));
         model.addAttribute("content", "contents"); // Initial content
-        return "main";
+        return "contents";
     }
+
 
 
 

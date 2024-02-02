@@ -1,6 +1,25 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" >
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let activeMenuId = localStorage.getItem('activeMenuId');
+
+
+        console.log("activeMenuId======="+activeMenuId);
+
+        if (activeMenuId) {
+            document.querySelectorAll('.menu-link').forEach(function(link) {
+                if (link.getAttribute('href') === activeMenuId) {
+                    // 해당 메뉴 아이템을 활성화
+                    link.closest('.menu-item').classList.add('active');
+                    // 추가적으로 해당 메뉴가 보이도록 스크롤 조정 가능
+                }
+            });
+        }
+    });
+
+</script>
 <div th:fragment="sidebar" id="kt_app_sidebar" class="app-sidebar flex-column" data-kt-drawer="true" data-kt-drawer-name="app-sidebar" data-kt-drawer-activate="{default: true, lg: false}" data-kt-drawer-overlay="true" data-kt-drawer-width="225px" data-kt-drawer-direction="start" data-kt-drawer-toggle="#kt_app_sidebar_mobile_toggle">
 
     <!--begin::Logo-->
@@ -33,7 +52,7 @@
 
                     <script th:inline="javascript">
                         /*<![CDATA[*/
-                        const menuList = [[${userMenus}]];
+                        const menuList = [[${session.USER_MENUS}]];
                         /*]]>*/
                         let menu_s=0;
                         let menu_b=0;
@@ -110,8 +129,8 @@
 
                                     html +='<div class="menu-sub menu-sub-accordion">';
                                 }
-                                html +='<div class="menu-item">\n'+
-                                    '<a class="menu-link" href="javascript:loadContent(\'' + item.PROG_NM + '\')">\n' +
+                                html +='<div id "'+item.MENU_NM+'" class="menu-item">\n'+
+                                    '<a class="menu-link" href="' + item.PROG_NM + '">\n' +
                                     '<span class="menu-bullet">\n' +
                                     '<span class="bullet bullet-dot"></span>\n' +
                                     '</span>\n' +

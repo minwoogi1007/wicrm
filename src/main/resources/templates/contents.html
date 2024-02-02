@@ -1,6 +1,9 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{/main}">
 
+<div layout:fragment="content">
 <div  class="app-main flex-column flex-row-fluid" id="kt_app_main">
     <!--begin::Content wrapper-->
     <div class="d-flex flex-column flex-column-fluid">
@@ -2934,5 +2937,4 @@
     </div>
     <!--end::Footer-->
 </div>
-
-</html>
+</div>

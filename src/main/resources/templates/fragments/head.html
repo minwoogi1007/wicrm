@@ -1,11 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" >
-<script>
 
-    const OutStr="<object style='display:;' ID=\"EventClientCtrl\" WIDTH=100 HEIGHT=100 CLASSID=\"CLSID:86019F2F-2899-4C4C-A6FE-24CFF7CD6D4C\"  codebase=\"/activeXLGUBaseOpenApi_1.0.1.21.cab#version=1,0,1,21\"></object>";
-    document.writeln(OutStr);
-
-</script>
 <div th:fragment="head" id="kt_app_header" class="app-header">
     <!--begin::Header container-->
     <div class="app-container container-fluid d-flex align-items-stretch justify-content-between" id="kt_app_header_container">
@@ -37,7 +32,9 @@
                     <div data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-placement="bottom-start" class="menu-item here show menu-here-bg menu-lg-down-accordion me-0 me-lg-2">
                         <!--begin:Menu link-->
                         <span class="menu-link">
-                            <span class="menu-title">Dashboards</span>
+
+                                <span class="menu-title">Dashboards </span>
+
                             <span class="menu-arrow d-lg-none"></span>
                         </span>
                         <!--end:Menu link-->
