@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class BoardController {
     @GetMapping("/board")
     public String getContentFragment(Model model) {
-        model.addAttribute("content", "list"); // Content changes to list.html
+       // model.addAttribute("content", "list"); // Content changes to list.html
         System.out.println("리스트 !!!");
         return "board/board";
     }
