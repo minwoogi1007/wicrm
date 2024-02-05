@@ -114,7 +114,7 @@
 
                                     html +='<div class="menu-sub menu-sub-accordion">';
                                 }
-                                html +='<div id ="'+item.MENU_NM+'" class="menu-item">\n'+
+                                html +='<div  class="menu-item">\n'+
                                     '<a class="menu-link" href="' + item.PROG_NM + '">\n' +
                                     '<span class="menu-bullet">\n' +
                                     '<span class="bullet bullet-dot"></span>\n' +
@@ -132,6 +132,66 @@
 
                         document.getElementById('menuList').innerHTML = html;
 
+
+                        // 메뉴 링크에 클릭 이벤트 리스너 추가
+                        document.querySelectorAll('.menu-link').forEach(link => {
+                            link.addEventListener('click', function() {
+                                const menuPath = this.getAttribute('href');// 현재 클릭된 항목에서 가장 가까운 .menu-item.menu-accordion 찾기
+                                const menuName = this.querySelector('.menu-title').textContent;
+
+                                const closestMenuAccordion = this.closest('.menu-item.menu-accordion');
+                                // 두 단계 위의 .menu-item.menu-accordion 찾기
+                                const parentMenuAccordion = closestMenuAccordion.parentElement.closest('.menu-item.menu-accordion');
+
+                                // 선택된 메뉴 정보를 localStorage에 저장
+                                localStorage.setItem('activeMenuPath', menuPath);
+                                localStorage.setItem('menuName', menuName); // 클릭된 메뉴의 아이디 값 저장
+
+                                if (closestMenuAccordion) {
+                                    localStorage.setItem('activeSubMenuId', closestMenuAccordion.id || closestMenuAccordion.getAttribute('data-id'));
+                                }
+                                if (parentMenuAccordion) {
+                                    localStorage.setItem('activeMainMenuId', parentMenuAccordion.id || parentMenuAccordion.getAttribute('data-id'));
+                                }
+                            });
+                        });
+
+
+                        // 페이지 로딩 시 저장된 메뉴 활성화
+                        document.addEventListener('DOMContentLoaded', () => {
+                            const activeMenuPath = localStorage.getItem('activeMenuPath');
+                            const activeSubMenuId  = localStorage.getItem('activeSubMenuId');
+                            const activeMainMenuId  = localStorage.getItem('activeMainMenuId');
+
+                            if (activeMenuPath) {
+                                document.querySelectorAll('.menu-link').forEach(link => {
+                                    if (link.getAttribute('href') === activeMenuPath) {
+                                        link.classList.add('active'); // 현재 선택된 메뉴 항목 활성화
+                                    }
+                                });
+                            }
+
+                            if (activeSubMenuId) {
+                                const activeSubMenu = document.getElementById(activeSubMenuId) || document.querySelector(`[data-id="${activeSubMenuId}"]`);
+                                if (activeSubMenu) {
+                                    // 여기서 필요한 클래스 추가
+                                    activeSubMenu.classList.add('here', 'show');
+                                }
+                            }
+
+                            if (activeMainMenuId) {
+                                const activeMainMenu = document.getElementById(activeMainMenuId) || document.querySelector(`[data-id="${activeMainMenuId}"]`);
+                                if (activeMainMenu) {
+                                    // 여기서 필요한 클래스 추가
+                                    activeMainMenu.classList.add('here', 'show');
+                                }
+                            }
+
+                                localStorage.removeItem('activeMenuPath');
+                                localStorage.removeItem('activeSubMenuId');
+                                localStorage.removeItem('activeMainMenuId');
+
+                        });
 
 
                     </script>
