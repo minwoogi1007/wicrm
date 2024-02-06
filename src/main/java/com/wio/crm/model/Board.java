@@ -19,6 +19,17 @@ public class Board {
     private String EMPNM;
     private String DELCODE;
     private String NOCODE;
+    private String RE_COUNT;
+
+
+
+    public String getRE_COUNT() {
+        return RE_COUNT;
+    }
+
+    public void setRE_COUNT(String RE_COUNT) {
+        this.RE_COUNT = RE_COUNT;
+    }
 
     public String getUNO() {
         return UNO;

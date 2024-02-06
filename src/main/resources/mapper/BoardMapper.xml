@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wio.crm.mapper.BoardMapper">
+    <select id="noticeBoardList" resultType="Map">
+        SELECT
+            UNO,
+            GNO,
+            SUBJECT,
+            ID,
+            IN_DATE,
+            REPLY_DEPTH,
+            att_file,
+            hit,
+            EMPNM,
+            re_count,
+            decode(nocode, '1', 'notice', '') nocode
+        FROM (
+                 SELECT
+                     a.*,
+                     (
+                         SELECT
+                             count(*)
+                         FROM
+                             BOARD_CALL b
+                         WHERE
+                             b.GNO = a.GNO
+                           AND b.cat_group = a.cat_group
+                           AND b.SUBJECT is null
+                           AND b.delcode is null
+                     ) as re_count,
+                     ROW_NUMBER() OVER (ORDER BY a.GNO DESC) AS rn
+                 FROM
+                     BOARD_CALL a
+                 WHERE
+                     a.CAT_GROUP = 'gongi'
+                   AND a.REPLY_DEPTH = 'A'
+                   AND a.DELCODE IS NULL
+                   AND a.subject is not null
+             )
+        ORDER BY GNO DESC, REPLY_DEPTH
+
+    </select>
+</mapper>

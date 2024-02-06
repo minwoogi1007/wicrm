@@ -59,7 +59,7 @@ var KTSigninGeneral = function() {
                                     }
                                 });
                             } else {
-                                throw new Error('Login failed');
+                                throw new Error('아이디 또는 비밀번호를 잘못 입력했습니다.');
                             }
                         }).then(data => {
                             // 로그인 성공 후 리디렉션 또는 추가 처리
@@ -83,7 +83,7 @@ var KTSigninGeneral = function() {
                         // 유효성 검사 실패 시 처리
                         Swal.fire({
 
-                            text: "유효성 검사 실패 시 처리 Sorry, looks like there are some errors detected, please try again.",
+                            text: "아이디 비밀번호 입력을 다시 해보세요",
                             icon: "error",
                             buttonsStyling: false,
                             confirmButtonText: "Ok, got it!",
@@ -110,7 +110,7 @@ var KTSigninGeneral = function() {
                             const e = t.getAttribute("data-kt-redirect-url");
                             e && (location.href = e)
                         } else Swal.fire({
-                            text: "Sorry, the email or password is incorrect, please try again.",
+                            text: "111  Sorry, the email or password is incorrect, please try again.",
                             icon: "error",
                             buttonsStyling: !1,
                             confirmButtonText: "Ok, got it!",
@@ -120,7 +120,7 @@ var KTSigninGeneral = function() {
                         })
                     })).catch((function(t) {
                         Swal.fire({
-                            text: "Sorry, looks like there are some errors detected, please try again.",
+                            text: "222  Sorry, looks like there are some errors detected, please try again.",
                             icon: "error",
                             buttonsStyling: !1,
                             confirmButtonText: "Ok, got it!",
@@ -131,7 +131,7 @@ var KTSigninGeneral = function() {
                     })).then((() => {
                         e.removeAttribute("data-kt-indicator"), e.disabled = !1
                     }))) : Swal.fire({
-                        text: "Sorry, looks like there are some errors detected, please try again.",
+                        text: "333  Sorry, looks like there are some errors detected, please try again.",
                         icon: "error",
                         buttonsStyling: !1,
                         confirmButtonText: "Ok, got it!",
