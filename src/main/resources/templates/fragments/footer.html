@@ -1,9 +1,27 @@
-<div class="app-sidebar-footer flex-column-auto pt-2 pb-6 px-6" id="kt_app_sidebar_footer">
-  <a href="https://preview.keenthemes.com/html/keen/docs" class="btn btn-flex flex-center btn-custom btn-primary overflow-hidden text-nowrap px-0 h-40px w-100" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-dismiss-="click" title="200+ in-house components and 3rd-party plugins">
-    <span class="btn-label">Docs & Components</span>
-    <i class="ki-duotone ki-document btn-icon fs-2 m-0">
-      <span class="path1"></span>
-      <span class="path2"></span>
-    </i>
-  </a>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" >
+<!--begin::Footer-->
+<div th:fragment="footer" id="kt_app_footer" class="app-footer">
+  <!--begin::Footer container-->
+  <div class="app-container container-fluid d-flex flex-column flex-md-row flex-center flex-md-stack py-3">
+    <!--begin::Copyright-->
+    <div class="text-gray-900 order-2 order-md-1">
+      <span class="text-muted fw-semibold me-1">2024&copy;</span>
+      <a href="https://keenthemes.com" target="_blank" class="text-gray-800 text-hover-primary">TWOWIN</a>
+    </div>
+    <!--end::Copyright-->
+    <!--begin::Menu-->
+    <ul class="menu menu-gray-600 menu-hover-primary fw-semibold order-1">
+      <li class="menu-item">
+        <a href="#" target="_blank" class="menu-link px-2">About</a>
+      </li>
+      <li class="menu-item">
+        <a href="#" target="_blank" class="menu-link px-2">Mail</a>
+      </li>
+
+    </ul>
+    <!--end::Menu-->
+  </div>
+  <!--end::Footer container-->
 </div>
+<!--end::Footer-->
