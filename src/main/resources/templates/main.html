@@ -32,7 +32,7 @@
 <!--begin::App-->
 <div class="d-flex flex-column flex-root app-root" id="kt_app_root">
 	<!--begin::Page-->
-	<th:block class="app-page flex-column flex-column-fluid" id="kt_app_page">
+	<div class="app-page flex-column flex-column-fluid" id="kt_app_page">
 		<!--begin::Header-->
 		<!--HEAD.HTML-->
 		<th:block th:replace="~{/fragments/head :: head}"></th:block>
@@ -41,20 +41,18 @@
 		<div class="app-wrapper flex-column flex-row-fluid" id="kt_app_wrapper">
 			<!--begin::Sidebar-->
 			<!--sidebar.HTML-->
+
 			<th:block th:replace="~{/fragments/sidebar :: sidebar}"></th:block>
 			<!--end::Sidebar-->
 			<!--begin::Main-->
-			<!--contents.HTML-->
-			<!--/*@thymesVar id="contents" type=""*/-->
-
+			<div class="app-main flex-column flex-row-fluid" id="kt_app_main">
 				<th:block  layout:fragment="content"></th:block>
-
-
-			<!--end:::Main-->
-			<!--begin::Footer-->
-			<th:block th:replace="~{/fragments/footer:: footer}"></th:block>
-			<!--end::Footer-->
+			</div>
+			<div id="kt_app_footer" class="app-footer">
+				<th:block th:replace="~{/fragments/footer:: footer}"></th:block>
+			</div>
 		</div>
+
 		<!--end::Wrapper-->
 	</div>
 	<!--end::Page-->
@@ -120,11 +118,10 @@
 <script src="/assets/js/widgets.bundle.js"></script>
 <script src="/assets/js/custom/apps/chat/chat.js"></script>
 <script src="/assets/js/custom/utilities/modals/users-search.js"></script>
-<script>
-
-</script>
-<!--end::Custom Javascript-->
 <!--end::Javascript-->
+<!--begin::Custom Javascript(used for this page only)-->
+<script src="/assets/js/custom/apps/ecommerce/reports/customer-orders/customer-orders.js"></script>
+<!--end::Custom Javascript-->
 </body>
 <!--end::Body-->
 </html>
