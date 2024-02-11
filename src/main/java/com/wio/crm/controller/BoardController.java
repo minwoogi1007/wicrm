@@ -15,7 +15,7 @@ public class BoardController {
 
     @GetMapping("/board")
     public String getContentFragment(Model model) {
-       // model.addAttribute("list",boardService.getNoticeBoardList() ); // Content changes to list.html
+        model.addAttribute("list",boardService.getNoticeBoardList() ); // Content changes to list.html
 
         return "board/board";
     }
