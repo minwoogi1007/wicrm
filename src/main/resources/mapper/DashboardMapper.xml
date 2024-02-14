@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wio.crm.mapper.DashboardMapper">
+    <select id="findDataForCard1" resultType="com.wio.crm.model.DashboardData">
+        <![CDATA[
+
+
+        SELECT
+            count_miss,
+            count_com,
+            count_miss+count_com as count_sum,
+            ROUND((count_com / NULLIF(count_miss + count_com, 0)) * 100, 2) AS processing_rate
+        FROM (
+                 SELECT
+                     (SELECT COUNT(*)
+                      FROM (
+                               SELECT *
+                               FROM CALL_LOG_D B
+                                        JOIN (
+                                   SELECT MAX(CALLDATE) AS CALL_DATE, CLID, CUST_CODE, PROJECT_CODE
+                                   FROM CALL_LOG_D
+                                   WHERE REPLACE(substr(calldate,0,10),'-') BETWEEN '20240214' AND '20240214'
+                                   GROUP BY CLID, CUST_CODE, PROJECT_CODE
+                               ) A ON A.CALL_DATE = B.CALLDATE AND A.CLID = B.CLID
+                                        LEFT JOIN temp01 T ON T.empno = B.empno
+                                        LEFT JOIN tcnt01 C ON C.CUST_CODE = B.CUST_CODE
+                               WHERE REPLACE(substr(B.calldate,0,10),'-') BETWEEN '20240214' AND '20240214'
+                                 AND B.RESULT <> 'ANSWER'
+                                 AND B.CONFIRM = '0'
+                                 AND B.context <> 'outbound'
+                           )) AS count_miss,
+
+                     (SELECT COUNT(*)
+                      FROM TBND01 A
+                      WHERE A.PRC_GUBN = '2'
+                        AND TO_CHAR(A.IN_DATE, 'YYYYMMDD') BETWEEN '20240214' AND '20240214'
+                        AND CUST_CODE = DECODE('', '', A.CUST_CODE, '')
+                     ) AS count_com
+                 FROM dual
+             )
+
+
+        ]]>
+    </select>
+</mapper>
