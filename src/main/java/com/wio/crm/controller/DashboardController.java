@@ -21,8 +21,10 @@ public class DashboardController {
     }
 
     @GetMapping("/api/dashboard-data")
-    public ResponseEntity<Map<String, DashboardData>> getDashboardData() {
-        Map<String, DashboardData> data = dashboardService.getDashboardData();
+    public ResponseEntity<Map<String, Object>> getDashboardData() {
+        Map<String, Object> data = dashboardService.getDashboardData();
         return ResponseEntity.ok(data);
     }
+
+
 }

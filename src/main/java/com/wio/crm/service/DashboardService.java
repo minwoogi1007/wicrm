@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -18,15 +19,18 @@ public class DashboardService {
     public DashboardService(DashboardMapper dashboardMapper) {
         this.dashboardMapper = dashboardMapper;
     }
-    public Map<String, DashboardData> getDashboardData() {
-        Map<String, DashboardData> data = new HashMap<>();
+    public Map<String, Object> getDashboardData() {
+        Map<String, Object> data = new HashMap<>();
         // 데이터베이스 조회
         DashboardData card1Data = dashboardMapper.findDataForCard1();
-//        DashboardData card2Data = dashboardMapper.findDataForCard2();
+        DashboardData card2Data = dashboardMapper.findDataForCard2();
+        List<DashboardData> pointList = dashboardMapper.findPointList(); // 예를 들어 리스트 데이터 조회
+
 
         data.put("card-data-1", card1Data);
-     //   data.put("card-data-2", card2Data);
-        // 추가 카드 데이터 처리
+        data.put("card-data-2", card2Data);
+        data.put("pointlist-data", pointList);
+
 
         return data;
     }

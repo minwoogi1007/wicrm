@@ -8,6 +8,10 @@ public class DashboardData {
 
     private String processing_rate;
 
+    private String dailyPoint;
+
+    private String cs_type;
+
     public String getCount_Miss() {
         return count_Miss;
     }
@@ -38,5 +42,21 @@ public class DashboardData {
 
     public void setProcessing_rate(String processing_rate) {
         this.processing_rate = processing_rate;
+    }
+
+    public String getDailyPoint() {
+        return dailyPoint;
+    }
+
+    public void setDailyPoint(String dailyPoint) {
+        this.dailyPoint = dailyPoint;
+    }
+
+    public String getCs_type() {
+        return cs_type;
+    }
+
+    public void setCs_type(String cs_type) {
+        this.cs_type = cs_type;
     }
 }

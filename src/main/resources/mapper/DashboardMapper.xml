@@ -42,4 +42,66 @@
 
         ]]>
     </select>
+    <select id="findDataForCard2" resultType="com.wio.crm.model.DashboardData">
+        <![CDATA[
+
+
+        select TO_CHAR(sum(point)*-1,'999,999,999,999')as dailyPoint from
+            tcnt01_point a
+        where call_code is not null
+          and ISSUE_DATE = to_char(sysdate,'YYYYMMDD')
+          and  CUST_CODE  = DECODE('', '', CUST_CODE, '')
+
+        ]]>
+    </select>
+    <select id="findPointList" resultType="com.wio.crm.model.DashboardData">
+        <![CDATA[
+
+
+
+        WITH AggregatedData AS (
+            SELECT
+                CS_TYPE,
+                SUM(POINT)*-1 AS TotalPoints
+            FROM tcnt01_point b
+                     INNER JOIN tcnt01 a ON a.cust_code = b.cust_code
+                     INNER JOIN tbnd01 c ON b.cust_code = c.cust_code
+                AND b.projct_code = c.project_code
+                AND b.call_code = c.call_code
+                AND b.person_code = c.person_code
+            WHERE b.issue_date BETWEEN '20240214' AND '20240214'
+            GROUP BY CS_TYPE
+        ),
+             RankedData AS (
+                 SELECT
+                     CS_TYPE,
+                     TotalPoints,
+                     ROW_NUMBER() OVER (ORDER BY TotalPoints DESC) AS Rank
+                 FROM AggregatedData A
+             ),
+             FinalData AS (
+                 SELECT
+                     CASE
+                         WHEN Rank <= 2 THEN CS_TYPE
+                         ELSE '기타'
+                         END AS GroupingKey,
+                     SUM(TotalPoints) AS Points
+                 FROM RankedData
+                 GROUP BY
+                     CASE
+                         WHEN Rank <= 2 THEN CS_TYPE
+                         ELSE '기타'
+                         END
+             )
+        SELECT
+            DECODE((SELECT ADM_SNAME FROM TSYS01 WHERE ADM_GUBN='4002' AND ADM_CODE= GroupingKey),NULL,'기타',(SELECT ADM_SNAME FROM TSYS01 WHERE ADM_GUBN='4002' AND ADM_CODE= GroupingKey)) AS CS_TYPE,
+            TO_CHAR(Points,'999,999,999,999') as dailyPoint
+        FROM FinalData
+        ORDER BY
+            CASE WHEN GroupingKey = '기타' THEN 1 ELSE 0 END, Points DESC
+
+
+        ]]>
+    </select>
+
 </mapper>

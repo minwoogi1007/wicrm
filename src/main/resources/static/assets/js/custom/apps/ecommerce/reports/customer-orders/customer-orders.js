@@ -1,4 +1,4 @@
-"use strict";
+
 var KTAppEcommerceReportCustomerOrders = function() {
     var t, e;
     return {
