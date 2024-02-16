@@ -10,6 +10,8 @@ public class DashboardData {
 
     private String dailyPoint;
 
+    private int dailyPointN;
+
     private String cs_type;
 
     public String getCount_Miss() {
@@ -58,5 +60,13 @@ public class DashboardData {
 
     public void setCs_type(String cs_type) {
         this.cs_type = cs_type;
+    }
+
+    public int getDailyPointN() {
+        return dailyPointN;
+    }
+
+    public void setDailyPointN(int dailyPointN) {
+        this.dailyPointN = dailyPointN;
     }
 }

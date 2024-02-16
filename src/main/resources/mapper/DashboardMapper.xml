@@ -6,10 +6,10 @@
 
 
         SELECT
-            count_miss,
-            count_com,
-            count_miss+count_com as count_sum,
-            ROUND((count_com / NULLIF(count_miss + count_com, 0)) * 100, 2) AS processing_rate
+            nvl(count_miss,0) as count_miss,
+            nvl(count_com,0) as count_com,
+            nvl(count_miss+count_com,0) as count_sum,
+            nvl(ROUND((count_com / NULLIF(count_miss + count_com, 0)) * 100, 2),0) AS processing_rate
         FROM (
                  SELECT
                      (SELECT COUNT(*)
@@ -19,12 +19,12 @@
                                         JOIN (
                                    SELECT MAX(CALLDATE) AS CALL_DATE, CLID, CUST_CODE, PROJECT_CODE
                                    FROM CALL_LOG_D
-                                   WHERE REPLACE(substr(calldate,0,10),'-') BETWEEN '20240214' AND '20240214'
+                                   WHERE REPLACE(substr(calldate,0,10),'-') = '20240213'
                                    GROUP BY CLID, CUST_CODE, PROJECT_CODE
                                ) A ON A.CALL_DATE = B.CALLDATE AND A.CLID = B.CLID
                                         LEFT JOIN temp01 T ON T.empno = B.empno
                                         LEFT JOIN tcnt01 C ON C.CUST_CODE = B.CUST_CODE
-                               WHERE REPLACE(substr(B.calldate,0,10),'-') BETWEEN '20240214' AND '20240214'
+                               WHERE REPLACE(substr(B.calldate,0,10),'-') = '20240213'
                                  AND B.RESULT <> 'ANSWER'
                                  AND B.CONFIRM = '0'
                                  AND B.context <> 'outbound'
@@ -33,7 +33,7 @@
                      (SELECT COUNT(*)
                       FROM TBND01 A
                       WHERE A.PRC_GUBN = '2'
-                        AND TO_CHAR(A.IN_DATE, 'YYYYMMDD') BETWEEN '20240214' AND '20240214'
+                        AND TO_CHAR(A.IN_DATE, 'YYYYMMDD')= '20240213'
                         AND CUST_CODE = DECODE('', '', A.CUST_CODE, '')
                      ) AS count_com
                  FROM dual
@@ -44,14 +44,48 @@
     </select>
     <select id="findDataForCard2" resultType="com.wio.crm.model.DashboardData">
         <![CDATA[
-
-
-        select TO_CHAR(sum(point)*-1,'999,999,999,999')as dailyPoint from
-            tcnt01_point a
-        where call_code is not null
-          and ISSUE_DATE = to_char(sysdate,'YYYYMMDD')
-          and  CUST_CODE  = DECODE('', '', CUST_CODE, '')
-
+        SELECT
+            NVL(
+                    TO_CHAR(
+                            CASE
+                                WHEN percentChange > 100 THEN percentChange - 100
+                                ELSE percentChange
+                                END,
+                            'FM999999990.00'
+                        ),
+                    '0'
+                ) AS processing_rate,
+            dailyPoint,
+            dailyPointN
+        FROM (
+                 SELECT
+                             (today.dailyPointN - yesterday.dailyPointN) / NULLIF(yesterday.dailyPointN, 0) * 100 AS percentChange,
+                             today.dailyPoint as dailyPoint,
+                             today.dailyPointN as dailyPointN
+                 FROM
+                     (
+                         SELECT
+                             NVL(TO_CHAR(SUM(point) * -1, '999,999,999,999'), '0') AS dailyPoint,
+                             NVL(SUM(point) * -1, 0) AS dailyPointN
+                         FROM
+                             tcnt01_point
+                         WHERE
+                             call_code IS NOT NULL
+                           AND ISSUE_DATE = '20240213' -- 오늘 날짜
+                           AND CUST_CODE = DECODE('', '', CUST_CODE, '')
+                     ) today,
+                     (
+                         SELECT
+                             NVL(TO_CHAR(SUM(point) * -1, '999,999,999,999'), '0') AS dailyPoint,
+                             NVL(SUM(point) * -1, 0) AS dailyPointN
+                         FROM
+                             tcnt01_point
+                         WHERE
+                             call_code IS NOT NULL
+                           AND ISSUE_DATE = '20240207' -- 어제 날짜; 날짜가 잘못 지정되었으니 적절히 조정해야 함
+                           AND CUST_CODE = DECODE('', '', CUST_CODE, '')
+                     ) yesterday
+             )
         ]]>
     </select>
     <select id="findPointList" resultType="com.wio.crm.model.DashboardData">
@@ -69,7 +103,7 @@
                 AND b.projct_code = c.project_code
                 AND b.call_code = c.call_code
                 AND b.person_code = c.person_code
-            WHERE b.issue_date BETWEEN '20240214' AND '20240214'
+            WHERE b.issue_date = '20240213'
             GROUP BY CS_TYPE
         ),
              RankedData AS (
@@ -95,13 +129,86 @@
              )
         SELECT
             DECODE((SELECT ADM_SNAME FROM TSYS01 WHERE ADM_GUBN='4002' AND ADM_CODE= GroupingKey),NULL,'기타',(SELECT ADM_SNAME FROM TSYS01 WHERE ADM_GUBN='4002' AND ADM_CODE= GroupingKey)) AS CS_TYPE,
-            TO_CHAR(Points,'999,999,999,999') as dailyPoint
+            TO_CHAR(nvl(Points,0),'999,999,999,999') as dailyPoint , nvl(Points,0) dailyPointN
         FROM FinalData
         ORDER BY
             CASE WHEN GroupingKey = '기타' THEN 1 ELSE 0 END, Points DESC
 
 
         ]]>
+    </select>
+    <select id="findPointList" resultType="com.wio.crm.model.DashboardData">
+        <![CDATA[
+    SELECT
+    (SELECT COUNT(*) FROM (
+    SELECT B.CALLDATE, B.CLID, B.PERSON_CODE, B.CUST_CODE, B.PROJECT_CODE, B.empno, B.INCALL_NO,
+    T.emp_name, C.cust_name AS PJN, 1 AS COUNT, B.RESULT,
+    DECODE(B.CONTEXT, 'outbound', 'OUT', 'IN') AS CONTEXT
+    FROM (
+    SELECT MAX(CALLDATE) AS CALL_DATE, CLID, CUST_CODE, PROJECT_CODE
+    FROM CALL_LOG_D
+    WHERE REPLACE(substr(calldate,0,10),'-') ='20240213'
+    GROUP BY CLID, CUST_CODE, PROJECT_CODE
+    ) A
+    INNER JOIN CALL_LOG_D B ON A.CALL_DATE = B.CALLDATE AND A.CLID = B.CLID
+    LEFT JOIN temp01 T ON T.empno = B.empno
+    LEFT JOIN tcnt01 C ON C.CUST_CODE = B.CUST_CODE
+    WHERE REPLACE(substr(B.calldate,0,10),'-') ='20240213'
+    AND B.RESULT <> 'ANSWER'
+    AND B.CONFIRM = '0'
+    AND B.context <> 'outbound'
+    )
+    ) AS count_call_log_d,
+    (SELECT COUNT(*)
+    FROM TBND01 a
+    WHERE 1=1
+    AND A.CUST_CODE = DECODE('', '', A.CUST_CODE, '')
+    AND A.PRC_GUBN = '2'
+    AND TO_CHAR(IN_DATE, 'YYYYMMDD') ='20240213'
+    ) AS count_tbnd01,
+    (SELECT COUNT(*)
+    FROM TBND01 a
+    WHERE 1=1
+    AND A.CUST_CODE = DECODE('', '', A.CUST_CODE, '')
+    AND A.PRC_GUBN = '2'
+    AND EMG_GUBN ='1'
+    AND TO_CHAR(IN_DATE, 'YYYYMMDD') ='20240213'
+    ) AS count_tbnd01,
+    (SELECT COUNT(*) FROM (
+    SELECT B.CALLDATE, B.CLID, B.PERSON_CODE, B.CUST_CODE, B.PROJECT_CODE, B.empno, B.INCALL_NO,
+    T.emp_name, C.cust_name AS PJN, 1 AS COUNT, B.RESULT,
+    DECODE(B.CONTEXT, 'outbound', 'OUT', 'IN') AS CONTEXT
+    FROM (
+    SELECT MAX(CALLDATE) AS CALL_DATE, CLID, CUST_CODE, PROJECT_CODE
+    FROM CALL_LOG_D
+    WHERE REPLACE(substr(calldate,0,10),'-') ='20240212'
+    GROUP BY CLID, CUST_CODE, PROJECT_CODE
+    ) A
+    INNER JOIN CALL_LOG_D B ON A.CALL_DATE = B.CALLDATE AND A.CLID = B.CLID
+    LEFT JOIN temp01 T ON T.empno = B.empno
+    LEFT JOIN tcnt01 C ON C.CUST_CODE = B.CUST_CODE
+    WHERE REPLACE(substr(B.calldate,0,10),'-') ='20240212'
+    AND B.RESULT <> 'ANSWER'
+    AND B.CONFIRM = '0'
+    AND B.context <> 'outbound'
+    )
+    ) AS count_call_log_d,
+    (SELECT COUNT(*)
+    FROM TBND01 a
+    WHERE 1=1
+    AND A.CUST_CODE = DECODE('', '', A.CUST_CODE, '')
+    AND A.PRC_GUBN = '2'
+    AND TO_CHAR(IN_DATE, 'YYYYMMDD') ='20240212'
+    ) AS count_tbnd01,
+    (SELECT COUNT(*)
+    FROM TBND01 a
+    WHERE 1=1
+    AND A.CUST_CODE = DECODE('', '', A.CUST_CODE, '')
+    AND A.PRC_GUBN = '2'
+    AND EMG_GUBN ='1'
+    AND TO_CHAR(IN_DATE, 'YYYYMMDD') ='20240212'
+    ) AS count_tbnd01
+    FROM dual]]>
     </select>
 
 </mapper>

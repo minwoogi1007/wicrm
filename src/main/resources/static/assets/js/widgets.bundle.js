@@ -456,33 +456,7 @@ var KTCardWidget13 = function() {
 "undefined" != typeof module && (module.exports = KTCardWidget13), KTUtil.onDOMContentLoaded((function() {
     KTCardWidget13.init()
 }));
-var KTCardsWidget17 = {
-    init: function() {
-        ! function() {
-            var e = document.getElementById("kt_card_widget_17_chart");
-            if (e) {
-                var t = {
-                        size: e.getAttribute("data-kt-size") ? parseInt(e.getAttribute("data-kt-size")) : 70,
-                        lineWidth: e.getAttribute("data-kt-line") ? parseInt(e.getAttribute("data-kt-line")) : 11,
-                        rotate: e.getAttribute("data-kt-rotate") ? parseInt(e.getAttribute("data-kt-rotate")) : 145
-                    },
-                    a = document.createElement("canvas"),
-                    l = document.createElement("span");
-                "undefined" != typeof G_vmlCanvasManager && G_vmlCanvasManager.initElement(a);
-                var r = a.getContext("2d");
-                a.width = a.height = t.size, e.appendChild(l), e.appendChild(a), r.translate(t.size / 2, t.size / 2), r.rotate((t.rotate / 180 - .5) * Math.PI);
-                var o = (t.size - t.lineWidth) / 2,
-                    i = function(e, t, a) {
-                        a = Math.min(Math.max(0, a || 1), 1), r.beginPath(), r.arc(0, 0, o, 0, 2 * Math.PI * a, !1), r.strokeStyle = e, r.lineCap = "round", r.lineWidth = t, r.stroke()
-                    };
-                i("#E4E6EF", t.lineWidth, 1), i(KTUtil.getCssVariableValue("--bs-primary"), t.lineWidth, 100 / 150), i(KTUtil.getCssVariableValue("--bs-success"), t.lineWidth, .4)
-            }
-        }()
-    }
-};
-"undefined" != typeof module && (module.exports = KTCardsWidget17), KTUtil.onDOMContentLoaded((function() {
-    KTCardsWidget17.init()
-}));
+
 var KTCardsWidget19 = {
     init: function() {
         ! function() {
