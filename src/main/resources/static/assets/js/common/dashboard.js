@@ -1,7 +1,12 @@
 //그래프 생성을 위한 변수
+//마일리지
 var chartM1=0;
 var chartM2=0;
 var dailyPointN = 0;
+
+//상담 유형
+
+
 
 $(document).ready(function() {
     let isFirstCall = true;
@@ -11,7 +16,7 @@ $(document).ready(function() {
             url: "/api/dashboard-data", // 서버 엔드포인트
             type: "GET",
             success: function(response) {
-                //console.log(response);
+                console.log(response);
                 // response는 각 카드 데이터를 포함하는 객체
                 Object.keys(response).forEach(function(key) {
                     // 예: key = 'card-data-1'
@@ -83,7 +88,23 @@ $(document).ready(function() {
 
 
                         });
+                    }else if(key=="card-data-3"){
+                        const cardData3 = response[key];
+                        const todayMiss = cardData3.todayMiss;
+                        const todayCom = cardData3.todayCom;
+                        const todayEme = cardData3.todayEme;
+                        const yseterdayEme = cardData3.yseterdayEme;
+                        const yesterdayCom = cardData3.yesterdayCom;
+                        const yesterdayMiss = cardData3.yesterdayMiss;
+
+                        $('#count-todayMiss-' + key).text(todayMiss);
+                        $('#count-todayCom-' + key).text(todayCom);
+                        $('#count-todayEme-' + key).text(todayEme);
+                        $('#count-yseterdayEme-' + key).text(' / '+yseterdayEme);
+                        $('#count-yesterdayCom-' + key).text(' / '+yesterdayCom);
+                        $('#count-yesterdayMiss-' + key).text(' / '+yesterdayMiss);
                     }
+
                 });
                 KTCardsWidget17.init();
             },
@@ -129,4 +150,199 @@ $(document).ready(function() {
         KTCardsWidget17.init()
     }));
 
+    var KTChartsWidget8 = function() {
+        var e = {
+                self: null,
+                rendered: !1
+            },
+            t = {
+                self: null,
+                rendered: !1
+            },
+            a = function(e, t, a, l, r) {
+                var o = document.querySelector(a);
+                if (o) {
+                    var i = parseInt(KTUtil.css(o, "height")),
+                        s = KTUtil.getCssVariableValue("--bs-border-dashed-color"),
+                        n = {
+                            series: [{
+                                name: "Social Campaigns",
+                                data: l[0]
+                            }, {
+                                name: "Email Newsletter",
+                                data: l[1]
+                            }, {
+                                name: "TV Campaign",
+                                data: l[2]
+                            }, {
+                                name: "Google Ads",
+                                data: l[3]
+                            }, {
+                                name: "Courses",
+                                data: l[4]
+                            }, {
+                                name: "Radio",
+                                data: l[5]
+                            }],
+                            chart: {
+                                fontFamily: "inherit",
+                                type: "bubble",
+                                height: i,
+                                toolbar: {
+                                    show: !1
+                                }
+                            },
+                            plotOptions: {
+                                bubble: {}
+                            },
+                            stroke: {
+                                show: !1,
+                                width: 0
+                            },
+                            legend: {
+                                show: !1
+                            },
+                            dataLabels: {
+                                enabled: !1
+                            },
+                            xaxis: {
+                                type: "numeric",
+                                tickAmount: 7,
+                                min: 0,
+                                max: 700,
+                                axisBorder: {
+                                    show: !1
+                                },
+                                axisTicks: {
+                                    show: !0,
+                                    height: 0
+                                },
+                                labels: {
+                                    show: !0,
+                                    trim: !0,
+                                    style: {
+                                        colors: KTUtil.getCssVariableValue("--bs-gray-500"),
+                                        fontSize: "13px"
+                                    }
+                                }
+                            },
+                            yaxis: {
+                                tickAmount: 7,
+                                min: 0,
+                                max: 700,
+                                labels: {
+                                    style: {
+                                        colors: KTUtil.getCssVariableValue("--bs-gray-500"),
+                                        fontSize: "13px"
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                style: {
+                                    fontSize: "12px"
+                                },
+                                x: {
+                                    formatter: function(e) {
+                                        return "Clicks: " + e
+                                    }
+                                },
+                                y: {
+                                    formatter: function(e) {
+                                        return "$" + e + "K"
+                                    }
+                                },
+                                z: {
+                                    title: "Impression: "
+                                }
+                            },
+                            crosshairs: {
+                                show: !0,
+                                position: "front",
+                                stroke: {
+                                    color: KTUtil.getCssVariableValue("--bs-border-dashed-color"),
+                                    width: 1,
+                                    dashArray: 0
+                                }
+                            },
+                            colors: [KTUtil.getCssVariableValue("--bs-primary"), KTUtil.getCssVariableValue("--bs-success"), KTUtil.getCssVariableValue("--bs-warning"), KTUtil.getCssVariableValue("--bs-danger"), KTUtil.getCssVariableValue("--bs-info"), "#43CED7"],
+                            fill: {
+                                opacity: 1
+                            },
+                            markers: {
+                                strokeWidth: 0
+                            },
+                            grid: {
+                                borderColor: s,
+                                strokeDashArray: 4,
+                                padding: {
+                                    right: 20
+                                },
+                                yaxis: {
+                                    lines: {
+                                        show: !0
+                                    }
+                                }
+                            }
+                        };
+                    e.self = new ApexCharts(o, n);
+                    var d = document.querySelector(t);
+                    !0 === r && setTimeout((function() {
+                        e.self.render(), e.rendered = !0
+                    }), 200), d.addEventListener("shown.bs.tab", (function(t) {
+                        !1 === e.rendered && (e.self.render(), e.rendered = !0)
+                    }))
+                }
+            };
+        return {
+            init: function() {
+                var l = [
+                        [
+                            [100, 250, 30]
+                        ],
+                        [
+                            [225, 300, 35]
+                        ],
+                        [
+                            [300, 350, 25]
+                        ],
+                        [
+                            [350, 350, 20]
+                        ],
+                        [
+                            [450, 400, 25]
+                        ],
+                        [
+                            [550, 350, 35]
+                        ]
+                    ],
+                    r = [
+                        [
+                            [125, 300, 40]
+                        ],
+                        [
+                            [250, 350, 35]
+                        ],
+                        [
+                            [350, 450, 30]
+                        ],
+                        [
+                            [450, 250, 25]
+                        ],
+                        [
+                            [500, 500, 30]
+                        ],
+                        [
+                            [600, 250, 28]
+                        ]
+                    ];
+                a(e, "#kt_chart_widget_8_week_toggle", "#kt_chart_widget_8_week_chart", l, !1), a(t, "#kt_chart_widget_8_month_toggle", "#kt_chart_widget_8_month_chart", r, !0);
+                KTThemeMode.on("kt.thememode.change", (function() {
+                    e.rendered && e.self.destroy(), t.rendered && t.self.destroy(), a(e, "#kt_chart_widget_8_week_toggle", "#kt_chart_widget_8_week_chart", l, e.rendered), a(t, "#kt_chart_widget_8_month_toggle", "#kt_chart_widget_8_month_chart", r, t.rendered)
+                }))
+            }
+        }
+    }();
+    "undefined" != typeof module && (module.exports = KTChartsWidget8), KTUtil.onDOMContentLoaded((function() {
+        KTChartsWidget8.init()
+    }));
 });

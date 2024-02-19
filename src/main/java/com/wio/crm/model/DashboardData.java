@@ -14,6 +14,13 @@ public class DashboardData {
 
     private String cs_type;
 
+    private String todayMiss;
+    private String todayCom;
+    private String todayEme;
+    private String yseterdayEme;
+    private String yesterdayCom;
+    private String yesterdayMiss;
+
     public String getCount_Miss() {
         return count_Miss;
     }
@@ -68,5 +75,53 @@ public class DashboardData {
 
     public void setDailyPointN(int dailyPointN) {
         this.dailyPointN = dailyPointN;
+    }
+
+    public String getTodayMiss() {
+        return todayMiss;
+    }
+
+    public void setTodayMiss(String todayMiss) {
+        this.todayMiss = todayMiss;
+    }
+
+    public String getTodayCom() {
+        return todayCom;
+    }
+
+    public void setTodayCom(String todayCom) {
+        this.todayCom = todayCom;
+    }
+
+    public String getTodayEme() {
+        return todayEme;
+    }
+
+    public void setTodayEme(String todayEme) {
+        this.todayEme = todayEme;
+    }
+
+    public String getYseterdayEme() {
+        return yseterdayEme;
+    }
+
+    public void setYseterdayEme(String yseterdayEme) {
+        this.yseterdayEme = yseterdayEme;
+    }
+
+    public String getYesterdayCom() {
+        return yesterdayCom;
+    }
+
+    public void setYesterdayCom(String yesterdayCom) {
+        this.yesterdayCom = yesterdayCom;
+    }
+
+    public String getYesterdayMiss() {
+        return yesterdayMiss;
+    }
+
+    public void setYesterdayMiss(String yesterdayMiss) {
+        this.yesterdayMiss = yesterdayMiss;
     }
 }

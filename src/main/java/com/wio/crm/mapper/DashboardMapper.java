@@ -14,4 +14,8 @@ public interface DashboardMapper {
     DashboardData findDataForCard2();
 
     List<DashboardData> findPointList();
+
+    DashboardData dashConSum();
+
+    List<DashboardData> dashStatCount();
 }

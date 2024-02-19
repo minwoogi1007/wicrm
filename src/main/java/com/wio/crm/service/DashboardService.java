@@ -24,13 +24,15 @@ public class DashboardService {
         // 데이터베이스 조회
         DashboardData card1Data = dashboardMapper.findDataForCard1();
         DashboardData card2Data = dashboardMapper.findDataForCard2();
-        List<DashboardData> pointList = dashboardMapper.findPointList(); // 예를 들어 리스트 데이터 조회
-
+        List<DashboardData> pointList = dashboardMapper.findPointList(); //
+        DashboardData dashConSum = dashboardMapper.dashConSum();
+        List<DashboardData> dashStatCount = dashboardMapper.dashStatCount();
 
         data.put("card-data-1", card1Data);
         data.put("card-data-2", card2Data);
+        data.put("card-data-3", dashConSum);
         data.put("pointlist-data", pointList);
-
+        data.put("dashStatCount-data", dashStatCount);
 
         return data;
     }
