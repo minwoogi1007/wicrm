@@ -21,14 +21,6 @@ public class DashboardData {
     private String yesterdayCom;
     private String yesterdayMiss;
 
-
-    private String StatPeriod;
-    private String CS_NAME;
-    private String POINT;
-    private String COUNT;
-
-    private String Percentage;
-
     public String getCount_Miss() {
         return count_Miss;
     }
@@ -131,45 +123,5 @@ public class DashboardData {
 
     public void setYesterdayMiss(String yesterdayMiss) {
         this.yesterdayMiss = yesterdayMiss;
-    }
-
-    public String getStatPeriod() {
-        return StatPeriod;
-    }
-
-    public void setStatPeriod(String statPeriod) {
-        StatPeriod = statPeriod;
-    }
-
-    public String getCS_NAME() {
-        return CS_NAME;
-    }
-
-    public void setCS_NAME(String CS_NAME) {
-        this.CS_NAME = CS_NAME;
-    }
-
-    public String getPOINT() {
-        return POINT;
-    }
-
-    public void setPOINT(String POINT) {
-        this.POINT = POINT;
-    }
-
-    public String getCOUNT() {
-        return COUNT;
-    }
-
-    public void setCOUNT(String COUNT) {
-        this.COUNT = COUNT;
-    }
-
-    public String getPercentage() {
-        return Percentage;
-    }
-
-    public void setPercentage(String percentage) {
-        Percentage = percentage;
     }
 }

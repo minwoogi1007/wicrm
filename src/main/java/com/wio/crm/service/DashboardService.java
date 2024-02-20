@@ -26,20 +26,12 @@ public class DashboardService {
         DashboardData card2Data = dashboardMapper.findDataForCard2();
         List<DashboardData> pointList = dashboardMapper.findPointList(); //
         DashboardData dashConSum = dashboardMapper.dashConSum();
-
+        List<DashboardData> dashStatCount = dashboardMapper.dashStatCount();
 
         data.put("card-data-1", card1Data);
         data.put("card-data-2", card2Data);
         data.put("card-data-3", dashConSum);
         data.put("pointlist-data", pointList);
-
-        return data;
-    }
-    public Map<String, Object> getDashboardConCount() {
-        Map<String, Object> data = new HashMap<>();
-        // 데이터베이스 조회
-        List<DashboardData> dashStatCount = dashboardMapper.dashStatCount();
-
         data.put("dashStatCount-data", dashStatCount);
 
         return data;

@@ -282,58 +282,50 @@
     <select id="dashStatCount" resultType="com.wio.crm.model.DashboardData">
         <![CDATA[
 
-        WITH DateRange AS (
-            SELECT
-                TRUNC(SYSDATE-6) AS Today,
-                TRUNC(SYSDATE-6, 'IW') AS WeekStart,
-                TRUNC(SYSDATE-6, 'IW') + 6 AS WeekEnd
-            FROM DUAL
-        ), Stats AS (
+        WITH AggregatedData AS (
             SELECT
                 CS_TYPE,
-                (SELECT ADM_SNAME FROM TSYS01 WHERE ADM_GUBN='4002' AND ADM_CODE= CS_TYPE) AS CS_NAME,
-                SUM(b.POINT)*-1 AS POINT,
-                COUNT(CS_TYPE) AS COUNT,
-            CASE
-            WHEN b.issue_date = TRUNC(SYSDATE-6) THEN '오늘'
-            ELSE '주간'
-        END AS StatPeriod
-    FROM tcnt01_point b
-    INNER JOIN tcnt01 a ON a.cust_code = b.cust_code
-    INNER JOIN tbnd01 c ON b.cust_code = c.cust_code
-        AND b.projct_code = c.project_code
-        AND b.call_code = c.call_code
-        AND b.person_code = c.person_code
-    WHERE b.issue_date BETWEEN (SELECT WeekStart FROM DateRange) AND (SELECT WeekEnd FROM DateRange)
-    GROUP BY CS_TYPE, CASE WHEN b.issue_date = TRUNC(SYSDATE-6) THEN '오늘' ELSE '주간' END
-), TotalCounts AS (
-    SELECT
-        StatPeriod,
-        SUM(COUNT) AS TotalCount
-    FROM Stats
-    GROUP BY StatPeriod
-), RankedStats AS (
-    SELECT
-        s.StatPeriod,
-        s.CS_TYPE,
-        s.CS_NAME,
-        s.POINT,
-        s.COUNT,
-        ROUND((s.COUNT / t.TotalCount) * 100, 0) AS Percentage,
-        ROW_NUMBER() OVER (PARTITION BY s.StatPeriod ORDER BY s.COUNT DESC, s.POINT DESC) AS rn
-    FROM Stats s
-    JOIN TotalCounts t ON s.StatPeriod = t.StatPeriod
-)
+                SUM(POINT)*-1 AS TotalPoints,
+                count(CS_TYPE) as TotalCount
+            FROM tcnt01_point b
+                     INNER JOIN tcnt01 a ON a.cust_code = b.cust_code
+                     INNER JOIN tbnd01 c ON b.cust_code = c.cust_code
+                AND b.projct_code = c.project_code
+                AND b.call_code = c.call_code
+                AND b.person_code = c.person_code
+            WHERE b.issue_date = '20240214'
+            GROUP BY CS_TYPE
+        ),
+             RankedData AS (
+                 SELECT
+                     CS_TYPE,
+                     TotalPoints,
+                     TotalCount,
+                     ROW_NUMBER() OVER (ORDER BY TotalPoints DESC) AS Rank
+                 FROM AggregatedData A
+             ),
+             FinalData AS (
+                 SELECT
+                     CASE
+                         WHEN Rank <= 6 THEN CS_TYPE
+                         ELSE '기타'
+                         END AS GroupingKey,
+                     SUM(TotalPoints) AS Points,
+                     sum(TotalCount) as Counts
+                 FROM RankedData
+                 GROUP BY
+                     CASE
+                         WHEN Rank <= 6 THEN CS_TYPE
+                         ELSE '기타'
+                         END
+             )
         SELECT
-            StatPeriod,
-            CS_TYPE,
-            CS_NAME,
-            POINT,
-            COUNT,
-            Percentage
-        FROM RankedStats
-        WHERE rn <= 6
-        ORDER BY StatPeriod DESC, rn
+            DECODE((SELECT ADM_SNAME FROM TSYS01 WHERE ADM_GUBN='4002' AND ADM_CODE= GroupingKey),NULL,'기타',(SELECT ADM_SNAME FROM TSYS01 WHERE ADM_GUBN='4002' AND ADM_CODE= GroupingKey)) AS CS_TYPE,
+            TO_CHAR(nvl(Points,0),'999,999,999,999') as dailyPoint , nvl(Points,0) dailyPointN, nvl(Counts,0) dailyCount
+        FROM FinalData
+        ORDER BY
+            CASE WHEN GroupingKey = '기타' THEN 1 ELSE 0 END, Points DESC
+
         ]]>
     </select>
 </mapper>
