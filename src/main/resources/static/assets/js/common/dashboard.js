@@ -4,13 +4,53 @@ var chartM1=0;
 var chartM2=0;
 var dailyPointN = 0;
 
-//상담 유형
+//상담 유형 상위6개
+let conCsTypeD1="";
+let conCsTypeD2="";
+let conCsTypeD3="";
+let conCsTypeD4="";
+let conCsTypeD5="";
+let conCsTypeD6="";
 
+let conCsCountD1=0;
+let conCsCountD2=0;
+let conCsCountD3=0;
+let conCsCountD4=0;
+let conCsCountD5=0;
+let conCsCountD6=0;
+
+let conCsPayD1=0;
+let conCsPayD2=0;
+let conCsPayD3=0;
+let conCsPayD4=0;
+let conCsPayD5=0;
+let conCsPayD6=0;
+
+let conCsTypeW1="";
+let conCsTypeW2="";
+let conCsTypeW4="";
+let conCsTypeW5="";
+let conCsTypeW6="";
+
+let conCsCountW1=0;
+let conCsCountW2=0;
+let conCsCountW3=0;
+let conCsCountW4=0;
+let conCsCountW5=0;
+let conCsCountW6=0;
+
+let conCsPayW1=0;
+let conCsPayW2=0;
+let conCsPayW3=0;
+let conCsPayW4=0;
+let conCsPayW5=0;
+let conCsPayW6=0;
 
 
 $(document).ready(function() {
     let isFirstCall = true;
     fetchData();
+    fetchDataCon();
     function fetchData() {
         $.ajax({
             url: "/api/dashboard-data", // 서버 엔드포인트
@@ -116,7 +156,51 @@ $(document).ready(function() {
     }
 
     // 5초마다 fetchData 함수를 호출하여 데이터를 새로고침
-    setInterval(fetchData, 10000);
+    //setInterval(fetchData, 10000);
+
+    function fetchDataCon() {
+
+
+        $.ajax({
+            url: "/api/dashboard-conCount-data", // 서버 엔드포인트
+            type: "GET",
+            success: function(response) {
+                console.log("상담유형 그래프 조회");
+                console.log(response);
+                // response는 각 카드 데이터를 포함하는 객체
+                Object.keys(response).forEach(function(key) {
+                    // 예: key = 'card-data-1'
+                    //console.log(key);
+                    if (response["dashStatCount-data"]) {
+                        const conCountList = response["dashStatCount-data"];
+                        let weekData = [];
+                        let dayData = [];
+
+                        // 데이터 변환
+                        conCountList.forEach((item) => {
+                            let chartData = { x: item.POINT, y: item.COUNT, z: item.Percentage };
+                            if (item.STATPERIOD === '주간') {
+                                weekData.push([chartData]);
+                            } else if (item.STATPERIOD === '오늘') {
+                                dayData.push([chartData]);
+                            }
+                        });
+
+                        console.log("Week Data:", weekData);
+                        // 차트 그리기 함수 호출
+                        //a(e, "#kt_chart_widget_8_week_toggle", "#kt_chart_widget_8_week_chart", weekData, false);
+                        //a(t, "#kt_chart_widget_8_month_toggle", "#kt_chart_widget_8_month_chart", dayData, true);
+                    }
+
+                });
+
+            },
+            error: function(xhr, status, error) {
+                console.error("Data load failed:", error);
+            }
+        });
+
+    }
     var KTCardsWidget17 = {
         init: function() {
             ! function() {

@@ -25,6 +25,11 @@ public class DashboardController {
         Map<String, Object> data = dashboardService.getDashboardData();
         return ResponseEntity.ok(data);
     }
+    @GetMapping("/api/dashboard-conCount-data")
+    public ResponseEntity<Map<String, Object>> getDashboardConCount() {
+        Map<String, Object> data = dashboardService.getDashboardConCount();
+        return ResponseEntity.ok(data);
+    }
 
 
 }
