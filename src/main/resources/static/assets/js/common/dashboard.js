@@ -198,78 +198,79 @@ $(document).ready(function() {
                             if(index==0){
                                 conCsTypeW1=item.cs_Name;
                                 conCsCountW1=item.cs_Type_Count;
-                                conCsPayW1=item.cs_Type_Point;
+                                conCsPayW1=item.cs_Type_Point/1000;
                                 conCsPerW1=item.cs_Type_Percentage;
                             }else if(index==1){
                                 conCsTypeW2=item.cs_Name;
                                 conCsCountW2=item.cs_Type_Count;
-                                conCsPayW2=item.cs_Type_Point;
+                                conCsPayW2=item.cs_Type_Point/1000;
                                 conCsPerW2=item.cs_Type_Percentage;
                             }else if(index==2){
                                 conCsTypeW3=item.cs_Name;
                                 conCsCountW3=item.cs_Type_Count;
-                                conCsPayW3=item.cs_Type_Point;
+                                conCsPayW3=item.cs_Type_Point/1000;
                                 conCsPerW3=item.cs_Type_Percentage;
                             }else if(index==3){
                                 conCsTypeW4=item.cs_Name;
                                 conCsCountW4=item.cs_Type_Count;
-                                conCsPayW4=item.cs_Type_Point;
+                                conCsPayW4=item.cs_Type_Point/1000;
                                 conCsPerW4=item.cs_Type_Percentage;
                             }else if(index==4){
                                 conCsTypeW5=item.cs_Name;
                                 conCsCountW5=item.cs_Type_Count;
-                                conCsPayW5=item.cs_Type_Point;
+                                conCsPayW5=item.cs_Type_Point/1000;
                                 conCsPerW5=item.cs_Type_Percentage;
                             }else if(index==5){
                                 conCsTypeW6=item.cs_Name;
                                 conCsCountW6=item.cs_Type_Count;
-                                conCsPayW6=item.cs_Type_Point;
+                                conCsPayW6=item.cs_Type_Point/1000;
                                 conCsPerW6=item.cs_Type_Percentage;
                             }else if(index==6){
 
                                 conCsTypeD1=item.cs_Name;
                                 conCsCountD1=item.cs_Type_Count;
-                                conCsPayD1=item.cs_Type_Point;
+                                conCsPayD1=item.cs_Type_Point/1000;
                                 conCsPerD1=item.cs_Type_Percentage;
 
                             }else if(index==7){
 
                                 conCsTypeD2=item.cs_Name;
                                 conCsCountD2=item.cs_Type_Count;
-                                conCsPayD2=item.cs_Type_Point;
+                                conCsPayD2=item.cs_Type_Point/1000;
                                 conCsPerD2=item.cs_Type_Percentage;
 
                             }else if(index==8){
 
                                 conCsTypeD3=item.cs_Name;
                                 conCsCountD3=item.cs_Type_Count;
-                                conCsPayD3=item.cs_Type_Point;
+                                conCsPayD3=item.cs_Type_Point/1000;
                                 conCsPerD3=item.cs_Type_Percentage;
 
                             }else if(index==9){
 
                                 conCsTypeD4=item.cs_Name;
                                 conCsCountD4=item.cs_Type_Count;
-                                conCsPayD4=item.cs_Type_Point;
+                                conCsPayD4=item.cs_Type_Point/1000;
                                 conCsPerD4=item.cs_Type_Percentage;
 
                             }else if(index==10){
 
                                 conCsTypeD5=item.cs_Name;
                                 conCsCountD5=item.cs_Type_Count;
-                                conCsPayD5=item.cs_Type_Point;
+                                conCsPayD5=item.cs_Type_Point/1000;
                                 conCsPerD5=item.cs_Type_Percentage;
 
                             }else if(index==11){
                                 conCsTypeD6=item.cs_Name;
                                 conCsCountD6=item.cs_Type_Count;
-                                conCsPayD6=item.cs_Type_Point;
+                                conCsPayD6=item.cs_Type_Point/1000;
                                 conCsPerD6=item.cs_Type_Percentage;
 
                             }
                           });
 
                         // 차트 그리기 함수 호출
+                        console.log(conCsPerD6);
                         KTChartsWidget8.init();
                         //a(e, "#kt_chart_widget_8_week_toggle", "#kt_chart_widget_8_week_chart", weekData, false);
                         //a(t, "#kt_chart_widget_8_month_toggle", "#kt_chart_widget_8_month_chart", dayData, true);
@@ -376,7 +377,7 @@ $(document).ready(function() {
                                 type: "numeric",
                                 tickAmount: 7,
                                 min: 0,
-                                max: 700,
+                                max: conCsCountW1*1.1,
                                 axisBorder: {
                                     show: !1
                                 },
@@ -396,7 +397,7 @@ $(document).ready(function() {
                             yaxis: {
                                 tickAmount: 7,
                                 min: 0,
-                                max: 700,
+                                max: conCsPayW1*1.1,
                                 labels: {
                                     style: {
                                         colors: KTUtil.getCssVariableValue("--bs-gray-500"),
@@ -464,42 +465,42 @@ $(document).ready(function() {
             init: function() {
                 var l = [
                         [
-                            [100, 250, 30]
+                            [conCsCountW1, conCsPayW1, conCsPerW1]
                         ],
                         [
-                            [225, 300, 35]
+                            [conCsCountW1, conCsPayW2, conCsPerW2]
                         ],
                         [
-                            [300, 350, 25]
+                            [conCsCountW1, conCsPayW3, conCsPerW3]
                         ],
                         [
-                            [350, 350, 20]
+                            [conCsCountW1, conCsPayW4, conCsPerW4]
                         ],
                         [
-                            [450, 400, 25]
+                            [conCsCountW1, conCsPayW5, conCsPerW5]
                         ],
                         [
-                            [550, 350, 35]
+                            [conCsCountW1, conCsPayW6, conCsPerW6]
                         ]
                     ],
                     r = [
                         [
-                            [125, 300, 40]
+                            [conCsCountD1, conCsPayD1, conCsPerD1]
                         ],
                         [
-                            [250, 350, 35]
+                            [conCsCountD1, conCsPayD2, conCsPerD2]
                         ],
                         [
-                            [350, 450, 30]
+                            [conCsCountD1, conCsPayD3, conCsPerD3]
                         ],
                         [
-                            [450, 250, 25]
+                            [conCsCountD1, conCsPayD4, conCsPerD4]
                         ],
                         [
-                            [500, 500, 30]
+                            [conCsCountD1, conCsPayD5, conCsPerD5]
                         ],
                         [
-                            [600, 250, 28]
+                            [conCsCountD1, conCsPayD6, conCsPerD6]
                         ]
                     ];
                 console.log(l);
