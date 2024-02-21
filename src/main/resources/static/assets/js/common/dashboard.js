@@ -4,48 +4,6 @@ var chartM1=0;
 var chartM2=0;
 var dailyPointN = 0;
 
-//상담 유형 상위6개
-let conCsTypeD1="";
-let conCsTypeD2="";
-let conCsTypeD3="";
-let conCsTypeD4="";
-let conCsTypeD5="";
-let conCsTypeD6="";
-
-let conCsCountD1=0;
-let conCsCountD2=0;
-let conCsCountD3=0;
-let conCsCountD4=0;
-let conCsCountD5=0;
-let conCsCountD6=0;
-
-let conCsPayD1=0;
-let conCsPayD2=0;
-let conCsPayD3=0;
-let conCsPayD4=0;
-let conCsPayD5=0;
-let conCsPayD6=0;
-
-let conCsTypeW1="";
-let conCsTypeW2="";
-let conCsTypeW4="";
-let conCsTypeW5="";
-let conCsTypeW6="";
-
-let conCsCountW1=0;
-let conCsCountW2=0;
-let conCsCountW3=0;
-let conCsCountW4=0;
-let conCsCountW5=0;
-let conCsCountW6=0;
-
-let conCsPayW1=0;
-let conCsPayW2=0;
-let conCsPayW3=0;
-let conCsPayW4=0;
-let conCsPayW5=0;
-let conCsPayW6=0;
-
 
 $(document).ready(function() {
     let isFirstCall = true;
@@ -158,9 +116,67 @@ $(document).ready(function() {
     // 5초마다 fetchData 함수를 호출하여 데이터를 새로고침
     //setInterval(fetchData, 10000);
 
+
+
+//상담 유형 상위6개
+    let conCsTypeD1="";
+    let conCsTypeD2="";
+    let conCsTypeD3="";
+    let conCsTypeD4="";
+    let conCsTypeD5="";
+    let conCsTypeD6="";
+
+    let conCsCountD1=0;
+    let conCsCountD2=0;
+    let conCsCountD3=0;
+    let conCsCountD4=0;
+    let conCsCountD5=0;
+    let conCsCountD6=0;
+
+    let conCsPayD1=0;
+    let conCsPayD2=0;
+    let conCsPayD3=0;
+    let conCsPayD4=0;
+    let conCsPayD5=0;
+    let conCsPayD6=0;
+
+    let conCsPerD1=0;
+    let conCsPerD2=0;
+    let conCsPerD3=0;
+    let conCsPerD4=0;
+    let conCsPerD5=0;
+    let conCsPerD6=0;
+
+
+    let conCsTypeW1="";
+    let conCsTypeW2="";
+    let conCsTypeW3="";
+    let conCsTypeW4="";
+    let conCsTypeW5="";
+    let conCsTypeW6="";
+
+    let conCsCountW1=0;
+    let conCsCountW2=0;
+    let conCsCountW3=0;
+    let conCsCountW4=0;
+    let conCsCountW5=0;
+    let conCsCountW6=0;
+
+    let conCsPayW1=0;
+    let conCsPayW2=0;
+    let conCsPayW3=0;
+    let conCsPayW4=0;
+    let conCsPayW5=0;
+    let conCsPayW6=0;
+
+    let conCsPerW1=0;
+    let conCsPerW2=0;
+    let conCsPerW3=0;
+    let conCsPerW4=0;
+    let conCsPerW5=0;
+    let conCsPerW6=0;
+
     function fetchDataCon() {
-
-
         $.ajax({
             url: "/api/dashboard-conCount-data", // 서버 엔드포인트
             type: "GET",
@@ -177,17 +193,84 @@ $(document).ready(function() {
                         let dayData = [];
 
                         // 데이터 변환
-                        conCountList.forEach((item) => {
-                            let chartData = { x: item.POINT, y: item.COUNT, z: item.Percentage };
-                            if (item.STATPERIOD === '주간') {
-                                weekData.push([chartData]);
-                            } else if (item.STATPERIOD === '오늘') {
-                                dayData.push([chartData]);
-                            }
-                        });
+                        conCountList.forEach((item,index) => {
 
-                        console.log("Week Data:", weekData);
+                            if(index==0){
+                                conCsTypeW1=item.cs_Name;
+                                conCsCountW1=item.cs_Type_Count;
+                                conCsPayW1=item.cs_Type_Point;
+                                conCsPerW1=item.cs_Type_Percentage;
+                            }else if(index==1){
+                                conCsTypeW2=item.cs_Name;
+                                conCsCountW2=item.cs_Type_Count;
+                                conCsPayW2=item.cs_Type_Point;
+                                conCsPerW2=item.cs_Type_Percentage;
+                            }else if(index==2){
+                                conCsTypeW3=item.cs_Name;
+                                conCsCountW3=item.cs_Type_Count;
+                                conCsPayW3=item.cs_Type_Point;
+                                conCsPerW3=item.cs_Type_Percentage;
+                            }else if(index==3){
+                                conCsTypeW4=item.cs_Name;
+                                conCsCountW4=item.cs_Type_Count;
+                                conCsPayW4=item.cs_Type_Point;
+                                conCsPerW4=item.cs_Type_Percentage;
+                            }else if(index==4){
+                                conCsTypeW5=item.cs_Name;
+                                conCsCountW5=item.cs_Type_Count;
+                                conCsPayW5=item.cs_Type_Point;
+                                conCsPerW5=item.cs_Type_Percentage;
+                            }else if(index==5){
+                                conCsTypeW6=item.cs_Name;
+                                conCsCountW6=item.cs_Type_Count;
+                                conCsPayW6=item.cs_Type_Point;
+                                conCsPerW6=item.cs_Type_Percentage;
+                            }else if(index==6){
+
+                                conCsTypeD1=item.cs_Name;
+                                conCsCountD1=item.cs_Type_Count;
+                                conCsPayD1=item.cs_Type_Point;
+                                conCsPerD1=item.cs_Type_Percentage;
+
+                            }else if(index==7){
+
+                                conCsTypeD2=item.cs_Name;
+                                conCsCountD2=item.cs_Type_Count;
+                                conCsPayD2=item.cs_Type_Point;
+                                conCsPerD2=item.cs_Type_Percentage;
+
+                            }else if(index==8){
+
+                                conCsTypeD3=item.cs_Name;
+                                conCsCountD3=item.cs_Type_Count;
+                                conCsPayD3=item.cs_Type_Point;
+                                conCsPerD3=item.cs_Type_Percentage;
+
+                            }else if(index==9){
+
+                                conCsTypeD4=item.cs_Name;
+                                conCsCountD4=item.cs_Type_Count;
+                                conCsPayD4=item.cs_Type_Point;
+                                conCsPerD4=item.cs_Type_Percentage;
+
+                            }else if(index==10){
+
+                                conCsTypeD5=item.cs_Name;
+                                conCsCountD5=item.cs_Type_Count;
+                                conCsPayD5=item.cs_Type_Point;
+                                conCsPerD5=item.cs_Type_Percentage;
+
+                            }else if(index==11){
+                                conCsTypeD6=item.cs_Name;
+                                conCsCountD6=item.cs_Type_Count;
+                                conCsPayD6=item.cs_Type_Point;
+                                conCsPerD6=item.cs_Type_Percentage;
+
+                            }
+                          });
+
                         // 차트 그리기 함수 호출
+                        KTChartsWidget8.init();
                         //a(e, "#kt_chart_widget_8_week_toggle", "#kt_chart_widget_8_week_chart", weekData, false);
                         //a(t, "#kt_chart_widget_8_month_toggle", "#kt_chart_widget_8_month_chart", dayData, true);
                     }
@@ -419,6 +502,8 @@ $(document).ready(function() {
                             [600, 250, 28]
                         ]
                     ];
+                console.log(l);
+                console.log(r);
                 a(e, "#kt_chart_widget_8_week_toggle", "#kt_chart_widget_8_week_chart", l, !1), a(t, "#kt_chart_widget_8_month_toggle", "#kt_chart_widget_8_month_chart", r, !0);
                 KTThemeMode.on("kt.thememode.change", (function() {
                     e.rendered && e.self.destroy(), t.rendered && t.self.destroy(), a(e, "#kt_chart_widget_8_week_toggle", "#kt_chart_widget_8_week_chart", l, e.rendered), a(t, "#kt_chart_widget_8_month_toggle", "#kt_chart_widget_8_month_chart", r, t.rendered)
@@ -426,7 +511,4 @@ $(document).ready(function() {
             }
         }
     }();
-    "undefined" != typeof module && (module.exports = KTChartsWidget8), KTUtil.onDOMContentLoaded((function() {
-        KTChartsWidget8.init()
-    }));
 });

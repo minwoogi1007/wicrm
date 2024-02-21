@@ -22,12 +22,12 @@ public class DashboardData {
     private String yesterdayMiss;
 
 
-    private String StatPeriod;
-    private String CS_NAME;
-    private String POINT;
-    private String COUNT;
+    private String statPeriod;
+    private String cs_Name;
+    private String cs_Type_Point;
+    private String cs_Type_Count;
 
-    private String Percentage;
+    private String cs_Type_Percentage;
 
     public String getCount_Miss() {
         return count_Miss;
@@ -69,20 +69,20 @@ public class DashboardData {
         this.dailyPoint = dailyPoint;
     }
 
-    public String getCs_type() {
-        return cs_type;
-    }
-
-    public void setCs_type(String cs_type) {
-        this.cs_type = cs_type;
-    }
-
     public int getDailyPointN() {
         return dailyPointN;
     }
 
     public void setDailyPointN(int dailyPointN) {
         this.dailyPointN = dailyPointN;
+    }
+
+    public String getCs_type() {
+        return cs_type;
+    }
+
+    public void setCs_type(String cs_type) {
+        this.cs_type = cs_type;
     }
 
     public String getTodayMiss() {
@@ -133,43 +133,46 @@ public class DashboardData {
         this.yesterdayMiss = yesterdayMiss;
     }
 
+
+
+    public String getCs_Type_Point() {
+        return cs_Type_Point;
+    }
+
+    public void setCs_Type_Point(String cs_Type_Point) {
+        this.cs_Type_Point = cs_Type_Point;
+    }
+
+    public String getCs_Type_Count() {
+        return cs_Type_Count;
+    }
+
+    public void setCs_Type_Count(String cs_Type_Count) {
+        this.cs_Type_Count = cs_Type_Count;
+    }
+
+
     public String getStatPeriod() {
-        return StatPeriod;
+        return statPeriod;
     }
 
     public void setStatPeriod(String statPeriod) {
-        StatPeriod = statPeriod;
+        this.statPeriod = statPeriod;
     }
 
-    public String getCS_NAME() {
-        return CS_NAME;
+    public String getCs_Name() {
+        return cs_Name;
     }
 
-    public void setCS_NAME(String CS_NAME) {
-        this.CS_NAME = CS_NAME;
+    public void setCs_Name(String cs_Name) {
+        this.cs_Name = cs_Name;
     }
 
-    public String getPOINT() {
-        return POINT;
+    public String getCs_Type_Percentage() {
+        return cs_Type_Percentage;
     }
 
-    public void setPOINT(String POINT) {
-        this.POINT = POINT;
-    }
-
-    public String getCOUNT() {
-        return COUNT;
-    }
-
-    public void setCOUNT(String COUNT) {
-        this.COUNT = COUNT;
-    }
-
-    public String getPercentage() {
-        return Percentage;
-    }
-
-    public void setPercentage(String percentage) {
-        Percentage = percentage;
+    public void setCs_Type_Percentage(String cs_Type_Percentage) {
+        this.cs_Type_Percentage = cs_Type_Percentage;
     }
 }
