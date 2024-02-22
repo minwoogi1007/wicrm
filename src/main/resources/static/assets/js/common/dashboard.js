@@ -8,7 +8,7 @@ var dailyPointN = 0;
 $(document).ready(function() {
     let isFirstCall = true;
     fetchData();
-    fetchDataCon();
+
     function fetchData() {
         $.ajax({
             url: "/api/dashboard-data", // 서버 엔드포인트
@@ -176,115 +176,7 @@ $(document).ready(function() {
     let conCsPerW5=0;
     let conCsPerW6=0;
 
-    function fetchDataCon() {
-        $.ajax({
-            url: "/api/dashboard-conCount-data", // 서버 엔드포인트
-            type: "GET",
-            success: function(response) {
-                console.log("상담유형 그래프 조회");
-                console.log(response);
-                // response는 각 카드 데이터를 포함하는 객체
-                Object.keys(response).forEach(function(key) {
-                    // 예: key = 'card-data-1'
-                    //console.log(key);
-                    if (response["dashStatCount-data"]) {
-                        const conCountList = response["dashStatCount-data"];
-                        let weekData = [];
-                        let dayData = [];
 
-                        // 데이터 변환
-                        conCountList.forEach((item,index) => {
-
-                            if(index==0){
-                                conCsTypeW1=item.cs_Name;
-                                conCsCountW1=item.cs_Type_Count;
-                                conCsPayW1=item.cs_Type_Point/1000;
-                                conCsPerW1=item.cs_Type_Percentage;
-                            }else if(index==1){
-                                conCsTypeW2=item.cs_Name;
-                                conCsCountW2=item.cs_Type_Count;
-                                conCsPayW2=item.cs_Type_Point/1000;
-                                conCsPerW2=item.cs_Type_Percentage;
-                            }else if(index==2){
-                                conCsTypeW3=item.cs_Name;
-                                conCsCountW3=item.cs_Type_Count;
-                                conCsPayW3=item.cs_Type_Point/1000;
-                                conCsPerW3=item.cs_Type_Percentage;
-                            }else if(index==3){
-                                conCsTypeW4=item.cs_Name;
-                                conCsCountW4=item.cs_Type_Count;
-                                conCsPayW4=item.cs_Type_Point/1000;
-                                conCsPerW4=item.cs_Type_Percentage;
-                            }else if(index==4){
-                                conCsTypeW5=item.cs_Name;
-                                conCsCountW5=item.cs_Type_Count;
-                                conCsPayW5=item.cs_Type_Point/1000;
-                                conCsPerW5=item.cs_Type_Percentage;
-                            }else if(index==5){
-                                conCsTypeW6=item.cs_Name;
-                                conCsCountW6=item.cs_Type_Count;
-                                conCsPayW6=item.cs_Type_Point/1000;
-                                conCsPerW6=item.cs_Type_Percentage;
-                            }else if(index==6){
-
-                                conCsTypeD1=item.cs_Name;
-                                conCsCountD1=item.cs_Type_Count;
-                                conCsPayD1=item.cs_Type_Point/1000;
-                                conCsPerD1=item.cs_Type_Percentage;
-
-                            }else if(index==7){
-
-                                conCsTypeD2=item.cs_Name;
-                                conCsCountD2=item.cs_Type_Count;
-                                conCsPayD2=item.cs_Type_Point/1000;
-                                conCsPerD2=item.cs_Type_Percentage;
-
-                            }else if(index==8){
-
-                                conCsTypeD3=item.cs_Name;
-                                conCsCountD3=item.cs_Type_Count;
-                                conCsPayD3=item.cs_Type_Point/1000;
-                                conCsPerD3=item.cs_Type_Percentage;
-
-                            }else if(index==9){
-
-                                conCsTypeD4=item.cs_Name;
-                                conCsCountD4=item.cs_Type_Count;
-                                conCsPayD4=item.cs_Type_Point/1000;
-                                conCsPerD4=item.cs_Type_Percentage;
-
-                            }else if(index==10){
-
-                                conCsTypeD5=item.cs_Name;
-                                conCsCountD5=item.cs_Type_Count;
-                                conCsPayD5=item.cs_Type_Point/1000;
-                                conCsPerD5=item.cs_Type_Percentage;
-
-                            }else if(index==11){
-                                conCsTypeD6=item.cs_Name;
-                                conCsCountD6=item.cs_Type_Count;
-                                conCsPayD6=item.cs_Type_Point/1000;
-                                conCsPerD6=item.cs_Type_Percentage;
-
-                            }
-                          });
-
-                        // 차트 그리기 함수 호출
-                        console.log(conCsPerD6);
-                        KTChartsWidget8.init();
-                        //a(e, "#kt_chart_widget_8_week_toggle", "#kt_chart_widget_8_week_chart", weekData, false);
-                        //a(t, "#kt_chart_widget_8_month_toggle", "#kt_chart_widget_8_month_chart", dayData, true);
-                    }
-
-                });
-
-            },
-            error: function(xhr, status, error) {
-                console.error("Data load failed:", error);
-            }
-        });
-
-    }
     var KTCardsWidget17 = {
         init: function() {
             ! function() {
@@ -318,198 +210,288 @@ $(document).ready(function() {
         KTCardsWidget17.init()
     }));
 
-    var KTChartsWidget8 = function() {
+//상담유형
+    var KTChartsWidget6 = function() {
         var e = {
                 self: null,
                 rendered: !1
             },
-            t = {
-                self: null,
-                rendered: !1
-            },
-            a = function(e, t, a, l, r) {
-                var o = document.querySelector(a);
-                if (o) {
-                    var i = parseInt(KTUtil.css(o, "height")),
-                        s = KTUtil.getCssVariableValue("--bs-border-dashed-color"),
-                        n = {
+            t = function(e) {
+                var t = document.getElementById("kt_charts_widget_6");
+                if (t) {
+                    var a = KTUtil.getCssVariableValue("--bs-gray-800"),
+                        l = KTUtil.getCssVariableValue("--bs-border-dashed-color"),
+                        r = {
                             series: [{
-                                name: "Social Campaigns",
-                                data: l[0]
-                            }, {
-                                name: "Email Newsletter",
-                                data: l[1]
-                            }, {
-                                name: "TV Campaign",
-                                data: l[2]
-                            }, {
-                                name: "Google Ads",
-                                data: l[3]
-                            }, {
-                                name: "Courses",
-                                data: l[4]
-                            }, {
-                                name: "Radio",
-                                data: l[5]
+                                name: "Sales",
+                                data: [15, 12, 10, 8, 7]
                             }],
                             chart: {
                                 fontFamily: "inherit",
-                                type: "bubble",
-                                height: i,
+                                type: "bar",
+                                height: 350,
                                 toolbar: {
                                     show: !1
                                 }
                             },
                             plotOptions: {
-                                bubble: {}
+                                bar: {
+                                    borderRadius: 8,
+                                    horizontal: !0,
+                                    distributed: !0,
+                                    barHeight: 50,
+                                    dataLabels: {
+                                        position: "bottom"
+                                    }
+                                }
                             },
-                            stroke: {
-                                show: !1,
-                                width: 0
+                            dataLabels: {
+                                enabled: !0,
+                                textAnchor: "start",
+                                offsetX: 0,
+                                formatter: function(e, t) {
+                                    e *= 1e3;
+                                    return wNumb({
+                                        thousand: ","
+                                    }).to(e)
+                                },
+                                style: {
+                                    fontSize: "14px",
+                                    fontWeight: "600",
+                                    align: "left"
+                                }
                             },
+                            legend: {
+                                show: !1
+                            },
+                            colors: ["#3E97FF", "#F1416C", "#50CD89", "#FFC700", "#7239EA"],
+                            xaxis: {
+                                categories: ["ECR - 90%", "FGI - 82%", "EOQ - 75%", "FMG - 60%", "PLG - 50%"],
+                                labels: {
+                                    formatter: function(e) {
+                                        return e + "K"
+                                    },
+                                    style: {
+                                        colors: [a],
+                                        fontSize: "14px",
+                                        fontWeight: "600",
+                                        align: "left"
+                                    }
+                                },
+                                axisBorder: {
+                                    show: !1
+                                }
+                            },
+                            yaxis: {
+                                labels: {
+                                    formatter: function(e, t) {
+                                        return Number.isInteger(e) ? e + " - " + parseInt(100 * e / 18).toString() + "%" : e
+                                    },
+                                    style: {
+                                        colors: a,
+                                        fontSize: "14px",
+                                        fontWeight: "600"
+                                    },
+                                    offsetY: 2,
+                                    align: "left"
+                                }
+                            },
+                            grid: {
+                                borderColor: l,
+                                xaxis: {
+                                    lines: {
+                                        show: !0
+                                    }
+                                },
+                                yaxis: {
+                                    lines: {
+                                        show: !1
+                                    }
+                                },
+                                strokeDashArray: 4
+                            },
+                            tooltip: {
+                                style: {
+                                    fontSize: "12px"
+                                },
+                                y: {
+                                    formatter: function(e) {
+                                        return e + "K"
+                                    }
+                                }
+                            }
+                        };
+                    e.self = new ApexCharts(t, r), setTimeout((function() {
+                        e.self.render(), e.rendered = !0
+                    }), 200)
+                }
+            };
+        return {
+            init: function() {
+                t(e), KTThemeMode.on("kt.thememode.change", (function() {
+                    e.rendered && e.self.destroy(), t(e)
+                }))
+            }
+        }
+    }();
+    "undefined" != typeof module && (module.exports = KTChartsWidget6), KTUtil.onDOMContentLoaded((function() {
+        KTChartsWidget6.init()
+    }));
+
+
+
+    var KTChartsWidget36 = function() {
+        var e = {
+                self: null,
+                rendered: !1
+            },
+            t = function(e) {
+                var t = document.getElementById("kt_charts_widget_36");
+                if (t) {
+                    var a = parseInt(KTUtil.css(t, "height")),
+                        l = KTUtil.getCssVariableValue("--bs-gray-500"),
+                        r = KTUtil.getCssVariableValue("--bs-border-dashed-color"),
+                        o = KTUtil.getCssVariableValue("--bs-primary"),
+                        i = KTUtil.getCssVariableValue("--bs-primary"),
+                        s = KTUtil.getCssVariableValue("--bs-success"),
+                        n = {
+                            series: [{
+                                name: "Inbound Calls",
+                                data: [65, 80, 80, 60, 60, 45, 45, 80, 80, 70, 70, 90, 90, 80, 80, 80, 60, 60, 50]
+                            }, {
+                                name: "Outbound Calls",
+                                data: [90, 110, 110, 95, 95, 85, 85, 95, 95, 115, 115, 100, 100, 115, 115, 95, 95, 85, 85]
+                            }],
+                            chart: {
+                                fontFamily: "inherit",
+                                type: "area",
+                                height: a,
+                                toolbar: {
+                                    show: !1
+                                }
+                            },
+                            plotOptions: {},
                             legend: {
                                 show: !1
                             },
                             dataLabels: {
                                 enabled: !1
                             },
+                            fill: {
+                                type: "gradient",
+                                gradient: {
+                                    shadeIntensity: 1,
+                                    opacityFrom: .4,
+                                    opacityTo: .2,
+                                    stops: [15, 120, 100]
+                                }
+                            },
+                            stroke: {
+                                curve: "smooth",
+                                show: !0,
+                                width: 3,
+                                colors: [o, s]
+                            },
                             xaxis: {
-                                type: "numeric",
-                                tickAmount: 7,
-                                min: 0,
-                                max: conCsCountW1*1.1,
+                                categories: ["", "8 AM", "81 AM", "9 AM", "10 AM", "11 AM", "12 PM", "13 PM", "14 PM", "15 PM", "16 PM", "17 PM", "18 PM", "18:20 PM", "18:20 PM", "19 PM", "20 PM", "21 PM", ""],
                                 axisBorder: {
                                     show: !1
                                 },
                                 axisTicks: {
-                                    show: !0,
-                                    height: 0
+                                    show: !1
                                 },
+                                tickAmount: 6,
                                 labels: {
-                                    show: !0,
-                                    trim: !0,
+                                    rotate: 0,
+                                    rotateAlways: !0,
                                     style: {
-                                        colors: KTUtil.getCssVariableValue("--bs-gray-500"),
-                                        fontSize: "13px"
+                                        colors: l,
+                                        fontSize: "12px"
+                                    }
+                                },
+                                crosshairs: {
+                                    position: "front",
+                                    stroke: {
+                                        color: [o, s],
+                                        width: 1,
+                                        dashArray: 3
+                                    }
+                                },
+                                tooltip: {
+                                    enabled: !0,
+                                    formatter: void 0,
+                                    offsetY: 0,
+                                    style: {
+                                        fontSize: "12px"
                                     }
                                 }
                             },
                             yaxis: {
-                                tickAmount: 7,
-                                min: 0,
-                                max: conCsPayW1*1.1,
+                                max: 120,
+                                min: 30,
+                                tickAmount: 6,
                                 labels: {
                                     style: {
-                                        colors: KTUtil.getCssVariableValue("--bs-gray-500"),
-                                        fontSize: "13px"
+                                        colors: l,
+                                        fontSize: "12px"
+                                    }
+                                }
+                            },
+                            states: {
+                                normal: {
+                                    filter: {
+                                        type: "none",
+                                        value: 0
+                                    }
+                                },
+                                hover: {
+                                    filter: {
+                                        type: "none",
+                                        value: 0
+                                    }
+                                },
+                                active: {
+                                    allowMultipleDataPointsSelection: !1,
+                                    filter: {
+                                        type: "none",
+                                        value: 0
                                     }
                                 }
                             },
                             tooltip: {
                                 style: {
                                     fontSize: "12px"
-                                },
-                                x: {
-                                    formatter: function(e) {
-                                        return "Clicks: " + e
-                                    }
-                                },
-                                y: {
-                                    formatter: function(e) {
-                                        return "$" + e + "K"
-                                    }
-                                },
-                                z: {
-                                    title: "Impression: "
                                 }
                             },
-                            crosshairs: {
-                                show: !0,
-                                position: "front",
-                                stroke: {
-                                    color: KTUtil.getCssVariableValue("--bs-border-dashed-color"),
-                                    width: 1,
-                                    dashArray: 0
-                                }
-                            },
-                            colors: [KTUtil.getCssVariableValue("--bs-primary"), KTUtil.getCssVariableValue("--bs-success"), KTUtil.getCssVariableValue("--bs-warning"), KTUtil.getCssVariableValue("--bs-danger"), KTUtil.getCssVariableValue("--bs-info"), "#43CED7"],
-                            fill: {
-                                opacity: 1
-                            },
-                            markers: {
-                                strokeWidth: 0
-                            },
+                            colors: [i, KTUtil.getCssVariableValue("--bs-success")],
                             grid: {
-                                borderColor: s,
+                                borderColor: r,
                                 strokeDashArray: 4,
-                                padding: {
-                                    right: 20
-                                },
                                 yaxis: {
                                     lines: {
                                         show: !0
                                     }
                                 }
+                            },
+                            markers: {
+                                strokeColor: [o, s],
+                                strokeWidth: 3
                             }
                         };
-                    e.self = new ApexCharts(o, n);
-                    var d = document.querySelector(t);
-                    !0 === r && setTimeout((function() {
+                    e.self = new ApexCharts(t, n), setTimeout((function() {
                         e.self.render(), e.rendered = !0
-                    }), 200), d.addEventListener("shown.bs.tab", (function(t) {
-                        !1 === e.rendered && (e.self.render(), e.rendered = !0)
-                    }))
+                    }), 200)
                 }
             };
         return {
             init: function() {
-                var l = [
-                        [
-                            [conCsCountW1, conCsPayW1, conCsPerW1]
-                        ],
-                        [
-                            [conCsCountW1, conCsPayW2, conCsPerW2]
-                        ],
-                        [
-                            [conCsCountW1, conCsPayW3, conCsPerW3]
-                        ],
-                        [
-                            [conCsCountW1, conCsPayW4, conCsPerW4]
-                        ],
-                        [
-                            [conCsCountW1, conCsPayW5, conCsPerW5]
-                        ],
-                        [
-                            [conCsCountW1, conCsPayW6, conCsPerW6]
-                        ]
-                    ],
-                    r = [
-                        [
-                            [conCsCountD1, conCsPayD1, conCsPerD1]
-                        ],
-                        [
-                            [conCsCountD1, conCsPayD2, conCsPerD2]
-                        ],
-                        [
-                            [conCsCountD1, conCsPayD3, conCsPerD3]
-                        ],
-                        [
-                            [conCsCountD1, conCsPayD4, conCsPerD4]
-                        ],
-                        [
-                            [conCsCountD1, conCsPayD5, conCsPerD5]
-                        ],
-                        [
-                            [conCsCountD1, conCsPayD6, conCsPerD6]
-                        ]
-                    ];
-                console.log(l);
-                console.log(r);
-                a(e, "#kt_chart_widget_8_week_toggle", "#kt_chart_widget_8_week_chart", l, !1), a(t, "#kt_chart_widget_8_month_toggle", "#kt_chart_widget_8_month_chart", r, !0);
-                KTThemeMode.on("kt.thememode.change", (function() {
-                    e.rendered && e.self.destroy(), t.rendered && t.self.destroy(), a(e, "#kt_chart_widget_8_week_toggle", "#kt_chart_widget_8_week_chart", l, e.rendered), a(t, "#kt_chart_widget_8_month_toggle", "#kt_chart_widget_8_month_chart", r, t.rendered)
+                t(e), KTThemeMode.on("kt.thememode.change", (function() {
+                    e.rendered && e.self.destroy(), t(e)
                 }))
             }
         }
     }();
+    "undefined" != typeof module && (module.exports = KTChartsWidget36), KTUtil.onDOMContentLoaded((function() {
+        KTChartsWidget36.init()
+    }));
 });
