@@ -35,12 +35,12 @@ public class DashboardService {
 
         return data;
     }
-    public Map<String, Object> getDashboardConCount() {
+    public Map<String, Object> getDashboardCallCount() {
         Map<String, Object> data = new HashMap<>();
         // 데이터베이스 조회
-        List<DashboardData> dashStatCount = dashboardMapper.dashStatCount();
+        List<DashboardData> getDashboardCallCount = dashboardMapper.getDashboardCallCount();
 
-        data.put("dashStatCount-data", dashStatCount);
+        data.put("dashStatCount-data", getDashboardCallCount);
 
         return data;
     }

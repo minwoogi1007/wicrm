@@ -17,5 +17,5 @@ public interface DashboardMapper {
 
     DashboardData dashConSum();
 
-    List<DashboardData> dashStatCount();
+    List<DashboardData> getDashboardCallCount();
 }

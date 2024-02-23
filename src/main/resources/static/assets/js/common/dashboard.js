@@ -8,6 +8,7 @@ var dailyPointN = 0;
 $(document).ready(function() {
     let isFirstCall = true;
     fetchData();
+    fetchCallData()
 
     function fetchData() {
         $.ajax({
@@ -112,69 +113,46 @@ $(document).ready(function() {
         });
 
     }
+    let comData = [];
+    let missData = [];
+    function fetchCallData() {
+        $.ajax({
+            url: "/api/dashboard-callCount-data", // 서버 엔드포인트
+            type: "GET",
+            success: function(response) {
+                console.log(response);
+
+                // response는 각 카드 데이터를 포함하는 객체
+                Object.keys(response).forEach(function(key) {
+                    // 예: key = 'card-data-1'
+                    const callCountList = response[key];
+                    //console.log(key);
+                    callCountList.forEach((item, index) => {
+
+                        if(item.gubn == 1){
+                            comData.push(0,item.hour_09, item.hour_10, item.hour_11, item.hour_12, item.hour_13, item.hour_14, item.hour_15, item.hour_16, item.hour_17, item.hour_18, item.hour_19,0);
+
+                        }else{
+                            missData.push(0,item.hour_09, item.hour_10, item.hour_11, item.hour_12, item.hour_13, item.hour_14, item.hour_15, item.hour_16, item.hour_17, item.hour_18, item.hour_19,0);
+                        }
+
+                    });
+
+
+                });
+                KTChartsWidget36.init()
+            },
+            error: function(xhr, status, error) {
+                console.error("Data load failed:", error);
+            }
+        });
+
+
+    }
 
     // 5초마다 fetchData 함수를 호출하여 데이터를 새로고침
     //setInterval(fetchData, 10000);
 
-
-
-//상담 유형 상위6개
-    let conCsTypeD1="";
-    let conCsTypeD2="";
-    let conCsTypeD3="";
-    let conCsTypeD4="";
-    let conCsTypeD5="";
-    let conCsTypeD6="";
-
-    let conCsCountD1=0;
-    let conCsCountD2=0;
-    let conCsCountD3=0;
-    let conCsCountD4=0;
-    let conCsCountD5=0;
-    let conCsCountD6=0;
-
-    let conCsPayD1=0;
-    let conCsPayD2=0;
-    let conCsPayD3=0;
-    let conCsPayD4=0;
-    let conCsPayD5=0;
-    let conCsPayD6=0;
-
-    let conCsPerD1=0;
-    let conCsPerD2=0;
-    let conCsPerD3=0;
-    let conCsPerD4=0;
-    let conCsPerD5=0;
-    let conCsPerD6=0;
-
-
-    let conCsTypeW1="";
-    let conCsTypeW2="";
-    let conCsTypeW3="";
-    let conCsTypeW4="";
-    let conCsTypeW5="";
-    let conCsTypeW6="";
-
-    let conCsCountW1=0;
-    let conCsCountW2=0;
-    let conCsCountW3=0;
-    let conCsCountW4=0;
-    let conCsCountW5=0;
-    let conCsCountW6=0;
-
-    let conCsPayW1=0;
-    let conCsPayW2=0;
-    let conCsPayW3=0;
-    let conCsPayW4=0;
-    let conCsPayW5=0;
-    let conCsPayW6=0;
-
-    let conCsPerW1=0;
-    let conCsPerW2=0;
-    let conCsPerW3=0;
-    let conCsPerW4=0;
-    let conCsPerW5=0;
-    let conCsPerW6=0;
 
 
     var KTCardsWidget17 = {
@@ -356,11 +334,11 @@ $(document).ready(function() {
                         s = KTUtil.getCssVariableValue("--bs-success"),
                         n = {
                             series: [{
-                                name: "Inbound Calls",
-                                data: [65, 80, 80, 60, 60, 45, 45, 80, 80, 70, 70, 90, 90, 80, 80, 80, 60, 60, 50]
+                                name: "처리 완료",
+                                data: comData
                             }, {
-                                name: "Outbound Calls",
-                                data: [90, 110, 110, 95, 95, 85, 85, 95, 95, 115, 115, 100, 100, 115, 115, 95, 95, 85, 85]
+                                name: "미처리",
+                                data: missData
                             }],
                             chart: {
                                 fontFamily: "inherit",
@@ -393,7 +371,7 @@ $(document).ready(function() {
                                 colors: [o, s]
                             },
                             xaxis: {
-                                categories: ["", "8 AM", "81 AM", "9 AM", "10 AM", "11 AM", "12 PM", "13 PM", "14 PM", "15 PM", "16 PM", "17 PM", "18 PM", "18:20 PM", "18:20 PM", "19 PM", "20 PM", "21 PM", ""],
+                                categories: ["",   "9 AM", "10 AM", "11 AM", "12 PM", "13 PM", "14 PM", "15 PM", "16 PM", "17 PM", "18 PM", "19 PM",""],
                                 axisBorder: {
                                     show: !1
                                 },
@@ -491,7 +469,5 @@ $(document).ready(function() {
             }
         }
     }();
-    "undefined" != typeof module && (module.exports = KTChartsWidget36), KTUtil.onDOMContentLoaded((function() {
-        KTChartsWidget36.init()
-    }));
+
 });

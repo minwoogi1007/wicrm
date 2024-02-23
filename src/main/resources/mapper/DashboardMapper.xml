@@ -332,4 +332,57 @@
 
         ]]>
     </select>
+    <select id="getDashboardCallCount" resultType="com.wio.crm.model.DashboardData">
+        <![CDATA[
+        SELECT  PRC_DATE,GUBN,HOUR_09,HOUR_10,HOUR_11,HOUR_12,HOUR_13,HOUR_14,HOUR_15,HOUR_16,HOUR_17,HOUR_18,HOUR_09+HOUR_10+HOUR_11+HOUR_12+HOUR_13+HOUR_14+HOUR_15+HOUR_16+HOUR_17+HOUR_18+HOUR_19 as callSum
+          FROM (
+                  SELECT TO_CHAR(IN_DATE, 'YYYYMMDD') PRC_DATE,'1' GUBN
+                       , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '09', 1, 0)) HOUR_09
+                       , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '10', 1, 0)) HOUR_10
+                       , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '11', 1, 0)) HOUR_11
+                       , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '12', 1, 0)) HOUR_12
+                       , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '13', 1, 0)) HOUR_13
+                       , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '14', 1, 0)) HOUR_14
+                       , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '15', 1, 0)) HOUR_15
+                       , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '16', 1, 0)) HOUR_16
+                       , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '17', 1, 0)) HOUR_17
+                       , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '18', 1, 0)) HOUR_18
+                       , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '19', 1, 0)) HOUR_19
+                  FROM TBND01 A
+                  WHERE 1=1
+                    AND PRC_GUBN IN ('1', '2')
+                    AND TO_CHAR(IN_DATE, 'YYYYMMDD') = '20240213'
+                  GROUP BY TO_CHAR(IN_DATE, 'YYYYMMDD')
+                  UNION ALL
+                  SELECT SUBSTR(REPLACE(CALLDATE,'-',''), 1,8) PRC_DATE ,'2' GUBN
+                       , SUM(DECODE(SUBSTR(CALLDATE, 12,2), '09', 1, 0)) HOUR_09
+                       , SUM(DECODE(SUBSTR(CALLDATE, 12,2), '10', 1, 0)) HOUR_10
+                       , SUM(DECODE(SUBSTR(CALLDATE, 12,2), '11', 1, 0)) HOUR_11
+                       , SUM(DECODE(SUBSTR(CALLDATE, 12,2), '12', 1, 0)) HOUR_12
+                       , SUM(DECODE(SUBSTR(CALLDATE, 12,2), '13', 1, 0)) HOUR_13
+                       , SUM(DECODE(SUBSTR(CALLDATE, 12,2), '14', 1, 0)) HOUR_14
+                       , SUM(DECODE(SUBSTR(CALLDATE, 12,2), '15', 1, 0)) HOUR_15
+                       , SUM(DECODE(SUBSTR(CALLDATE, 12,2), '16', 1, 0)) HOUR_16
+                       , SUM(DECODE(SUBSTR(CALLDATE, 12,2), '17', 1, 0)) HOUR_17
+                       , SUM(DECODE(SUBSTR(CALLDATE, 12,2), '18', 1, 0)) HOUR_18
+                       , SUM(DECODE(SUBSTR(CALLDATE, 12,2), '19', 1, 0)) HOUR_19
+                  FROM (SELECT B.CALLDATE,B.CLID,B.PERSON_CODE,B.CUST_CODE,B.PROJECT_CODE,B.empno,B.INCALL_NO ,1 COUNT,B.RESULT,B.CONTEXT
+                        FROM
+                            (SELECT MAX(CALLDATE)CALL_DATE ,CLID,CUST_CODE,PROJECT_CODE
+                            FROM CALL_LOG_D
+                            WHERE substr(calldate,0,10)= '2024-02-13'
+                            GROUP BY SUBSTR(calldate,0,10) , CLID,CUST_CODE,PROJECT_CODE) A,CALL_LOG_D B
+                        WHERE A.CALL_DATE = B.CALLDATE
+                          AND substr(calldate,0,10) = '2024-02-13'
+                          AND A.CLID = B.CLID
+                          AND RESULT <>'ANSWER'   and b.context <> 'outbound'
+                        ORDER BY CALLDATE DESC) a
+                  WHERE 1=1
+                    AND CUST_CODE IS NOT NULL
+                  GROUP BY SUBSTR(REPLACE(CALLDATE,'-',''), 1,8)
+            )
+        ORDER BY PRC_DATE
+
+        ]]>
+    </select>
 </mapper>
