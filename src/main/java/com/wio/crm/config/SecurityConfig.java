@@ -24,10 +24,10 @@ public class SecurityConfig {
         //                .disable()
         //        )   //초기 비밀번호 암호화를 위해 만들어 놓은 부분
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/general/**").hasAuthority("ROLE_GENERAL")
-                        .requestMatchers("/company/**").hasAuthority("ROLE_COMPANY")
-                        .requestMatchers("/**").hasAuthority("ROLE_EMPLOYEE")
-                        .requestMatchers("/superuser/**").hasAuthority("ROLE_SUPERUSER")
+                        //requestMatchers("/general/**").hasAuthority("ROLE_GENERAL")
+                        //.requestMatchers("/company/**").hasAuthority("ROLE_COMPANY")
+                        //.requestMatchers("/**").hasAuthority("ROLE_EMPLOYEE")
+                        //.requestMatchers("/superuser/**").hasAuthority("ROLE_SUPERUSER")
                         .requestMatchers("/encrypt-passwords", "/encryption","/check-userid-availability").permitAll() // 여기에 /encryption 추가
 
                         .anyRequest().authenticated())

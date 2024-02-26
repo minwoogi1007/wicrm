@@ -9,13 +9,13 @@ import java.util.List;
 
 @Mapper
 public interface DashboardMapper {
-    DashboardData findDataForCard1();
+    DashboardData findDataForCard1(String username);
 
-    DashboardData findDataForCard2();
+    DashboardData findDataForCard2(String username);
 
-    List<DashboardData> findPointList();
+    List<DashboardData> findPointList(String username);
 
-    DashboardData dashConSum();
+    DashboardData dashConSum(String username);
 
-    List<DashboardData> getDashboardCallCount();
+    List<DashboardData> getDashboardCallCount(String username);
 }

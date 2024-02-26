@@ -19,12 +19,12 @@
                                         JOIN (
                                    SELECT MAX(CALLDATE) AS CALL_DATE, CLID, CUST_CODE, PROJECT_CODE
                                    FROM CALL_LOG_D
-                                   WHERE REPLACE(substr(calldate,0,10),'-') = '20240214'
+                                   WHERE REPLACE(substr(calldate,0,10),'-') = '20240205'
                                    GROUP BY CLID, CUST_CODE, PROJECT_CODE
                                ) A ON A.CALL_DATE = B.CALLDATE AND A.CLID = B.CLID
                                         LEFT JOIN temp01 T ON T.empno = B.empno
                                         LEFT JOIN tcnt01 C ON C.CUST_CODE = B.CUST_CODE
-                               WHERE REPLACE(substr(B.calldate,0,10),'-') = '20240214'
+                               WHERE REPLACE(substr(B.calldate,0,10),'-') = '20240205'
                                  AND B.RESULT <> 'ANSWER'
                                  AND B.CONFIRM = '0'
                                  AND B.context <> 'outbound'
@@ -33,8 +33,8 @@
                      (SELECT COUNT(*)
                       FROM TBND01 A
                       WHERE A.PRC_GUBN = '2'
-                        AND TO_CHAR(A.IN_DATE, 'YYYYMMDD')= '20240214'
-                        AND CUST_CODE = DECODE('', '', A.CUST_CODE, '')
+                        AND TO_CHAR(A.IN_DATE, 'YYYYMMDD')= '20240205'
+                        AND CUST_CODE = DECODE(#{username}, '', A.CUST_CODE, #{username})
                      ) AS count_com
                  FROM dual
              )
@@ -71,8 +71,8 @@
                              tcnt01_point
                          WHERE
                              call_code IS NOT NULL
-                           AND ISSUE_DATE = '20240213' -- 오늘 날짜
-                           AND CUST_CODE = DECODE('', '', CUST_CODE, '')
+                           AND ISSUE_DATE = '20240205' -- 오늘 날짜
+                           AND CUST_CODE = DECODE(#{username}, '', CUST_CODE, #{username})
                      ) today,
                      (
                          SELECT
@@ -83,7 +83,7 @@
                          WHERE
                              call_code IS NOT NULL
                            AND ISSUE_DATE = '20240210' -- 어제 날짜; 날짜가 잘못 지정되었으니 적절히 조정해야 함
-                           AND CUST_CODE = DECODE('', '', CUST_CODE, '')
+                           AND CUST_CODE = DECODE(#{username}, '', CUST_CODE, #{username})
                      ) yesterday
              )
         ]]>
@@ -96,14 +96,15 @@
         WITH AggregatedData AS (
             SELECT
                 CS_TYPE,
-                SUM(POINT)*-1 AS TotalPoints
+                count(POINT) AS TotalPoints
             FROM tcnt01_point b
                      INNER JOIN tcnt01 a ON a.cust_code = b.cust_code
                      INNER JOIN tbnd01 c ON b.cust_code = c.cust_code
                 AND b.projct_code = c.project_code
                 AND b.call_code = c.call_code
                 AND b.person_code = c.person_code
-            WHERE b.issue_date = '20240214'
+            WHERE b.issue_date = '20240205'
+              AND b.CUST_CODE = DECODE(#{username}, '', b.CUST_CODE, #{username})
             GROUP BY CS_TYPE
         ),
              RankedData AS (
@@ -133,8 +134,6 @@
         FROM FinalData
         ORDER BY
             CASE WHEN GroupingKey = '기타' THEN 1 ELSE 0 END, Points DESC
-
-
         ]]>
     </select>
     <select id="dashConSum" resultType="com.wio.crm.model.DashboardData">
@@ -168,7 +167,7 @@
                             FROM
                             CALL_LOG_D
                             WHERE
-                            REPLACE(substr(calldate, 0, 10), '-') = '20240213'
+                            REPLACE(substr(calldate, 0, 10), '-') = '20240202'
                             GROUP BY
                             CLID,
                             CUST_CODE,
@@ -179,7 +178,7 @@
                             LEFT JOIN temp01 T ON T.empno = B.empno
                             LEFT JOIN tcnt01 C ON C.CUST_CODE = B.CUST_CODE
                         WHERE
-                            REPLACE(substr(B.calldate, 0, 10), '-') = '20240213'
+                            REPLACE(substr(B.calldate, 0, 10), '-') = '20240202'
                           AND B.RESULT <> 'ANSWER'
                           AND B.CONFIRM = '0'
                           AND B.context <> 'outbound'
@@ -192,9 +191,9 @@
                     TBND01 a
                 WHERE
                     1 = 1
-                  AND A.CUST_CODE = DECODE('', '', A.CUST_CODE, '')
+                  AND A.CUST_CODE = DECODE(#{username}, '', A.CUST_CODE, #{username})
                   AND A.PRC_GUBN = '2'
-                  AND TO_CHAR(IN_DATE, 'YYYYMMDD') = '20240213'
+                  AND TO_CHAR(IN_DATE, 'YYYYMMDD') = '20240202'
             ) AS yesterdayCom,
             (
                 SELECT
@@ -203,10 +202,10 @@
                     TBND01 a
                 WHERE
                     1 = 1
-                  AND A.CUST_CODE = DECODE('', '', A.CUST_CODE, '')
+                  AND A.CUST_CODE = DECODE(#{username}, '', A.CUST_CODE, #{username})
                   AND A.PRC_GUBN = '2'
                   AND EMG_GUBN = '1'
-                  AND TO_CHAR(IN_DATE, 'YYYYMMDD') = '20240213'
+                  AND TO_CHAR(IN_DATE, 'YYYYMMDD') = '20240202'
             ) AS yseterdayEme,
             (
                 SELECT
@@ -236,7 +235,7 @@
                             FROM
                             CALL_LOG_D
                             WHERE
-                            REPLACE(substr(calldate, 0, 10), '-') = '20240214'
+                            REPLACE(substr(calldate, 0, 10), '-') = '20240205'
                             GROUP BY
                             CLID,
                             CUST_CODE,
@@ -247,7 +246,7 @@
                             LEFT JOIN temp01 T ON T.empno = B.empno
                             LEFT JOIN tcnt01 C ON C.CUST_CODE = B.CUST_CODE
                         WHERE
-                            REPLACE(substr(B.calldate, 0, 10), '-') = '20240214'
+                            REPLACE(substr(B.calldate, 0, 10), '-') = '20240205'
                           AND B.RESULT <> 'ANSWER'
                           AND B.CONFIRM = '0'
                           AND B.context <> 'outbound'
@@ -260,9 +259,9 @@
                     TBND01 a
                 WHERE
                     1 = 1
-                  AND A.CUST_CODE = DECODE('', '', A.CUST_CODE, '')
+                  AND A.CUST_CODE = DECODE(#{username}, '', A.CUST_CODE, #{username})
                   AND A.PRC_GUBN = '2'
-                  AND TO_CHAR(IN_DATE, 'YYYYMMDD') = '20240214'
+                  AND TO_CHAR(IN_DATE, 'YYYYMMDD') = '20240205'
             ) AS todayCom,
             (
                 SELECT
@@ -271,10 +270,10 @@
                     TBND01 a
                 WHERE
                     1 = 1
-                  AND A.CUST_CODE = DECODE('', '', A.CUST_CODE, '')
+                  AND A.CUST_CODE = DECODE(#{username}, '', A.CUST_CODE, #{username})
                   AND A.PRC_GUBN = '2'
                   AND EMG_GUBN = '1'
-                  AND TO_CHAR(IN_DATE, 'YYYYMMDD') = '20240214'
+                  AND TO_CHAR(IN_DATE, 'YYYYMMDD') = '20240205'
             ) AS todayEme
         FROM
             dual]]>
@@ -295,7 +294,8 @@
                 AND b.projct_code = c.project_code
                 AND b.call_code = c.call_code
                 AND b.person_code = c.person_code
-            WHERE b.issue_date = '20240214'
+            WHERE b.issue_date = '20240205'
+              AND b.CUST_CODE = DECODE(#{username}, '', b.CUST_CODE, #{username})
             GROUP BY CS_TYPE
         ),
              RankedData AS (
@@ -351,7 +351,7 @@
                   FROM TBND01 A
                   WHERE 1=1
                     AND PRC_GUBN IN ('1', '2')
-                    AND TO_CHAR(IN_DATE, 'YYYYMMDD') = '20240213'
+                    AND TO_CHAR(IN_DATE, 'YYYYMMDD') = '20240205'
                   GROUP BY TO_CHAR(IN_DATE, 'YYYYMMDD')
                   UNION ALL
                   SELECT SUBSTR(REPLACE(CALLDATE,'-',''), 1,8) PRC_DATE ,'2' GUBN
@@ -370,12 +370,13 @@
                         FROM
                             (SELECT MAX(CALLDATE)CALL_DATE ,CLID,CUST_CODE,PROJECT_CODE
                             FROM CALL_LOG_D
-                            WHERE substr(calldate,0,10)= '2024-02-13'
+                            WHERE substr(calldate,0,10)= '2024-02-5'
                             GROUP BY SUBSTR(calldate,0,10) , CLID,CUST_CODE,PROJECT_CODE) A,CALL_LOG_D B
                         WHERE A.CALL_DATE = B.CALLDATE
-                          AND substr(calldate,0,10) = '2024-02-13'
+                          AND substr(calldate,0,10) = '2024-02-5'
                           AND A.CLID = B.CLID
                           AND RESULT <>'ANSWER'   and b.context <> 'outbound'
+                          AND A.CUST_CODE = DECODE(#{username}, '', A.CUST_CODE, #{username})
                         ORDER BY CALLDATE DESC) a
                   WHERE 1=1
                     AND CUST_CODE IS NOT NULL

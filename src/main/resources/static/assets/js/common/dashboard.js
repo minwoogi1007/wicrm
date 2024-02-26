@@ -1,9 +1,12 @@
 //그래프 생성을 위한 변수
 //마일리지
-var chartM1=0;
-var chartM2=0;
-var dailyPointN = 0;
-
+let chartM1=0;
+let chartM2=0;
+let dailyPointN = 0;
+let countMiss =0;
+let countCom =0;
+let countSum =0;
+let countRate = 0;
 
 $(document).ready(function() {
     let isFirstCall = true;
@@ -20,14 +23,13 @@ $(document).ready(function() {
                 Object.keys(response).forEach(function(key) {
                     // 예: key = 'card-data-1'
                     //console.log(key);
+
                     if(key=="card-data-1"){
                         const cardData = response[key]; // { "count_Miss": "7", "count_Com": "306" }
-                        const countMiss = cardData.count_Miss;
-                        const countCom = cardData.count_Com;
-                        var countSum = cardData.count_sum;
-                        let countRate = cardData.processing_rate;
-
-
+                        countMiss = cardData.count_Miss;
+                        countCom = cardData.count_Com;
+                        countSum = cardData.count_sum;
+                        countRate = cardData.processing_rate;
                         if (!isFirstCall) {
                             // Apply animation only if it's not the first call
                             var $countSumElement = $('#count-sum-' + key);
@@ -48,6 +50,8 @@ $(document).ready(function() {
                         $('#count-com-' + key).text(countCom+'  처리'); // "count-com-card-data-1" 요소에 countCom 값 설정
 
                         $('#count-sum-' + key).text(countSum); // "count-com-sum-data-1" 요소에 countCom 값 설정
+
+                        $('#callSum').text(countSum+'  calls today');
                         $('#count-rate-' + key).text(countRate+'  %'); // "count-com-rate-data-1" 요소에 countCom 값 설정
 
                         // 프로그레스 바 업데이트
@@ -57,7 +61,9 @@ $(document).ready(function() {
                         dailyPoint = cardData2.dailyPoint;
                         dailyPointN =cardData2.dailyPointN;
                         countRate=cardData2.processing_rate+'%';
-                        $('#count-dailPoint-' + key).text(dailyPoint);
+
+                        $('#count-dailPoint-' + key).text(countCom);
+
                         $('#count-per-' + key).text(countRate);
 
                     }else if(key=="pointlist-data"){
@@ -70,8 +76,12 @@ $(document).ready(function() {
                             //차트에 필요한 데이터
                             if(index==0){
                                 chartM1 = item.dailyPointN;
+                                console.log('1111111=='+chartM1);
+                                console.log('2222222=='+chartM2);
                             }else if(index==1){
                                 chartM2 = item.dailyPointN;
+                                console.log('333333333=='+chartM1);
+                                console.log('44444444=='+chartM2);
                             }
 
                             $('#pointlist').append(`
@@ -80,7 +90,7 @@ $(document).ready(function() {
                                     <!--begin::Bullet-->
                                         <div class="bullet w-8px h-3px rounded-2 ${bulletColor} me-3" ${bulletStyle}></div>
                                         <div class="text-gray-500 flex-grow-1 me-4">${item.cs_type}</div>
-                                        <div class="fw-bolder text-gray-700 text-xxl-end">&#8361;${item.dailyPoint}</div>
+                                        <div class="fw-bolder text-gray-700 text-xxl-end">${item.dailyPoint} 건</div>
                                    
                                 </div>
                              `);
@@ -103,7 +113,8 @@ $(document).ready(function() {
                         $('#count-yesterdayCom-' + key).text(' / '+yesterdayCom);
                         $('#count-yesterdayMiss-' + key).text(' / '+yesterdayMiss);
                     }
-
+                    $('#count-dailPoint-card-data-2').text(countCom);
+                    $('#count-per-card-data-2' ).text(countRate+'%');
                 });
                 KTCardsWidget17.init();
             },
@@ -178,15 +189,17 @@ $(document).ready(function() {
                             a = Math.min(Math.max(0, a || 1), 1), r.beginPath(), r.arc(0, 0, o, 0, 2 * Math.PI * a, !1), r.strokeStyle = e, r.lineCap = "round", r.lineWidth = t, r.stroke()
                         };
                     i("#E4E6EF", t.lineWidth, 1),
-                        i(KTUtil.getCssVariableValue("--bs-success"), t.lineWidth, chartM1/dailyPointN),
-                        i(KTUtil.getCssVariableValue("--bs-primary"), t.lineWidth, chartM2/dailyPointN)
+                        i(KTUtil.getCssVariableValue("--bs-success"), t.lineWidth, 1-chartM1/countCom),
+                        i(KTUtil.getCssVariableValue("--bs-primary"), t.lineWidth, chartM2/countCom)
                 }
             }()
+            console.log('countCom'+countCom);
+            console.log('chartM1/countCom'+chartM1/countCom);
+
+            console.log('chartM2/countCom'+chartM2/countCom);
         }
     };
-    "undefined" != typeof module && (module.exports = KTCardsWidget17), KTUtil.onDOMContentLoaded((function() {
-        KTCardsWidget17.init()
-    }));
+
 
 //상담유형
     var KTChartsWidget6 = function() {
@@ -405,9 +418,9 @@ $(document).ready(function() {
                                 }
                             },
                             yaxis: {
-                                max: 120,
-                                min: 30,
-                                tickAmount: 6,
+                                max: 200,
+                                min: 0,
+                                tickAmount: 10,
                                 labels: {
                                     style: {
                                         colors: l,

@@ -3,6 +3,8 @@ package com.wio.crm.service;
 import com.wio.crm.mapper.Tcnt01EmpMapper;
 import com.wio.crm.mapper.Temp01Mapper;
 import com.wio.crm.mapper.TipdwMapper;
+import com.wio.crm.model.Tcnt01Emp;
+import com.wio.crm.model.Temp01;
 import com.wio.crm.model.Tipdw;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,15 +65,23 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private List<SimpleGrantedAuthority> getUserAuthorities(Tipdw user) {
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        // 데이터베이스에서 사용자의 추가 정보 조회
+        Tcnt01Emp tcntEmp;
+        Temp01 tmp01;
         if ("0".equals(user.getGubn())) {
 
             authorities.add(new SimpleGrantedAuthority("ROLE_EMPLOYEE"));
+            tmp01 = temp01Mapper.findByUserId(user.getUsername());
+
             // Further logic if needed
         } else if ("1".equals(user.getGubn())) {
 
             authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+            tcntEmp = tcnt01EmpMapper.findByUserId(user.getUsername());
             // Further logic if needed
         }
+
+
         return authorities;
     }
 
