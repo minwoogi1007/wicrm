@@ -1,5 +1,6 @@
 package com.wio.crm.service;
 
+import com.wio.crm.config.CustomUserDetails;
 import com.wio.crm.mapper.Tcnt01EmpMapper;
 import com.wio.crm.mapper.Temp01Mapper;
 import com.wio.crm.mapper.TipdwMapper;
@@ -8,6 +9,7 @@ import com.wio.crm.model.Temp01;
 import com.wio.crm.model.Tipdw;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,10 +30,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final MenuService menuService;
     private final Logger logger = LoggerFactory.getLogger(CustomUserDetailsService.class);
 
-    public CustomUserDetailsService(TipdwMapper tipdwMapper,
-                                    Tcnt01EmpMapper tcnt01EmpMapper,
-                                    Temp01Mapper temp01Mapper,
-                                    MenuService menuService) {
+    public CustomUserDetailsService(TipdwMapper tipdwMapper, Tcnt01EmpMapper tcnt01EmpMapper,
+                                    Temp01Mapper temp01Mapper, MenuService menuService) {
         this.tipdwMapper = tipdwMapper;
         this.tcnt01EmpMapper = tcnt01EmpMapper;
         this.temp01Mapper = temp01Mapper;
@@ -40,50 +40,78 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String userid) throws UsernameNotFoundException {
-        logger.info("Attempting to load user: {}", userid);
-        Tipdw user = findUserByUserId(userid);
+        try {
+            logger.info("Attempting to load user: {}", userid);
+            Tipdw user = findUserByUserId(userid);
 
-        List<SimpleGrantedAuthority> authorities = getUserAuthorities(user);
-        logger.info("Authorities: {}", authorities);
+            if (user == null) {
+                throw new UsernameNotFoundException("User not found with userid: " + userid);
+            }
 
-        return new User(user.getUserid(), user.getPw(), authorities);
+            List<SimpleGrantedAuthority> authorities = getUserAuthorities(user);
+            logger.info("User: {} has authorities: {}", user.getUserid(), authorities);
+
+            // cust_code 값을 처리하는 부분 추가
+            String custCode = null; // custCode 초기화
+            if ("1".equals(user.getGubn())) {
+                Tcnt01Emp tcnt01Emp = tcnt01EmpMapper.findByUserId(userid);
+                if (tcnt01Emp != null) {
+                    custCode = tcnt01Emp.getCustCode(); // custCode 값 할당
+                }
+            }
+            logger.info("user.getGubn: {}",user.getGubn());
+            logger.info("custCode: {}",custCode);
+
+            return new CustomUserDetails(user.getUserid(), user.getPw(), authorities, custCode);
+        } catch (Exception e) {
+            logger.error("An error occurred while trying to authenticate the user: {}", userid, e);
+            throw new InternalAuthenticationServiceException("An error occurred while authenticating the user: " + userid, e);
+        }
     }
-
 
     private Tipdw findUserByUserId(String userid) {
         Tipdw user = tipdwMapper.findByUserId(userid);
         if (user == null) {
-            logger.info("아이디 없음");
-            throw new UsernameNotFoundException("User not found");
+            logAndThrowUsernameNotFoundException("User not found for userid: " + userid);
         }
         if ("N".equals(user.getConfirmYn())) {
-            logger.info("승인대기");
-            throw new UsernameNotFoundException("Approval pending");
+            logAndThrowUsernameNotFoundException("Approval pending for userid: " + userid);
         }
         return user;
     }
 
-    private List<SimpleGrantedAuthority> getUserAuthorities(Tipdw user) {
-        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        // 데이터베이스에서 사용자의 추가 정보 조회
-        Tcnt01Emp tcntEmp;
-        Temp01 tmp01;
-        if ("0".equals(user.getGubn())) {
-
-            authorities.add(new SimpleGrantedAuthority("ROLE_EMPLOYEE"));
-            tmp01 = temp01Mapper.findByUserId(user.getUsername());
-
-            // Further logic if needed
-        } else if ("1".equals(user.getGubn())) {
-
-            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-            tcntEmp = tcnt01EmpMapper.findByUserId(user.getUsername());
-            // Further logic if needed
-        }
-
-
-        return authorities;
+    private void logAndThrowUsernameNotFoundException(String message) {
+        logger.info(message);
+        throw new UsernameNotFoundException(message);
     }
 
-
+    private List<SimpleGrantedAuthority> getUserAuthorities(Tipdw user) {
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        switch (user.getGubn()) {
+            case "0": // EMPLOYEE
+              //  Temp01 temp01 = temp01Mapper.findByUserId(user.getUserid());
+              //  if (temp01 != null) {
+                    authorities.add(new SimpleGrantedAuthority("ROLE_EMPLOYEE"));
+                    // 여기에서 temp01 정보를 기반으로 추가적인 권한을 부여하거나, 처리할 수 있습니다.
+                    logger.info("Employee info retrieved for user: {}", user.getUserid());
+             //   } else {
+              //      logger.warn("No additional employee info found for user: {}", user.getUserid());
+             //   }
+                break;
+            case "1": // USER
+              //  Tcnt01Emp tcnt01Emp = tcnt01EmpMapper.findByUserId(user.getUserid());
+              //  if (tcnt01Emp != null) {
+                    authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+                    // 여기에서 tcnt01Emp 정보를 기반으로 추가적인 권한을 부여하거나, 처리할 수 있습니다.
+                    logger.info("User info retrieved for user: {}", user.getUserid());
+              // } else {
+              //      logger.warn("No additional user info found for user: {}", user.getUserid());
+              //  }
+                break;
+            default:
+                logger.warn("Unknown user type: {}", user.getGubn());
+                break;
+        }
+        return authorities;
+    }
 }

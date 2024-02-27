@@ -7,6 +7,6 @@ import org.apache.ibatis.annotations.Select;
 
 @Mapper
 public interface Tcnt01EmpMapper {
-    @Select("SELECT * FROM tcnt01emp WHERE userid = #{userid}")
-    Tcnt01Emp findByUserId(@Param("userid") String userid);
+    @Select("SELECT CUST_CODE as custCode, EMPNO, EMP_NAME, ID, PW, DEPART, POSITION, ZIP_NO, ADDR, TEL_NO, FEX_NO, HAND_PHONE, EMAIL, RMK, USE_YN, IN_DATE, IN_EMPNO, UP_DATE, UP_EMPNO, ADDR2, SUBID, USERID FROM tcnt01_emp WHERE id = #{username}")
+    Tcnt01Emp findByUserId(@Param("username") String username);
 }

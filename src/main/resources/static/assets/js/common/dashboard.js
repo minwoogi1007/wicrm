@@ -7,7 +7,7 @@ let countMiss =0;
 let countCom =0;
 let countSum =0;
 let countRate = 0;
-
+let callSum=0;
 $(document).ready(function() {
     let isFirstCall = true;
     fetchData();
@@ -146,7 +146,7 @@ $(document).ready(function() {
                         }else{
                             missData.push(0,item.hour_09, item.hour_10, item.hour_11, item.hour_12, item.hour_13, item.hour_14, item.hour_15, item.hour_16, item.hour_17, item.hour_18, item.hour_19,0);
                         }
-
+                        callSum = item.callSum;
                     });
 
 
@@ -189,7 +189,7 @@ $(document).ready(function() {
                             a = Math.min(Math.max(0, a || 1), 1), r.beginPath(), r.arc(0, 0, o, 0, 2 * Math.PI * a, !1), r.strokeStyle = e, r.lineCap = "round", r.lineWidth = t, r.stroke()
                         };
                     i("#E4E6EF", t.lineWidth, 1),
-                        i(KTUtil.getCssVariableValue("--bs-success"), t.lineWidth, 1-chartM1/countCom),
+                        i(KTUtil.getCssVariableValue("--bs-success"), t.lineWidth, chartM1/countCom+chartM2/countCom),
                         i(KTUtil.getCssVariableValue("--bs-primary"), t.lineWidth, chartM2/countCom)
                 }
             }()
@@ -418,9 +418,9 @@ $(document).ready(function() {
                                 }
                             },
                             yaxis: {
-                                max: 200,
+                                max: callSum,
                                 min: 0,
-                                tickAmount: 10,
+                                tickAmount: 6,
                                 labels: {
                                     style: {
                                         colors: l,

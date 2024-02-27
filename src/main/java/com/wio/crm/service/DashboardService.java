@@ -1,5 +1,6 @@
 package com.wio.crm.service;
 
+import com.wio.crm.config.CustomUserDetails;
 import com.wio.crm.mapper.DashboardMapper;
 import com.wio.crm.model.DashboardData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,26 +29,22 @@ public class DashboardService {
         System.out.println("================="+username);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 
-        // 권한 정보를 이용한 로직 구현
-        for (GrantedAuthority authority : authorities) {
-            System.out.println("================="+authority);
-            if ("ROLE_EMPLOYEE".equals(authority.getAuthority())) {
-                // ROLE_EMPLOYEE에 대한 로직 처리
-                System.out.println("================="+authority.getAuthority());
-            } else if ("ROLE_USER".equals(authority.getAuthority())) {
-                // ROLE_USER에 대한 로직 처리
-                System.out.println("================="+authority.getAuthority());
-            }
+        // 현재 사용자의 CustomUserDetails 객체에서 custCode 추출
+        String custCode = null;
+        if (authentication.getPrincipal() instanceof CustomUserDetails) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            custCode = userDetails.getCustCode();
+        }else{
+            custCode = "";
         }
-
+        System.out.println("custCode================="+custCode);
         Map<String, Object> data = new HashMap<>();
         // 데이터베이스 조회
-        DashboardData card1Data = dashboardMapper.findDataForCard1(username);
-        DashboardData card2Data = dashboardMapper.findDataForCard2(username);
-        List<DashboardData> pointList = dashboardMapper.findPointList(username); //
-        DashboardData dashConSum = dashboardMapper.dashConSum(username);
+        DashboardData card1Data = dashboardMapper.findDataForCard1(custCode);
+        DashboardData card2Data = dashboardMapper.findDataForCard2(custCode);
+        List<DashboardData> pointList = dashboardMapper.findPointList(custCode); //
+        DashboardData dashConSum = dashboardMapper.dashConSum(custCode);
 
 
         data.put("card-data-1", card1Data);
@@ -59,8 +56,17 @@ public class DashboardService {
     }
     public Map<String, Object> getDashboardCallCount(String username) {
         Map<String, Object> data = new HashMap<>();
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         // 데이터베이스 조회
-        List<DashboardData> getDashboardCallCount = dashboardMapper.getDashboardCallCount(username);
+        String custCode = null;
+        if (authentication.getPrincipal() instanceof CustomUserDetails) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            custCode = userDetails.getCustCode();
+        }else{
+            custCode = "";
+        }
+        List<DashboardData> getDashboardCallCount = dashboardMapper.getDashboardCallCount(custCode);
 
         data.put("dashStatCount-data", getDashboardCallCount);
 
