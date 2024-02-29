@@ -7,6 +7,6 @@ import org.apache.ibatis.annotations.Select;
 
 @Mapper
 public interface Temp01Mapper {
-    @Select("SELECT * FROM temp01 WHERE userid = #{username}")
+    @Select("SELECT * FROM N_TEMP01 WHERE userid = #{username}")
     Temp01 findByUserId(@Param("username") String userid);
 }

@@ -2,45 +2,54 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.wio.crm.mapper.DashboardMapper">
     <select id="findDataForCard1" resultType="com.wio.crm.model.DashboardData">
+        select
+        nvl(todayMiss,0)todayMiss,
+        nvl(todayCom,0)todayCom,
+        nvl(todayEme,0) todayEme,
+        nvl(todayMiss+todayCom,0)count_sum,
+        NVL(ROUND((todayCom / NULLIF(todayMiss + todayCom, 0)) * 100, 2), 0) AS processing_rate
+        from
+        (
+        select
 
-        SELECT
-            NVL(count_miss, 0) AS count_miss,
-            NVL(count_com, 0) AS count_com,
-            NVL(count_miss + count_com, 0) AS count_sum,
-            NVL(ROUND((count_com / NULLIF(count_miss + count_com, 0)) * 100, 2), 0) AS processing_rate
-        FROM (
-                 SELECT
-                     (
-                         SELECT COUNT(*)
-                         FROM (
-                                  SELECT *
-                                  FROM CALL_LOG_D B
-                                           JOIN (
-                                      SELECT MAX(CALLDATE) AS CALL_DATE, CLID, CUST_CODE, PROJECT_CODE
-                                      FROM CALL_LOG_D
-                                      WHERE REPLACE(substr(calldate,0,10),'-') ='20240205'
-                                      GROUP BY CLID, CUST_CODE, PROJECT_CODE
-                                  ) A ON A.CALL_DATE = B.CALLDATE AND A.CLID = B.CLID
-                                           LEFT JOIN temp01 T ON T.empno = B.empno
-                                           LEFT JOIN tcnt01 C ON C.CUST_CODE = B.CUST_CODE
-                                  WHERE REPLACE(substr(B.calldate,0,10),'-') ='20240205'
-                                    <![CDATA[
-                                    AND B.RESULT <> 'ANSWER'
-                                    AND B.CONFIRM = '0'
-                                    AND B.context <> 'outbound'
-                                  ]]>
-                              )
-                     ) AS count_miss,
-                     (
-                         SELECT COUNT(*)
-                         FROM TBND01 A
-                         WHERE A.PRC_GUBN = '2'
-                           AND TO_CHAR(A.IN_DATE, 'YYYYMMDD') = '20240205'
-                        <if test="custCode != null and !custCode.isEmpty()">
-                            AND CUST_CODE = #{custCode}
-                         </if>
-             ) AS count_com
-            FROM dual
+        (
+        SELECT count(*)
+        FROM
+        (SELECT MAX(CALLDATE)CALL_DATE ,CLID,CUST_CODE,PROJECT_CODE
+        FROM CALL_LOG_D
+        WHERE substr(calldate,0,10)= TO_CHAR(SYSDATE,'YYYY-MM-DD')
+        GROUP BY SUBSTR(calldate,0,10) , CLID,CUST_CODE,PROJECT_CODE) A,CALL_LOG_D B
+        WHERE A.CALL_DATE = B.CALLDATE
+        AND substr(calldate,0,10) =TO_CHAR(SYSDATE,'YYYY-MM-DD')
+     <![CDATA[
+          AND A.CLID = B.CLID
+        AND RESULT <>'ANSWER'
+        and b.context <> 'outbound'
+        and a.cust_code is not null
+      ]]>
+        <if test="custCode != null and !custCode.isEmpty()">
+            AND a.CUST_CODE = #{custCode}
+        </if>
+        )  todayMiss,
+        (
+        SELECT count(A.CUST_CODE)
+        FROM TBND01 A
+        WHERE 1=1
+        AND PRC_GUBN = '2'
+        AND TO_CHAR(IN_DATE, 'YYYYMMDD') = TO_CHAR(SYSDATE,'YYYYMMDD')
+        <if test="custCode != null and !custCode.isEmpty()">
+            AND CUST_CODE = #{custCode}
+        </if>
+        )todayCom,
+        (
+        SELECT count(A.CUST_CODE)
+        FROM TBND01 A
+        WHERE 1=1
+        AND A.PRC_GUBN = '2'
+        AND EMG_GUBN = '1'
+        AND TO_CHAR(IN_DATE, 'YYYYMMDD') = to_char(sysdate,'YYYYMMDD')
+        )todayEme
+        from dual
         )
 
 </select>
@@ -74,7 +83,7 @@
                              tcnt01_point
                          WHERE
                              call_code IS NOT NULL
-                           AND ISSUE_DATE = '20240205' -- 오늘 날짜
+                           AND ISSUE_DATE =to_char(sysdate,'YYYYMMDD') -- 오늘 날짜
                              <if test="custCode != null and !custCode.isEmpty()">
                             AND CUST_CODE = #{custCode}
                              </if>
@@ -87,7 +96,7 @@
                              tcnt01_point
                          WHERE
                              call_code IS NOT NULL
-                           AND ISSUE_DATE = '20240210' -- 어제 날짜; 날짜가 잘못 지정되었으니 적절히 조정해야 함
+                           AND ISSUE_DATE = to_char(sysdate-1,'YYYYMMDD') -- 어제 날짜; 날짜가 잘못 지정되었으니 적절히 조정해야 함
                              <if test="custCode != null and !custCode.isEmpty()">
                             AND CUST_CODE = #{custCode}
                              </if>
@@ -110,7 +119,7 @@
                 AND b.projct_code = c.project_code
                 AND b.call_code = c.call_code
                 AND b.person_code = c.person_code
-            WHERE b.issue_date = '20240205'
+            WHERE b.issue_date = to_char(sysdate,'YYYYMMDD')
         <if test="custCode != null and !custCode.isEmpty()">
               AND b.CUST_CODE = #{custCode}
         </if>
@@ -147,163 +156,89 @@
         ]]>
     </select>
     <select id="dashConSum" resultType="com.wio.crm.model.DashboardData">
+
+
         <![CDATA[
-        SELECT
-            (
-                SELECT
-                    COUNT(*)
-                FROM
-                    (
-                        SELECT
-                            B.CALLDATE,
-                            B.CLID,
-                            B.PERSON_CODE,
-                            B.CUST_CODE,
-                            B.PROJECT_CODE,
-                            B.empno,
-                            B.INCALL_NO,
-                            T.emp_name,
-                            C.cust_name AS PJN,
-                            1 AS COUNT,
-          B.RESULT,
-          DECODE(B.CONTEXT, 'outbound', 'OUT', 'IN') AS CONTEXT
-                        FROM
-                            (
-                            SELECT
-                            MAX(CALLDATE) AS CALL_DATE,
-                            CLID,
-                            CUST_CODE,
-                            PROJECT_CODE
-                            FROM
-                            CALL_LOG_D
-                            WHERE
-                            REPLACE(substr(calldate, 0, 10), '-') = '20240202'
-                            GROUP BY
-                            CLID,
-                            CUST_CODE,
-                            PROJECT_CODE
-                            ) A
-                            INNER JOIN CALL_LOG_D B ON A.CALL_DATE = B.CALLDATE
-                            AND A.CLID = B.CLID
-                            LEFT JOIN temp01 T ON T.empno = B.empno
-                            LEFT JOIN tcnt01 C ON C.CUST_CODE = B.CUST_CODE
-                        WHERE
-                            REPLACE(substr(B.calldate, 0, 10), '-') = '20240202'
-                          AND B.RESULT <> 'ANSWER'
-                          AND B.CONFIRM = '0'
-                          AND B.context <> 'outbound'
-        ]]>
-                        <if test="custCode != null and !custCode.isEmpty()">
-                          AND B.CUST_CODE = #{custCode}
-                        </if>
-                    )
-            ) AS yesterdayMiss,
-            (
-                SELECT
-                    COUNT(*)
-                FROM
-                    TBND01 a
-                WHERE
-                    1 = 1
-            <if test="custCode != null and !custCode.isEmpty()">
-                AND A.CUST_CODE = #{custCode}
-            </if>
-                  AND A.PRC_GUBN = '2'
-                  AND TO_CHAR(IN_DATE, 'YYYYMMDD') = '20240202'
-            ) AS yesterdayCom,
-            (
-                SELECT
-                    COUNT(*)
-                FROM
-                    TBND01 a
-                WHERE
-                    1 = 1
-                <if test="custCode != null and !custCode.isEmpty()">
-                  AND A.CUST_CODE = #{custCode}
-                </if>
-                  AND A.PRC_GUBN = '2'
-                  AND EMG_GUBN = '1'
-                  AND TO_CHAR(IN_DATE, 'YYYYMMDD') = '20240202'
-            ) AS yseterdayEme,
-            (
-                SELECT
-                    COUNT(*)
-                FROM
-                    (
-                        SELECT
-                            B.CALLDATE,
-                            B.CLID,
-                            B.PERSON_CODE,
-                            B.CUST_CODE,
-                            B.PROJECT_CODE,
-                            B.empno,
-                            B.INCALL_NO,
-                            T.emp_name,
-                            C.cust_name AS PJN,
-                            1 AS COUNT,
-          B.RESULT,
-          DECODE(B.CONTEXT, 'outbound', 'OUT', 'IN') AS CONTEXT
-                        FROM
-                            (
-                            SELECT
-                            MAX(CALLDATE) AS CALL_DATE,
-                            CLID,
-                            CUST_CODE,
-                            PROJECT_CODE
-                            FROM
-                            CALL_LOG_D
-                            WHERE
-                            REPLACE(substr(calldate, 0, 10), '-') = '20240205'
-                            GROUP BY
-                            CLID,
-                            CUST_CODE,
-                            PROJECT_CODE
-                            ) A
-                            INNER JOIN CALL_LOG_D B ON A.CALL_DATE = B.CALLDATE
-                            AND A.CLID = B.CLID
-                            LEFT JOIN temp01 T ON T.empno = B.empno
-                            LEFT JOIN tcnt01 C ON C.CUST_CODE = B.CUST_CODE
-                        WHERE
-                            REPLACE(substr(B.calldate, 0, 10), '-') = '20240205'
-        <![CDATA[
-                          AND B.RESULT <> 'ANSWER'
-                          AND B.CONFIRM = '0'
-                          AND B.context <> 'outbound'
-         ]]>
-        <if test="custCode != null and !custCode.isEmpty()">
-                          AND B.CUST_CODE = #{custCode}
-        </if>
-                    )
-            ) AS todayMiss,
-            (
-                SELECT
-                    COUNT(*)
-                FROM
-                    TBND01 a
-                WHERE
-                    1 = 1
-                <if test="custCode != null and !custCode.isEmpty()">
-                    AND A.CUST_CODE = #{custCode}
-                </if>
-                  AND A.PRC_GUBN = '2'
-                  AND TO_CHAR(IN_DATE, 'YYYYMMDD') = '20240205'
-            ) AS todayCom,
-            (
-                SELECT
-                    COUNT(*)
-                FROM
-                    TBND01 a
-                WHERE
-                    1 = 1
-                <if test="custCode != null and !custCode.isEmpty()">
-                    AND A.CUST_CODE = #{custCode}
-                </if>
-                  AND A.PRC_GUBN = '2'
-                  AND EMG_GUBN = '1'
-                  AND TO_CHAR(IN_DATE, 'YYYYMMDD') = '20240205'
-            ) AS todayEme
+        select (
+        SELECT count(*)
         FROM
-            dual
+        (SELECT MAX(CALLDATE)CALL_DATE ,CLID,CUST_CODE,PROJECT_CODE
+        FROM CALL_LOG_D
+        WHERE substr(calldate,0,10)= TO_CHAR(SYSDATE,'YYYY-MM-DD')
+        GROUP BY SUBSTR(calldate,0,10) , CLID,CUST_CODE,PROJECT_CODE) A,CALL_LOG_D B
+        WHERE A.CALL_DATE = B.CALLDATE
+        AND substr(calldate,0,10) =TO_CHAR(SYSDATE-1,'YYYY-MM-DD')
+        AND A.CLID = B.CLID
+        AND RESULT <>'ANSWER'
+        and b.context <> 'outbound'
+        and a.cust_code is not null
+        ]]>
+        <if test="custCode != null and !custCode.isEmpty()">
+            AND A.CUST_CODE = #{custCode}
+        </if>
+        ) yesterdayMiss,
+        (
+        SELECT count(A.CUST_CODE)
+        FROM TBND01 A
+        WHERE 1=1
+        AND PRC_GUBN = '2'
+        AND TO_CHAR(IN_DATE, 'YYYYMMDD') = TO_CHAR(SYSDATE-1,'YYYYMMDD')
+        <if test="custCode != null and !custCode.isEmpty()">
+            AND A.CUST_CODE = #{custCode}
+        </if>
+        )yesterdayCom,
+        (
+        SELECT count(A.CUST_CODE)
+        FROM TBND01 A
+        WHERE 1=1
+        AND A.PRC_GUBN = '2'
+        AND EMG_GUBN = '1'
+        AND TO_CHAR(IN_DATE, 'YYYYMMDD') = to_char(sysdate-1,'YYYYMMDD')
+        <if test="custCode != null and !custCode.isEmpty()">
+            AND A.CUST_CODE = #{custCode}
+        </if>
+        )yesterdayEme,
+        (
+        <![CDATA[
+        SELECT count(*)
+        FROM
+        (SELECT MAX(CALLDATE)CALL_DATE ,CLID,CUST_CODE,PROJECT_CODE
+        FROM CALL_LOG_D
+        WHERE substr(calldate,0,10)= TO_CHAR(SYSDATE,'YYYY-MM-DD')
+        GROUP BY SUBSTR(calldate,0,10) , CLID,CUST_CODE,PROJECT_CODE) A,CALL_LOG_D B
+        WHERE A.CALL_DATE = B.CALLDATE
+        AND substr(calldate,0,10) =TO_CHAR(SYSDATE,'YYYY-MM-DD')
+        AND A.CLID = B.CLID
+        AND RESULT <>'ANSWER'
+        and b.context <> 'outbound'
+        and a.cust_code is not null
+        ]]>
+        <if test="custCode != null and !custCode.isEmpty()">
+            AND A.CUST_CODE = #{custCode}
+        </if>
+        )  todayMiss,
+        (
+        SELECT count(A.CUST_CODE)
+        FROM TBND01 A
+        WHERE 1=1
+        AND PRC_GUBN = '2'
+        AND TO_CHAR(IN_DATE, 'YYYYMMDD') = TO_CHAR(SYSDATE,'YYYYMMDD')
+        <if test="custCode != null and !custCode.isEmpty()">
+            AND A.CUST_CODE = #{custCode}
+        </if>
+        )todayCom,
+        (
+        SELECT count(A.CUST_CODE)
+        FROM TBND01 A
+        WHERE 1=1
+        AND A.PRC_GUBN = '2'
+        AND EMG_GUBN = '1'
+        AND TO_CHAR(IN_DATE, 'YYYYMMDD') = to_char(sysdate,'YYYYMMDD')
+        <if test="custCode != null and !custCode.isEmpty()">
+            AND A.CUST_CODE = #{custCode}
+        </if>
+        )todayEme
+        from dual
     </select>
     <select id="dashStatCount" resultType="com.wio.crm.model.DashboardData">
 
@@ -321,7 +256,7 @@
                 AND b.projct_code = c.project_code
                 AND b.call_code = c.call_code
                 AND b.person_code = c.person_code
-            WHERE b.issue_date = '20240205'
+            WHERE b.issue_date = to_char(sysdate,'YYYYMMDD')
         <if test="custCode != null and !custCode.isEmpty()">
               AND b.CUST_CODE = #{custCode}
         </if>
@@ -384,7 +319,7 @@
                   FROM TBND01 A
                   WHERE 1=1
                     AND PRC_GUBN IN ('1', '2')
-                    AND TO_CHAR(IN_DATE, 'YYYYMMDD') = '20240205'
+                    AND TO_CHAR(IN_DATE, 'YYYYMMDD') = to_char(sysdate,'YYYYMMDD')
                     <if test="custCode != null and !custCode.isEmpty()">
                         AND A.CUST_CODE =  #{custCode}
                     </if>
@@ -406,10 +341,10 @@
                         FROM
                             (SELECT MAX(CALLDATE)CALL_DATE ,CLID,CUST_CODE,PROJECT_CODE
                             FROM CALL_LOG_D
-                            WHERE REPLACE(substr(calldate,0,10),'-') ='20240205'
+                            WHERE REPLACE(substr(calldate,0,10),'-') =to_char(sysdate,'YYYYMMDD')
                             GROUP BY SUBSTR(calldate,0,10) , CLID,CUST_CODE,PROJECT_CODE) A,CALL_LOG_D B
                         WHERE A.CALL_DATE = B.CALLDATE
-                          AND REPLACE(substr(calldate,0,10),'-') ='20240205'
+                          AND REPLACE(substr(calldate,0,10),'-') =to_char(sysdate,'YYYYMMDD')
                           AND A.CLID = B.CLID
                 <![CDATA[
                           AND RESULT <>'ANSWER'

@@ -162,7 +162,7 @@ $(document).ready(function() {
     }
 
     // 5초마다 fetchData 함수를 호출하여 데이터를 새로고침
-    //setInterval(fetchData, 10000);
+    setInterval(fetchData, 50000);
 
 
 

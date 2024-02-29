@@ -18,11 +18,11 @@
                  WITH DETAIL_MENU AS (SELECT  HM.MENU_CD AS HMENU_CD
                                            ,   MM.MENU_CD AS MMENU_CD
                                            ,   DM.MENU_CD AS DMENU_CD
-                                      FROM  WMENU HM
-                                         , WMENU DM
-                                         , WMENU MM
-                                         , W_MENU_USER MU
-                                         , TEMP01 EP
+                                      FROM  N_WMENU HM
+                                         , N_WMENU DM
+                                         , N_WMENU MM
+                                         , N_WMENU_USER MU
+                                         , N_TEMP01 EP
                                       WHERE HM.MENU_CD = MM.MENU_REF AND HM.USE_YN = 'Y'
                                         AND MM.MENU_CD = DM.MENU_REF AND MM.USE_YN = 'Y'
                                         AND DM.MENU_CD = MU.MENU_CD AND DM.USE_YN = 'Y'
@@ -32,11 +32,11 @@
                                       UNION ALL SELECT  HM.MENU_CD AS HMENU_CD
                                                      ,   MM.MENU_CD AS MMENU_CD
                                                      ,   DM.MENU_CD AS DMENU_CD
-                                      FROM  WMENU HM
-                                         , WMENU DM
-                                         , WMENU MM
-                                         , W_MENU_USER MU
-                                         , TCNT01_EMP EP
+                                      FROM  N_WMENU HM
+                                         , N_WMENU DM
+                                         , N_WMENU MM
+                                         , N_WMENU_USER MU
+                                         , N_TCNT01_EMP EP
                                       WHERE HM.MENU_CD = MM.MENU_REF AND HM.USE_YN = 'Y'
                                         AND MM.MENU_CD = DM.MENU_REF AND MM.USE_YN = 'Y'
                                         AND DM.MENU_CD = MU.MENU_CD AND DM.USE_YN = 'Y'
@@ -55,7 +55,7 @@
                                         ,A.USE_YN
                                         ,1 AS SEQ
                                         ,0 AS HMENU_CD
-                                   FROM WMENU A
+                                   FROM N_WMENU A
                                    WHERE A.MENU_CD IN (SELECT HMENU_CD FROM DETAIL_MENU GROUP BY HMENU_CD)
                                    UNION ALL
                                    SELECT A.MENU_CD
@@ -68,7 +68,7 @@
                                         ,A.USE_YN
                                         ,2 AS SEQ
                                         ,0 AS HMENU_CD
-                                   FROM WMENU A
+                                   FROM N_WMENU A
                                    WHERE A.MENU_CD IN (SELECT MMENU_CD FROM DETAIL_MENU GROUP BY MMENU_CD)
                                    UNION ALL
                                    SELECT A.MENU_CD
@@ -81,9 +81,9 @@
                                         ,A.USE_YN
                                         ,3 AS SEQ
                                         ,C.MENU_CD AS HMENU_CD
-                                   FROM WMENU A
-                                      , WMENU B
-                                      , WMENU C
+                                   FROM N_WMENU A
+                                      , N_WMENU B
+                                      , N_WMENU C
                                    WHERE A.MENU_CD IN (SELECT DMENU_CD FROM DETAIL_MENU GROUP BY DMENU_CD)
                                      AND A.MENU_REF =  B.MENU_CD AND B.MENU_REF = C.MENU_CD
                                )
