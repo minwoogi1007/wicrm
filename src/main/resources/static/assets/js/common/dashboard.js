@@ -102,14 +102,14 @@ $(document).ready(function() {
                         const todayMiss = cardData3.todayMiss;
                         const todayCom = cardData3.todayCom;
                         const todayEme = cardData3.todayEme;
-                        const yseterdayEme = cardData3.yseterdayEme;
+                        const yesterdayEme = cardData3.yesterdayEme;
                         const yesterdayCom = cardData3.yesterdayCom;
                         const yesterdayMiss = cardData3.yesterdayMiss;
 
                         $('#count-todayMiss-' + key).text(todayMiss);
                         $('#count-todayCom-' + key).text(todayCom);
                         $('#count-todayEme-' + key).text(todayEme);
-                        $('#count-yseterdayEme-' + key).text(' / '+yseterdayEme);
+                        $('#count-yseterdayEme-' + key).text(' / '+yesterdayEme);
                         $('#count-yesterdayCom-' + key).text(' / '+yesterdayCom);
                         $('#count-yesterdayMiss-' + key).text(' / '+yesterdayMiss);
                     }
