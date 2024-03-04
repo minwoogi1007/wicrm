@@ -17,7 +17,7 @@ public class DashboardData {
     private String todayMiss;
     private String todayCom;
     private String todayEme;
-    private String yseterdayEme;
+    private String yesterdayEme;
     private String yesterdayCom;
     private String yesterdayMiss;
 
@@ -125,12 +125,12 @@ public class DashboardData {
         this.todayEme = todayEme;
     }
 
-    public String getYseterdayEme() {
-        return yseterdayEme;
+    public String getYesterdayEme() {
+        return yesterdayEme;
     }
 
-    public void setYseterdayEme(String yseterdayEme) {
-        this.yseterdayEme = yseterdayEme;
+    public void setYesterdayEme(String yesterdayEme) {
+        this.yesterdayEme = yesterdayEme;
     }
 
     public String getYesterdayCom() {

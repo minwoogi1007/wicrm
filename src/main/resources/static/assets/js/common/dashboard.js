@@ -32,8 +32,11 @@ $(document).ready(function() {
                         countRate = cardData.processing_rate;
                         if (!isFirstCall) {
                             // Apply animation only if it's not the first call
+                            // 현재 countSum 요소의 값을 가져와서 숫자로 변환합니다.
+                            var currentCountSum = parseInt($('#count-sum-' + key).text()) || 0;
+
                             var $countSumElement = $('#count-sum-' + key);
-                            $({ Counter: 0 }).animate({ Counter: countSum }, {
+                            $({ Counter: currentCountSum }).animate({ Counter: countSum }, {
                                 duration: 1000,
                                 easing: 'swing',
                                 step: function () {
@@ -45,26 +48,76 @@ $(document).ready(function() {
                             $('#count-sum-' + key).text(countSum);
                         }
 
-                        // 요소 ID를 구성하여 각 값 설정
-                        $('#count-miss-' + key).text(countMiss); // "count-miss-card-data-1" 요소에 countMiss 값 설정
-                        $('#count-com-' + key).text(countCom+'  처리'); // "count-com-card-data-1" 요소에 countCom 값 설정
-
-                        $('#count-sum-' + key).text(countSum); // "count-com-sum-data-1" 요소에 countCom 값 설정
-
-                        $('#callSum').text(countSum+'  calls today');
-                        $('#count-rate-' + key).text(countRate+'  %'); // "count-com-rate-data-1" 요소에 countCom 값 설정
+                        // 기타 요소 값 설정
+                        $('#count-miss-' + key).text(countMiss);
+                        $('#count-com-' + key).text(countCom + ' 처리');
+                        // $('#count-sum-' + key).text(countSum); // 애니메이션으로 값이 설정되므로 이 줄은 필요 없습니다.
+                        $('#callSum').text(countSum + ' calls today');
+                        $('#count-rate-' + key).text(countRate + ' %');
 
                         // 프로그레스 바 업데이트
                         $(".progress-bar").css("width", countRate + "%").attr("aria-valuenow", countRate);
                     }else if(key=="card-data-2"){
                         const cardData2 = response[key];
-                        dailyPoint = cardData2.dailyPoint;
-                        dailyPointN =cardData2.dailyPointN;
+                        const yesterdayMiss = cardData2.yesterdayMiss;
+                        const yesterdayCom =cardData2.yesterdayCom;
+                        const yesterdayEme =cardData2.yesterdayEme;
+                        const todayMiss=cardData2.todayMiss;
+                        const todayCom=cardData2.todayCom;
+                        const todayEme=cardData2.todayEme;
+
+
                         countRate=cardData2.processing_rate+'%';
 
                         $('#count-dailPoint-' + key).text(countCom);
 
                         $('#count-per-' + key).text(countRate);
+
+                        if(yesterdayMiss > countMiss){
+                            $('#card-data-3_miss').empty().append(`
+                                <i class="ki-duotone ki-arrow-down-right fs-2 text-danger me-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                            `);
+                        }else{
+                            $('#card-data-3_miss').empty().append(`
+                                <i class="ki-duotone ki-arrow-up-right fs-2 text-success me-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                 </i>
+                              `);
+                        }
+                        if(yesterdayEme > todayEme){
+                            $('#card-data-3_eme').empty().append(`
+                                <i class="ki-duotone ki-arrow-down-right fs-2 text-danger me-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                            `);
+                        }else{
+                            $('#card-data-3_eme').empty().append(`
+                                <i class="ki-duotone ki-arrow-up-right fs-2 text-success me-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                 </i>
+                              `);
+                        }
+                        if(yesterdayCom > todayCom){
+                            $('#card-data-3_com').empty().append(`
+                                <i class="ki-duotone ki-arrow-down-right fs-2 text-danger me-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                            `);
+                        }else{
+                            $('#card-data-3_com').empty().append(`
+                                <i class="ki-duotone ki-arrow-up-right fs-2 text-success me-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                 </i>
+                              `);
+                        }
 
                     }else if(key=="pointlist-data"){
                         const pointListData = response[key];
@@ -102,14 +155,14 @@ $(document).ready(function() {
                         const todayMiss = cardData3.todayMiss;
                         const todayCom = cardData3.todayCom;
                         const todayEme = cardData3.todayEme;
-                        const yseterdayEme = cardData3.yseterdayEme;
+                        const yesterdayEme = cardData3.yesterdayEme;
                         const yesterdayCom = cardData3.yesterdayCom;
                         const yesterdayMiss = cardData3.yesterdayMiss;
 
                         $('#count-todayMiss-' + key).text(todayMiss);
                         $('#count-todayCom-' + key).text(todayCom);
                         $('#count-todayEme-' + key).text(todayEme);
-                        $('#count-yseterdayEme-' + key).text(' / '+yseterdayEme);
+                        $('#count-yesterdayEme-' + key).text(' / '+yesterdayEme);
                         $('#count-yesterdayCom-' + key).text(' / '+yesterdayCom);
                         $('#count-yesterdayMiss-' + key).text(' / '+yesterdayMiss);
                     }
@@ -122,7 +175,6 @@ $(document).ready(function() {
                 console.error("Data load failed:", error);
             }
         });
-
     }
     let comData = [];
     let missData = [];
@@ -132,7 +184,8 @@ $(document).ready(function() {
             type: "GET",
             success: function(response) {
                 console.log(response);
-
+                comData = [];
+                missData = [];
                 // response는 각 카드 데이터를 포함하는 객체
                 Object.keys(response).forEach(function(key) {
                     // 예: key = 'card-data-1'
@@ -162,8 +215,8 @@ $(document).ready(function() {
     }
 
     // 5초마다 fetchData 함수를 호출하여 데이터를 새로고침
-    setInterval(fetchData, 50000);
-
+    setInterval(fetchData, 25000);
+    setInterval(fetchCallData, 25000);
 
 
     var KTCardsWidget17 = {
@@ -339,6 +392,10 @@ $(document).ready(function() {
             t = function(e) {
                 var t = document.getElementById("kt_charts_widget_36");
                 if (t) {
+                    if (e.self) {
+                        e.self.destroy(); // 기존 차트 인스턴스 제거
+                        e.rendered = false;
+                    }
                     var a = parseInt(KTUtil.css(t, "height")),
                         l = KTUtil.getCssVariableValue("--bs-gray-500"),
                         r = KTUtil.getCssVariableValue("--bs-border-dashed-color"),
@@ -418,7 +475,7 @@ $(document).ready(function() {
                                 }
                             },
                             yaxis: {
-                                max: callSum,
+                                max: callSum+countMiss,
                                 min: 0,
                                 tickAmount: 6,
                                 labels: {
@@ -469,6 +526,7 @@ $(document).ready(function() {
                                 strokeWidth: 3
                             }
                         };
+
                     e.self = new ApexCharts(t, n), setTimeout((function() {
                         e.self.render(), e.rendered = !0
                     }), 200)
@@ -482,5 +540,143 @@ $(document).ready(function() {
             }
         }
     }();
+
+    var KTChartsWidget1 = function() {
+        var e = {
+                self: null,
+                rendered: !1
+            },
+            t = function() {
+                var t = document.getElementById("kt_charts_widget_1");
+                if (t) {
+                    var a = t.hasAttribute("data-kt-negative-color") ? t.getAttribute("data-kt-negative-color") : KTUtil.getCssVariableValue("--bs-success"),
+                        l = parseInt(KTUtil.css(t, "height")),
+                        r = KTUtil.getCssVariableValue("--bs-gray-500"),
+                        o = KTUtil.getCssVariableValue("--bs-border-dashed-color"),
+                        i = {
+                            series: [{
+                                name: "Subscribed",
+                                data: [20, 30, 20, 40, 60, 75, 65, 18, 10, 5, 15, 40, 60, 18, 35, 55, 20]
+                            }, {
+                                name: "Unsubscribed",
+                                data: [-20, -15, -5, -20, -30, -15, -10, -8, -5, -5, -10, -25, -15, -5, -10, -5, -15]
+                            }],
+                            chart: {
+                                fontFamily: "inherit",
+                                type: "bar",
+                                stacked: !0,
+                                height: l,
+                                toolbar: {
+                                    show: !1
+                                }
+                            },
+                            plotOptions: {
+                                bar: {
+                                    columnWidth: "35%",
+                                    barHeight: "70%",
+                                    borderRadius: [6, 6]
+                                }
+                            },
+                            legend: {
+                                show: !1
+                            },
+                            dataLabels: {
+                                enabled: !1
+                            },
+                            xaxis: {
+                                categories: ["Jan 5", "Jan 7", "Jan 9", "Jan 11", "Jan 13", "Jan 15", "Jan 17", "Jan 19", "Jan 20", "Jan 21", "Jan 23", "Jan 24", "Jan 25", "Jan 26", "Jan 24", "Jan 28", "Jan 29"],
+                                axisBorder: {
+                                    show: !1
+                                },
+                                axisTicks: {
+                                    show: !1
+                                },
+                                tickAmount: 10,
+                                labels: {
+                                    style: {
+                                        colors: [r],
+                                        fontSize: "12px"
+                                    }
+                                },
+                                crosshairs: {
+                                    show: !1
+                                }
+                            },
+                            yaxis: {
+                                min: -50,
+                                max: 80,
+                                tickAmount: 6,
+                                labels: {
+                                    style: {
+                                        colors: [r],
+                                        fontSize: "12px"
+                                    },
+                                    formatter: function(e) {
+                                        return parseInt(e) + "K"
+                                    }
+                                }
+                            },
+                            fill: {
+                                opacity: 1
+                            },
+                            states: {
+                                normal: {
+                                    filter: {
+                                        type: "none",
+                                        value: 0
+                                    }
+                                },
+                                hover: {
+                                    filter: {
+                                        type: "none",
+                                        value: 0
+                                    }
+                                },
+                                active: {
+                                    allowMultipleDataPointsSelection: !1,
+                                    filter: {
+                                        type: "none",
+                                        value: 0
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                style: {
+                                    fontSize: "12px",
+                                    borderRadius: 4
+                                },
+                                y: {
+                                    formatter: function(e) {
+                                        return e > 0 ? e + "K" : Math.abs(e) + "K"
+                                    }
+                                }
+                            },
+                            colors: [KTUtil.getCssVariableValue("--bs-primary"), a],
+                            grid: {
+                                borderColor: o,
+                                strokeDashArray: 4,
+                                yaxis: {
+                                    lines: {
+                                        show: !0
+                                    }
+                                }
+                            }
+                        };
+                    e.self = new ApexCharts(t, i), setTimeout((function() {
+                        e.self.render(), e.rendered = !0
+                    }), 200)
+                }
+            };
+        return {
+            init: function() {
+                t(), KTThemeMode.on("kt.thememode.change", (function() {
+                    e.rendered && e.self.destroy(), t()
+                }))
+            }
+        }
+    }();
+    "undefined" != typeof module && (module.exports = KTChartsWidget1), KTUtil.onDOMContentLoaded((function() {
+        KTChartsWidget1.init()
+    }));
 
 });

@@ -4,7 +4,7 @@
     <select id="findDataForCard1" resultType="com.wio.crm.model.DashboardData">
         select
         nvl(todayMiss,0)todayMiss,
-        nvl(todayCom,0)todayCom,
+        nvl(todayCom,0)count_Com,
         nvl(todayEme,0) todayEme,
         nvl(todayMiss+todayCom,0)count_sum,
         NVL(ROUND((todayCom / NULLIF(todayMiss + todayCom, 0)) * 100, 2), 0) AS processing_rate
@@ -18,13 +18,14 @@
         (SELECT MAX(CALLDATE)CALL_DATE ,CLID,CUST_CODE,PROJECT_CODE
         FROM CALL_LOG_D
         WHERE substr(calldate,0,10)= TO_CHAR(SYSDATE,'YYYY-MM-DD')
+        and cust_code is not null
         GROUP BY SUBSTR(calldate,0,10) , CLID,CUST_CODE,PROJECT_CODE) A,CALL_LOG_D B
         WHERE A.CALL_DATE = B.CALLDATE
         AND substr(calldate,0,10) =TO_CHAR(SYSDATE,'YYYY-MM-DD')
      <![CDATA[
           AND A.CLID = B.CLID
         AND RESULT <>'ANSWER'
-        and b.context <> 'outbound'
+        --and b.context <> 'outbound'
         and a.cust_code is not null
       ]]>
         <if test="custCode != null and !custCode.isEmpty()">
@@ -165,12 +166,13 @@
         (SELECT MAX(CALLDATE)CALL_DATE ,CLID,CUST_CODE,PROJECT_CODE
         FROM CALL_LOG_D
         WHERE substr(calldate,0,10)= TO_CHAR(SYSDATE,'YYYY-MM-DD')
+        and cust_code is not null
         GROUP BY SUBSTR(calldate,0,10) , CLID,CUST_CODE,PROJECT_CODE) A,CALL_LOG_D B
         WHERE A.CALL_DATE = B.CALLDATE
         AND substr(calldate,0,10) =TO_CHAR(SYSDATE-1,'YYYY-MM-DD')
         AND A.CLID = B.CLID
         AND RESULT <>'ANSWER'
-        and b.context <> 'outbound'
+        --and b.context <> 'outbound'
         and a.cust_code is not null
         ]]>
         <if test="custCode != null and !custCode.isEmpty()">
@@ -205,12 +207,13 @@
         (SELECT MAX(CALLDATE)CALL_DATE ,CLID,CUST_CODE,PROJECT_CODE
         FROM CALL_LOG_D
         WHERE substr(calldate,0,10)= TO_CHAR(SYSDATE,'YYYY-MM-DD')
+        and cust_code is not null
         GROUP BY SUBSTR(calldate,0,10) , CLID,CUST_CODE,PROJECT_CODE) A,CALL_LOG_D B
         WHERE A.CALL_DATE = B.CALLDATE
         AND substr(calldate,0,10) =TO_CHAR(SYSDATE,'YYYY-MM-DD')
         AND A.CLID = B.CLID
         AND RESULT <>'ANSWER'
-        and b.context <> 'outbound'
+        --and b.context <> 'outbound'
         and a.cust_code is not null
         ]]>
         <if test="custCode != null and !custCode.isEmpty()">
@@ -318,7 +321,7 @@
                        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '19', 1, 0)) HOUR_19
                   FROM TBND01 A
                   WHERE 1=1
-                    AND PRC_GUBN IN ('1', '2')
+                    AND PRC_GUBN ='2'
                     AND TO_CHAR(IN_DATE, 'YYYYMMDD') = to_char(sysdate,'YYYYMMDD')
                     <if test="custCode != null and !custCode.isEmpty()">
                         AND A.CUST_CODE =  #{custCode}
@@ -342,13 +345,14 @@
                             (SELECT MAX(CALLDATE)CALL_DATE ,CLID,CUST_CODE,PROJECT_CODE
                             FROM CALL_LOG_D
                             WHERE REPLACE(substr(calldate,0,10),'-') =to_char(sysdate,'YYYYMMDD')
+                             and cust_code is not null
                             GROUP BY SUBSTR(calldate,0,10) , CLID,CUST_CODE,PROJECT_CODE) A,CALL_LOG_D B
                         WHERE A.CALL_DATE = B.CALLDATE
                           AND REPLACE(substr(calldate,0,10),'-') =to_char(sysdate,'YYYYMMDD')
                           AND A.CLID = B.CLID
                 <![CDATA[
                           AND RESULT <>'ANSWER'
-                          and b.context <> 'outbound'
+                         -- and b.context <> 'outbound'
                 ]]>
                         <if test="custCode != null and !custCode.isEmpty()">
                           AND A.CUST_CODE =  #{custCode}
