@@ -8,7 +8,10 @@ let countCom =0;
 let countSum =0;
 let countRate = 0;
 let callSum=0;
-$(document).ready(function() {
+let comSum =0;
+let missSum = 0;
+
+    $(document).ready(function() {
     let isFirstCall = true;
     fetchData();
     fetchCallData()
@@ -59,12 +62,8 @@ $(document).ready(function() {
                         $(".progress-bar").css("width", countRate + "%").attr("aria-valuenow", countRate);
                     }else if(key=="card-data-2"){
                         const cardData2 = response[key];
-                        const yesterdayMiss = cardData2.yesterdayMiss;
-                        const yesterdayCom =cardData2.yesterdayCom;
-                        const yesterdayEme =cardData2.yesterdayEme;
-                        const todayMiss=cardData2.todayMiss;
-                        const todayCom=cardData2.todayCom;
-                        const todayEme=cardData2.todayEme;
+
+
 
 
                         countRate=cardData2.processing_rate+'%';
@@ -73,51 +72,6 @@ $(document).ready(function() {
 
                         $('#count-per-' + key).text(countRate);
 
-                        if(yesterdayMiss > countMiss){
-                            $('#card-data-3_miss').empty().append(`
-                                <i class="ki-duotone ki-arrow-down-right fs-2 text-danger me-2">
-                                    <span class="path1"></span>
-                                    <span class="path2"></span>
-                                </i>
-                            `);
-                        }else{
-                            $('#card-data-3_miss').empty().append(`
-                                <i class="ki-duotone ki-arrow-up-right fs-2 text-success me-2">
-                                    <span class="path1"></span>
-                                    <span class="path2"></span>
-                                 </i>
-                              `);
-                        }
-                        if(yesterdayEme > todayEme){
-                            $('#card-data-3_eme').empty().append(`
-                                <i class="ki-duotone ki-arrow-down-right fs-2 text-danger me-2">
-                                    <span class="path1"></span>
-                                    <span class="path2"></span>
-                                </i>
-                            `);
-                        }else{
-                            $('#card-data-3_eme').empty().append(`
-                                <i class="ki-duotone ki-arrow-up-right fs-2 text-success me-2">
-                                    <span class="path1"></span>
-                                    <span class="path2"></span>
-                                 </i>
-                              `);
-                        }
-                        if(yesterdayCom > todayCom){
-                            $('#card-data-3_com').empty().append(`
-                                <i class="ki-duotone ki-arrow-down-right fs-2 text-danger me-2">
-                                    <span class="path1"></span>
-                                    <span class="path2"></span>
-                                </i>
-                            `);
-                        }else{
-                            $('#card-data-3_com').empty().append(`
-                                <i class="ki-duotone ki-arrow-up-right fs-2 text-success me-2">
-                                    <span class="path1"></span>
-                                    <span class="path2"></span>
-                                 </i>
-                              `);
-                        }
 
                     }else if(key=="pointlist-data"){
                         const pointListData = response[key];
@@ -165,6 +119,58 @@ $(document).ready(function() {
                         $('#count-yesterdayEme-' + key).text(' / '+yesterdayEme);
                         $('#count-yesterdayCom-' + key).text(' / '+yesterdayCom);
                         $('#count-yesterdayMiss-' + key).text(' / '+yesterdayMiss);
+
+                        if(yesterdayMiss > todayMiss){
+                            $('#card-data-3_miss').empty().append(`
+                                <i class="ki-duotone ki-arrow-down-right fs-2 text-danger me-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                            `);
+                        }else{
+                            $('#card-data-3_miss').empty().append(`
+                                <i class="ki-duotone ki-arrow-up-right fs-2 text-success me-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                 </i>
+                              `);
+                        }
+                        if(yesterdayEme > todayEme){
+                            $('#card-data-3_eme').empty().append(`
+                                <i class="ki-duotone ki-arrow-down-right fs-2 text-danger me-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                            `);
+                        }else{
+                            $('#card-data-3_eme').empty().append(`
+                                <i class="ki-duotone ki-arrow-up-right fs-2 text-success me-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                 </i>
+                              `);
+                        }
+                        if(yesterdayCom > todayCom){
+                            $('#card-data-3_com').empty().append(`
+                                <i class="ki-duotone ki-arrow-down-right fs-2 text-danger me-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                            `);
+                        }else{
+                            $('#card-data-3_com').empty().append(`
+                                <i class="ki-duotone ki-arrow-up-right fs-2 text-success me-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                 </i>
+                              `);
+                        }
+                        console.log('yesterdayCom==='+yesterdayCom);
+                        console.log('todayCom==='+todayCom);
+                        console.log('yesterdayEme==='+yesterdayEme);
+                        console.log('todayEme==='+todayEme);
+                        console.log('yesterdayMiss==='+yesterdayMiss);
+                        console.log('todayMiss==='+todayMiss);
                     }
                     $('#count-dailPoint-card-data-2').text(countCom);
                     $('#count-per-card-data-2' ).text(countRate+'%');
@@ -190,6 +196,8 @@ $(document).ready(function() {
                 Object.keys(response).forEach(function(key) {
                     // 예: key = 'card-data-1'
                     const callCountList = response[key];
+
+
                     //console.log(key);
                     callCountList.forEach((item, index) => {
 
@@ -198,12 +206,22 @@ $(document).ready(function() {
 
                         }else{
                             missData.push(0,item.hour_09, item.hour_10, item.hour_11, item.hour_12, item.hour_13, item.hour_14, item.hour_15, item.hour_16, item.hour_17, item.hour_18, item.hour_19,0);
+
                         }
-                        callSum = item.callSum;
+
+                       // callSum = item.callSum;
                     });
 
 
                 });
+                comSum = Math.max(...comData);
+                missSum =Math.max(...missData);
+
+                if(comSum > missSum){
+                    callSum = comSum*1.1;
+                }else{
+                    callSum =missSum*1.1;
+                }
                 KTChartsWidget36.init()
             },
             error: function(xhr, status, error) {
@@ -475,7 +493,7 @@ $(document).ready(function() {
                                 }
                             },
                             yaxis: {
-                                max: callSum+countMiss,
+                                max: callSum,
                                 min: 0,
                                 tickAmount: 6,
                                 labels: {
@@ -612,7 +630,12 @@ $(document).ready(function() {
                                         fontSize: "12px"
                                     },
                                     formatter: function(e) {
-                                        return parseInt(e) + "K"
+                                            if(parseInt(e) < 0 ){
+                                                return parseInt(e)*-1 + "K"
+                                            }else{
+                                                return parseInt(e) + "K"
+                                            }
+
                                     }
                                 }
                             },
