@@ -10,6 +10,7 @@ let countRate = 0;
 let callSum=0;
 let comSum =0;
 let missSum = 0;
+let yesterComSum = 0;
 
     $(document).ready(function() {
     let isFirstCall = true;
@@ -184,6 +185,7 @@ let missSum = 0;
     }
     let comData = [];
     let missData = [];
+    let yesterComData = [];
     function fetchCallData() {
         $.ajax({
             url: "/api/dashboard-callCount-data", // 서버 엔드포인트
@@ -192,6 +194,7 @@ let missSum = 0;
                 console.log(response);
                 comData = [];
                 missData = [];
+                yesterComData = [];
                 // response는 각 카드 데이터를 포함하는 객체
                 Object.keys(response).forEach(function(key) {
                     // 예: key = 'card-data-1'
@@ -204,9 +207,11 @@ let missSum = 0;
                         if(item.gubn == 1){
                             comData.push(0,item.hour_09, item.hour_10, item.hour_11, item.hour_12, item.hour_13, item.hour_14, item.hour_15, item.hour_16, item.hour_17, item.hour_18, item.hour_19,0);
 
-                        }else{
+                        }else if(item.gubn == 2){
                             missData.push(0,item.hour_09, item.hour_10, item.hour_11, item.hour_12, item.hour_13, item.hour_14, item.hour_15, item.hour_16, item.hour_17, item.hour_18, item.hour_19,0);
 
+                        }else{
+                            yesterComData.push(0,item.hour_09, item.hour_10, item.hour_11, item.hour_12, item.hour_13, item.hour_14, item.hour_15, item.hour_16, item.hour_17, item.hour_18, item.hour_19,0);
                         }
 
                        // callSum = item.callSum;
@@ -216,12 +221,11 @@ let missSum = 0;
                 });
                 comSum = Math.max(...comData);
                 missSum =Math.max(...missData);
+                yesterComSum=Math.max(...yesterComData);
 
-                if(comSum > missSum){
-                    callSum = comSum*1.1;
-                }else{
-                    callSum =missSum*1.1;
-                }
+
+                callSum = Math.max(comSum, missSum, yesterComSum);
+
                 KTChartsWidget36.init()
             },
             error: function(xhr, status, error) {
@@ -419,11 +423,17 @@ let missSum = 0;
                         r = KTUtil.getCssVariableValue("--bs-border-dashed-color"),
                         o = KTUtil.getCssVariableValue("--bs-primary"),
                         i = KTUtil.getCssVariableValue("--bs-primary"),
+                        p = KTUtil.getCssVariableValue("--bs-secondary"),
                         s = KTUtil.getCssVariableValue("--bs-success"),
                         n = {
                             series: [{
+                                name: "전일 처리 완료",
+                                data: yesterComData
+
+                            }, {
                                 name: "처리 완료",
                                 data: comData
+
                             }, {
                                 name: "미처리",
                                 data: missData
@@ -456,7 +466,7 @@ let missSum = 0;
                                 curve: "smooth",
                                 show: !0,
                                 width: 3,
-                                colors: [o, s]
+                                colors: [p, o, s]
                             },
                             xaxis: {
                                 categories: ["",   "9 AM", "10 AM", "11 AM", "12 PM", "13 PM", "14 PM", "15 PM", "16 PM", "17 PM", "18 PM", "19 PM",""],
@@ -478,7 +488,7 @@ let missSum = 0;
                                 crosshairs: {
                                     position: "front",
                                     stroke: {
-                                        color: [o, s],
+                                        color: [p, o, s],
                                         width: 1,
                                         dashArray: 3
                                     }
@@ -529,7 +539,7 @@ let missSum = 0;
                                     fontSize: "12px"
                                 }
                             },
-                            colors: [i, KTUtil.getCssVariableValue("--bs-success")],
+                            colors: [p,i, KTUtil.getCssVariableValue("--bs-success")],
                             grid: {
                                 borderColor: r,
                                 strokeDashArray: 4,
@@ -540,7 +550,7 @@ let missSum = 0;
                                 }
                             },
                             markers: {
-                                strokeColor: [o, s],
+                                strokeColor: [p, o, s],
                                 strokeWidth: 3
                             }
                         };
@@ -702,4 +712,154 @@ let missSum = 0;
         KTChartsWidget1.init()
     }));
 
+    //구매몰 유형
+    var KTChartsWidget18 = function() {
+        var e = {
+                self: null,
+                rendered: !1
+            },
+            t = function(e) {
+                var t = document.getElementById("kt_charts_widget_18_chart");
+                if (t) {
+                    var a = parseInt(KTUtil.css(t, "height")),
+                        l = KTUtil.getCssVariableValue("--bs-gray-900"),
+                        r = KTUtil.getCssVariableValue("--bs-border-dashed-color"),
+                        o = {
+                            series: [{
+                                name: "Spent time",
+                                data: [54, 42, 75, 110, 23, 87, 50]
+                            }],
+                            chart: {
+                                fontFamily: "inherit",
+                                type: "bar",
+                                height: a,
+                                toolbar: {
+                                    show: !1
+                                }
+                            },
+                            plotOptions: {
+                                bar: {
+                                    horizontal: !1,
+                                    columnWidth: ["28%"],
+                                    borderRadius: 5,
+                                    dataLabels: {
+                                        position: "top"
+                                    },
+                                    startingShape: "flat"
+                                }
+                            },
+                            legend: {
+                                show: !1
+                            },
+                            dataLabels: {
+                                enabled: !0,
+                                offsetY: -28,
+                                style: {
+                                    fontSize: "13px",
+                                    colors: [l]
+                                },
+                                formatter: function(e) {
+                                    return e
+                                }
+                            },
+                            stroke: {
+                                show: !0,
+                                width: 2,
+                                colors: ["transparent"]
+                            },
+                            xaxis: {
+                                categories: ["QA Analysis", "Marketing", "Web Dev", "Maths", "Front-end Dev", "Physics", "Phylosophy"],
+                                axisBorder: {
+                                    show: !1
+                                },
+                                axisTicks: {
+                                    show: !1
+                                },
+                                labels: {
+                                    style: {
+                                        colors: KTUtil.getCssVariableValue("--bs-gray-500"),
+                                        fontSize: "13px"
+                                    }
+                                },
+                                crosshairs: {
+                                    fill: {
+                                        gradient: {
+                                            opacityFrom: 0,
+                                            opacityTo: 0
+                                        }
+                                    }
+                                }
+                            },
+                            yaxis: {
+                                labels: {
+                                    style: {
+                                        colors: KTUtil.getCssVariableValue("--bs-gray-500"),
+                                        fontSize: "13px"
+                                    },
+                                    formatter: function(e) {
+                                        return e + "H"
+                                    }
+                                }
+                            },
+                            fill: {
+                                opacity: 1
+                            },
+                            states: {
+                                normal: {
+                                    filter: {
+                                        type: "none",
+                                        value: 0
+                                    }
+                                },
+                                hover: {
+                                    filter: {
+                                        type: "none",
+                                        value: 0
+                                    }
+                                },
+                                active: {
+                                    allowMultipleDataPointsSelection: !1,
+                                    filter: {
+                                        type: "none",
+                                        value: 0
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                style: {
+                                    fontSize: "12px"
+                                },
+                                y: {
+                                    formatter: function(e) {
+                                        return +e + " hours"
+                                    }
+                                }
+                            },
+                            colors: [KTUtil.getCssVariableValue("--bs-primary"), KTUtil.getCssVariableValue("--bs-primary-light")],
+                            grid: {
+                                borderColor: r,
+                                strokeDashArray: 4,
+                                yaxis: {
+                                    lines: {
+                                        show: !0
+                                    }
+                                }
+                            }
+                        };
+                    e.self = new ApexCharts(t, o), setTimeout((function() {
+                        e.self.render(), e.rendered = !0
+                    }), 200)
+                }
+            };
+        return {
+            init: function() {
+                t(e), KTThemeMode.on("kt.thememode.change", (function() {
+                    e.rendered && e.self.destroy(), t(e)
+                }))
+            }
+        }
+    }();
+    "undefined" != typeof module && (module.exports = KTChartsWidget18), KTUtil.onDOMContentLoaded((function() {
+        KTChartsWidget18.init()
+    }));
 });

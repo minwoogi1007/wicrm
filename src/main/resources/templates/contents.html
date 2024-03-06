@@ -307,236 +307,41 @@
                         <!--begin::Chart widget 8-->
                         <div class="card card-flush h-xl-100">
                             <!--begin::Header-->
-                            <div class="card-header pt-5">
+                            <div class="card-header pt-7">
                                 <!--begin::Title-->
                                 <h3 class="card-title align-items-start flex-column">
-                                    <span class="card-label fw-bolder text-gray-900">상담 유형</span>
-                                    <span class="text-gray-500 mt-1 fw-semibold fs-6"></span>
+                                    <span class="card-label fw-bold text-gray-800">Learn Activity</span>
+                                    <span class="text-gray-500 mt-1 fw-semibold fs-6">Hours per course</span>
                                 </h3>
                                 <!--end::Title-->
                                 <!--begin::Toolbar-->
                                 <div class="card-toolbar">
-                                    <ul class="nav" id="kt_chart_widget_8_tabs">
-                                        <li class="nav-item">
-                                            <a class="nav-link btn btn-sm btn-color-muted btn-active btn-active-light fw-bold px-4 me-1" data-bs-toggle="tab" id="kt_chart_widget_8_week_toggle" href="#kt_chart_widget_8_week_tab">오늘</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link btn btn-sm btn-color-muted btn-active btn-active-light fw-bold px-4 me-1 active" data-bs-toggle="tab" id="kt_chart_widget_8_month_toggle" href="#kt_chart_widget_8_month_tab">주간</a>
-                                        </li>
-                                    </ul>
+                                    <!--begin::Daterangepicker(defined in src/js/layout/app.js)-->
+                                    <div data-kt-daterangepicker="true" data-kt-daterangepicker-opens="left" class="btn btn-sm btn-light d-flex align-items-center px-4">
+                                        <!--begin::Display range-->
+                                        <div class="text-gray-600 fw-bold">Loading date range...</div>
+                                        <!--end::Display range-->
+                                        <i class="ki-duotone ki-calendar-8 fs-1 ms-2 me-0">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                            <span class="path3"></span>
+                                            <span class="path4"></span>
+                                            <span class="path5"></span>
+                                            <span class="path6"></span>
+                                        </i>
+                                    </div>
+                                    <!--end::Daterangepicker-->
                                 </div>
                                 <!--end::Toolbar-->
                             </div>
                             <!--end::Header-->
                             <!--begin::Body-->
-                            <div class="card-body pt-6">
-                                <!--begin::Tab content-->
-                                <div class="tab-content">
-                                    <!--begin::Tab pane-->
-                                    <div class="tab-pane fade" id="kt_chart_widget_8_week_tab" role="tabpanel">
-                                        <!--begin::Statistics-->
-                                        <div class="mb-5">
-                                            <!--begin::Statistics-->
-                                            <div class="d-flex align-items-center mb-2">
-                                                <span class="fs-3x fw-bold text-gray-800 me-2 lh-1 ls-n2">18,89</span>
-                                                <span class="badge badge-light-success fs-base">
-                                                                    <i class="ki-duotone ki-arrow-up fs-5 text-success ms-n1">
-                                                                        <span class="path1"></span>
-                                                                        <span class="path2"></span>
-                                                                    </i>4,8%</span>
-                                            </div>
-                                            <!--end::Statistics-->
-                                            <!--begin::Description-->
-                                            <span class="fs-6 fw-semibold text-gray-500">상담 유형 평균 </span>
-                                            <!--end::Description-->
-                                        </div>
-                                        <!--end::Statistics-->
-                                        <!--begin::Chart-->
-                                        <div id="kt_chart_widget_8_week_chart" class="ms-n5 min-h-auto" style="height: 275px"></div>
-                                        <!--end::Chart-->
-                                        <!--begin::Items-->
-                                        <div class="d-flex flex-wrap pt-5">
-                                            <!--begin::Item-->
-                                            <div class="d-flex flex-column me-7 me-lg-16 pt-sm-3 pt-6">
-                                                <!--begin::Item-->
-                                                <div class="d-flex align-items-center mb-3 mb-sm-6">
-                                                    <!--begin::Bullet-->
-                                                    <span class="bullet bullet-dot bg-primary me-2 h-10px w-10px"></span>
-                                                    <!--end::Bullet-->
-                                                    <!--begin::Label-->
-                                                    <span id="conConType1" class="fw-bold text-gray-600 fs-6"></span>
-                                                    <!--end::Label-->
-                                                </div>
-                                                <!--ed::Item-->
-                                                <!--begin::Item-->
-                                                <div class="d-flex align-items-center">
-                                                    <!--begin::Bullet-->
-                                                    <span class="bullet bullet-dot bg-danger me-2 h-10px w-10px"></span>
-                                                    <!--end::Bullet-->
-                                                    <!--begin::Label-->
-                                                    <span id="conConType4" class="fw-bold text-&lt;gray-600 fs-6"></span>
-                                                    <!--end::Label-->
-                                                </div>
-                                                <!--ed::Item-->
-                                            </div>
-                                            <!--ed::Item-->
-                                            <!--begin::Item-->
-                                            <div class="d-flex flex-column me-7 me-lg-16 pt-sm-3 pt-6">
-                                                <!--begin::Item-->
-                                                <div class="d-flex align-items-center mb-3 mb-sm-6">
-                                                    <!--begin::Bullet-->
-                                                    <span class="bullet bullet-dot bg-success me-2 h-10px w-10px"></span>
-                                                    <!--end::Bullet-->
-                                                    <!--begin::Label-->
-                                                    <span id="conConType2" class="fw-bold text-gray-600 fs-6"></span>
-                                                    <!--end::Label-->
-                                                </div>
-                                                <!--ed::Item-->
-                                                <!--begin::Item-->
-                                                <div class="d-flex align-items-center">
-                                                    <!--begin::Bullet-->
-                                                    <span class="bullet bullet-dot bg-warning me-2 h-10px w-10px"></span>
-                                                    <!--end::Bullet-->
-                                                    <!--begin::Label-->
-                                                    <span id="conConType5" class="fw-bold text-gray-600 fs-6"></span>
-                                                    <!--end::Label-->
-                                                </div>
-                                                <!--ed::Item-->
-                                            </div>
-                                            <!--ed::Item-->
-                                            <!--begin::Item-->
-                                            <div class="d-flex flex-column pt-sm-3 pt-6">
-                                                <!--begin::Item-->
-                                                <div class="d-flex align-items-center mb-3 mb-sm-6">
-                                                    <!--begin::Bullet-->
-                                                    <span class="bullet bullet-dot bg-info me-2 h-10px w-10px"></span>
-                                                    <!--end::Bullet-->
-                                                    <!--begin::Label-->
-                                                    <span id="conConType3" class="fw-bold text-gray-600 fs-6"></span>
-                                                    <!--end::Label-->
-                                                </div>
-                                                <!--ed::Item-->
-                                                <!--begin::Item-->
-                                                <div class="d-flex align-items-center">
-                                                    <!--begin::Bullet-->
-                                                    <span class="bullet bullet-dot bg-success me-2 h-10px w-10px"></span>
-                                                    <!--end::Bullet-->
-                                                    <!--begin::Label-->
-                                                    <span id="conConType6" class="fw-bold text-gray-600 fs-6"></span>
-                                                    <!--end::Label-->
-                                                </div>
-                                                <!--ed::Item-->
-                                            </div>
-                                            <!--ed::Item-->
-                                        </div>
-                                        <!--ed::Items-->
-                                    </div>
-                                    <!--end::Tab pane-->
-                                    <!--begin::Tab pane-->
-                                    <div class="tab-pane fade active show" id="kt_chart_widget_8_month_tab" role="tabpanel">
-                                        <!--begin::Statistics-->
-                                        <div class="mb-5">
-                                            <!--begin::Statistics-->
-                                            <div class="d-flex align-items-center mb-2">
-                                                <span class="fs-1 fw-semibold text-gray-500 me-1 mt-n1"></span>
-                                                <span class="fs-3x fw-bold text-gray-800 me-2 lh-1 ls-n2">8,55</span>
-                                                <span class="badge badge-light-success fs-base">
-                                                                    <i class="ki-duotone ki-arrow-up fs-5 text-success ms-n1">
-                                                                        <span class="path1"></span>
-                                                                        <span class="path2"></span>
-                                                                    </i>2.2%</span>
-                                            </div>
-                                            <!--end::Statistics-->
-                                            <!--begin::Description-->
-                                            <span class="fs-6 fw-semibold text-gray-500">상담 상위 6개 유형</span>
-                                            <!--end::Description-->
-                                        </div>
-                                        <!--end::Statistics-->
-                                        <!--begin::Chart-->
-                                        <div id="kt_chart_widget_8_month_chart" class="ms-n5 min-h-auto" style="height: 275px"></div>
-                                        <!--end::Chart-->
-                                        <!--begin::Items-->
-                                        <div class="d-flex flex-wrap pt-5">
-                                            <!--begin::Item-->
-                                            <div class="d-flex flex-column me-7 me-lg-16 pt-sm-3 pt-6">
-                                                <!--begin::Item-->
-                                                <div class="d-flex align-items-center mb-3 mb-sm-6">
-                                                    <!--begin::Bullet-->
-                                                    <span class="bullet bullet-dot bg-primary me-2 h-10px w-10px"></span>
-                                                    <!--end::Bullet-->
-                                                    <!--begin::Label-->
-                                                    <span class="fw-bold text-gray-600 fs-6">Social Campaigns</span>
-                                                    <!--end::Label-->
-                                                </div>
-                                                <!--ed::Item-->
-                                                <!--begin::Item-->
-                                                <div class="d-flex align-items-center">
-                                                    <!--begin::Bullet-->
-                                                    <span class="bullet bullet-dot bg-danger me-2 h-10px w-10px"></span>
-                                                    <!--end::Bullet-->
-                                                    <!--begin::Label-->
-                                                    <span class="fw-bold text-gray-600 fs-6">Google Ads</span>
-                                                    <!--end::Label-->
-                                                </div>
-                                                <!--ed::Item-->
-                                            </div>
-                                            <!--ed::Item-->
-                                            <!--begin::Item-->
-                                            <div class="d-flex flex-column me-7 me-lg-16 pt-sm-3 pt-6">
-                                                <!--begin::Item-->
-                                                <div class="d-flex align-items-center mb-3 mb-sm-6">
-                                                    <!--begin::Bullet-->
-                                                    <span class="bullet bullet-dot bg-success me-2 h-10px w-10px"></span>
-                                                    <!--end::Bullet-->
-                                                    <!--begin::Label-->
-                                                    <span class="fw-bold text-gray-600 fs-6">Email Newsletter</span>
-                                                    <!--end::Label-->
-                                                </div>
-                                                <!--ed::Item-->
-                                                <!--begin::Item-->
-                                                <div class="d-flex align-items-center">
-                                                    <!--begin::Bullet-->
-                                                    <span class="bullet bullet-dot bg-warning me-2 h-10px w-10px"></span>
-                                                    <!--end::Bullet-->
-                                                    <!--begin::Label-->
-                                                    <span class="fw-bold text-gray-600 fs-6">Courses</span>
-                                                    <!--end::Label-->
-                                                </div>
-                                                <!--ed::Item-->
-                                            </div>
-                                            <!--ed::Item-->
-                                            <!--begin::Item-->
-                                            <div class="d-flex flex-column pt-sm-3 pt-6">
-                                                <!--begin::Item-->
-                                                <div class="d-flex align-items-center mb-3 mb-sm-6">
-                                                    <!--begin::Bullet-->
-                                                    <span class="bullet bullet-dot bg-info me-2 h-10px w-10px"></span>
-                                                    <!--end::Bullet-->
-                                                    <!--begin::Label-->
-                                                    <span class="fw-bold text-gray-600 fs-6">TV Campaign</span>
-                                                    <!--end::Label-->
-                                                </div>
-                                                <!--ed::Item-->
-                                                <!--begin::Item-->
-                                                <div class="d-flex align-items-center">
-                                                    <!--begin::Bullet-->
-                                                    <span class="bullet bullet-dot bg-success me-2 h-10px w-10px"></span>
-                                                    <!--end::Bullet-->
-                                                    <!--begin::Label-->
-                                                    <span class="fw-bold text-gray-600 fs-6">Radio</span>
-                                                    <!--end::Label-->
-                                                </div>
-                                                <!--ed::Item-->
-                                            </div>
-                                            <!--ed::Item-->
-                                        </div>
-                                        <!--ed::Items-->
-                                    </div>
-                                    <!--end::Tab pane-->
-                                </div>
-                                <!--end::Tab content-->
+                            <div class="card-body d-flex align-items-end px-0 pt-3 pb-5">
+                                <!--begin::Chart-->
+                                <div id="kt_charts_widget_18_chart" class="h-325px w-100 min-h-auto ps-4 pe-6"></div>
+                                <!--end::Chart-->
                             </div>
-                            <!--end::Body-->
+                            <!--end: Card Body-->
                         </div>
                         <!--end::Chart widget 8-->
                     </div>
@@ -557,11 +362,9 @@
                                 <div class="card-toolbar">
                                     <!--begin::Menu-->
                                     <button class="btn btn-icon btn-color-gray-500 btn-active-color-primary justify-content-end" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-overflow="true">
-                                        <i class="ki-duotone ki-dots-square fs-1 text-gray-500 me-n1">
+                                        <i class="ki-duotone ki-arrows-circle fs-1 text-gray-500 me-n1">
                                             <span class="path1"></span>
                                             <span class="path2"></span>
-                                            <span class="path3"></span>
-                                            <span class="path4"></span>
                                         </i>
                                     </button>
                                     <!--begin::Menu 2-->
@@ -608,6 +411,8 @@
                     </div>
                     <!--end::Col-->
                 </div>
+
+
                 <!--end::Row-->
                 <!--begin::Row-->
                 <div class="row gx-5 gx-xl-10">
