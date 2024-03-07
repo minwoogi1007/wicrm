@@ -54,22 +54,28 @@ public class DashboardService {
 
         return data;
     }
-    public Map<String, Object> getDashboardCallCount(String username) {
-        Map<String, Object> data = new HashMap<>();
-
+    //로그인 유저별 코드 (거래처 는 업체 코드)
+    private String getCurrentUserCustCode() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        // 데이터베이스 조회
-        String custCode = null;
         if (authentication.getPrincipal() instanceof CustomUserDetails) {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            custCode = userDetails.getCustCode();
-        }else{
-            custCode = "";
+            return userDetails.getCustCode();
         }
-        List<DashboardData> getDashboardCallCount = dashboardMapper.getDashboardCallCount(custCode);
-
-        data.put("dashStatCount-data", getDashboardCallCount);
-
+        System.out.println("권한 --"+authentication.getAuthorities());
+        return "";
+    }
+    public Map<String, Object> getDashboardCallCount(String username) {
+        String custCode = getCurrentUserCustCode();
+        Map<String, Object> data = new HashMap<>();
+        data.put("dashStatCount-data", dashboardMapper.getDashboardCallCount(custCode));
         return data;
     }
+
+    public Map<String, Object> getDashboardPersonCount(String username) {
+        String custCode = getCurrentUserCustCode();
+        Map<String, Object> data = new HashMap<>();
+        data.put("dashStatCount-data", dashboardMapper.getDashboardPersonCount(custCode));
+        return data;
+    }
+
 }

@@ -39,5 +39,15 @@ public class DashboardController {
         return ResponseEntity.ok(data);
     }
 
+    @GetMapping("/api/dashboard-personCount-data")
+    public ResponseEntity<Map<String, Object>> getDashboardPersonCount(Principal principal) {
+
+        String username = principal.getName();
+        Map<String, Object> data = dashboardService.getDashboardPersonCount(username);
+        return ResponseEntity.ok(data);
+    }
+
+
+
 
 }

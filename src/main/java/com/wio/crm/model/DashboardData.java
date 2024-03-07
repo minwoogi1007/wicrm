@@ -45,6 +45,13 @@ public class DashboardData {
 
     private int callSum;
 
+    private String personMonth;
+
+    private int newPersonCount;
+
+    private int oldPersonCount;
+
+
     public String getCount_Miss() {
         return count_Miss;
     }
@@ -302,5 +309,29 @@ public class DashboardData {
 
     public void setCallSum(int callSum) {
         this.callSum = callSum;
+    }
+
+    public String getPersonMonth() {
+        return personMonth;
+    }
+
+    public void setPersonMonth(String personMonth) {
+        this.personMonth = personMonth;
+    }
+
+    public int getNewPersonCount() {
+        return newPersonCount;
+    }
+
+    public void setNewPersonCount(int newPersonCount) {
+        this.newPersonCount = newPersonCount;
+    }
+
+    public int getOldPersonCount() {
+        return oldPersonCount;
+    }
+
+    public void setOldPersonCount(int oldPersonCount) {
+        this.oldPersonCount = oldPersonCount;
     }
 }

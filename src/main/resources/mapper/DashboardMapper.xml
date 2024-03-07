@@ -387,4 +387,37 @@
 
 
     </select>
+    <select id="getDashboardPersonCount" resultType="com.wio.crm.model.DashboardData">
+        SELECT
+            IN_DATE_MONTH as PERSONMONTH,
+            SUM(CASE WHEN DATE_MATCH = 'N' THEN 1 ELSE 0 END) AS NEWPERSONCOUNT,
+            SUM(CASE WHEN DATE_MATCH = 'O' THEN 1 ELSE 0 END) AS OLDPERSONCOUNT
+        FROM (
+            SELECT
+                TO_CHAR(B.IN_DATE, 'YYYY-MM') AS IN_DATE_MONTH,A.PERSON_CODE,
+                CASE
+                WHEN TO_CHAR(A.IN_DATE, 'YYYYMM') = TO_CHAR(B.IN_DATE, 'YYYYMM') THEN 'N'
+                ELSE 'O'
+                END AS DATE_MATCH
+            FROM
+            TPER01 A
+            JOIN TBND01 B ON A.CUST_CODE = B.CUST_CODE
+                AND A.PROJECT_CODE = B.PROJECT_CODE
+                AND A.PERSON_CODE = B.PERSON_CODE
+            <if test="custCode != null and !custCode.isEmpty()">
+                AND A.CUST_CODE =  #{custCode}
+            </if>
+            WHERE
+        <![CDATA[
+            B.IN_DATE >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -11)
+            AND B.IN_DATE < TRUNC(SYSDATE, 'MM') + INTERVAL '1' MONTH
+        ]]>
+
+        )
+        GROUP BY
+        IN_DATE_MONTH
+        ORDER BY
+        IN_DATE_MONTH
+
+    </select>
 </mapper>

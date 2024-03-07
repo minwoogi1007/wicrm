@@ -18,4 +18,7 @@ public interface DashboardMapper {
     DashboardData dashConSum(String custCode);
 
     List<DashboardData> getDashboardCallCount(String custCode);
+
+    List<DashboardData> getDashboardPersonCount(String custCode);
+
 }

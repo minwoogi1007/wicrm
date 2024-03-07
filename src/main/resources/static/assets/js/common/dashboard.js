@@ -15,7 +15,8 @@ let yesterComSum = 0;
     $(document).ready(function() {
     let isFirstCall = true;
     fetchData();
-    fetchCallData()
+    fetchCallData();
+    fetchPersonData();
 
     function fetchData() {
         $.ajax({
@@ -236,6 +237,45 @@ let yesterComSum = 0;
 
     }
 
+    let personMonth = [];
+    let newPersonCount = [];
+    let oldPersonCount = [];
+
+    function fetchPersonData(){
+        $.ajax({
+            url: "/api/dashboard-personCount-data", // 서버 엔드포인트
+            type: "GET",
+            success: function(response) {
+
+
+                // response는 각 카드 데이터를 포함하는 객체
+                Object.keys(response).forEach(function(key) {
+
+                    const personCountList = response[key];
+
+
+                    //console.log(key);
+                    personCountList.forEach((item, index) => {
+                        personMonth.push(item.personMonth);
+                        newPersonCount.push(item.newPersonCount);
+                        oldPersonCount.push(item.oldPersonCount);
+
+                    });
+
+
+                });
+
+                console.log(personMonth);
+                console.log(newPersonCount);
+                console.log(oldPersonCount);
+
+                KTChartsWidget1.init()
+            },
+            error: function(xhr, status, error) {
+                console.error("Data load failed:", error);
+            }
+        });
+    }
     // 5초마다 fetchData 함수를 호출하여 데이터를 새로고침
     setInterval(fetchData, 25000);
     setInterval(fetchCallData, 25000);
@@ -584,10 +624,10 @@ let yesterComSum = 0;
                         i = {
                             series: [{
                                 name: "Subscribed",
-                                data: [20, 30, 20, 40, 60, 75, 65, 18, 10, 5, 15, 40, 60, 18, 35, 55, 20]
+                                data: newPersonCount
                             }, {
                                 name: "Unsubscribed",
-                                data: [-20, -15, -5, -20, -30, -15, -10, -8, -5, -5, -10, -25, -15, -5, -10, -5, -15]
+                                data: oldPersonCount
                             }],
                             chart: {
                                 fontFamily: "inherit",
@@ -612,7 +652,7 @@ let yesterComSum = 0;
                                 enabled: !1
                             },
                             xaxis: {
-                                categories: ["Jan 5", "Jan 7", "Jan 9", "Jan 11", "Jan 13", "Jan 15", "Jan 17", "Jan 19", "Jan 20", "Jan 21", "Jan 23", "Jan 24", "Jan 25", "Jan 26", "Jan 24", "Jan 28", "Jan 29"],
+                                categories: personMonth,
                                 axisBorder: {
                                     show: !1
                                 },
@@ -708,9 +748,7 @@ let yesterComSum = 0;
             }
         }
     }();
-    "undefined" != typeof module && (module.exports = KTChartsWidget1), KTUtil.onDOMContentLoaded((function() {
-        KTChartsWidget1.init()
-    }));
+
 
     //구매몰 유형
     var KTChartsWidget18 = function() {
