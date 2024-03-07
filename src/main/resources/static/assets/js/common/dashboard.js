@@ -8,6 +8,7 @@ let countCom =0;
 let countSum =0;
 let countRate = 0;
 let callSum=0;
+let timeX =0;
 $(document).ready(function() {
     let isFirstCall = true;
     fetchData();
