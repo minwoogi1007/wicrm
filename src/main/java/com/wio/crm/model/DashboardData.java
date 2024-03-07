@@ -51,6 +51,12 @@ public class DashboardData {
 
     private int oldPersonCount;
 
+    private int thisMonth;
+
+    private int previousMonth;
+
+    private int percentChange;
+
 
     public String getCount_Miss() {
         return count_Miss;
@@ -331,7 +337,31 @@ public class DashboardData {
         return oldPersonCount;
     }
 
-    public void setOldPersonCount(int oldPersonCount) {
+    public void setOldPersonCount(int oldPersonCount){
         this.oldPersonCount = oldPersonCount;
+    }
+
+    public int getThisMonth() {
+        return thisMonth;
+    }
+
+    public void setThisMonth(int thisMonth) {
+        this.thisMonth = thisMonth;
+    }
+
+    public int getPreviousMonth() {
+        return previousMonth;
+    }
+
+    public void setPreviousMonth(int previousMonth) {
+        this.previousMonth = previousMonth;
+    }
+
+    public int getPercentChange() {
+        return percentChange;
+    }
+
+    public void setPercentChange(int percentChange) {
+        this.percentChange = percentChange;
     }
 }

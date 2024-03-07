@@ -21,4 +21,7 @@ public interface DashboardMapper {
 
     List<DashboardData> getDashboardPersonCount(String custCode);
 
+    DashboardData getDashboardMonth(String custCode);
+
+
 }

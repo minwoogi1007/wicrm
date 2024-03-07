@@ -420,4 +420,35 @@
         IN_DATE_MONTH
 
     </select>
+
+    <select id="getDashboardMonth" resultType="com.wio.crm.model.DashboardData">
+
+    SELECT   A AS THISMONTH ,B PREVIOUSMONTH,
+        CASE
+        WHEN A >= B THEN TRUNC((A / B) * 100)
+        ELSE TRUNC((A / B) * 100)
+        END
+        AS PERCENTCHANGE
+    FROM (
+        SELECT (
+            SELECT COUNT(CUST_CODE)
+            FROM TBND01
+            WHERE TO_CHAR(IN_dATE,'YYYYMM') = TO_CHAR(SYSDATE,'YYYYMM')
+        <if test="custCode != null and !custCode.isEmpty()">
+            AND CUST_CODE =  #{custCode}
+        </if>
+            AND PRC_GUBN = '2'
+        ) AS A,
+        (
+            SELECT COUNT(CUST_CODE)
+            FROM TBND01
+            WHERE TO_CHAR(IN_DATE,'YYYYMM') = TO_CHAR(ADD_MONTHS(SYSDATE, -1),'YYYYMM')
+        <if test="custCode != null and !custCode.isEmpty()">
+            AND CUST_CODE =  #{custCode}
+        </if>
+            AND PRC_GUBN = '2'
+        ) AS B
+        FROM DUAL
+    )
+    </select>
 </mapper>

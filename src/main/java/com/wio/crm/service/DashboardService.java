@@ -78,4 +78,13 @@ public class DashboardService {
         return data;
     }
 
+    public Map<String, Object> getDashboardMonth(String username) {
+        String custCode = getCurrentUserCustCode();
+        Map<String, Object> data = new HashMap<>();
+        data.put("dashMonth-data", dashboardMapper.getDashboardMonth(custCode));
+        return data;
+    }
+
+
+
 }

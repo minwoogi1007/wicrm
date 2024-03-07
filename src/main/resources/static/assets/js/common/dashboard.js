@@ -12,12 +12,56 @@ let comSum =0;
 let missSum = 0;
 let yesterComSum = 0;
 
+
+
     $(document).ready(function() {
     let isFirstCall = true;
     fetchData();
     fetchCallData();
     fetchPersonData();
+    fetchMonthData();
+// ID를 사용하여 버튼 선택
+    const customCount = document.getElementById('customCount');
+    const timeCount = document.getElementById('timeCount');
 
+    customCount.addEventListener('click', function() {
+        fetchPersonData()
+    });
+    timeCount.addEventListener('click', function() {
+        fetchCallData()
+    });
+
+    function formatNumberWithCommas(number) {
+        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+    function fetchMonthData(){
+        $.ajax({
+            url: "/api/dashboard-month-data", // 서버 엔드포인트
+            type: "GET",
+            success: function(response) {
+                let thisMonth=0;
+                let previousMonth=0;
+                let percentChange=0;
+
+                // response는 각 카드 데이터를 포함하는 객체
+                Object.keys(response).forEach(function(key) {
+                    const monthCount = response[key];
+                    thisMonth = monthCount.thisMonth;
+                    previousMonth =monthCount.previousMonth;
+                    percentChange = monthCount.percentChange;
+
+
+                    $('#thisMonth').text(thisMonth.toLocaleString()+'  이번달' );
+                    $('#previousMonth').text(previousMonth.toLocaleString() );
+                    $('#percentChange').text(percentChange +'%');
+                });
+
+            },
+            error: function(xhr, status, error) {
+                console.error("Data load failed:", error);
+            }
+        });
+    }
     function fetchData() {
         $.ajax({
             url: "/api/dashboard-data", // 서버 엔드포인트
@@ -243,16 +287,21 @@ let yesterComSum = 0;
     let newPersonMax=0;
     let oldPersonMax=0;
     function fetchPersonData(){
+
+
         $.ajax({
             url: "/api/dashboard-personCount-data", // 서버 엔드포인트
             type: "GET",
             success: function(response) {
-
+                personMonth = [];
+                newPersonCount = [];
+                oldPersonCount = [];
 
                 // response는 각 카드 데이터를 포함하는 객체
                 Object.keys(response).forEach(function(key) {
 
                     const personCountList = response[key];
+
 
 
                     //console.log(key);
@@ -265,8 +314,25 @@ let yesterComSum = 0;
 
 
                 });
+
+
                 newPersonMax =Math.max(...newPersonCount);
-                oldPersonMax =Math.max(...oldPersonCount);
+                oldPersonMax =Math.min(...oldPersonCount);
+
+                if(newPersonMax <100 ){
+                    newPersonMax =Math.ceil(newPersonMax/10)*10;
+                }else{
+                    newPersonMax =Math.ceil(newPersonMax/100)*100;
+                }
+                if(newPersonMax <100 ){
+                    oldPersonMax = Math.floor(oldPersonMax/10)*10;
+                }else{
+                    oldPersonMax = Math.floor(oldPersonMax/100)*100;
+                }
+
+
+                console.log(newPersonMax);
+                console.log(oldPersonMax);
 
                 console.log(personMonth);
                 console.log(newPersonCount);
@@ -281,7 +347,6 @@ let yesterComSum = 0;
     }
     // 5초마다 fetchData 함수를 호출하여 데이터를 새로고침
     setInterval(fetchData, 25000);
-    setInterval(fetchCallData, 25000);
 
 
     var KTCardsWidget17 = {
@@ -620,16 +685,20 @@ let yesterComSum = 0;
             t = function() {
                 var t = document.getElementById("kt_charts_widget_1");
                 if (t) {
+                    if (e.self) {
+                        e.self.destroy(); // 기존 차트 인스턴스 제거
+                        e.rendered = false;
+                    }
                     var a = t.hasAttribute("data-kt-negative-color") ? t.getAttribute("data-kt-negative-color") : KTUtil.getCssVariableValue("--bs-success"),
                         l = parseInt(KTUtil.css(t, "height")),
                         r = KTUtil.getCssVariableValue("--bs-gray-500"),
                         o = KTUtil.getCssVariableValue("--bs-border-dashed-color"),
                         i = {
                             series: [{
-                                name: "Subscribed",
+                                name: "신규 고객",
                                 data: newPersonCount
                             }, {
-                                name: "Unsubscribed",
+                                name: "기존 고객",
                                 data: oldPersonCount
                             }],
                             chart: {
@@ -684,9 +753,9 @@ let yesterComSum = 0;
                                     },
                                     formatter: function(e) {
                                             if(parseInt(e) < 0 ){
-                                                return parseInt(e)*-1 + "K"
+                                                return parseInt(e)*-1
                                             }else{
-                                                return parseInt(e) + "K"
+                                                return parseInt(e)
                                             }
 
                                     }
@@ -723,7 +792,7 @@ let yesterComSum = 0;
                                 },
                                 y: {
                                     formatter: function(e) {
-                                        return e > 0 ? e + "K" : Math.abs(e) + "K"
+                                        return e > 0 ? e: Math.abs(e)
                                     }
                                 }
                             },

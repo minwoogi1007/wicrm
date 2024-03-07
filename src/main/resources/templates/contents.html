@@ -232,10 +232,10 @@
                                     <!--begin::Info-->
                                     <div class="d-flex align-items-center">
                                         <!--begin::Amount-->
-                                        <span class="fs-2hx fw-bold text-gray-900 me-2 lh-1 ls-n2">1,836</span>
+                                        <span id="previousMonth" class="fs-2hx fw-bold text-gray-900 me-2 lh-1 ls-n2"></span>
                                         <!--end::Amount-->
                                         <!--begin::Badge-->
-                                        <span class="badge badge-light-danger fs-base">
+                                        <span  class="badge badge-light-danger fs-base">
 															<i class="ki-duotone ki-arrow-down fs-5 text-danger ms-n1">
 																<span class="path1"></span>
 																<span class="path2"></span>
@@ -244,7 +244,7 @@
                                     </div>
                                     <!--end::Info-->
                                     <!--begin::Subtitle-->
-                                    <span class="text-gray-500 pt-1 fw-semibold fs-6">Orders This Month</span>
+                                    <span class="text-gray-500 pt-1 fw-semibold fs-6">전월 상담 완료</span>
                                     <!--end::Subtitle-->
                                 </div>
                                 <!--end::Title-->
@@ -255,8 +255,8 @@
                                 <!--begin::Progress-->
                                 <div class="d-flex align-items-center flex-column mt-3 w-100">
                                     <div class="d-flex justify-content-between w-100 mt-auto mb-2">
-                                        <span class="fw-bolder fs-6 text-gray-900">1,048 to Goal</span>
-                                        <span class="fw-bold fs-6 text-gray-500">62%</span>
+                                        <span  id="thisMonth" class="fw-bolder fs-6 text-gray-900"></span>
+                                        <span  id="percentChange" class="fw-bold fs-6 text-gray-500"></span>
                                     </div>
                                     <div class="h-8px mx-3 w-100 bg-light-success rounded">
                                         <div class="bg-success rounded h-8px" role="progressbar" style="width: 62%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
@@ -278,11 +278,23 @@
                                 <!--begin::Title-->
                                 <h3 class="card-title align-items-start flex-column">
                                     <span class="card-label fw-bolder text-gray-900">시간대별 인입</span>
-                                    <span id="callSum"class="text-gray-500 mt-1 fw-semibold fs-6">1,046 Inbound Calls today</span>
+                                    <span id="callSum"class="text-gray-500 mt-1 fw-semibold fs-6"></span>
                                 </h3>
                                 <!--end::Title-->
                                 <!--begin::Toolbar-->
+                                <div class="card-toolbar">
+                                    <!--begin::Menu-->
+                                    <button id="timeCount" class="btn btn-icon btn-color-gray-500 btn-active-color-primary justify-content-end" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-overflow="true">
+                                        <i class="ki-duotone ki-arrows-circle fs-1 text-gray-500 me-n1">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                        </i>
+                                    </button>
+                                    <!--begin::Menu 2-->
 
+                                    <!--end::Menu 2-->
+                                    <!--end::Menu-->
+                                </div>
                                 <!--end::Toolbar-->
                             </div>
                             <!--end::Header-->
@@ -310,8 +322,8 @@
                             <div class="card-header pt-7">
                                 <!--begin::Title-->
                                 <h3 class="card-title align-items-start flex-column">
-                                    <span class="card-label fw-bold text-gray-800">Learn Activity</span>
-                                    <span class="text-gray-500 mt-1 fw-semibold fs-6">Hours per course</span>
+                                    <span class="card-label fw-bold text-gray-800">구매몰</span>
+                                    <span class="text-gray-500 mt-1 fw-semibold fs-6">고객 구매처 </span>
                                 </h3>
                                 <!--end::Title-->
                                 <!--begin::Toolbar-->
@@ -355,13 +367,13 @@
                                 <!--begin::Title-->
                                 <h3 class="card-title align-items-start flex-column">
                                     <span class="card-label fw-bolder text-gray-900">고객</span>
-                                    <span class="text-gray-500 pt-2 fw-semibold fs-6">신규 인입</span>
+                                    <span class="text-gray-500 pt-2 fw-semibold fs-6">월간 신규 인입</span>
                                 </h3>
                                 <!--end::Title-->
                                 <!--begin::Toolbar-->
                                 <div class="card-toolbar">
                                     <!--begin::Menu-->
-                                    <button class="btn btn-icon btn-color-gray-500 btn-active-color-primary justify-content-end" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-overflow="true">
+                                    <button id="customCount" class="btn btn-icon btn-color-gray-500 btn-active-color-primary justify-content-end" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-overflow="true">
                                         <i class="ki-duotone ki-arrows-circle fs-1 text-gray-500 me-n1">
                                             <span class="path1"></span>
                                             <span class="path2"></span>
