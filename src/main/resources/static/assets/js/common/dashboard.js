@@ -240,7 +240,8 @@ let yesterComSum = 0;
     let personMonth = [];
     let newPersonCount = [];
     let oldPersonCount = [];
-
+    let newPersonMax=0;
+    let oldPersonMax=0;
     function fetchPersonData(){
         $.ajax({
             url: "/api/dashboard-personCount-data", // 서버 엔드포인트
@@ -258,12 +259,14 @@ let yesterComSum = 0;
                     personCountList.forEach((item, index) => {
                         personMonth.push(item.personMonth);
                         newPersonCount.push(item.newPersonCount);
-                        oldPersonCount.push(item.oldPersonCount);
+                        oldPersonCount.push(item.oldPersonCount*-1);
 
                     });
 
 
                 });
+                newPersonMax =Math.max(...newPersonCount);
+                oldPersonMax =Math.max(...oldPersonCount);
 
                 console.log(personMonth);
                 console.log(newPersonCount);
@@ -671,9 +674,9 @@ let yesterComSum = 0;
                                 }
                             },
                             yaxis: {
-                                min: -50,
-                                max: 80,
-                                tickAmount: 6,
+                                min: oldPersonMax,
+                                max: newPersonMax,
+                                tickAmount: 10,
                                 labels: {
                                     style: {
                                         colors: [r],
