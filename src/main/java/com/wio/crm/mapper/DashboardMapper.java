@@ -23,5 +23,6 @@ public interface DashboardMapper {
 
     DashboardData getDashboardMonth(String custCode);
 
+    List<DashboardData> getEmployeeList();
 
 }

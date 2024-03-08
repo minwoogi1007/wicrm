@@ -14,13 +14,13 @@ let yesterComSum = 0;
 
 
 
-    $(document).ready(function() {
+$(document).ready(function() {
     let isFirstCall = true;
     fetchData();
     fetchCallData();
     fetchPersonData();
     fetchMonthData();
-// ID를 사용하여 버튼 선택
+    // ID를 사용하여 버튼 선택
     const customCount = document.getElementById('customCount');
     const timeCount = document.getElementById('timeCount');
 
@@ -42,6 +42,9 @@ let yesterComSum = 0;
                 let thisMonth=0;
                 let previousMonth=0;
                 let percentChange=0;
+                let percent=0;
+
+
 
                 // response는 각 카드 데이터를 포함하는 객체
                 Object.keys(response).forEach(function(key) {
@@ -50,10 +53,35 @@ let yesterComSum = 0;
                     previousMonth =monthCount.previousMonth;
                     percentChange = monthCount.percentChange;
 
+                    if(percentChange <100){
+                        percent = 100 - percentChange;
+
+                        $('#percent').text(percent +'%');
+                        $('#directionIcon').empty().append(`
+                                <i class="ki-duotone ki-arrow-down fs-5 text-danger ms-n1">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                                
+                         `);
+                    }else {
+                        $('#percent').text(percent +'%');
+                        $('#directionIcon').empty().append(`
+                                <i class="ki-duotone ki-arrow-up fs-5 text-success ms-n1">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                                
+                         `);
+                    }
 
                     $('#thisMonth').text(thisMonth.toLocaleString()+'  이번달' );
                     $('#previousMonth').text(previousMonth.toLocaleString() );
                     $('#percentChange').text(percentChange +'%');
+                    //
+                    // 프로그레스바 너비 업데이트
+                    $('#progressbarMonth').css('width', percentChange + '%').attr('aria-valuenow', percentChange);
+
                 });
 
             },
@@ -347,7 +375,7 @@ let yesterComSum = 0;
     }
     // 5초마다 fetchData 함수를 호출하여 데이터를 새로고침
     setInterval(fetchData, 25000);
-
+    setInterval(fetchMonthData, 25000);
 
     var KTCardsWidget17 = {
         init: function() {
@@ -972,4 +1000,107 @@ let yesterComSum = 0;
     "undefined" != typeof module && (module.exports = KTChartsWidget18), KTUtil.onDOMContentLoaded((function() {
         KTChartsWidget18.init()
     }));
+
+    am5.ready(function () {
+
+        // Create root element
+        // https://www.amcharts.com/docs/v5/getting-started/#Root_element
+        var root = am5.Root.new("kt_amcharts_1");
+
+        // Set themes
+        // https://www.amcharts.com/docs/v5/concepts/themes/
+        root.setThemes([
+            am5themes_Animated.new(root)
+        ]);
+
+        // Create chart
+        // https://www.amcharts.com/docs/v5/charts/xy-chart/
+        var chart = root.container.children.push(am5xy.XYChart.new(root, {
+            panX: false,
+            panY: false,
+            wheelX: "panX",
+            wheelY: "zoomX",
+            layout: root.verticalLayout
+        }));
+
+        // Add legend
+        // https://www.amcharts.com/docs/v5/charts/xy-chart/legend-xy-series/
+        var legend = chart.children.push(
+            am5.Legend.new(root, {
+                centerX: am5.p50,
+                x: am5.p50
+            })
+        );
+
+        var data = [50,24,54,22,56,74]
+
+        // Create axes
+        // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+        var xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
+            categoryField: "year",
+            renderer: am5xy.AxisRendererX.new(root, {
+                cellStartLocation: 0.1,
+                cellEndLocation: 0.9
+            }),
+            tooltip: am5.Tooltip.new(root, {})
+        }));
+
+        xAxis.data.setAll(data);
+
+        var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
+            renderer: am5xy.AxisRendererY.new(root, {})
+        }));
+
+        // Add series
+        // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+        function makeSeries(name, fieldName) {
+            var series = chart.series.push(am5xy.ColumnSeries.new(root, {
+                name: name,
+                xAxis: xAxis,
+                yAxis: yAxis,
+                valueYField: fieldName,
+                categoryXField: "year"
+            }));
+
+            series.columns.template.setAll({
+                tooltipText: "{name}, {categoryX}:{valueY}",
+                width: am5.percent(90),
+                tooltipY: 0
+            });
+
+            series.data.setAll(data);
+
+            // Make stuff animate on load
+            // https://www.amcharts.com/docs/v5/concepts/animations/
+            series.appear();
+
+            series.bullets.push(function () {
+                return am5.Bullet.new(root, {
+                    locationY: 0,
+                    sprite: am5.Label.new(root, {
+                        text: "{valueY}",
+                        fill: root.interfaceColors.get("alternativeText"),
+                        centerY: 0,
+                        centerX: am5.p50,
+                        populateText: true
+                    })
+                });
+            });
+
+            legend.data.push(series);
+        }
+
+        makeSeries("Europe", "europe");
+        makeSeries("North America", "namerica");
+        makeSeries("Asia", "asia");
+        makeSeries("Latin America", "lamerica");
+        makeSeries("Middle East", "meast");
+        makeSeries("Africa", "africa");
+
+
+        // Make stuff animate on load
+        // https://www.amcharts.com/docs/v5/concepts/animations/
+        chart.appear(1000, 100);
+
+    }); // end am5.ready()
 });

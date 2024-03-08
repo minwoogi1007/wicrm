@@ -11,20 +11,11 @@ import com.wio.crm.mapper.BoardMapper;
 import java.util.List;
 
 @Service
-public class BoardService {
+public interface BoardService {
 
-    @Autowired
-    private BoardMapper boardMapper;
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    String custCode = null;
-    //사내 공지 게시판 조회
-    public List<Board> getNoticeBoardList () {
 
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+    List<Board> findPostsByCategory(String category);
+    List<Board> findAllPosts(); // 모든 게시글 조회
 
-        custCode = userDetails.getCustCode();
-        if(custCode == null) custCode = "gongi";
-    return boardMapper.noticeBoardList(custCode);
-}
 
 }

@@ -46,7 +46,7 @@ public class DashboardService {
         List<DashboardData> pointList = dashboardMapper.findPointList(custCode); //
         DashboardData dashConSum = dashboardMapper.dashConSum(custCode);
 
-
+        System.out.println(authentication );
         data.put("card-data-1", card1Data);
         data.put("card-data-2", card2Data);
         data.put("card-data-3", dashConSum);
@@ -84,7 +84,12 @@ public class DashboardService {
         data.put("dashMonth-data", dashboardMapper.getDashboardMonth(custCode));
         return data;
     }
-
+    public Map<String, Object> getEmployeeList() {
+        String custCode = getCurrentUserCustCode();
+        Map<String, Object> data = new HashMap<>();
+        data.put("employeeList", dashboardMapper.getEmployeeList());
+        return data;
+    }
 
 
 }

@@ -4,13 +4,17 @@ import com.wio.crm.model.DashboardData;
 import com.wio.crm.service.DashboardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -55,6 +59,12 @@ public class DashboardController {
         return ResponseEntity.ok(data);
     }
 
+    @GetMapping("/api/dashboard-employee")
+    @PreAuthorize("hasAuthority('ROLE_EMPLOYEE')")
+    public  ResponseEntity<Map<String, Object>> getEmployeeList() {
 
+        Map<String, Object> data = dashboardService.getEmployeeList();
+        return ResponseEntity.ok(data);
+    }
 
 }

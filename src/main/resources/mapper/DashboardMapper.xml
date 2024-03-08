@@ -451,4 +451,37 @@
         FROM DUAL
     )
     </select>
+
+    <select id="getEmployeeList" resultType="Map">
+        WITH ReplyCounts AS (
+            SELECT
+                GNO,
+                cat_group,
+                COUNT(*) AS re_count
+            FROM BOARD_CALL
+            WHERE SUBJECT IS NULL AND DELCODE IS NULL
+            GROUP BY GNO, cat_group
+        )
+        SELECT
+            --ROW_NUMBER() OVER (ORDER BY a.GNO DESC) AS rownum,
+            a.UNO,
+            a.GNO,
+            a.SUBJECT,
+            a.ID,
+            a.IN_DATE,
+            a.REPLY_DEPTH,
+            a.att_file,
+            a.hit,
+            a.EMPNM,
+            rc.re_count,
+            CASE WHEN a.nocode = '1' THEN 'notice' ELSE '' END AS nocode
+        FROM BOARD_CALL a
+                 LEFT JOIN ReplyCounts rc ON a.GNO = rc.GNO AND a.cat_group = rc.cat_group
+        WHERE a.CAT_GROUP = 'gongi'
+          AND a.REPLY_DEPTH = 'A'
+          AND a.DELCODE IS NULL
+          AND a.SUBJECT IS NOT NULL
+        ORDER BY a.GNO DESC, a.REPLY_DEPTH
+
+    </select>
 </mapper>
