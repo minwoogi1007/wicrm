@@ -166,6 +166,12 @@ $(document).ready(function() {
                         // $('#count-sum-' + key).text(countSum); // 애니메이션으로 값이 설정되므로 이 줄은 필요 없습니다.
                         $('#callSum').text(countSum + ' calls today');
                         $('#count-rate-' + key).text(countRate + ' %');
+                        if (countRate < 40) {
+                            $('#count-rate-' + key).addClass('blink');
+                        } else {
+                            $('#count-rate-' + key).removeClass('blink');
+                        }
+
 
                         // 프로그레스 바 업데이트
                         $(".progress-bar").css("width", countRate + "%").attr("aria-valuenow", countRate);

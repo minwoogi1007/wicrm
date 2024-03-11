@@ -20,6 +20,31 @@
 	<link href="/assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
 	<!--end::Global Stylesheets Bundle-->
 	<script>// Frame-busting to prevent site from being loaded within a frame without permission (click-jacking) if (window.top != window.self) { window.top.location.replace(window.self.location.href); }</script>
+
+	<style>
+		@keyframes blinker {
+			50% {
+				opacity: 0;
+			}
+		}
+
+		.blink {
+			animation: blinker 1s linear infinite;
+			color: red; /* 텍스트 색상을 빨간색으로 설정 */
+			background-color: transparent; /* 배경색을 투명으로 설정 */
+		}
+		/* 배경색을 깜박이게 하려면 */
+		@keyframes backgroundBlinker {
+			50% {
+				background-color: red;
+			}
+		}
+
+		.backgroundBlink {
+			animation: backgroundBlinker 1s linear infinite;
+			color: white; /* 텍스트 색상을 하얀색으로 설정 (선택사항) */
+		}
+	</style>
 </head>
 <!--end::Head-->
 <!--begin::Body-->
