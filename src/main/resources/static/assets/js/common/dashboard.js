@@ -13,16 +13,17 @@ let missSum = 0;
 let yesterComSum = 0;
 
 
-
 $(document).ready(function() {
     let isFirstCall = true;
     fetchData();
     fetchCallData();
     fetchPersonData();
     fetchMonthData();
+    fetchDailyData();
     // ID를 사용하여 버튼 선택
     const customCount = document.getElementById('customCount');
     const timeCount = document.getElementById('timeCount');
+    const dailyAvg = document.getElementById('dailyAvg');
 
     customCount.addEventListener('click', function() {
         fetchPersonData()
@@ -30,7 +31,26 @@ $(document).ready(function() {
     timeCount.addEventListener('click', function() {
         fetchCallData()
     });
+    dailyAvg.addEventListener('click', function() {
+        fetchDailyData()
+    });
+    $(document).ready(function() {
+        $.ajax({
+            url: '/api/dashboard-employee',
+            type: 'GET',
+            success: function(response) {
+                // 성공적으로 데이터를 받아온 경우 처리 로직
+                console.log(response);
 
+                // 예: 받아온 데이터를 HTML 요소에 동적으로 추가
+                // $('#employeeList').append('<p>' + JSON.stringify(response) + '</p>');
+            },
+            error: function(xhr, status, error) {
+                // 요청 실패 시 처리 로직
+                console.error("Error: " + status + " " + error);
+            }
+        });
+    });
     function formatNumberWithCommas(number) {
         return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
@@ -53,9 +73,10 @@ $(document).ready(function() {
                     previousMonth =monthCount.previousMonth;
                     percentChange = monthCount.percentChange;
 
+                    console.log(percentChange);
                     if(percentChange <100){
                         percent = 100 - percentChange;
-
+                        console.log("percentChange <100  ===="+percent);
                         $('#percent').text(percent +'%');
                         $('#directionIcon').empty().append(`
                                 <i class="ki-duotone ki-arrow-down fs-5 text-danger ms-n1">
@@ -64,7 +85,13 @@ $(document).ready(function() {
                                 </i>
                                 
                          `);
+
+
+                        $('#percentColor').removeClass('badge-light-success').addClass('badge-light-danger');
+                        $('#progressbarMonth').css('width', percentChange + '%').attr('aria-valuenow', percentChange);
                     }else {
+                        percent = percentChange-100;
+                        console.log("percentChange >100  ===="+percent);
                         $('#percent').text(percent +'%');
                         $('#directionIcon').empty().append(`
                                 <i class="ki-duotone ki-arrow-up fs-5 text-success ms-n1">
@@ -73,6 +100,9 @@ $(document).ready(function() {
                                 </i>
                                 
                          `);
+                        $('#percentColor').removeClass('badge-light-danger').addClass('badge-light-success');
+
+                        $('#progressbarMonth').css('width', 100 + '%').attr('aria-valuenow', 100);
                     }
 
                     $('#thisMonth').text(thisMonth.toLocaleString()+'  이번달' );
@@ -80,7 +110,12 @@ $(document).ready(function() {
                     $('#percentChange').text(percentChange +'%');
                     //
                     // 프로그레스바 너비 업데이트
-                    $('#progressbarMonth').css('width', percentChange + '%').attr('aria-valuenow', percentChange);
+                    if(percentChange>100){
+
+                    }else{
+
+                    }
+
 
                 });
 
@@ -95,7 +130,7 @@ $(document).ready(function() {
             url: "/api/dashboard-data", // 서버 엔드포인트
             type: "GET",
             success: function(response) {
-                console.log(response);
+                //console.log(response);
                 // response는 각 카드 데이터를 포함하는 객체
                 Object.keys(response).forEach(function(key) {
                     // 예: key = 'card-data-1'
@@ -157,12 +192,12 @@ $(document).ready(function() {
                             //차트에 필요한 데이터
                             if(index==0){
                                 chartM1 = item.dailyPointN;
-                                console.log('1111111=='+chartM1);
-                                console.log('2222222=='+chartM2);
+                                //console.log('1111111=='+chartM1);
+                                //console.log('2222222=='+chartM2);
                             }else if(index==1){
                                 chartM2 = item.dailyPointN;
-                                console.log('333333333=='+chartM1);
-                                console.log('44444444=='+chartM2);
+                                //console.log('333333333=='+chartM1);
+                                //console.log('44444444=='+chartM2);
                             }
 
                             $('#pointlist').append(`
@@ -239,12 +274,12 @@ $(document).ready(function() {
                                  </i>
                               `);
                         }
-                        console.log('yesterdayCom==='+yesterdayCom);
-                        console.log('todayCom==='+todayCom);
-                        console.log('yesterdayEme==='+yesterdayEme);
-                        console.log('todayEme==='+todayEme);
-                        console.log('yesterdayMiss==='+yesterdayMiss);
-                        console.log('todayMiss==='+todayMiss);
+                        //console.log('yesterdayCom==='+yesterdayCom);
+                        //console.log('todayCom==='+todayCom);
+                        //console.log('yesterdayEme==='+yesterdayEme);
+                        //console.log('todayEme==='+todayEme);
+                        //console.log('yesterdayMiss==='+yesterdayMiss);
+                        //console.log('todayMiss==='+todayMiss);
                     }
                     $('#count-dailPoint-card-data-2').text(countCom);
                     $('#count-per-card-data-2' ).text(countRate+'%');
@@ -264,7 +299,7 @@ $(document).ready(function() {
             url: "/api/dashboard-callCount-data", // 서버 엔드포인트
             type: "GET",
             success: function(response) {
-                console.log(response);
+                //console.log(response);
                 comData = [];
                 missData = [];
                 yesterComData = [];
@@ -359,12 +394,12 @@ $(document).ready(function() {
                 }
 
 
-                console.log(newPersonMax);
-                console.log(oldPersonMax);
+                //console.log(newPersonMax);
+                //console.log(oldPersonMax);
 
-                console.log(personMonth);
-                console.log(newPersonCount);
-                console.log(oldPersonCount);
+                //console.log(personMonth);
+                //console.log(newPersonCount);
+                //console.log(oldPersonCount);
 
                 KTChartsWidget1.init()
             },
@@ -373,6 +408,45 @@ $(document).ready(function() {
             }
         });
     }
+    let avg1week = [];
+    let avg1month = [];
+    let avg3months = [];
+    let avg6months = [];
+    let avg9months = [];
+    let avg12months = [];
+
+    function fetchDailyData() {
+        $.ajax({
+            url: "/api/dashboard-daily-data",
+            type: "GET",
+            success: function(response) {
+                // 배열 초기화
+                avg1week = [];
+                avg1month = [];
+                avg3months = [];
+                avg6months = [];
+                avg9months = [];
+                avg12months = [];
+
+                // 데이터 처리
+                response.dailyAve.forEach(function(item) {
+                    avg1week.push(item.AVG1WEEK);
+                    avg1month.push(item.AVG1MONTH);
+                    avg3months.push(item.AVG3MONTHS);
+                    avg6months.push(item.AVG6MONTHS);
+                    avg9months.push(item.AVG9MONTHS);
+                    avg12months.push(item.AVG12MONTHS);
+                });
+
+                // 차트 업데이트
+                KTChartsWidget18.init()
+            },
+            error: function(xhr, status, error) {
+                console.error("Data load failed:", error);
+            }
+        });
+    }
+
     // 5초마다 fetchData 함수를 호출하여 데이터를 새로고침
     setInterval(fetchData, 25000);
     setInterval(fetchMonthData, 25000);
@@ -404,10 +478,10 @@ $(document).ready(function() {
                         i(KTUtil.getCssVariableValue("--bs-primary"), t.lineWidth, chartM2/countCom)
                 }
             }()
-            console.log('countCom'+countCom);
-            console.log('chartM1/countCom'+chartM1/countCom);
+            //console.log('countCom'+countCom);
+            //console.log('chartM1/countCom'+chartM1/countCom);
 
-            console.log('chartM2/countCom'+chartM2/countCom);
+            //console.log('chartM2/countCom'+chartM2/countCom);
         }
     };
 
@@ -723,10 +797,10 @@ $(document).ready(function() {
                         o = KTUtil.getCssVariableValue("--bs-border-dashed-color"),
                         i = {
                             series: [{
-                                name: "신규 고객",
+                                name: "신규 인입 고객",
                                 data: newPersonCount
                             }, {
-                                name: "기존 고객",
+                                name: "기존 인입 고객",
                                 data: oldPersonCount
                             }],
                             chart: {
@@ -851,256 +925,99 @@ $(document).ready(function() {
 
 
     //구매몰 유형
-    var KTChartsWidget18 = function() {
+    var KTChartsWidget18 = (function() {
         var e = {
-                self: null,
-                rendered: !1
-            },
-            t = function(e) {
-                var t = document.getElementById("kt_charts_widget_18_chart");
-                if (t) {
-                    var a = parseInt(KTUtil.css(t, "height")),
-                        l = KTUtil.getCssVariableValue("--bs-gray-900"),
-                        r = KTUtil.getCssVariableValue("--bs-border-dashed-color"),
-                        o = {
-                            series: [{
-                                name: "Spent time",
-                                data: [54, 42, 75, 110, 23, 87, 50]
-                            }],
-                            chart: {
-                                fontFamily: "inherit",
-                                type: "bar",
-                                height: a,
-                                toolbar: {
-                                    show: !1
-                                }
-                            },
-                            plotOptions: {
-                                bar: {
-                                    horizontal: !1,
-                                    columnWidth: ["28%"],
-                                    borderRadius: 5,
-                                    dataLabels: {
-                                        position: "top"
-                                    },
-                                    startingShape: "flat"
-                                }
-                            },
-                            legend: {
-                                show: !1
-                            },
+            self: null,
+            rendered: false
+        };
+
+        var t = function(e) {
+            var t = document.getElementById("kt_charts_widget_18_chart");
+            // 기존 차트가 있다면 제거
+            if (e.self) {
+                e.self.destroy();
+            }
+
+            if (t) {
+                var a = parseInt(KTUtil.css(t, "height"));
+                var o = {
+                    series: [
+
+                        { name: "1주", data: avg1week },
+                        { name: "1개월", data: avg1month },
+                        { name: "3개월", data: avg3months },
+                        { name: "6개월", data: avg6months },
+                        { name: "9개월", data: avg9months },
+                        { name: "12개월", data: avg12months }
+                    ],
+                    chart: {
+                        type: "bar",
+                        height: a,
+                        toolbar: { show: false }
+                    },
+                    plotOptions: {
+                        bar: {
+                            horizontal: false,
+                            columnWidth: '90%',
+                            borderRadius: 4,
                             dataLabels: {
-                                enabled: !0,
-                                offsetY: -28,
-                                style: {
-                                    fontSize: "13px",
-                                    colors: [l]
-                                },
-                                formatter: function(e) {
-                                    return e
-                                }
+                                position: 'top',
                             },
-                            stroke: {
-                                show: !0,
-                                width: 2,
-                                colors: ["transparent"]
-                            },
-                            xaxis: {
-                                categories: ["QA Analysis", "Marketing", "Web Dev", "Maths", "Front-end Dev", "Physics", "Phylosophy"],
-                                axisBorder: {
-                                    show: !1
-                                },
-                                axisTicks: {
-                                    show: !1
-                                },
-                                labels: {
-                                    style: {
-                                        colors: KTUtil.getCssVariableValue("--bs-gray-500"),
-                                        fontSize: "13px"
-                                    }
-                                },
-                                crosshairs: {
-                                    fill: {
-                                        gradient: {
-                                            opacityFrom: 0,
-                                            opacityTo: 0
-                                        }
-                                    }
-                                }
-                            },
-                            yaxis: {
-                                labels: {
-                                    style: {
-                                        colors: KTUtil.getCssVariableValue("--bs-gray-500"),
-                                        fontSize: "13px"
-                                    },
-                                    formatter: function(e) {
-                                        return e + "H"
-                                    }
-                                }
-                            },
-                            fill: {
-                                opacity: 1
-                            },
-                            states: {
-                                normal: {
-                                    filter: {
-                                        type: "none",
-                                        value: 0
-                                    }
-                                },
-                                hover: {
-                                    filter: {
-                                        type: "none",
-                                        value: 0
-                                    }
-                                },
-                                active: {
-                                    allowMultipleDataPointsSelection: !1,
-                                    filter: {
-                                        type: "none",
-                                        value: 0
-                                    }
-                                }
-                            },
-                            tooltip: {
-                                style: {
-                                    fontSize: "12px"
-                                },
-                                y: {
-                                    formatter: function(e) {
-                                        return +e + " hours"
-                                    }
-                                }
-                            },
-                            colors: [KTUtil.getCssVariableValue("--bs-primary"), KTUtil.getCssVariableValue("--bs-primary-light")],
-                            grid: {
-                                borderColor: r,
-                                strokeDashArray: 4,
-                                yaxis: {
-                                    lines: {
-                                        show: !0
-                                    }
-                                }
+                        },
+                    },
+                    dataLabels: {
+                        enabled: true
+                    },
+                    legend: {
+                        show: true,
+                        position: 'top',
+                        horizontalAlign: 'right',
+                    },
+                    xaxis: {
+                        categories: ["월요일", "화요일", "수요일", "목요일", "금요일"],
+                        labels: {
+                            rotate: 0
+                        }
+                    },
+                    yaxis: {
+                        title: {
+                            text: '상담완료 수'
+                        }
+                    },
+                    fill: {
+                        opacity: 1
+                    },
+                    tooltip: {
+                        y: {
+                            formatter: function(val) {
+                                return val + " 건"
                             }
-                        };
-                    e.self = new ApexCharts(t, o), setTimeout((function() {
-                        e.self.render(), e.rendered = !0
-                    }), 200)
-                }
-            };
+                        }
+                    }
+                };
+                e.self = new ApexCharts(t, o);
+                e.self.render();
+            }
+        };
+
         return {
             init: function() {
-                t(e), KTThemeMode.on("kt.thememode.change", (function() {
-                    e.rendered && e.self.destroy(), t(e)
-                }))
+                t(e);
+            },
+            updateChart: function(newData) {
+                if(e.self) {
+                    e.self.updateSeries(newData);
+                } else {
+                    t(e); // If the chart is not initialized, initialize it.
+                }
             }
         }
-    }();
-    "undefined" != typeof module && (module.exports = KTChartsWidget18), KTUtil.onDOMContentLoaded((function() {
-        KTChartsWidget18.init()
-    }));
-
-    am5.ready(function () {
-
-        // Create root element
-        // https://www.amcharts.com/docs/v5/getting-started/#Root_element
-        var root = am5.Root.new("kt_amcharts_1");
-
-        // Set themes
-        // https://www.amcharts.com/docs/v5/concepts/themes/
-        root.setThemes([
-            am5themes_Animated.new(root)
-        ]);
-
-        // Create chart
-        // https://www.amcharts.com/docs/v5/charts/xy-chart/
-        var chart = root.container.children.push(am5xy.XYChart.new(root, {
-            panX: false,
-            panY: false,
-            wheelX: "panX",
-            wheelY: "zoomX",
-            layout: root.verticalLayout
-        }));
-
-        // Add legend
-        // https://www.amcharts.com/docs/v5/charts/xy-chart/legend-xy-series/
-        var legend = chart.children.push(
-            am5.Legend.new(root, {
-                centerX: am5.p50,
-                x: am5.p50
-            })
-        );
-
-        var data = [50,24,54,22,56,74]
-
-        // Create axes
-        // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
-        var xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
-            categoryField: "year",
-            renderer: am5xy.AxisRendererX.new(root, {
-                cellStartLocation: 0.1,
-                cellEndLocation: 0.9
-            }),
-            tooltip: am5.Tooltip.new(root, {})
-        }));
-
-        xAxis.data.setAll(data);
-
-        var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
-            renderer: am5xy.AxisRendererY.new(root, {})
-        }));
-
-        // Add series
-        // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
-        function makeSeries(name, fieldName) {
-            var series = chart.series.push(am5xy.ColumnSeries.new(root, {
-                name: name,
-                xAxis: xAxis,
-                yAxis: yAxis,
-                valueYField: fieldName,
-                categoryXField: "year"
-            }));
-
-            series.columns.template.setAll({
-                tooltipText: "{name}, {categoryX}:{valueY}",
-                width: am5.percent(90),
-                tooltipY: 0
-            });
-
-            series.data.setAll(data);
-
-            // Make stuff animate on load
-            // https://www.amcharts.com/docs/v5/concepts/animations/
-            series.appear();
-
-            series.bullets.push(function () {
-                return am5.Bullet.new(root, {
-                    locationY: 0,
-                    sprite: am5.Label.new(root, {
-                        text: "{valueY}",
-                        fill: root.interfaceColors.get("alternativeText"),
-                        centerY: 0,
-                        centerX: am5.p50,
-                        populateText: true
-                    })
-                });
-            });
-
-            legend.data.push(series);
-        }
-
-        makeSeries("Europe", "europe");
-        makeSeries("North America", "namerica");
-        makeSeries("Asia", "asia");
-        makeSeries("Latin America", "lamerica");
-        makeSeries("Middle East", "meast");
-        makeSeries("Africa", "africa");
+    })();
 
 
-        // Make stuff animate on load
-        // https://www.amcharts.com/docs/v5/concepts/animations/
-        chart.appear(1000, 100);
 
-    }); // end am5.ready()
+
+
+
+
 });

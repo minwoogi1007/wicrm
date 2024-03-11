@@ -1,7 +1,6 @@
 package com.wio.crm.mapper;
 
 
-import com.wio.crm.model.Board;
 import com.wio.crm.model.DashboardData;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -24,5 +23,7 @@ public interface DashboardMapper {
     DashboardData getDashboardMonth(String custCode);
 
     List<DashboardData> getEmployeeList();
+
+    List<DashboardData> getDailyAve(String custCode);
 
 }

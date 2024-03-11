@@ -453,35 +453,181 @@
     </select>
 
     <select id="getEmployeeList" resultType="Map">
-        WITH ReplyCounts AS (
-            SELECT
-                GNO,
-                cat_group,
-                COUNT(*) AS re_count
-            FROM BOARD_CALL
-            WHERE SUBJECT IS NULL AND DELCODE IS NULL
-            GROUP BY GNO, cat_group
-        )
+        <![CDATA[
+
+        SELECT 'Yearly' AS Period, E.EMP_NAME, SUM(NVL(TB.PRC_02, 0)) AS PRCSUM, SUM(TB.point) AS POINTSUM, CP.callP, SUM(NVL(TB.PRC_02, 0)) * CP.callP AS TOTAL
+        FROM (SELECT
+                  EMPNO,
+                  NVL(SUM(CASE WHEN prc_gubn = '2' THEN 1 ELSE 0 END), 0) AS PRC_02,
+                  (SELECT SUM(point)
+                   FROM tcnt01_point
+                   WHERE EMPNO = TBND01.EMPNO
+                     AND call_code IS NOT NULL
+                     AND TO_CHAR(IN_DATE, 'YYYY') = TO_CHAR(SYSDATE, 'YYYY')
+                  ) * -1 AS point
+              FROM TBND01
+              WHERE TO_CHAR(IN_DATE, 'YYYY') = TO_CHAR(SYSDATE, 'YYYY')
+                AND CUST_CODE <> 'P000000052'
+              GROUP BY EMPNO
+             ) TB
+                 LEFT JOIN TEMP01 E ON TB.EMPNO = E.EMPNO
+                 LEFT JOIN (
+            SELECT EMPNO,
+                   CASE
+                       WHEN COUNT < 1680 THEN 500
+                       WHEN COUNT < 1890 THEN 536
+                       WHEN COUNT < 2100 THEN 556
+                       WHEN COUNT < 2310 THEN 667
+                       WHEN COUNT < 2520 THEN 701
+                       WHEN COUNT < 2730 THEN 730
+                       WHEN COUNT < 3045 THEN 755
+                       ELSE 788
+                       END AS callP
+            FROM (
+                     SELECT EMPNO, COUNT(*) AS COUNT
+                     FROM TBND01
+                     WHERE PRC_GUBN = '2'
+                       AND TO_CHAR(IN_DATE, 'YYYY') = TO_CHAR(SYSDATE, 'YYYY')
+                       AND CUST_CODE <> 'P000000052'
+                     GROUP BY EMPNO
+                 ) GROUPED
+        ) CP ON TB.EMPNO = CP.EMPNO
+        GROUP BY E.EMP_NAME, CP.callP
+        UNION ALL
+        SELECT 'Manthly' AS Period, E.EMP_NAME, SUM(NVL(TB.PRC_02, 0)) AS PRCSUM, SUM(TB.point) AS POINTSUM, CP.callP, SUM(NVL(TB.PRC_02, 0)) * CP.callP AS TOTAL
+        FROM (SELECT
+                  EMPNO,
+                  NVL(SUM(CASE WHEN prc_gubn = '2' THEN 1 ELSE 0 END), 0) AS PRC_02,
+                  (SELECT SUM(point)
+                   FROM tcnt01_point
+                   WHERE EMPNO = TBND01.EMPNO
+                     AND call_code IS NOT NULL
+                     AND TO_CHAR(IN_DATE, 'YYYYMM') = TO_CHAR(SYSDATE, 'YYYYMM')
+                  ) * -1 AS point
+              FROM TBND01
+              WHERE TO_CHAR(IN_DATE, 'YYYYMM') = TO_CHAR(SYSDATE, 'YYYYMM')
+                AND CUST_CODE <> 'P000000052'
+              GROUP BY EMPNO
+             ) TB
+                 LEFT JOIN TEMP01 E ON TB.EMPNO = E.EMPNO
+                 LEFT JOIN (
+            SELECT EMPNO,
+                   CASE
+                       WHEN COUNT < 1680 THEN 500
+                       WHEN COUNT < 1890 THEN 536
+                       WHEN COUNT < 2100 THEN 556
+                       WHEN COUNT < 2310 THEN 667
+                       WHEN COUNT < 2520 THEN 701
+                       WHEN COUNT < 2730 THEN 730
+                       WHEN COUNT < 3045 THEN 755
+                       ELSE 788
+                       END AS callP
+            FROM (
+                     SELECT EMPNO, COUNT(*) AS COUNT
+                     FROM TBND01
+                     WHERE PRC_GUBN = '2'
+                       AND TO_CHAR(IN_DATE, 'YYYYMM') = TO_CHAR(SYSDATE, 'YYYYMM')
+                       AND CUST_CODE <> 'P000000052'
+                     GROUP BY EMPNO
+                 ) GROUPED
+        ) CP ON TB.EMPNO = CP.EMPNO
+        GROUP BY E.EMP_NAME, CP.callP
+        UNION ALL
+        SELECT 'Daily' AS Period, E.EMP_NAME, SUM(NVL(TB.PRC_02, 0)) AS PRCSUM, SUM(TB.point) AS POINTSUM, CP.callP, SUM(NVL(TB.PRC_02, 0)) * CP.callP AS TOTAL
+        FROM (SELECT
+                  EMPNO,
+                  NVL(SUM(CASE WHEN prc_gubn = '2' THEN 1 ELSE 0 END), 0) AS PRC_02,
+                  (SELECT SUM(point)
+                   FROM tcnt01_point
+                   WHERE EMPNO = TBND01.EMPNO
+                     AND call_code IS NOT NULL
+                     AND TO_CHAR(IN_DATE, 'YYYYMMDD') = TO_CHAR(SYSDATE, 'YYYYMMDD')
+                  ) * -1 AS point
+              FROM TBND01
+              WHERE TO_CHAR(IN_DATE, 'YYYYMMDD') = TO_CHAR(SYSDATE, 'YYYYMMDD')
+                AND CUST_CODE <> 'P000000052'
+              GROUP BY EMPNO
+             ) TB
+                 LEFT JOIN TEMP01 E ON TB.EMPNO = E.EMPNO
+                 LEFT JOIN (
+            SELECT EMPNO,
+                   CASE
+                       WHEN COUNT < 1680 THEN 500
+                       WHEN COUNT < 1890 THEN 536
+                       WHEN COUNT < 2100 THEN 556
+                       WHEN COUNT < 2310 THEN 667
+                       WHEN COUNT < 2520 THEN 701
+                       WHEN COUNT < 2730 THEN 730
+                       WHEN COUNT < 3045 THEN 755
+                       ELSE 788
+                       END AS callP
+            FROM (
+                     SELECT EMPNO, COUNT(*) AS COUNT
+                     FROM TBND01
+                     WHERE PRC_GUBN = '2'
+                       AND TO_CHAR(IN_DATE, 'YYYYMMDD') = TO_CHAR(SYSDATE, 'YYYYMMDD')
+                       AND CUST_CODE <> 'P000000052'
+                     GROUP BY EMPNO
+                 ) GROUPED
+        ) CP ON TB.EMPNO = CP.EMPNO
+        GROUP BY E.EMP_NAME, CP.callP
+        order by EMP_NAME
+        ]]>
+    </select>
+    <select id="getDailyAve" resultType="Map">
+
+        WITH DatePeriods AS (
+            SELECT '월요일' AS weekday, 2 AS day_num FROM DUAL UNION ALL
+            SELECT '화요일', 3 FROM DUAL UNION ALL
+            SELECT '수요일', 4 FROM DUAL UNION ALL
+            SELECT '목요일', 5 FROM DUAL UNION ALL
+            SELECT '금요일', 6 FROM DUAL
+        ),
+             Periods AS (
+                 SELECT '1W' AS period, TRUNC(SYSDATE-8) AS start_date, TRUNC(SYSDATE-1)-1 AS end_date, 1 AS weeks FROM DUAL UNION ALL
+                 SELECT '1M', ADD_MONTHS(TRUNC(SYSDATE, 'MM')-1, -1), TRUNC(SYSDATE, 'MM')-1-1, 4 AS weeks FROM DUAL UNION ALL
+                 SELECT '3M', ADD_MONTHS(TRUNC(SYSDATE, 'MM')-1, -3), TRUNC(SYSDATE, 'MM')-1-1, 13 AS weeks FROM DUAL UNION ALL
+                 SELECT '6M', ADD_MONTHS(TRUNC(SYSDATE, 'MM')-1, -6), TRUNC(SYSDATE, 'MM')-1-1, 26 AS weeks FROM DUAL UNION ALL
+                 SELECT '9M', ADD_MONTHS(TRUNC(SYSDATE, 'MM')-1, -9), TRUNC(SYSDATE, 'MM')-1-1, 26 AS weeks FROM DUAL UNION ALL
+                 SELECT '12M', ADD_MONTHS(TRUNC(SYSDATE, 'MM')-1, -12), TRUNC(SYSDATE, 'MM')-1-1, 52 AS weeks FROM DUAL
+             ),
+             AggregatedData AS (
+                 SELECT
+                     dp.weekday,
+                     p.period,
+                     COUNT(*) AS count,
+            p.weeks AS weeks
+        FROM twowincall.tbnd01 t
+            JOIN Periods p ON t.IN_DATE BETWEEN p.start_date AND p.end_date
+            JOIN DatePeriods dp ON TO_CHAR(t.IN_DATE, 'D', 'NLS_DATE_LANGUAGE=AMERICAN') = TO_CHAR(dp.day_num)
+        WHERE t.PRC_GUBN = '2'
+        <if test="custCode != null and !custCode.isEmpty()">
+            AND CUST_CODE =  #{custCode}
+        </if>
+          AND TO_CHAR(t.IN_DATE, 'D', 'NLS_DATE_LANGUAGE=AMERICAN') BETWEEN '2' AND '6'
+        GROUP BY dp.weekday, p.period, p.weeks
+            )
         SELECT
-            --ROW_NUMBER() OVER (ORDER BY a.GNO DESC) AS rownum,
-            a.UNO,
-            a.GNO,
-            a.SUBJECT,
-            a.ID,
-            a.IN_DATE,
-            a.REPLY_DEPTH,
-            a.att_file,
-            a.hit,
-            a.EMPNM,
-            rc.re_count,
-            CASE WHEN a.nocode = '1' THEN 'notice' ELSE '' END AS nocode
-        FROM BOARD_CALL a
-                 LEFT JOIN ReplyCounts rc ON a.GNO = rc.GNO AND a.cat_group = rc.cat_group
-        WHERE a.CAT_GROUP = 'gongi'
-          AND a.REPLY_DEPTH = 'A'
-          AND a.DELCODE IS NULL
-          AND a.SUBJECT IS NOT NULL
-        ORDER BY a.GNO DESC, a.REPLY_DEPTH
+            dp.weekday,
+            ROUND(SUM(CASE WHEN ad.period = '1W' THEN ad.count ELSE 0 END) / MAX(CASE WHEN ad.period = '1W' THEN ad.weeks ELSE 1 END), 0) AS avg1week,
+            ROUND(SUM(CASE WHEN ad.period = '1M' THEN ad.count ELSE 0 END) / MAX(CASE WHEN ad.period = '1M' THEN ad.weeks ELSE 4 END), 0) AS avg1month,
+            ROUND(SUM(CASE WHEN ad.period = '3M' THEN ad.count ELSE 0 END) / MAX(CASE WHEN ad.period = '3M' THEN ad.weeks ELSE 13 END), 0) AS avg3months,
+            ROUND(SUM(CASE WHEN ad.period = '6M' THEN ad.count ELSE 0 END) / MAX(CASE WHEN ad.period = '6M' THEN ad.weeks ELSE 26 END), 0) AS avg6months,
+            ROUND(SUM(CASE WHEN ad.period = '9M' THEN ad.count ELSE 0 END) / MAX(CASE WHEN ad.period = '9M' THEN ad.weeks ELSE 26 END), 0) AS avg9months,
+            ROUND(SUM(CASE WHEN ad.period = '12M' THEN ad.count ELSE 0 END) / MAX(CASE WHEN ad.period = '12M' THEN ad.weeks ELSE 52 END), 0) AS avg12months
+        FROM DatePeriods dp
+                 LEFT JOIN AggregatedData ad ON dp.weekday = ad.weekday
+        GROUP BY dp.weekday
+        ORDER BY
+            CASE dp.weekday
+                WHEN '월요일' THEN 1
+                WHEN '화요일' THEN 2
+                WHEN '수요일' THEN 3
+                WHEN '목요일' THEN 4
+                WHEN '금요일' THEN 5
+                END
 
     </select>
+
+
 </mapper>

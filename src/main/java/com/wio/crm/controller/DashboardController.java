@@ -67,4 +67,11 @@ public class DashboardController {
         return ResponseEntity.ok(data);
     }
 
+    @GetMapping("/api/dashboard-daily-data")
+    public ResponseEntity<Map<String, Object>> getDailyAve(Principal principal) {
+
+        String username = principal.getName();
+        Map<String, Object> data = dashboardService.getDailyAve(username);
+        return ResponseEntity.ok(data);
+    }
 }

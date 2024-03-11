@@ -57,6 +57,68 @@ public class DashboardData {
 
     private int percentChange;
 
+    private String weekDay;
+    private int avg1week;
+    private int avg1month;
+    private int avg3months;
+    private int avg6months;
+    private int avg9months;
+    private int avg12months;
+
+    private String period;
+    private String empName;
+    private int prcSum;
+    private int pointSum;
+    private int callP;
+    private int total;
+
+    public String getPeriod() {
+        return period;
+    }
+
+    public void setPeriod(String period) {
+        this.period = period;
+    }
+
+    public String getEmpName() {
+        return empName;
+    }
+
+    public void setEmpName(String empName) {
+        this.empName = empName;
+    }
+
+    public int getPrcSum() {
+        return prcSum;
+    }
+
+    public void setPrcSum(int prcSum) {
+        this.prcSum = prcSum;
+    }
+
+    public int getPointSum() {
+        return pointSum;
+    }
+
+    public void setPointSum(int pointSum) {
+        this.pointSum = pointSum;
+    }
+
+    public int getCallP() {
+        return callP;
+    }
+
+    public void setCallP(int callP) {
+        this.callP = callP;
+    }
+
+    public int getTotal() {
+        return total;
+    }
+
+    public void setTotal(int total) {
+        this.total = total;
+    }
 
     public String getCount_Miss() {
         return count_Miss;
@@ -363,5 +425,61 @@ public class DashboardData {
 
     public void setPercentChange(int percentChange) {
         this.percentChange = percentChange;
+    }
+
+    public String getWeekDay() {
+        return weekDay;
+    }
+
+    public void setWeekDay(String weekDay) {
+        this.weekDay = weekDay;
+    }
+
+    public int getAvg1week() {
+        return avg1week;
+    }
+
+    public void setAvg1week(int avg1week) {
+        this.avg1week = avg1week;
+    }
+
+    public int getAvg1month() {
+        return avg1month;
+    }
+
+    public void setAvg1month(int avg1month) {
+        this.avg1month = avg1month;
+    }
+
+    public int getAvg3months() {
+        return avg3months;
+    }
+
+    public void setAvg3months(int avg3months) {
+        this.avg3months = avg3months;
+    }
+
+    public int getAvg6months() {
+        return avg6months;
+    }
+
+    public void setAvg6months(int avg6months) {
+        this.avg6months = avg6months;
+    }
+
+    public int getAvg9months() {
+        return avg9months;
+    }
+
+    public void setAvg9months(int avg9months) {
+        this.avg9months = avg9months;
+    }
+
+    public int getAvg12months() {
+        return avg12months;
+    }
+
+    public void setAvg12months(int avg12months) {
+        this.avg12months = avg12months;
     }
 }

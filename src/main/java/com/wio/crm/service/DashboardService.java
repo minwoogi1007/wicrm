@@ -85,9 +85,16 @@ public class DashboardService {
         return data;
     }
     public Map<String, Object> getEmployeeList() {
-        String custCode = getCurrentUserCustCode();
+
         Map<String, Object> data = new HashMap<>();
         data.put("employeeList", dashboardMapper.getEmployeeList());
+        return data;
+    }
+
+    public Map<String, Object> getDailyAve(String username) {
+        String custCode = getCurrentUserCustCode();
+        Map<String, Object> data = new HashMap<>();
+        data.put("dailyAve", dashboardMapper.getDailyAve(custCode));
         return data;
     }
 
