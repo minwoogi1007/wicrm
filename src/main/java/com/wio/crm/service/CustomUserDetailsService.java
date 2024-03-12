@@ -91,6 +91,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             case "0": // EMPLOYEE
               //  Temp01 temp01 = temp01Mapper.findByUserId(user.getUserid());
               //  if (temp01 != null) {
+                    System.out.println("이건 직원용 ROLE_EMPLOYEE");
                     authorities.add(new SimpleGrantedAuthority("ROLE_EMPLOYEE"));
                     // 여기에서 temp01 정보를 기반으로 추가적인 권한을 부여하거나, 처리할 수 있습니다.
                     logger.info("Employee info retrieved for user: {}", user.getUserid());
@@ -101,6 +102,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             case "1": // USER
               //  Tcnt01Emp tcnt01Emp = tcnt01EmpMapper.findByUserId(user.getUserid());
               //  if (tcnt01Emp != null) {
+                    System.out.println("이건 거래처용 ROLE_USER");
                     authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
                     // 여기에서 tcnt01Emp 정보를 기반으로 추가적인 권한을 부여하거나, 처리할 수 있습니다.
                     logger.info("User info retrieved for user: {}", user.getUserid());

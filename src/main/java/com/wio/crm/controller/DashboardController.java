@@ -31,7 +31,7 @@ public class DashboardController {
     public ResponseEntity<Map<String, Object>> getDashboardData(Principal principal) {
         // SecurityContext에서 인증 객체를 가져옵니다.
         String username = principal.getName();
-
+        dashboardService.printUserDetails();
         Map<String, Object> data = dashboardService.getDashboardData(username);
         return ResponseEntity.ok(data);
     }
@@ -59,9 +59,10 @@ public class DashboardController {
         return ResponseEntity.ok(data);
     }
 
-    @GetMapping("/api/dashboard-employee")
+    @GetMapping("/empl/dashboard-employee")
     @PreAuthorize("hasAuthority('ROLE_EMPLOYEE')")
     public  ResponseEntity<Map<String, Object>> getEmployeeList() {
+
 
         Map<String, Object> data = dashboardService.getEmployeeList();
         return ResponseEntity.ok(data);

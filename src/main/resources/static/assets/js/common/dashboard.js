@@ -34,23 +34,7 @@ $(document).ready(function() {
     dailyAvg.addEventListener('click', function() {
         fetchDailyData()
     });
-    $(document).ready(function() {
-        $.ajax({
-            url: '/api/dashboard-employee',
-            type: 'GET',
-            success: function(response) {
-                // 성공적으로 데이터를 받아온 경우 처리 로직
-                console.log(response);
 
-                // 예: 받아온 데이터를 HTML 요소에 동적으로 추가
-                // $('#employeeList').append('<p>' + JSON.stringify(response) + '</p>');
-            },
-            error: function(xhr, status, error) {
-                // 요청 실패 시 처리 로직
-                console.error("Error: " + status + " " + error);
-            }
-        });
-    });
     function formatNumberWithCommas(number) {
         return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
@@ -73,10 +57,8 @@ $(document).ready(function() {
                     previousMonth =monthCount.previousMonth;
                     percentChange = monthCount.percentChange;
 
-                    console.log(percentChange);
                     if(percentChange <100){
                         percent = 100 - percentChange;
-                        console.log("percentChange <100  ===="+percent);
                         $('#percent').text(percent +'%');
                         $('#directionIcon').empty().append(`
                                 <i class="ki-duotone ki-arrow-down fs-5 text-danger ms-n1">
@@ -91,7 +73,6 @@ $(document).ready(function() {
                         $('#progressbarMonth').css('width', percentChange + '%').attr('aria-valuenow', percentChange);
                     }else {
                         percent = percentChange-100;
-                        console.log("percentChange >100  ===="+percent);
                         $('#percent').text(percent +'%');
                         $('#directionIcon').empty().append(`
                                 <i class="ki-duotone ki-arrow-up fs-5 text-success ms-n1">

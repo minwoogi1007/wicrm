@@ -4,6 +4,7 @@ import com.wio.crm.service.MenuService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,8 +26,12 @@ public class MainController {
             logger.info("No authentication information available.");
             return "sign-in";
         }
+
        // String userid = authentication.getName(); // 현재 인증된 사용자의 ID를 가져옵니다.
        // model.addAttribute("userMenus", menuService.getCompanyUserMenus(userid));
+        boolean isEmployee = authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_EMPLOYEE"));
+        model.addAttribute("isEmployee", isEmployee);
+
         model.addAttribute("content", "contents"); // Initial content
         return "contents";
     }

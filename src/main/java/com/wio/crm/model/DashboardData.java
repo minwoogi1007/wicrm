@@ -71,6 +71,114 @@ public class DashboardData {
     private int pointSum;
     private int callP;
     private int total;
+    private int DAILY_PRCSUM;
+    private int MONTHLY_PRCSUM;
+    private int YEARLY_PRCSUM;
+    private String DAILY_POINTSUM;
+    private String MONTHLY_POINTSUM;
+    private String YEARLY_POINTSUM;
+    private int DAILY_CALLP;
+    private int MONTHLY_CALLP;
+    private int YEARLY_CALLP;
+    private String TDAILY_TOTAL;
+    private String MONTHLY_TOTAL;
+    private String TYEARLY_TOTAL;
+
+    public int getDAILY_PRCSUM() {
+        return DAILY_PRCSUM;
+    }
+
+    public void setDAILY_PRCSUM(int DAILY_PRCSUM) {
+        this.DAILY_PRCSUM = DAILY_PRCSUM;
+    }
+
+    public int getMONTHLY_PRCSUM() {
+        return MONTHLY_PRCSUM;
+    }
+
+    public void setMONTHLY_PRCSUM(int MONTHLY_PRCSUM) {
+        this.MONTHLY_PRCSUM = MONTHLY_PRCSUM;
+    }
+
+    public int getYEARLY_PRCSUM() {
+        return YEARLY_PRCSUM;
+    }
+
+    public void setYEARLY_PRCSUM(int YEARLY_PRCSUM) {
+        this.YEARLY_PRCSUM = YEARLY_PRCSUM;
+    }
+
+    public String getDAILY_POINTSUM() {
+        return DAILY_POINTSUM;
+    }
+
+    public void setDAILY_POINTSUM(String DAILY_POINTSUM) {
+        this.DAILY_POINTSUM = DAILY_POINTSUM;
+    }
+
+    public String getMONTHLY_POINTSUM() {
+        return MONTHLY_POINTSUM;
+    }
+
+    public void setMONTHLY_POINTSUM(String MONTHLY_POINTSUM) {
+        this.MONTHLY_POINTSUM = MONTHLY_POINTSUM;
+    }
+
+    public String getYEARLY_POINTSUM() {
+        return YEARLY_POINTSUM;
+    }
+
+    public void setYEARLY_POINTSUM(String YEARLY_POINTSUM) {
+        this.YEARLY_POINTSUM = YEARLY_POINTSUM;
+    }
+
+    public int getDAILY_CALLP() {
+        return DAILY_CALLP;
+    }
+
+    public void setDAILY_CALLP(int DAILY_CALLP) {
+        this.DAILY_CALLP = DAILY_CALLP;
+    }
+
+    public int getMONTHLY_CALLP() {
+        return MONTHLY_CALLP;
+    }
+
+    public void setMONTHLY_CALLP(int MONTHLY_CALLP) {
+        this.MONTHLY_CALLP = MONTHLY_CALLP;
+    }
+
+    public int getYEARLY_CALLP() {
+        return YEARLY_CALLP;
+    }
+
+    public void setYEARLY_CALLP(int YEARLY_CALLP) {
+        this.YEARLY_CALLP = YEARLY_CALLP;
+    }
+
+    public String getTDAILY_TOTAL() {
+        return TDAILY_TOTAL;
+    }
+
+    public void setTDAILY_TOTAL(String TDAILY_TOTAL) {
+        this.TDAILY_TOTAL = TDAILY_TOTAL;
+    }
+
+    public String getMONTHLY_TOTAL() {
+        return MONTHLY_TOTAL;
+    }
+
+    public void setMONTHLY_TOTAL(String MONTHLY_TOTAL) {
+        this.MONTHLY_TOTAL = MONTHLY_TOTAL;
+    }
+
+    public String getTYEARLY_TOTAL() {
+        return TYEARLY_TOTAL;
+    }
+
+    public void setTYEARLY_TOTAL(String TYEARLY_TOTAL) {
+        this.TYEARLY_TOTAL = TYEARLY_TOTAL;
+    }
 
     public String getPeriod() {
         return period;

@@ -3,11 +3,15 @@ package com.wio.crm.service;
 import com.wio.crm.config.CustomUserDetails;
 import com.wio.crm.mapper.DashboardMapper;
 import com.wio.crm.model.DashboardData;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -26,10 +30,7 @@ public class DashboardService {
     }
     public Map<String, Object> getDashboardData(String username) {
 
-        System.out.println("================="+username);
-
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
         // 현재 사용자의 CustomUserDetails 객체에서 custCode 추출
         String custCode = null;
         if (authentication.getPrincipal() instanceof CustomUserDetails) {
@@ -38,7 +39,6 @@ public class DashboardService {
         }else{
             custCode = "";
         }
-        System.out.println("custCode================="+custCode);
         Map<String, Object> data = new HashMap<>();
         // 데이터베이스 조회
         DashboardData card1Data = dashboardMapper.findDataForCard1(custCode);
@@ -46,7 +46,6 @@ public class DashboardService {
         List<DashboardData> pointList = dashboardMapper.findPointList(custCode); //
         DashboardData dashConSum = dashboardMapper.dashConSum(custCode);
 
-        System.out.println(authentication );
         data.put("card-data-1", card1Data);
         data.put("card-data-2", card2Data);
         data.put("card-data-3", dashConSum);
@@ -61,7 +60,6 @@ public class DashboardService {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             return userDetails.getCustCode();
         }
-        System.out.println("권한 --"+authentication.getAuthorities());
         return "";
     }
     public Map<String, Object> getDashboardCallCount(String username) {
@@ -85,7 +83,7 @@ public class DashboardService {
         return data;
     }
     public Map<String, Object> getEmployeeList() {
-
+        checkUserRole();
         Map<String, Object> data = new HashMap<>();
         data.put("employeeList", dashboardMapper.getEmployeeList());
         return data;
@@ -97,6 +95,65 @@ public class DashboardService {
         data.put("dailyAve", dashboardMapper.getDailyAve(custCode));
         return data;
     }
+    public void checkUserRole() {
+        // 현재 인증된 사용자의 Authentication 객체 가져오기
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
+        if (authentication == null) {
+            System.out.println("사용자가 로그인하지 않았습니다.");
+            return;
+        }
 
+        // 사용자의 권한 정보를 추출하고, ROLE_EMPLOYEE 또는 ROLE_USER 인지 확인
+        boolean isEmployee = false;
+        boolean isUser = false;
+
+        for (GrantedAuthority authority : authentication.getAuthorities()) {
+            if (authority.getAuthority().equals("ROLE_EMPLOYEE")) {
+                isEmployee = true;
+            } else if (authority.getAuthority().equals("ROLE_USER")) {
+                isUser = true;
+            }
+        }
+
+        // 권한에 따라 다른 로직 수행
+        if (isEmployee) {
+            System.out.println("사용자는 직원(EMPLOYEE)입니다.");
+        } else if (isUser) {
+            System.out.println("사용자는 거래처(USER)입니다.");
+        } else {
+            System.out.println("사용자는 알려진 권한이 없습니다.");
+        }
+    }
+
+    public void printUserDetails() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null) {
+            // 사용자의 기본 인증 정보 출력
+            System.out.println("Username: " + authentication.getName());
+            System.out.println("Credentials: " + authentication.getCredentials());
+            System.out.println("Authorities: " + authentication.getAuthorities());
+
+            // UserDetails 객체에서 추가적인 사용자 정보를 조회
+            if (authentication.getPrincipal() instanceof UserDetails) {
+                UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+                System.out.println("Username: " + userDetails.getUsername());
+                System.out.println("Password: " + userDetails.getPassword());
+                System.out.println("Authorities: " + userDetails.getAuthorities());
+            }
+
+            // 세션 ID와 세션에 저장된 모든 속성 출력
+            ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+            HttpSession session = attr.getRequest().getSession(false); // false: 기존 세션이 있을 경우에만 가져옴
+            if (session != null) {
+                System.out.println("Session ID: " + session.getId());
+                java.util.Enumeration<String> attributeNames = session.getAttributeNames();
+                while (attributeNames.hasMoreElements()) {
+                    String attributeName = attributeNames.nextElement();
+                    System.out.println("Session attribute Name: " + attributeName + ", Value: " + session.getAttribute(attributeName));
+                }
+            }
+        }
+    }
 }

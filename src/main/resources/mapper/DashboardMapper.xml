@@ -454,124 +454,157 @@
 
     <select id="getEmployeeList" resultType="Map">
         <![CDATA[
-
-        SELECT 'Yearly' AS Period, E.EMP_NAME, SUM(NVL(TB.PRC_02, 0)) AS PRCSUM, SUM(TB.point) AS POINTSUM, CP.callP, SUM(NVL(TB.PRC_02, 0)) * CP.callP AS TOTAL
-        FROM (SELECT
-                  EMPNO,
-                  NVL(SUM(CASE WHEN prc_gubn = '2' THEN 1 ELSE 0 END), 0) AS PRC_02,
-                  (SELECT SUM(point)
-                   FROM tcnt01_point
-                   WHERE EMPNO = TBND01.EMPNO
-                     AND call_code IS NOT NULL
-                     AND TO_CHAR(IN_DATE, 'YYYY') = TO_CHAR(SYSDATE, 'YYYY')
-                  ) * -1 AS point
-              FROM TBND01
-              WHERE TO_CHAR(IN_DATE, 'YYYY') = TO_CHAR(SYSDATE, 'YYYY')
-                AND CUST_CODE <> 'P000000052'
-              GROUP BY EMPNO
-             ) TB
-                 LEFT JOIN TEMP01 E ON TB.EMPNO = E.EMPNO
-                 LEFT JOIN (
-            SELECT EMPNO,
-                   CASE
-                       WHEN COUNT < 1680 THEN 500
-                       WHEN COUNT < 1890 THEN 536
-                       WHEN COUNT < 2100 THEN 556
-                       WHEN COUNT < 2310 THEN 667
-                       WHEN COUNT < 2520 THEN 701
-                       WHEN COUNT < 2730 THEN 730
-                       WHEN COUNT < 3045 THEN 755
-                       ELSE 788
-                       END AS callP
-            FROM (
-                     SELECT EMPNO, COUNT(*) AS COUNT
-                     FROM TBND01
-                     WHERE PRC_GUBN = '2'
-                       AND TO_CHAR(IN_DATE, 'YYYY') = TO_CHAR(SYSDATE, 'YYYY')
-                       AND CUST_CODE <> 'P000000052'
-                     GROUP BY EMPNO
-                 ) GROUPED
-        ) CP ON TB.EMPNO = CP.EMPNO
-        GROUP BY E.EMP_NAME, CP.callP
-        UNION ALL
-        SELECT 'Manthly' AS Period, E.EMP_NAME, SUM(NVL(TB.PRC_02, 0)) AS PRCSUM, SUM(TB.point) AS POINTSUM, CP.callP, SUM(NVL(TB.PRC_02, 0)) * CP.callP AS TOTAL
-        FROM (SELECT
-                  EMPNO,
-                  NVL(SUM(CASE WHEN prc_gubn = '2' THEN 1 ELSE 0 END), 0) AS PRC_02,
-                  (SELECT SUM(point)
-                   FROM tcnt01_point
-                   WHERE EMPNO = TBND01.EMPNO
-                     AND call_code IS NOT NULL
-                     AND TO_CHAR(IN_DATE, 'YYYYMM') = TO_CHAR(SYSDATE, 'YYYYMM')
-                  ) * -1 AS point
-              FROM TBND01
-              WHERE TO_CHAR(IN_DATE, 'YYYYMM') = TO_CHAR(SYSDATE, 'YYYYMM')
-                AND CUST_CODE <> 'P000000052'
-              GROUP BY EMPNO
-             ) TB
-                 LEFT JOIN TEMP01 E ON TB.EMPNO = E.EMPNO
-                 LEFT JOIN (
-            SELECT EMPNO,
-                   CASE
-                       WHEN COUNT < 1680 THEN 500
-                       WHEN COUNT < 1890 THEN 536
-                       WHEN COUNT < 2100 THEN 556
-                       WHEN COUNT < 2310 THEN 667
-                       WHEN COUNT < 2520 THEN 701
-                       WHEN COUNT < 2730 THEN 730
-                       WHEN COUNT < 3045 THEN 755
-                       ELSE 788
-                       END AS callP
-            FROM (
-                     SELECT EMPNO, COUNT(*) AS COUNT
-                     FROM TBND01
-                     WHERE PRC_GUBN = '2'
-                       AND TO_CHAR(IN_DATE, 'YYYYMM') = TO_CHAR(SYSDATE, 'YYYYMM')
-                       AND CUST_CODE <> 'P000000052'
-                     GROUP BY EMPNO
-                 ) GROUPED
-        ) CP ON TB.EMPNO = CP.EMPNO
-        GROUP BY E.EMP_NAME, CP.callP
-        UNION ALL
-        SELECT 'Daily' AS Period, E.EMP_NAME, SUM(NVL(TB.PRC_02, 0)) AS PRCSUM, SUM(TB.point) AS POINTSUM, CP.callP, SUM(NVL(TB.PRC_02, 0)) * CP.callP AS TOTAL
-        FROM (SELECT
-                  EMPNO,
-                  NVL(SUM(CASE WHEN prc_gubn = '2' THEN 1 ELSE 0 END), 0) AS PRC_02,
-                  (SELECT SUM(point)
-                   FROM tcnt01_point
-                   WHERE EMPNO = TBND01.EMPNO
-                     AND call_code IS NOT NULL
-                     AND TO_CHAR(IN_DATE, 'YYYYMMDD') = TO_CHAR(SYSDATE, 'YYYYMMDD')
-                  ) * -1 AS point
-              FROM TBND01
-              WHERE TO_CHAR(IN_DATE, 'YYYYMMDD') = TO_CHAR(SYSDATE, 'YYYYMMDD')
-                AND CUST_CODE <> 'P000000052'
-              GROUP BY EMPNO
-             ) TB
-                 LEFT JOIN TEMP01 E ON TB.EMPNO = E.EMPNO
-                 LEFT JOIN (
-            SELECT EMPNO,
-                   CASE
-                       WHEN COUNT < 1680 THEN 500
-                       WHEN COUNT < 1890 THEN 536
-                       WHEN COUNT < 2100 THEN 556
-                       WHEN COUNT < 2310 THEN 667
-                       WHEN COUNT < 2520 THEN 701
-                       WHEN COUNT < 2730 THEN 730
-                       WHEN COUNT < 3045 THEN 755
-                       ELSE 788
-                       END AS callP
-            FROM (
-                     SELECT EMPNO, COUNT(*) AS COUNT
-                     FROM TBND01
-                     WHERE PRC_GUBN = '2'
-                       AND TO_CHAR(IN_DATE, 'YYYYMMDD') = TO_CHAR(SYSDATE, 'YYYYMMDD')
-                       AND CUST_CODE <> 'P000000052'
-                     GROUP BY EMPNO
-                 ) GROUPED
-        ) CP ON TB.EMPNO = CP.EMPNO
-        GROUP BY E.EMP_NAME, CP.callP
-        order by EMP_NAME
+        SELECT
+            EMP_NAME,
+            NVL(SUM(DAILY_PRCSUM),0) AS DAILY_PRCSUM,
+            NVL(SUM(MONTHLY_PRCSUM),0) AS MONTHLY_PRCSUM,
+            NVL(SUM(YEARLY_PRCSUM),0) AS YEARLY_PRCSUM,
+            TO_CHAR(SUM(DAILY_POINTSUM),'999,999,999') AS DAILY_POINTSUM, -- 숫자로 합계 계산
+            TO_CHAR(SUM(MONTHLY_POINTSUM),'999,999,999') AS MONTHLY_POINTSUM, -- 숫자로 합계 계산
+            TO_CHAR(SUM(YEARLY_POINTSUM),'999,999,999') AS YEARLY_POINTSUM, -- 숫자로 합계 계산
+            NVL(SUM(DAILY_CALLP),0) AS TOTAL_DAILY_CALLP,
+            NVL(SUM(MONTHLY_CALLP),0) AS TOTAL_MONTHLY_CALLP,
+            NVL(SUM(YEARLY_CALLP),0) AS TOTAL_YEARLY_CALLP,
+            TO_CHAR(SUM(DAILY_TOTAL),'999,999,999') AS DAILY_TOTAL, -- 숫자로 합계 계산
+            TO_CHAR(SUM(MONTHLY_TOTAL),'999,999,999') AS MONTHLY_TOTAL, -- 숫자로 합계 계산
+            TO_CHAR(SUM(YEARLY_TOTAL),'999,999,999') AS YEARLY_TOTAL -- 숫자로 합계 계산
+        FROM (
+                 SELECT
+                     EMP_NAME,
+                     NVL(MAX(CASE WHEN PERIOD = 'DAILY' THEN PRCSUM END),0) AS DAILY_PRCSUM,
+                     NVL(MAX(CASE WHEN PERIOD = 'MONTHLY' THEN PRCSUM END),0) AS MONTHLY_PRCSUM,
+                     NVL(MAX(CASE WHEN PERIOD = 'YEARLY' THEN PRCSUM END),0) AS YEARLY_PRCSUM,
+                     NVL(MAX(CASE WHEN PERIOD = 'DAILY' THEN POINTSUM END),0) AS DAILY_POINTSUM,
+                     NVL(MAX(CASE WHEN PERIOD = 'MONTHLY' THEN POINTSUM END),0) AS MONTHLY_POINTSUM,
+                     NVL(MAX(CASE WHEN PERIOD = 'YEARLY' THEN POINTSUM END),0) AS YEARLY_POINTSUM,
+                     NVL(MAX(CASE WHEN PERIOD = 'DAILY' THEN CALLP END),0) AS DAILY_CALLP,
+                     NVL(MAX(CASE WHEN PERIOD = 'MONTHLY' THEN CALLP END),0) AS MONTHLY_CALLP,
+                     NVL(MAX(CASE WHEN PERIOD = 'YEARLY' THEN CALLP END),0) AS YEARLY_CALLP,
+                     NVL(MAX(CASE WHEN PERIOD = 'DAILY' THEN TOTAL END),0) AS DAILY_TOTAL,
+                     NVL(MAX(CASE WHEN PERIOD = 'MONTHLY' THEN TOTAL END),0) AS MONTHLY_TOTAL,
+                     NVL(MAX(CASE WHEN PERIOD = 'YEARLY' THEN TOTAL END),0) AS YEARLY_TOTAL
+                 FROM (
+                          SELECT 'YEARLY' AS PERIOD, E.EMP_NAME, SUM(NVL(TB.PRC_02, 0)) AS PRCSUM, SUM(TB.POINT) AS POINTSUM, CP.CALLP, SUM(NVL(TB.PRC_02, 0)) * CP.CALLP AS TOTAL
+                          FROM (SELECT
+                                    EMPNO,
+                                    NVL(SUM(CASE WHEN PRC_GUBN = '2' THEN 1 ELSE 0 END), 0) AS PRC_02,
+                                    (SELECT SUM(POINT)
+                                     FROM TCNT01_POINT
+                                     WHERE EMPNO = TBND01.EMPNO
+                                       AND CALL_CODE IS NOT NULL
+                                       AND TO_CHAR(IN_DATE, 'YYYY') = TO_CHAR(SYSDATE, 'YYYY')
+                                    ) * -1 AS POINT
+                                FROM TBND01
+                                WHERE TO_CHAR(IN_DATE, 'YYYY') = TO_CHAR(SYSDATE, 'YYYY')
+                                  AND CUST_CODE  <> 'P000000052'
+                                GROUP BY EMPNO
+                               ) TB
+                                   LEFT JOIN TEMP01 E ON TB.EMPNO = E.EMPNO
+                                   LEFT JOIN (
+                              SELECT EMPNO,
+                                     CASE
+                                         WHEN COUNT < 1680 THEN 500
+                                         WHEN COUNT < 1890 THEN 536
+                                         WHEN COUNT < 2100 THEN 556
+                                         WHEN COUNT < 2310 THEN 667
+                                         WHEN COUNT < 2520 THEN 701
+                                         WHEN COUNT < 2730 THEN 730
+                                         WHEN COUNT < 3045 THEN 755
+                                         ELSE 788
+                                         END AS CALLP
+                              FROM (
+                                       SELECT EMPNO, COUNT(*) AS COUNT
+                                       FROM TBND01
+                                       WHERE PRC_GUBN = '2'
+                                         AND TO_CHAR(IN_DATE, 'YYYY') = TO_CHAR(SYSDATE, 'YYYY')
+                                         AND CUST_CODE  <> 'P000000052'
+                                       GROUP BY EMPNO
+                                   ) GROUPED
+                          ) CP ON TB.EMPNO = CP.EMPNO
+                          GROUP BY E.EMP_NAME, CP.CALLP
+                          UNION ALL
+                          SELECT 'MONTHLY' AS PERIOD, E.EMP_NAME, SUM(NVL(TB.PRC_02, 0)) AS PRCSUM, SUM(TB.POINT) AS POINTSUM, CP.CALLP, SUM(NVL(TB.PRC_02, 0)) * CP.CALLP AS TOTAL
+                          FROM (SELECT
+                                    EMPNO,
+                                    NVL(SUM(CASE WHEN PRC_GUBN = '2' THEN 1 ELSE 0 END), 0) AS PRC_02,
+                                    (SELECT SUM(POINT)
+                                     FROM TCNT01_POINT
+                                     WHERE EMPNO = TBND01.EMPNO
+                                       AND CALL_CODE IS NOT NULL
+                                       AND TO_CHAR(IN_DATE, 'YYYYMM') = TO_CHAR(SYSDATE, 'YYYYMM')
+                                    ) * -1 AS POINT
+                                FROM TBND01
+                                WHERE TO_CHAR(IN_DATE, 'YYYYMM') = TO_CHAR(SYSDATE, 'YYYYMM')
+                                  AND CUST_CODE  <> 'P000000052'
+                                GROUP BY EMPNO
+                               ) TB
+                                   LEFT JOIN TEMP01 E ON TB.EMPNO = E.EMPNO
+                                   LEFT JOIN (
+                              SELECT EMPNO,
+                                     CASE
+                                         WHEN COUNT < 1680 THEN 500
+                                         WHEN COUNT < 1890 THEN 536
+                                         WHEN COUNT < 2100 THEN 556
+                                         WHEN COUNT < 2310 THEN 667
+                                         WHEN COUNT < 2520 THEN 701
+                                         WHEN COUNT < 2730 THEN 730
+                                         WHEN COUNT < 3045 THEN 755
+                                         ELSE 788
+                                         END AS CALLP
+                              FROM (
+                                       SELECT EMPNO, COUNT(*) AS COUNT
+                                       FROM TBND01
+                                       WHERE PRC_GUBN = '2'
+                                         AND TO_CHAR(IN_DATE, 'YYYYMM') = TO_CHAR(SYSDATE, 'YYYYMM')
+                                         AND CUST_CODE  <> 'P000000052'
+                                       GROUP BY EMPNO
+                                   ) GROUPED
+                          ) CP ON TB.EMPNO = CP.EMPNO
+                          GROUP BY E.EMP_NAME, CP.CALLP
+                          UNION ALL
+                          SELECT 'DAILY' AS PERIOD, E.EMP_NAME, SUM(NVL(TB.PRC_02, 0)) AS PRCSUM, SUM(TB.POINT) AS POINTSUM, CP.CALLP, SUM(NVL(TB.PRC_02, 0)) * CP.CALLP AS TOTAL
+                          FROM (SELECT
+                                    EMPNO,
+                                    NVL(SUM(CASE WHEN PRC_GUBN = '2' THEN 1 ELSE 0 END), 0) AS PRC_02,
+                                    (SELECT SUM(POINT)
+                                     FROM TCNT01_POINT
+                                     WHERE EMPNO = TBND01.EMPNO
+                                       AND CALL_CODE IS NOT NULL
+                                       AND TO_CHAR(IN_DATE, 'YYYYMMDD') = TO_CHAR(SYSDATE, 'YYYYMMDD')
+                                    ) * -1 AS POINT
+                                FROM TBND01
+                                WHERE TO_CHAR(IN_DATE, 'YYYYMMDD') = TO_CHAR(SYSDATE, 'YYYYMMDD')
+                                  AND CUST_CODE <> 'P000000052'
+                                GROUP BY EMPNO
+                               ) TB
+                                   LEFT JOIN TEMP01 E ON TB.EMPNO = E.EMPNO
+                                   LEFT JOIN (
+                              SELECT EMPNO,
+                                     CASE
+                                         WHEN COUNT < 1680 THEN 500
+                                         WHEN COUNT < 1890 THEN 536
+                                         WHEN COUNT < 2100 THEN 556
+                                         WHEN COUNT < 2310 THEN 667
+                                         WHEN COUNT < 2520 THEN 701
+                                         WHEN COUNT < 2730 THEN 730
+                                         WHEN COUNT < 3045 THEN 755
+                                         ELSE 788
+                                         END AS CALLP
+                              FROM (
+                                       SELECT EMPNO, COUNT(*) AS COUNT
+                                       FROM TBND01
+                                       WHERE PRC_GUBN = '2'
+                                         AND TO_CHAR(IN_DATE, 'YYYYMMDD') = TO_CHAR(SYSDATE, 'YYYYMMDD')
+                                         AND CUST_CODE <> 'P000000052'
+                                       GROUP BY EMPNO
+                                   ) GROUPED
+                          ) CP ON TB.EMPNO = CP.EMPNO
+                          GROUP BY E.EMP_NAME, CP.CALLP
+                      )
+                 GROUP BY EMP_NAME
+             )
+        GROUP BY ROLLUP(EMP_NAME)
+        ORDER BY EMP_NAME
         ]]>
     </select>
     <select id="getDailyAve" resultType="Map">
