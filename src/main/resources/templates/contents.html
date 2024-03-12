@@ -419,118 +419,98 @@
 
 
                 <!--end::Row-->
+                <div th:if="${isEmployee}" class="row gx-5 gx-xl-10">
                 <!--begin::Row-->
-                <div  th:if="${isEmployee}" class="row gx-5 gx-xl-12">
-                    <script th:inline="javascript">
-                        employeeList();
 
-                        /*<![CDATA[*/
-                        function employeeList(){
-                            $(document).ready(function() {
-                                $.ajax({
-                                    url: '/empl/dashboard-employee',
-                                    type: 'GET',
-                                    success: function(response) {
-                                        var tableBody = $('.table tbody');
-                                        tableBody.empty(); // 테이블 초기화
-
-                                        // 데이터를 테이블에 동적으로 추가
-                                        $.each(response.employeeList, function(i, item) {
-
-                                            var row = '<tr>' +
-
-                                                '<td>' + item.EMP_NAME + '</td>' +
-                                                '<td>' + item.DAILY_PRCSUM + '</td>' +
-                                                '<td>' + item.DAILY_POINTSUM + '</td>' +
-                                                '<td>' + item.MONTHLY_PRCSUM + '</td>' +
-                                                '<td>' + item.MONTHLY_POINTSUM + '</td>' +
-                                                '<td>' + item.YEARLY_PRCSUM + '</td>' +
-                                                '</tr>';
-                                            if(item.EMP_NAME ==null){
-                                                row = '<tr>' +
-
-                                                '<td>합  계</td>' +
-                                                '<td>' + item.DAILY_PRCSUM + '</td>' +
-                                                '<td>' + item.DAILY_POINTSUM + '</td>' +
-                                                '<td>' + item.MONTHLY_PRCSUM + '</td>' +
-                                                '<td>' + item.MONTHLY_POINTSUM + '</td>' +
-                                                '<td>' + item.YEARLY_PRCSUM + '</td>' +
-                                                '</tr>';
-                                            }
-                                            tableBody.append(row);
-                                        });
-                                        // 데이터 처리 로직
-                                    },
-                                    error: function(xhr, status, error) {
-                                        console.error("Error: " + status + " " + error);
-                                    }
-                                });
-                            });
-                        }
-                        /*]]>*/
-                    </script>
-                    <!--begin::Col-->
-                    <div class="col-xxl-12 mb-5 mb-xl-12">
-                        <div class="card card-flush h-md-100">
-                            <!--begin::Header-->
-                            <div class="card-header pt-5">
-                                <!--begin::Title-->
-                                <h3 class="card-title align-items-start flex-column">
-                                    <span class="card-label fw-bold text-gray-800">상담원별 처리 현황</span>
-                                    <span class="text-gray-500 mt-1 fw-semibold fs-6">Avg. 69.34% Conv. Rate</span>
-                                </h3>
-                                <!--end::Title-->
-                                <!--begin::Toolbar-->
-                                <div class="card-toolbar">
-                                    <button id="employee" class="btn btn-icon btn-color-gray-500 btn-active-color-primary justify-content-end" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-overflow="true">
-                                        <i class="ki-duotone ki-arrows-circle fs-1 text-gray-500 me-n1">
-                                            <span class="path1"></span>
-                                            <span class="path2"></span>
-                                        </i>
-                                    </button>
-                                </div>
-                                <!--end::Toolbar-->
-                            </div>
-                            <!--end::Header-->
-                            <!--begin::Body-->
-                            <div class="card-body pt-6">
-                                <!--begin::Nav-->
-
-                                <!--end::Nav-->
-                                <!--begin::Tab Content-->
-                                <div class="table-responsive table-loading">
-                                    <div class="table-loading-message">
-                                        Loading...
+                    <div class="col-xxl-6 mb-5 mb-xl-6">
+                            <div class="card card-flush h-md-100">
+                                <div class="card-header pt-5">
+                                    <h3 class="card-title align-items-start flex-column">
+                                        <span class="card-label fw-bold text-gray-800">상담원 처리 현황</span>
+                                    </h3>
+                                    <div class="card-toolbar">
+                                        <button id="employee" class="btn btn-icon btn-color-gray-500 btn-active-color-primary justify-content-end">
+                                            <i class="ki-duotone ki-arrows-circle fs-1 text-gray-500 me-n1">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                            </i>
+                                        </button>
                                     </div>
-                                    <table class="table table-striped gy-7 gs-7">
-                                        <thead>
-                                        <tr class="fw-semibold fs-6 text-gray-800 border-bottom border-gray-200">
-                                            <th>상담원</th>
-                                            <th>일 완료</th>
-                                            <th>일 비용</th>
-                                            <th>월 완료</th>
-                                            <th>월 비용</th>
-                                            <th>년 완료</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-
-                                        </tbody>
-                                    </table>
                                 </div>
-                                <!--end::Tab Content-->
+                                <div class="card-body pt-6">
+                                    <div class="table-responsive">
+                                        <!-- Loading message -->
+                                        <div class="table-loading-message" style="display:none;">Loading...</div>
+                                        <!-- Table -->
+                                        <table class="table table-striped gy-7 gs-7">
+                                            <thead>
+                                            <tr class="fw-bold fs-6 text-gray-800 border-bottom border-gray-200">
+                                                <th>상담원</th>
+                                                <th style="text-align: right;">일완료</th>
+                                                <th style="text-align: right;">일수수료</th>
+                                                <th style="text-align: right;">일매출</th>
+                                                <th style="text-align: right;">건당비용</th>
+                                                <th style="text-align: right;">월완료</th>
+                                                <th style="text-align: right;">월수수료</th>
+                                                <th style="text-align: right;">월매출</th>
+                                                <th style="text-align: right;">월매출 비율</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
-                            <!--end: Card Body-->
                         </div>
-                    </div>
-                    <script th:inline="javascript">
-                        const employee = document.getElementById('employee');
-                        employee.addEventListener('click', function() {
-                            employeeList();
-                        });
-                    </script>
 
-                    <!--end::Col-->
+                    <script th:inline="javascript">
+                            $(document).ready(function() {
+                                const employeeButton = document.getElementById('employee');
+                                employeeButton.addEventListener('click', employeeList);
+                                employeeList();
+                                function employeeList() {
+                                    // Show loading message
+                                    $('.table-loading-message').show();
+                                    $('.table tbody').empty(); // Clear the table
+
+                                    $.ajax({
+                                        url: '/empl/dashboard-employee',
+                                        type: 'GET',
+                                        success: function(response) {
+                                            var tableBody = $('.table tbody');
+
+                                            // Dynamically add data to the table
+                                            $.each(response.employeeList, function(i, item) {
+                                                var row = '<tr>' +
+                                                    '<td>' + item.EMP_NAME + '</td>' +
+                                                    '<td  style="text-align: right;">' + item.DAILY_PRCSUM + '</td>' +
+                                                    '<td style="text-align: right;">' + item.DAILY_TOTAL + '</td>' +
+                                                    '<td style="text-align: right;">' + item.DAILY_POINTSUM + '</td>' +
+                                                    '<td style="text-align: right;">' + item.TOTAL_MONTHLY_CALLP + '</td>' +
+                                                    '<td style="text-align: right;">' + item.MONTHLY_PRCSUM + '</td>' +
+                                                    '<td style="text-align: right;">' + item.MONTHLY_TOTAL + '</td>' +
+                                                    '<td style="text-align: right;">' + item.MONTHLY_POINTSUM + '</td>' +
+                                                    '<td style="text-align: right;">' + item.MONTHLY_POINTSUM_PERCENT + ' % </td>' +
+                                                    '</tr>';
+                                                tableBody.append(row);
+                                            });
+
+                                            // Hide loading message
+                                            $('.table-loading-message').hide();
+                                        },
+                                        error: function(xhr, status, error) {
+                                            console.error("Error: " + status + " " + error);
+                                            // Hide loading message in case of error as well
+                                            $('.table-loading-message').hide();
+                                        }
+                                    });
+                                }
+                            });
+                        </script>
+                    <div class="col-xxl-6 mb-5 mb-xl-10">
+                        <div class="card card-flush h-md-100"></div>
+                    </div>
                 </div>
                 <!--end::Row-->
                 <!--begin::Row-->

@@ -83,6 +83,15 @@ public class DashboardData {
     private String TDAILY_TOTAL;
     private String MONTHLY_TOTAL;
     private String TYEARLY_TOTAL;
+    private int MONTHLY_POINTSUM_PERCENT;
+
+    public int getMONTHLY_POINTSUM_PERCENT() {
+        return MONTHLY_POINTSUM_PERCENT;
+    }
+
+    public void setMONTHLY_POINTSUM_PERCENT(int MONTHLY_POINTSUM_PERCENT) {
+        this.MONTHLY_POINTSUM_PERCENT = MONTHLY_POINTSUM_PERCENT;
+    }
 
     public int getDAILY_PRCSUM() {
         return DAILY_PRCSUM;
