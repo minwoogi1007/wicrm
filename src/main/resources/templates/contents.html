@@ -509,14 +509,94 @@
                             });
                         </script>
                     <div class="col-xxl-6 mb-5 mb-xl-10">
-                        <div class="card card-flush h-md-100"></div>
+                        <div class="card card-flush h-md-100">
+                            <div class="card-header pt-5">
+                                <h3 class="card-title align-items-start flex-column">
+                                    <span class="card-label fw-bold text-gray-800">상담원 시간대 현황</span>
+                                </h3>
+                                <div class="card-toolbar">
+                                    <button  class="btn btn-icon btn-color-gray-500 btn-active-color-primary justify-content-end">
+                                        <i class="ki-duotone ki-arrows-circle fs-1 text-gray-500 me-n1">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                        </i>
+                                    </button>
+                                </div>
+                            </div>
+                            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                            <div class="card-body pt-6">
+                                <canvas id="myChart" width="800" height="400"></canvas>
+                                <script>
+                                    var myChart = new Chart(document.getElementById('myChart'), {
+                                        type: 'bar',
+                                        data: {
+                                            labels: ['9시', '10시', '11시', '12시', '13시', '14시', '15시', '16시', '17시', '18시'],
+                                            datasets: [
+                                                // 각 인원에 대한 데이터셋
+                                                {
+                                                    label: '정지영',
+                                                    data: [0, 0, 11, 13, 2, 14, 8, 8, 0, 0],
+                                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                                },{
+                                                    label: '정지영',
+                                                    data: [0, 0, 11, 13, 2, 14, 8, 8, 0, 0],
+                                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                                },{
+                                                    label: '정지영',
+                                                    data: [0, 0, 11, 13, 2, 14, 8, 8, 0, 0],
+                                                    backgroundColor: 'rgba(255, 0, 132, 0.2)',
+                                                },{
+                                                    label: '정지영',
+                                                    data: [0, 0, 11, 13, 2, 14, 8, 8, 0, 0],
+                                                    backgroundColor: 'rgba(255, 99, 0, 0.2)',
+                                                },{
+                                                    label: '정지영',
+                                                    data: [0, 0, 11, 13, 2, 14, 8, 8, 0, 0],
+                                                    backgroundColor: 'rgba(255, 99, 0, 0.2)',
+                                                },{
+                                                    label: '정지영',
+                                                    data: [0, 0, 11, 13, 2, 14, 8, 8, 0, 0],
+                                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                                },{
+                                                    label: '정지영',
+                                                    data: [0, 0, 11, 13, 2, 14, 8, 8, 0, 0],
+                                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                                },{
+                                                    label: '정지영',
+                                                    data: [0, 0, 11, 13, 2, 14, 8, 8, 0, 0],
+                                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                                },{
+                                                    label: '정지영',
+                                                    data: [0, 0, 11, 13, 2, 14, 8, 8, 0, 0],
+                                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                                },{
+                                                    label: '정지영',
+                                                    data: [0, 0, 11, 13, 2, 14, 8, 8, 0, 0],
+                                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                                }
+                                                // 다른 인원에 대한 데이터셋 추가...
+                                            ]
+                                        },
+                                        options: {
+                                            scales: {
+                                                x: {
+                                                    stacked: true,
+                                                },
+                                                y: {
+                                                    stacked: true
+                                                }
+                                            }
+                                        }
+                                    });
+                                </script>
+                            </div>
+                        </div>
                     </div>
-                </div>
                 <!--end::Row-->
                 <!--begin::Row-->
 
                 <!--end::Row-->
-            </div>
+                </div>
             <!--end::Content container-->
         </div>
         <!--end::Content-->
@@ -531,5 +611,4 @@
         <!--end::Footer-->
 </div>
 
-
-<!--end::Custom Javascript-->
+</div>
