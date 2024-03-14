@@ -11,6 +11,18 @@ public class Tipdw {
     private String userid;
     private String username;
 
+    // 기본 생성자
+
+
+    // 모든 필드를 포함하는 생성자
+    public Tipdw(String userid, String pw, String username, String gubn, String confirmYn) {
+        this.userid = userid;
+        this.pw = pw;
+        this.username = username;
+        this.gubn = gubn;
+        this.confirmYn = confirmYn;
+    }
+
     // Getters and Setters
     // ID
     public String getId() { return id; }
@@ -76,5 +88,16 @@ public class Tipdw {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+    // toString() 메서드는 로깅이나 디버깅 목적으로 유용할 수 있습니다.
+    @Override
+    public String toString() {
+        return "Tipdw{" +
+                "userid='" + userid + '\'' +
+                ", pw='" + pw + '\'' +
+                ", username='" + username + '\'' +
+                ", gubn='" + gubn + '\'' +
+                ", confirmYn='" + confirmYn + '\'' +
+                '}';
     }
 }

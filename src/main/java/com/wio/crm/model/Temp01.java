@@ -1,8 +1,19 @@
 package com.wio.crm.model;
 
 public class Temp01 {
+
+    public Temp01(String empno, String userId, String call_yn, String work_gubn, String position, String emp_Name) {
+        this.empno = empno;
+        this.userId = userId;
+        this.call_yn = call_yn;
+        this.work_gubn = work_gubn;
+        this.position = position;
+        this.emp_Name = emp_Name;
+
+
+    }
     private String empno;
-    private String empName;
+    private String emp_Name;
     // ... (Other fields)
     private String saup_gubn;
     private String id;
@@ -27,14 +38,31 @@ public class Temp01 {
     private String subId;
     private String con_time;
     private String userId;
+
+    public String getEmp_Name() {
+        return emp_Name;
+    }
+
+    public void setEmp_Name(String emp_Name) {
+        this.emp_Name = emp_Name;
+    }
+
+    private boolean isAdmin; // 관리자 여부를 나타내는 필드
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
+    }
+
     // Getters and Setters
     // EmpNo
     public String getEmpno() { return empno; }
     public void setEmpno(String empno) { this.empno = empno; }
 
     // EmpName
-    public String getEmpName() { return empName; }
-    public void setEmpName(String empName) { this.empName = empName; }
 
     // ... (Other getters and setters)
 

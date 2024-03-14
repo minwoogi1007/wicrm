@@ -59,7 +59,11 @@ var KTSigninGeneral = function() {
                                     }
                                 });
                             } else {
-                                throw new Error('아이디 또는 비밀번호를 잘못 입력했습니다.');
+
+                                // 서버 응답이 OK(200) 상태가 아닌 경우, 에러 처리
+                                return response.json().then(data => {
+                                    throw new Error(data.error || "An unknown error occurred."); // 서버로부터 에러 메시지 추출
+                                });
                             }
                         }).then(data => {
                             // 로그인 성공 후 리디렉션 또는 추가 처리

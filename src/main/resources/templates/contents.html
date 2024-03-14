@@ -525,68 +525,47 @@
                             </div>
                             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
                             <div class="card-body pt-6">
-                                <canvas id="myChart" width="800" height="400"></canvas>
+                                <canvas id="radarChart" width="400" height="400"></canvas>
+
                                 <script>
-                                    var myChart = new Chart(document.getElementById('myChart'), {
-                                        type: 'bar',
+                                    var ctx = document.getElementById('radarChart').getContext('2d');
+                                    var radarChart = new Chart(ctx, {
+                                        type: 'radar',
                                         data: {
-                                            labels: ['9시', '10시', '11시', '12시', '13시', '14시', '15시', '16시', '17시', '18시'],
+                                            labels: ['일완료', '일수수료', '일매출', '월완료', '월수수료', '월매출'],
                                             datasets: [
-                                                // 각 인원에 대한 데이터셋
                                                 {
-                                                    label: '정지영',
-                                                    data: [0, 0, 11, 13, 2, 14, 8, 8, 0, 0],
+                                                    label: '권김단아',
+                                                    data: [3, 1500, 4500, 171, 85500, 139500],
+                                                    fill: true,
                                                     backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                                                },{
-                                                    label: '정지영',
-                                                    data: [0, 0, 11, 13, 2, 14, 8, 8, 0, 0],
-                                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                                                },{
-                                                    label: '정지영',
-                                                    data: [0, 0, 11, 13, 2, 14, 8, 8, 0, 0],
-                                                    backgroundColor: 'rgba(255, 0, 132, 0.2)',
-                                                },{
-                                                    label: '정지영',
-                                                    data: [0, 0, 11, 13, 2, 14, 8, 8, 0, 0],
-                                                    backgroundColor: 'rgba(255, 99, 0, 0.2)',
-                                                },{
-                                                    label: '정지영',
-                                                    data: [0, 0, 11, 13, 2, 14, 8, 8, 0, 0],
-                                                    backgroundColor: 'rgba(255, 99, 0, 0.2)',
-                                                },{
-                                                    label: '정지영',
-                                                    data: [0, 0, 11, 13, 2, 14, 8, 8, 0, 0],
-                                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                                                },{
-                                                    label: '정지영',
-                                                    data: [0, 0, 11, 13, 2, 14, 8, 8, 0, 0],
-                                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                                                },{
-                                                    label: '정지영',
-                                                    data: [0, 0, 11, 13, 2, 14, 8, 8, 0, 0],
-                                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                                                },{
-                                                    label: '정지영',
-                                                    data: [0, 0, 11, 13, 2, 14, 8, 8, 0, 0],
-                                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                                                },{
-                                                    label: '정지영',
-                                                    data: [0, 0, 11, 13, 2, 14, 8, 8, 0, 0],
-                                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                                                }
-                                                // 다른 인원에 대한 데이터셋 추가...
+                                                    borderColor: 'rgba(255, 99, 132, 1)',
+                                                    pointBackgroundColor: 'rgba(255, 99, 132, 1)',
+                                                    pointBorderColor: '#fff',
+                                                    pointHoverBackgroundColor: '#fff',
+                                                    pointHoverBorderColor: 'rgba(255, 99, 132, 1)'
+                                                },
+                                                {
+                                                    label: '김민영',
+                                                    data: [7, 3500, 10500, 143, 71500, 213000],
+                                                    fill: true,
+                                                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                                    borderColor: 'rgba(54, 162, 235, 1)',
+                                                    pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                                                    pointBorderColor: '#fff',
+                                                    pointHoverBackgroundColor: '#fff',
+                                                    pointHoverBorderColor: 'rgba(54, 162, 235, 1)'
+                                                },
+                                                // 다른 상담원에 대한 데이터셋 추가 가능
                                             ]
                                         },
                                         options: {
-                                            scales: {
-                                                x: {
-                                                    stacked: true,
-                                                },
-                                                y: {
-                                                    stacked: true
+                                            elements: {
+                                                line: {
+                                                    borderWidth: 3
                                                 }
                                             }
-                                        }
+                                        },
                                     });
                                 </script>
                             </div>

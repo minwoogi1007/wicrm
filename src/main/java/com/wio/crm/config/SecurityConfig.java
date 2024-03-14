@@ -20,9 +20,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-        //        .csrf(csrf -> csrf
-        //                .disable()
-        //        )   //초기 비밀번호 암호화를 위해 만들어 놓은 부분
+                //.csrf(csrf -> csrf
+                //                .ignoringRequestMatchers("/logout") // /logout 경로에 대해 CSRF 보호를 비활성화합니다.
+                       // .disable()//초기 비밀번호 암호화를 위해 만들어 놓은 부분
+               // )
                 .authorizeHttpRequests(auth -> auth
                         //requestMatchers("/general/**").hasAuthority("ROLE_GENERAL")
                         //.requestMatchers("/company/**").hasAuthority("ROLE_COMPANY")

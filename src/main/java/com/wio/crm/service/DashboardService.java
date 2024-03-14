@@ -3,6 +3,8 @@ package com.wio.crm.service;
 import com.wio.crm.config.CustomUserDetails;
 import com.wio.crm.mapper.DashboardMapper;
 import com.wio.crm.model.DashboardData;
+import com.wio.crm.model.Tcnt01Emp;
+import com.wio.crm.model.Temp01;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -32,12 +34,19 @@ public class DashboardService {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         // 현재 사용자의 CustomUserDetails 객체에서 custCode 추출
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Temp01 tempUserInfo = userDetails.getTempUserInfo(); // 내부직원 정보 접근
+        Tcnt01Emp tcntUserInfo = userDetails.getTcntUserInfo(); // 거래처 직원 정보 접근
         String custCode = null;
-        if (authentication.getPrincipal() instanceof CustomUserDetails) {
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            custCode = userDetails.getCustCode();
-        }else{
+
+        if (tcntUserInfo != null && tcntUserInfo.getCustCode() != null) {
+            custCode = tcntUserInfo.getCustCode();
+            System.out.println("CustCode from Tcnt01Emp: " + custCode);
+        } else if (tempUserInfo != null) {
+            // tempUserInfo 사용 시 관련 로직
+            // 예: custCode = tempUserInfo.getSomeOtherInfo();
             custCode = "";
+            System.out.println("Accessing Temp01 UserInfo");
         }
         Map<String, Object> data = new HashMap<>();
         // 데이터베이스 조회
