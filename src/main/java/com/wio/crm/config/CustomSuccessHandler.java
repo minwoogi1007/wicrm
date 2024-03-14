@@ -1,6 +1,7 @@
 package com.wio.crm.config;
 
 import com.wio.crm.model.Menu;
+import com.wio.crm.service.LoginHistoryService;
 import com.wio.crm.service.MenuService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,6 +20,13 @@ public class CustomSuccessHandler extends SavedRequestAwareAuthenticationSuccess
 
     @Autowired
     private MenuService menuService;
+
+    @Autowired
+    private  LoginHistoryService loginHistoryService; // 로그인 이력을 관리하는 서비스
+
+
+
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws ServletException, IOException {
@@ -30,5 +38,10 @@ public class CustomSuccessHandler extends SavedRequestAwareAuthenticationSuccess
         // 조회된 메뉴 리스트를 세션에 저장
         HttpSession session = request.getSession();
         session.setAttribute("USER_MENUS", menuList);
+
+        // 로그인 이력 기록
+        loginHistoryService.recordLoginHistory(authentication.getName());
+
+        super.onAuthenticationSuccess(request, response, authentication);
     }
 }
