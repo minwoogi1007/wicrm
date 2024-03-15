@@ -31,8 +31,6 @@ public class CustomSuccessHandler extends SavedRequestAwareAuthenticationSuccess
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws ServletException, IOException {
         // 사용자 권한에 따른 메뉴 리스트 조회 및 세션 저장 로직
-
-        super.onAuthenticationSuccess(request, response, authentication);
         List<Menu> menuList = menuService.getCompanyUserMenus(authentication.getName());
 
         // 조회된 메뉴 리스트를 세션에 저장
@@ -42,6 +40,7 @@ public class CustomSuccessHandler extends SavedRequestAwareAuthenticationSuccess
         // 로그인 이력 기록
         loginHistoryService.recordLoginHistory(authentication.getName());
 
+        // 마지막에 한 번만 호출하여 리다이렉트 처리
         super.onAuthenticationSuccess(request, response, authentication);
     }
 }

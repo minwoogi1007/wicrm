@@ -47,9 +47,6 @@ public class CustomUserDetailsService implements UserDetailsService {
                 throw new UserNotConfirmedException("User with userid: " + userid + " is not confirmed yet.");
             }
 
-
-            System.out.println("user======================"+user.getConfirmYn());
-
             List<SimpleGrantedAuthority> authorities = new ArrayList<>();
             String custCode = null;
             Temp01 tempUser = null; // 내부직원 정보를 담을 객체
@@ -80,9 +77,9 @@ public class CustomUserDetailsService implements UserDetailsService {
                     System.out.println("getUse_yn"+tcntUser.getUse_yn());
                     System.out.println("getEmp_name"+tcntUser.getEmp_name());
                     System.out.println("getId"+tcntUser.getId());
+                    System.out.println("getCust_gubn"+tcntUser.getCust_gubn());
 
 
-                    System.out.println(custCode);
                 }
             }
 

@@ -2,12 +2,13 @@ package com.wio.crm.model;
 
 public class Tcnt01Emp {
 
-    public Tcnt01Emp(String custCode, String empno, String use_yn, String emp_name, String id) {
+    public Tcnt01Emp(String custCode, String empno, String use_yn, String emp_name, String id , String cust_gubn) {
         this.custCode = custCode;
         this.empno = empno;
         this.use_yn = use_yn;
         this.emp_name = emp_name;
         this.id = id;
+        this.cust_gubn=cust_gubn;
     }
     private String custCode;
     private String empno;
@@ -18,6 +19,16 @@ public class Tcnt01Emp {
     private String userId;
 
     private String id;
+
+    private String cust_gubn;
+
+    public String getCust_gubn() {
+        return cust_gubn;
+    }
+
+    public void setCust_gubn(String cust_gubn) {
+        this.cust_gubn = cust_gubn;
+    }
 
     public String getId() {
         return id;
