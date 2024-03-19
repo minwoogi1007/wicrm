@@ -616,5 +616,63 @@
 
     </select>
 
+    <select id="getWeeklySum" resultType="Map">
+    SELECT WEEK,
+        SUM(MONDAY) AS "MONDAY",
+        SUM(TUESDAY) AS "TUESDAY",
+        SUM(WEDNESDAY) AS "WEDNESDAY",
+        SUM(THURSDAY) AS "THURSDAY",
+        SUM(FRIDAY) AS "FRIDAY"
+    FROM (
+            SELECT 'PRI' AS WEEK,
+            COUNT(CASE WHEN TO_CHAR(IN_DATE,'DY', 'NLS_DATE_LANGUAGE=AMERICAN') = 'MON' THEN 1 END) AS MONDAY,
+            COUNT(CASE WHEN TO_CHAR(IN_DATE,'DY', 'NLS_DATE_LANGUAGE=AMERICAN') = 'TUE' THEN 1 END) AS TUESDAY,
+            COUNT(CASE WHEN TO_CHAR(IN_DATE,'DY', 'NLS_DATE_LANGUAGE=AMERICAN') = 'WED' THEN 1 END) AS WEDNESDAY,
+            COUNT(CASE WHEN TO_CHAR(IN_DATE,'DY', 'NLS_DATE_LANGUAGE=AMERICAN') = 'THU' THEN 1 END) AS THURSDAY,
+            COUNT(CASE WHEN TO_CHAR(IN_DATE,'DY', 'NLS_DATE_LANGUAGE=AMERICAN') = 'FRI' THEN 1 END) AS FRIDAY
+            FROM TBND01
+            WHERE PRC_GUBN = '2'
+            <if test="custCode != null and !custCode.isEmpty()">
+                AND CUST_CODE =  #{custCode}
+            </if>
+            AND IN_DATE BETWEEN TRUNC(SYSDATE, 'IW') - 10 AND TRUNC(SYSDATE, 'IW') - 3
+    UNION ALL
+            SELECT 'THI' AS WEEK,
+            COUNT(CASE WHEN TO_CHAR(IN_DATE,'DY', 'NLS_DATE_LANGUAGE=AMERICAN') = 'MON' THEN 1 END) AS MONDAY,
+            COUNT(CASE WHEN TO_CHAR(IN_DATE,'DY', 'NLS_DATE_LANGUAGE=AMERICAN') = 'TUE' THEN 1 END) AS TUESDAY,
+            COUNT(CASE WHEN TO_CHAR(IN_DATE,'DY', 'NLS_DATE_LANGUAGE=AMERICAN') = 'WED' THEN 1 END) AS WEDNESDAY,
+            COUNT(CASE WHEN TO_CHAR(IN_DATE,'DY', 'NLS_DATE_LANGUAGE=AMERICAN') = 'THU' THEN 1 END) AS THURSDAY,
+            COUNT(CASE WHEN TO_CHAR(IN_DATE,'DY', 'NLS_DATE_LANGUAGE=AMERICAN') = 'FRI' THEN 1 END) AS FRIDAY
+            FROM TBND01
+            WHERE PRC_GUBN = '2'
+            <if test="custCode != null and !custCode.isEmpty()">
+                AND CUST_CODE =  #{custCode}
+            </if>
+            AND IN_DATE BETWEEN TRUNC(SYSDATE, 'IW') AND TRUNC(SYSDATE, 'IW') + 4
+    )
+    GROUP BY WEEK
+    ORDER BY WEEK DESC
+</select>
 
+    <select id="getMonthlySum" resultType="Map">
+    WITH months AS (
+    SELECT ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -level + 1) AS month_start
+    FROM dual
+    <![CDATA[
+    CONNECT BY LEVEL <= 12
+    )
+    SELECT
+    TO_CHAR(m.month_start, 'YYYY-MM') AS "Month",
+    COUNT(t.IN_DATE) AS count
+    FROM months m
+    LEFT JOIN TBND01 t ON t.IN_DATE >= m.month_start
+        AND t.IN_DATE < ADD_MONTHS(m.month_start, 1)
+        ]]>
+        AND t.PRC_GUBN = '2'
+        <if test="custCode != null and !custCode.isEmpty()">
+            AND t.CUST_CODE =  #{custCode}
+        </if>
+    GROUP BY m.month_start
+    ORDER BY m.month_start
+    </select>
 </mapper>

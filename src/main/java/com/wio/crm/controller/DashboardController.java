@@ -75,4 +75,18 @@ public class DashboardController {
         Map<String, Object> data = dashboardService.getDailyAve(username);
         return ResponseEntity.ok(data);
     }
+    @GetMapping("/api/dashboard-weekly-data")
+    public ResponseEntity<Map<String, Object>> getWeeklySum(Principal principal) {
+
+        String username = principal.getName();
+        Map<String, Object> data = dashboardService.getWeeklySum(username);
+        return ResponseEntity.ok(data);
+    }
+    @GetMapping("/api/dashboard-monthly-data")
+    public ResponseEntity<Map<String, Object>> getMonthlySum(Principal principal) {
+
+        String username = principal.getName();
+        Map<String, Object> data = dashboardService.getMonthlySum(username);
+        return ResponseEntity.ok(data);
+    }
 }

@@ -417,7 +417,94 @@
                     <!--end::Col-->
                 </div>
 
+                <div class="row gx-5 gx-xl-10">
+                    <!--begin::Col-->
+                    <div class="col-xxl-6 mb-5 mb-xl-10">
+                        <!--begin::Chart widget 8-->
+                        <div class="card card-flush h-xl-100">
+                            <!--begin::Header-->
+                            <div class="card-header pt-7">
+                                <!--begin::Title-->
+                                <h3 class="card-title align-items-start flex-column">
+                                    <span class="card-label fw-bold text-gray-800">주간 처리</span>
+                                    <span class="text-gray-500 mt-1 fw-semibold fs-6">전주/이번주</span>
+                                </h3>
+                                <!--end::Title-->
+                                <!--begin::Toolbar-->
+                                <div class="card-toolbar">
+                                    <button id="weekly" class="btn btn-icon btn-color-gray-500 btn-active-color-primary justify-content-end" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-overflow="true">
+                                        <i class="ki-duotone ki-arrows-circle fs-1 text-gray-500 me-n1">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                        </i>
+                                    </button>
+                                </div>
+                                <!--end::Toolbar-->
+                            </div>
+                            <!--end::Header-->
+                            <!--begin::Body-->
+                            <div class="card-body d-flex align-items-end px-0 pt-3 pb-5">
+                                <!--begin::Chart-->
+                                <div class="card-body d-flex align-items-end px-0 pt-3 pb-5">
+                                    <!--begin::Chart-->
+                                    <div id="kt_charts_widget_18_1_chart" class="h-325px w-100 min-h-auto ps-4 pe-6"></div>
+                                    <!--end::Chart-->
+                                </div>
+                                <!--end::Chart-->
+                            </div>
+                            <!--end: Card Body-->
+                        </div>
+                        <!--end::Chart widget 8-->
+                    </div>
+                    <!--end::Col-->
+                    <!--begin::Col-->
+                    <div class="col-xxl-6 mb-5 mb-xl-10">
+                        <!--begin::Tables widget 16-->
+                        <div class="card card-flush h-lg-100">
+                            <!--begin::Header-->
+                            <div class="card-header pt-5">
+                                <!--begin::Title-->
+                                <h3 class="card-title align-items-start flex-column">
+                                    <span class="card-label fw-bolder text-gray-900">월간 처리</span>
+                                    <span class="text-gray-500 pt-2 fw-semibold fs-6">12개월</span>
+                                </h3>
+                                <!--end::Title-->
+                                <!--begin::Toolbar-->
+                                <div class="card-toolbar">
+                                    <!--begin::Menu-->
+                                    <button id="year" class="btn btn-icon btn-color-gray-500 btn-active-color-primary justify-content-end" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-overflow="true">
+                                        <i class="ki-duotone ki-arrows-circle fs-1 text-gray-500 me-n1">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                        </i>
+                                    </button>
+                                    <!--begin::Menu 2-->
 
+                                    <!--end::Menu 2-->
+                                    <!--end::Menu-->
+                                </div>
+                                <!--end::Toolbar-->
+                            </div>
+                            <!--end::Header-->
+                            <!--begin::Body-->
+                            <div class="card-body pt-0 px-0">
+                                <!--begin::Chart-->
+                                <div class="card-body d-flex align-items-end px-0 pt-3 pb-5">
+                                    <!--begin::Chart-->
+                                    <div id="kt_charts_widget_18_2_chart" class="h-325px w-100 min-h-auto ps-4 pe-6"></div>
+                                    <!--end::Chart-->
+                                </div>
+                                <!--end::Chart-->
+                                <!--begin::Info-->
+
+                                <!--ed::Info-->
+                            </div>
+                            <!--end::Body-->
+                        </div>
+                        <!--end::Tables widget 16-->
+                    </div>
+                    <!--end::Col-->
+                </div>
                 <!--end::Row-->
                 <div th:if="${isEmployee}" class="row gx-5 gx-xl-10">
                 <!--begin::Row-->

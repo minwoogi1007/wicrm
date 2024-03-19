@@ -104,6 +104,18 @@ public class DashboardService {
         data.put("dailyAve", dashboardMapper.getDailyAve(custCode));
         return data;
     }
+    public Map<String, Object> getWeeklySum(String username) {
+        String custCode = getCurrentUserCustCode();
+        Map<String, Object> data = new HashMap<>();
+        data.put("dailyAve", dashboardMapper.getWeeklySum(custCode));
+        return data;
+    }
+    public Map<String, Object> getMonthlySum(String username) {
+        String custCode = getCurrentUserCustCode();
+        Map<String, Object> data = new HashMap<>();
+        data.put("dailyAve", dashboardMapper.getMonthlySum(custCode));
+        return data;
+    }
     public void checkUserRole() {
         // 현재 인증된 사용자의 Authentication 객체 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

@@ -85,6 +85,82 @@ public class DashboardData {
     private String TYEARLY_TOTAL;
     private int MONTHLY_POINTSUM_PERCENT;
 
+    private String WEEK;
+    private int MONDAY;
+
+    private int TUESDAY;
+    private int WEDNESDAY;
+    private int THURSDAY;
+    private int FRIDAY;
+
+    private String MONTH;
+    private int countMonthSum;
+
+
+    public String getWEEK() {
+        return WEEK;
+    }
+
+    public void setWEEK(String WEEK) {
+        this.WEEK = WEEK;
+    }
+
+    public int getMONDAY() {
+        return MONDAY;
+    }
+
+    public void setMONDAY(int MONDAY) {
+        this.MONDAY = MONDAY;
+    }
+
+    public int getTUESDAY() {
+        return TUESDAY;
+    }
+
+    public void setTUESDAY(int TUESDAY) {
+        this.TUESDAY = TUESDAY;
+    }
+
+    public int getWEDNESDAY() {
+        return WEDNESDAY;
+    }
+
+    public void setWEDNESDAY(int WEDNESDAY) {
+        this.WEDNESDAY = WEDNESDAY;
+    }
+
+    public int getTHURSDAY() {
+        return THURSDAY;
+    }
+
+    public void setTHURSDAY(int THURSDAY) {
+        this.THURSDAY = THURSDAY;
+    }
+
+    public int getFRIDAY() {
+        return FRIDAY;
+    }
+
+    public void setFRIDAY(int FRIDAY) {
+        this.FRIDAY = FRIDAY;
+    }
+
+    public String getMONTH() {
+        return MONTH;
+    }
+
+    public void setMONTH(String MONTH) {
+        this.MONTH = MONTH;
+    }
+
+    public int getCountMonthSum() {
+        return countMonthSum;
+    }
+
+    public void setCountMonthSum(int countMonthSum) {
+        this.countMonthSum = countMonthSum;
+    }
+
     public int getMONTHLY_POINTSUM_PERCENT() {
         return MONTHLY_POINTSUM_PERCENT;
     }

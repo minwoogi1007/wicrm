@@ -20,10 +20,14 @@ $(document).ready(function() {
     fetchPersonData();
     fetchMonthData();
     fetchDailyData();
+    fetchWeeklyData();
+    fetchYearData();
     // ID를 사용하여 버튼 선택
     const customCount = document.getElementById('customCount');
     const timeCount = document.getElementById('timeCount');
     const dailyAvg = document.getElementById('dailyAvg');
+    const weekly = document.getElementById('weekly');
+
 
     customCount.addEventListener('click', function() {
         fetchPersonData()
@@ -33,6 +37,9 @@ $(document).ready(function() {
     });
     dailyAvg.addEventListener('click', function() {
         fetchDailyData()
+    });
+    weekly.addEventListener('click', function() {
+        fetchWeeklyData()
     });
 
     function formatNumberWithCommas(number) {
@@ -106,6 +113,7 @@ $(document).ready(function() {
             }
         });
     }
+
     function fetchData() {
         $.ajax({
             url: "/api/dashboard-data", // 서버 엔드포인트
@@ -331,6 +339,99 @@ $(document).ready(function() {
 
     }
 
+    //주간 처리 건수
+    let week;
+
+    let thiWeek =[];
+    let priWeek = [];
+    let thiWeekMax;
+    let priWeekMax;
+    let weekMax;
+    function fetchWeeklyData() {
+        $.ajax({
+            url: "/api/dashboard-weekly-data", // 서버 엔드포인트
+            type: "GET",
+            success: function(response) {
+                //console.log(response);
+                thiWeek = [];
+                priWeek = [];
+                // response는 각 카드 데이터를 포함하는 객체
+                Object.keys(response).forEach(function(key) {
+                    // 예: key = 'card-data-1'
+                    const weeklyList = response[key];
+
+                    //console.log(key);
+                    weeklyList.forEach((item) => {
+
+                        if(item.WEEK == 'THI'){
+                            thiWeek.push(item.MONDAY,item.TUESDAY,item.WEDNESDAY,item.THURSDAY ,item.FRIDAY);
+
+                        }else{
+                            priWeek.push(item.MONDAY,item.TUESDAY,item.WEDNESDAY,item.THURSDAY ,item.FRIDAY);
+                        }
+
+                    });
+
+                });
+
+                thiWeekMax = Math.max(...thiWeek);
+                priWeekMax =Math.max(...priWeek);
+
+                weekMax = Math.max(thiWeekMax, priWeekMax);
+                // 데이터 업데이트를 위한 메서드 호출
+                KTChartsWidget18_1.update(thiWeek, priWeek, weekMax);
+            },
+            error: function(xhr, status, error) {
+                console.error("Data load failed:", error);
+            }
+        });
+
+
+    }
+
+    //주간 처리 건수
+
+    let month =[];
+    let countMonthSum = [];
+    let countMonthSumMax;
+    function fetchYearData() {
+        $.ajax({
+            url: "/api/dashboard-monthly-data", // 서버 엔드포인트
+            type: "GET",
+            success: function(response) {
+                //console.log(response);
+                month = [];
+                countMonthSum = [];
+                // response는 각 카드 데이터를 포함하는 객체
+                Object.keys(response).forEach(function(key) {
+                    // 예: key = 'card-data-1'
+                    const monthlyList = response[key];
+
+                    //console.log(key);
+                    monthlyList.forEach((item) => {
+
+
+                        month.push(item.MONTH);
+
+
+                        countMonthSum.push(item.countMonthSum);
+
+
+                    });
+
+                });
+
+                countMonthSumMax = Math.max(...countMonthSum);
+                // 데이터 업데이트를 위한 메서드 호출
+                KTChartsWidget18_2.update(month, countMonthSum);
+            },
+            error: function(xhr, status, error) {
+                console.error("Data load failed:", error);
+            }
+        });
+
+
+    }
     let personMonth = [];
     let newPersonCount = [];
     let oldPersonCount = [];
@@ -911,7 +1012,7 @@ $(document).ready(function() {
     }();
 
 
-    //구매몰 유형
+    //일별 평균
     var KTChartsWidget18 = (function() {
         var e = {
             self: null,
@@ -1002,6 +1103,362 @@ $(document).ready(function() {
     })();
 
 
+    //월간 처리
+    // Class definition
+    var KTChartsWidget18_1 = function () {
+        var chart = {
+            self: null,
+            rendered: false
+        };
+
+        // Private methods
+        var initChart = function(chart) {
+            var element = document.getElementById("kt_charts_widget_18_1_chart");
+
+            if (!element) {
+                return;
+            }
+
+            var height = parseInt(KTUtil.css(element, 'height'));
+            var labelColor = KTUtil.getCssVariableValue('--bs-gray-900');
+            var borderColor = KTUtil.getCssVariableValue('--bs-border-dashed-color');
+
+            var options = {
+                series: [{ name: "이번주", data: thiWeek },{ name: "전주", data: priWeek }],
+                chart: {
+                    fontFamily: 'inherit',
+                    type: 'bar',
+                    height: height,
+                    toolbar: {
+                        show: false
+                    }
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: false,
+                        columnWidth: ['28%'],
+                        borderRadius: 5,
+                        dataLabels: {
+                            position: "top" // top, center, bottom
+                        },
+                        startingShape: 'flat'
+                    },
+                },
+                legend: {
+                    show: false
+                },
+                dataLabels: {
+                    enabled: true,
+                    offsetY: -28,
+                    style: {
+                        fontSize: '13px',
+                        colors: [labelColor]
+                    },
+                    formatter: function(val) {
+                        return val;// + "H";
+                    }
+                },
+                stroke: {
+                    show: true,
+                    width: 2,
+                    colors: ['transparent']
+                },
+                xaxis: {
+                    categories: ['월요일','화요일','수요일','목요일','금요일'],
+                    axisBorder: {
+                        show: false,
+                    },
+                    axisTicks: {
+                        show: false
+                    },
+                    labels: {
+                        style: {
+                            colors: KTUtil.getCssVariableValue('--bs-gray-500'),
+                            fontSize: '13px'
+                        }
+                    },
+                    crosshairs: {
+                        fill: {
+                            gradient: {
+                                opacityFrom: 0,
+                                opacityTo: 0
+                            }
+                        }
+                    }
+                },
+                yaxis: {
+                    labels: {
+                        style: {
+                            colors: KTUtil.getCssVariableValue('--bs-gray-500'),
+                            fontSize: '13px'
+                        },
+                        formatter: function(weekMax) {
+                            return weekMax ;
+                        }
+                    }
+                },
+                fill: {
+                    opacity: 1
+                },
+                states: {
+                    normal: {
+                        filter: {
+                            type: 'none',
+                            value: 0
+                        }
+                    },
+                    hover: {
+                        filter: {
+                            type: 'none',
+                            value: 0
+                        }
+                    },
+                    active: {
+                        allowMultipleDataPointsSelection: false,
+                        filter: {
+                            type: 'none',
+                            value: 0
+                        }
+                    }
+                },
+                tooltip: {
+                    style: {
+                        fontSize: '12px'
+                    },
+                    y: {
+                        formatter: function (val) {
+                            return  + val + ' hours'
+                        }
+                    }
+                },
+                colors: [KTUtil.getCssVariableValue('--bs-primary'), KTUtil.getCssVariableValue('--bs-primary-light')],
+                grid: {
+                    borderColor: borderColor,
+                    strokeDashArray: 4,
+                    yaxis: {
+                        lines: {
+                            show: true
+                        }
+                    }
+                }
+            };
+
+            chart.self = new ApexCharts(element, options);
+
+            // Set timeout to properly get the parent elements width
+            setTimeout(function() {
+                chart.self.render();
+                chart.rendered = true;
+            }, 200);
+        }
+
+        // Public methods
+        return {
+            init: function () {
+                initChart(chart);
+                // Theme mode change 이벤트 핸들러는 그대로 유지
+            },
+            update: function (thiWeekData, priWeekData, maxWeekValue) {
+                // 새로운 데이터와 옵션으로 차트를 업데이트합니다.
+                var newOptions = {
+                    series: [{ name: "이번주", data: thiWeekData }, { name: "전주", data: priWeekData }],
+                    xaxis: {
+                        categories: ['월요일','화요일','수요일','목요일','금요일']
+                    }
+                    // 필요한 다른 옵션 업데이트가 있으면 여기에 추가
+                };
+
+                if (chart.rendered) {
+                    // 차트 옵션 업데이트
+                    chart.self.updateOptions(newOptions, true);
+                } else {
+                    // 차트가 아직 렌더링되지 않았다면 초기화 과정을 거칩니다.
+                    initChart(chart);
+                    chart.rendered = true; // 이 부분을 추가하여 차트가 이미 렌더링되었음을 표시
+                }
+            }
+        }
+    }();
+
+// Webpack support
+    if (typeof module !== 'undefined') {
+        module.exports = KTChartsWidget18;
+    }
+
+//월간 처리
+    KTChartsWidget18_2
+    // Class definition
+    var KTChartsWidget18_2 = function () {
+        var chart = {
+            self: null,
+            rendered: false
+        };
+
+        // Private methods
+        var initChart = function(chart) {
+            var element = document.getElementById("kt_charts_widget_18_2_chart");
+
+            if (!element) {
+                return;
+            }
+
+            var height = parseInt(KTUtil.css(element, 'height'));
+            var labelColor = KTUtil.getCssVariableValue('--bs-gray-900');
+            var borderColor = KTUtil.getCssVariableValue('--bs-border-dashed-color');
+
+            var options = {
+                series: [{
+                    name: '상담 완료',
+                    data: countMonthSum
+                }],
+                chart: {
+                    fontFamily: 'inherit',
+                    type: 'bar',
+                    height: height,
+                    toolbar: {
+                        show: false
+                    }
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: false,
+                        columnWidth: ['28%'],
+                        borderRadius: 5,
+                        dataLabels: {
+                            position: "top" // top, center, bottom
+                        },
+                        startingShape: 'flat'
+                    },
+                },
+                legend: {
+                    show: false
+                },
+                dataLabels: {
+                    enabled: true,
+                    offsetY: -28,
+                    style: {
+                        fontSize: '13px',
+                        colors: [labelColor]
+                    },
+                    formatter: function(val) {
+                        return val;// + "H";
+                    }
+                },
+                stroke: {
+                    show: true,
+                    width: 2,
+                    colors: ['transparent']
+                },
+                xaxis: {
+                    categories: month,
+                    axisBorder: {
+                        show: false,
+                    },
+                    axisTicks: {
+                        show: false
+                    },
+                    labels: {
+                        style: {
+                            colors: KTUtil.getCssVariableValue('--bs-gray-500'),
+                            fontSize: '13px'
+                        }
+                    },
+                    crosshairs: {
+                        fill: {
+                            gradient: {
+                                opacityFrom: 0,
+                                opacityTo: 0
+                            }
+                        }
+                    }
+                },
+                yaxis: {
+                    labels: {
+                        style: {
+                            colors: KTUtil.getCssVariableValue('--bs-gray-500'),
+                            fontSize: '13px'
+                        },
+                        formatter: function(val) {
+                            return val + "H";
+                        }
+                    }
+                },
+                fill: {
+                    opacity: 1
+                },
+                states: {
+                    normal: {
+                        filter: {
+                            type: 'none',
+                            value: 0
+                        }
+                    },
+                    hover: {
+                        filter: {
+                            type: 'none',
+                            value: 0
+                        }
+                    },
+                    active: {
+                        allowMultipleDataPointsSelection: false,
+                        filter: {
+                            type: 'none',
+                            value: 0
+                        }
+                    }
+                },
+                tooltip: {
+                    style: {
+                        fontSize: '12px'
+                    },
+                    y: {
+                        formatter: function (val) {
+                            return  + val + ' hours'
+                        }
+                    }
+                },
+                colors: [KTUtil.getCssVariableValue('--bs-primary'), KTUtil.getCssVariableValue('--bs-primary-light')],
+                grid: {
+                    borderColor: borderColor,
+                    strokeDashArray: 4,
+                    yaxis: {
+                        lines: {
+                            show: true
+                        }
+                    }
+                }
+            };
+
+            chart.self = new ApexCharts(element, options);
+
+            // Set timeout to properly get the parent elements width
+            setTimeout(function() {
+                chart.self.render();
+                chart.rendered = true;
+            }, 200);
+        }
+
+        // Public methods
+        return {
+            init: function () {
+                initChart(chart);
+
+                // Update chart on theme mode change
+                KTThemeMode.on("kt.thememode.change", function() {
+                    if (chart.rendered) {
+                        chart.self.destroy();
+                    }
+
+                    initChart(chart);
+                });
+            }
+        }
+    }();
+
+// Webpack support
+    if (typeof module !== 'undefined') {
+        module.exports = KTChartsWidget18;
+    }
 
 
 
