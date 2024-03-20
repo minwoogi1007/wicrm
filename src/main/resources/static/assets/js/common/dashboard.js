@@ -27,6 +27,7 @@ $(document).ready(function() {
     const timeCount = document.getElementById('timeCount');
     const dailyAvg = document.getElementById('dailyAvg');
     const weekly = document.getElementById('weekly');
+    const year = document.getElementById('year');
 
 
     customCount.addEventListener('click', function() {
@@ -40,6 +41,9 @@ $(document).ready(function() {
     });
     weekly.addEventListener('click', function() {
         fetchWeeklyData()
+    });
+    year.addEventListener('click', function() {
+        fetchYearData()
     });
 
     function formatNumberWithCommas(number) {
@@ -391,17 +395,18 @@ $(document).ready(function() {
 
     //주간 처리 건수
 
-    let month =[];
-    let countMonthSum = [];
+    let month=[];
+    let countMonthSum= [];
     let countMonthSumMax;
     function fetchYearData() {
+
         $.ajax({
             url: "/api/dashboard-monthly-data", // 서버 엔드포인트
             type: "GET",
             success: function(response) {
-                //console.log(response);
-                month = [];
+                month =[];
                 countMonthSum = [];
+                //console.log(response);
                 // response는 각 카드 데이터를 포함하는 객체
                 Object.keys(response).forEach(function(key) {
                     // 예: key = 'card-data-1'
@@ -413,8 +418,7 @@ $(document).ready(function() {
 
                         month.push(item.MONTH);
 
-
-                        countMonthSum.push(item.countMonthSum);
+                        countMonthSum.push(item.COUNTMONTHSUM);
 
 
                     });
@@ -423,7 +427,7 @@ $(document).ready(function() {
 
                 countMonthSumMax = Math.max(...countMonthSum);
                 // 데이터 업데이트를 위한 메서드 호출
-                KTChartsWidget18_2.update(month, countMonthSum);
+                KTChartsWidget18_2.update(month,countMonthSum,countMonthSumMax);
             },
             error: function(xhr, status, error) {
                 console.error("Data load failed:", error);
@@ -1285,7 +1289,7 @@ $(document).ready(function() {
         module.exports = KTChartsWidget18;
     }
 
-//월간 처리
+    //월간 처리
     KTChartsWidget18_2
     // Class definition
     var KTChartsWidget18_2 = function () {
@@ -1307,10 +1311,7 @@ $(document).ready(function() {
             var borderColor = KTUtil.getCssVariableValue('--bs-border-dashed-color');
 
             var options = {
-                series: [{
-                    name: '상담 완료',
-                    data: countMonthSum
-                }],
+                series: [{ name: "상담완료", data: countMonthSum }],
                 chart: {
                     fontFamily: 'inherit',
                     type: 'bar',
@@ -1337,7 +1338,7 @@ $(document).ready(function() {
                     enabled: true,
                     offsetY: -28,
                     style: {
-                        fontSize: '13px',
+                        fontSize: '11px',
                         colors: [labelColor]
                     },
                     formatter: function(val) {
@@ -1360,7 +1361,7 @@ $(document).ready(function() {
                     labels: {
                         style: {
                             colors: KTUtil.getCssVariableValue('--bs-gray-500'),
-                            fontSize: '13px'
+                            fontSize: '11px'
                         }
                     },
                     crosshairs: {
@@ -1378,8 +1379,8 @@ $(document).ready(function() {
                             colors: KTUtil.getCssVariableValue('--bs-gray-500'),
                             fontSize: '13px'
                         },
-                        formatter: function(val) {
-                            return val + "H";
+                        formatter: function(weekMax) {
+                            return weekMax ;
                         }
                     }
                 },
@@ -1442,23 +1443,29 @@ $(document).ready(function() {
         return {
             init: function () {
                 initChart(chart);
-
-                // Update chart on theme mode change
-                KTThemeMode.on("kt.thememode.change", function() {
-                    if (chart.rendered) {
-                        chart.self.destroy();
+                // Theme mode change 이벤트 핸들러는 그대로 유지
+            },
+            update: function (month, countMonthSum, countMonthSumMax) {
+                // 새로운 데이터와 옵션으로 차트를 업데이트합니다.
+                var newOptions = {
+                    series: [{ name: "상담완료건", data: countMonthSum }],
+                    xaxis: {
+                        categories: month
                     }
+                    // 필요한 다른 옵션 업데이트가 있으면 여기에 추가
+                };
 
+                if (chart.rendered) {
+                    // 차트 옵션 업데이트
+                    chart.self.updateOptions(newOptions, true);
+                } else {
+                    // 차트가 아직 렌더링되지 않았다면 초기화 과정을 거칩니다.
                     initChart(chart);
-                });
+                    chart.rendered = true; // 이 부분을 추가하여 차트가 이미 렌더링되었음을 표시
+                }
             }
         }
     }();
-
-// Webpack support
-    if (typeof module !== 'undefined') {
-        module.exports = KTChartsWidget18;
-    }
 
 
 

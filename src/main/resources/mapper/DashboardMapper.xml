@@ -662,8 +662,8 @@
     CONNECT BY LEVEL <= 12
     )
     SELECT
-    TO_CHAR(m.month_start, 'YYYY-MM') AS "Month",
-    COUNT(t.IN_DATE) AS count
+    TO_CHAR(m.month_start, 'YYYY-MM') AS "MONTH",
+    COUNT(t.IN_DATE) AS countMonthSum
     FROM months m
     LEFT JOIN TBND01 t ON t.IN_DATE >= m.month_start
         AND t.IN_DATE < ADD_MONTHS(m.month_start, 1)
