@@ -22,6 +22,16 @@ public class Tcnt01Emp {
 
     private String cust_gubn;
 
+    private String cust_grade;
+
+    public String getCust_grade() {
+        return cust_grade;
+    }
+
+    public void setCust_grade(String cust_grade) {
+        this.cust_grade = cust_grade;
+    }
+
     public String getCust_gubn() {
         return cust_gubn;
     }

@@ -578,133 +578,6 @@ $(document).ready(function() {
     };
 
 
-//상담유형
-    var KTChartsWidget6 = function() {
-        var e = {
-                self: null,
-                rendered: !1
-            },
-            t = function(e) {
-                var t = document.getElementById("kt_charts_widget_6");
-                if (t) {
-                    var a = KTUtil.getCssVariableValue("--bs-gray-800"),
-                        l = KTUtil.getCssVariableValue("--bs-border-dashed-color"),
-                        r = {
-                            series: [{
-                                name: "Sales",
-                                data: [15, 12, 10, 8, 7]
-                            }],
-                            chart: {
-                                fontFamily: "inherit",
-                                type: "bar",
-                                height: 350,
-                                toolbar: {
-                                    show: !1
-                                }
-                            },
-                            plotOptions: {
-                                bar: {
-                                    borderRadius: 8,
-                                    horizontal: !0,
-                                    distributed: !0,
-                                    barHeight: 50,
-                                    dataLabels: {
-                                        position: "bottom"
-                                    }
-                                }
-                            },
-                            dataLabels: {
-                                enabled: !0,
-                                textAnchor: "start",
-                                offsetX: 0,
-                                formatter: function(e, t) {
-                                    e *= 1e3;
-                                    return wNumb({
-                                        thousand: ","
-                                    }).to(e)
-                                },
-                                style: {
-                                    fontSize: "14px",
-                                    fontWeight: "600",
-                                    align: "left"
-                                }
-                            },
-                            legend: {
-                                show: !1
-                            },
-                            colors: ["#3E97FF", "#F1416C", "#50CD89", "#FFC700", "#7239EA"],
-                            xaxis: {
-                                categories: ["ECR - 90%", "FGI - 82%", "EOQ - 75%", "FMG - 60%", "PLG - 50%"],
-                                labels: {
-                                    formatter: function(e) {
-                                        return e + "K"
-                                    },
-                                    style: {
-                                        colors: [a],
-                                        fontSize: "14px",
-                                        fontWeight: "600",
-                                        align: "left"
-                                    }
-                                },
-                                axisBorder: {
-                                    show: !1
-                                }
-                            },
-                            yaxis: {
-                                labels: {
-                                    formatter: function(e, t) {
-                                        return Number.isInteger(e) ? e + " - " + parseInt(100 * e / 18).toString() + "%" : e
-                                    },
-                                    style: {
-                                        colors: a,
-                                        fontSize: "14px",
-                                        fontWeight: "600"
-                                    },
-                                    offsetY: 2,
-                                    align: "left"
-                                }
-                            },
-                            grid: {
-                                borderColor: l,
-                                xaxis: {
-                                    lines: {
-                                        show: !0
-                                    }
-                                },
-                                yaxis: {
-                                    lines: {
-                                        show: !1
-                                    }
-                                },
-                                strokeDashArray: 4
-                            },
-                            tooltip: {
-                                style: {
-                                    fontSize: "12px"
-                                },
-                                y: {
-                                    formatter: function(e) {
-                                        return e + "K"
-                                    }
-                                }
-                            }
-                        };
-                    e.self = new ApexCharts(t, r), setTimeout((function() {
-                        e.self.render(), e.rendered = !0
-                    }), 200)
-                }
-            };
-        return {
-            init: function() {
-                t(e), KTThemeMode.on("kt.thememode.change", (function() {
-                    e.rendered && e.self.destroy(), t(e)
-                }))
-            }
-        }
-    }();
-    "undefined" != typeof module && (module.exports = KTChartsWidget6), KTUtil.onDOMContentLoaded((function() {
-        KTChartsWidget6.init()
-    }));
 
 
 
@@ -1155,7 +1028,7 @@ $(document).ready(function() {
                     enabled: true,
                     offsetY: -28,
                     style: {
-                        fontSize: '13px',
+                        fontSize: '11px',
                         colors: [labelColor]
                     },
                     formatter: function(val) {
@@ -1231,7 +1104,7 @@ $(document).ready(function() {
                     },
                     y: {
                         formatter: function (val) {
-                            return  + val + ' hours'
+                            return  + val + ' 건'
                         }
                     }
                 },
@@ -1285,9 +1158,7 @@ $(document).ready(function() {
     }();
 
 // Webpack support
-    if (typeof module !== 'undefined') {
-        module.exports = KTChartsWidget18;
-    }
+
 
     //월간 처리
     KTChartsWidget18_2
@@ -1414,7 +1285,7 @@ $(document).ready(function() {
                     },
                     y: {
                         formatter: function (val) {
-                            return  + val + ' hours'
+                            return  + val + ' 건'
                         }
                     }
                 },
@@ -1468,6 +1339,60 @@ $(document).ready(function() {
     }();
 
 
+    document.addEventListener("DOMContentLoaded", function() {
+        var options = {
+            chart: {
+                type: 'bar',
+                height: 600
+            },
+            series: [{
+                name: 'Completed Tasks',
+                data: [19, 25, 8, 10, 202, 59, 69, 3, 51, 37, 3, 7, 3, 1, 80] // count_Com 값
+            }, {
+                name: 'Missed Tasks',
+                data: [13, 8, 9, 3, 136, 45, 53, 5, 75, 50, 6, 10, 2, 0, 0, 49] // todayMiss 값
+            }],
+            xaxis: {
+                categories: ['P000000018', 'P000000046', 'P000000113', 'P000000116', 'P000000126', 'P000000179', 'P000000187', 'P000000189', 'P000000191', 'P000000193', 'P000000201', 'P000000204', 'P000000205', 'P000000206', 'P000000209', 'P000000211'] // cust_code 값
+            },
+            yaxis: {
+                title: {
+                    text: 'Tasks Count'
+                }
+            },
+            tooltip: {
+                y: {
+                    formatter: function (val) {
+                        return val + " tasks";
+                    }
+                }
+            },
+            title: {
+                text: 'Task Completion and Miss Rate by Customer Code',
+                align: 'center'
+            },
+            plotOptions: {
+                bar: {
+                    horizontal: false, // 막대를 가로 방향으로 표시하도록 설정
+                    columnWidth: '55%',
+                    endingShape: 'rounded'
+                },
+            },
+            dataLabels: {
+                enabled: false
+            },
+            legend: {
+                position: 'top',
+                horizontalAlign: 'right',
+                floating: true,
+                offsetY: -25,
+                offsetX: -5
+            }
+        };
+
+        var chart = new ApexCharts(document.querySelector("#dashboardGraph"), options);
+        chart.render();
+    });
 
 
 

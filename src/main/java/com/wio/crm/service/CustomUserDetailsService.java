@@ -70,14 +70,16 @@ public class CustomUserDetailsService implements UserDetailsService {
                 tcntUser = tcnt01EmpMapper.findByUserId(userid);
                 if (tcntUser != null) {
                     authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-                    custCode = tcntUser.getCustCode();
+                    custCode = tcntUser.getCust_grade();
+
+
 
                     System.out.println("getCustCode"+tcntUser.getCustCode());
                     System.out.println("getEmpno"+tcntUser.getEmpno());
                     System.out.println("getUse_yn"+tcntUser.getUse_yn());
                     System.out.println("getEmp_name"+tcntUser.getEmp_name());
                     System.out.println("getId"+tcntUser.getId());
-                    System.out.println("getCust_gubn"+tcntUser.getCust_gubn());
+                    System.out.println("getCust_gubn"+tcntUser.getCust_grade());
 
 
                 }

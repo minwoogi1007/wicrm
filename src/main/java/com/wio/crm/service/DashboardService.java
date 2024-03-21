@@ -35,21 +35,11 @@ public class DashboardService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         // 현재 사용자의 CustomUserDetails 객체에서 custCode 추출
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        Temp01 tempUserInfo = userDetails.getTempUserInfo(); // 내부직원 정보 접근
-        Tcnt01Emp tcntUserInfo = userDetails.getTcntUserInfo(); // 거래처 직원 정보 접근
-        String custCode = null;
 
-        if (tcntUserInfo != null && tcntUserInfo.getCustCode() != null) {
-            custCode = tcntUserInfo.getCustCode();
-            System.out.println("CustCode from Tcnt01Emp: " + custCode);
-        } else if (tempUserInfo != null) {
-            // tempUserInfo 사용 시 관련 로직
-            // 예: custCode = tempUserInfo.getSomeOtherInfo();
-            custCode = "";
-            System.out.println("Accessing Temp01 UserInfo");
-        }
         Map<String, Object> data = new HashMap<>();
         // 데이터베이스 조회
+        String custCode=getCurrentUserCustCode();
+
         DashboardData card1Data = dashboardMapper.findDataForCard1(custCode);
         DashboardData card2Data = dashboardMapper.findDataForCard2(custCode);
         List<DashboardData> pointList = dashboardMapper.findPointList(custCode); //
@@ -59,16 +49,31 @@ public class DashboardService {
         data.put("card-data-2", card2Data);
         data.put("card-data-3", dashConSum);
         data.put("pointlist-data", pointList);
-
+        printUserDetails();
         return data;
     }
     //로그인 유저별 코드 (거래처 는 업체 코드)
     private String getCurrentUserCustCode() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication.getPrincipal() instanceof CustomUserDetails) {
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            return userDetails.getCustCode();
+        if (!(authentication.getPrincipal() instanceof CustomUserDetails)) {
+            return ""; // CustomUserDetails가 아니면 빈 문자열 반환
         }
+
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+        // 거래처 직원 정보 접근
+        if (userDetails.getTcntUserInfo() != null) {
+            System.out.println("CustCode from Tcnt01Emp: " + userDetails.getTcntUserInfo().getCustCode());
+            return userDetails.getTcntUserInfo().getCustCode();
+        }
+
+        // 내부 직원 정보 접근
+        if (userDetails.getTempUserInfo() != null) {
+            // 내부 직원에 대한 처리가 필요한 경우 여기에 로직 추가
+            System.out.println("Accessing Temp01 UserInfo");
+            // 예: return userDetails.getTempUserInfo().getSomeOtherInfo();
+        }
+
         return "";
     }
     public Map<String, Object> getDashboardCallCount(String username) {
@@ -94,6 +99,7 @@ public class DashboardService {
     public Map<String, Object> getEmployeeList() {
         checkUserRole();
         Map<String, Object> data = new HashMap<>();
+
         data.put("employeeList", dashboardMapper.getEmployeeList());
         return data;
     }
@@ -113,6 +119,7 @@ public class DashboardService {
     public Map<String, Object> getMonthlySum(String username) {
         String custCode = getCurrentUserCustCode();
         Map<String, Object> data = new HashMap<>();
+
         data.put("dailyAve", dashboardMapper.getMonthlySum(custCode));
         return data;
     }
