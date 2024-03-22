@@ -57,14 +57,14 @@ public class CustomUserDetailsService implements UserDetailsService {
                 if (tempUser != null) {
                     authorities.add(new SimpleGrantedAuthority("ROLE_EMPLOYEE"));
                   //  custCode = tempUser.getCustCode();
-
+/*
                     System.out.println("tempUser.getEmpno()"+tempUser.getEmpno());
                     System.out.println("getUserId"+tempUser.getUserId());
                     System.out.println("getCall_yn"+tempUser.getCall_yn());
                     System.out.println("getWork_gubn"+tempUser.getWork_gubn());
                     System.out.println("getPosition"+tempUser.getPosition());
                     System.out.println("getEmpName"+tempUser.getEmp_Name());
-
+*/
                 }
             } else if ("1".equals(user.getGubn())) { // 거래처 직원
                 tcntUser = tcnt01EmpMapper.findByUserId(userid);

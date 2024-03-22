@@ -404,6 +404,7 @@
             JOIN TBND01 B ON A.CUST_CODE = B.CUST_CODE
                 AND A.PROJECT_CODE = B.PROJECT_CODE
                 AND A.PERSON_CODE = B.PERSON_CODE
+                and B.PRC_GUBN='2'
             <if test="custCode != null and !custCode.isEmpty()">
                 AND A.CUST_CODE =  #{custCode}
             </if>
@@ -572,11 +573,11 @@
         ),
              Periods AS (
                  SELECT '1W' AS period, TRUNC(SYSDATE-8) AS start_date, TRUNC(SYSDATE)-1 AS end_date, 1 AS weeks FROM DUAL UNION ALL
-                 SELECT '1M', ADD_MONTHS(TRUNC(SYSDATE, 'MM')-1, -1), TRUNC(SYSDATE, 'MM')-1-1, 4 AS weeks FROM DUAL UNION ALL
-                 SELECT '3M', ADD_MONTHS(TRUNC(SYSDATE, 'MM')-1, -3), TRUNC(SYSDATE, 'MM')-1-1, 13 AS weeks FROM DUAL UNION ALL
-                 SELECT '6M', ADD_MONTHS(TRUNC(SYSDATE, 'MM')-1, -6), TRUNC(SYSDATE, 'MM')-1-1, 26 AS weeks FROM DUAL UNION ALL
-                 SELECT '9M', ADD_MONTHS(TRUNC(SYSDATE, 'MM')-1, -9), TRUNC(SYSDATE, 'MM')-1-1, 26 AS weeks FROM DUAL UNION ALL
-                 SELECT '12M', ADD_MONTHS(TRUNC(SYSDATE, 'MM')-1, -12), TRUNC(SYSDATE, 'MM')-1-1, 52 AS weeks FROM DUAL
+                 SELECT '1M', ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -1), TRUNC(SYSDATE, 'MM'), 4 AS weeks FROM DUAL UNION ALL
+                 SELECT '3M', ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -3), TRUNC(SYSDATE, 'MM'), 13 AS weeks FROM DUAL UNION ALL
+                 SELECT '6M', ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -6), TRUNC(SYSDATE, 'MM'), 26 AS weeks FROM DUAL UNION ALL
+                 SELECT '9M', ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -9), TRUNC(SYSDATE, 'MM'), 26 AS weeks FROM DUAL UNION ALL
+                 SELECT '12M', ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -12), TRUNC(SYSDATE, 'MM'), 52 AS weeks FROM DUAL
              ),
              AggregatedData AS (
                  SELECT
@@ -648,7 +649,7 @@
             <if test="custCode != null and !custCode.isEmpty()">
                 AND CUST_CODE =  #{custCode}
             </if>
-            AND IN_DATE BETWEEN TRUNC(SYSDATE, 'IW') AND TRUNC(SYSDATE, 'IW') + 4
+            AND IN_DATE BETWEEN TRUNC(SYSDATE, 'IW') AND TRUNC(SYSDATE, 'IW') + 5
     )
     GROUP BY WEEK
     ORDER BY WEEK DESC
