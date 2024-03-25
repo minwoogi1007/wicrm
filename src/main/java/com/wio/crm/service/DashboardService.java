@@ -30,6 +30,30 @@ public class DashboardService {
     public DashboardService(DashboardMapper dashboardMapper) {
         this.dashboardMapper = dashboardMapper;
     }
+
+    public Map<String, Object> getTcntEmp() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        // 현재 사용자의 CustomUserDetails 객체에서 custCode 추출
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        String custGrade = "";
+        Map<String, Object> data = new HashMap<>();
+        if(userDetails.getTcntUserInfo() == null){
+            data.put("dataForA", "A 등급 사용자에 대한 데이터");
+        }else{
+             custGrade = userDetails.getTcntUserInfo().getCust_grade();
+        }
+
+        if ("A".equals(custGrade)) {
+            data.put("dataForA", "A 등급 사용자에 대한 데이터");
+        }
+        // 내부 직원 정보 접근
+        else if ("B".equals(custGrade)) {
+            // 여기에 B 등급 사용자를 위한 데이터 준비 로직 추가
+            data.put("dataForB", "B 등급 사용자에 대한 데이터");
+        }
+
+        return data;
+    }
     public Map<String, Object> getDashboardData(String username) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -64,6 +88,9 @@ public class DashboardService {
         // 거래처 직원 정보 접근
         if (userDetails.getTcntUserInfo() != null) {
             System.out.println("CustCode from Tcnt01Emp: " + userDetails.getTcntUserInfo().getCustCode());
+            System.out.println("CustCode from Tcnt01Emp: "+userDetails.getTcntUserInfo().getUserId());
+            System.out.println("CustCode from Tcnt01Emp: "+userDetails.getTcntUserInfo().getCust_grade());
+            System.out.println("CustCode from Tcnt01Emp: "+userDetails.getTcntUserInfo().getCust_gubn());
             return userDetails.getTcntUserInfo().getCustCode();
         }
 
