@@ -10,8 +10,8 @@ import com.wio.crm.model.Temp01;
 import com.wio.crm.model.Tipdw;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -55,37 +55,21 @@ public class CustomUserDetailsService implements UserDetailsService {
             if ("0".equals(user.getGubn())) { // 내부 직원
                 tempUser = temp01Mapper.findByUserId(userid);
                 if (tempUser != null) {
+                    if (tempUser == null || "0".equals(tempUser.getWork_gubn())) {
+                        throw new AccountExpiredException("User with userid: " + userid + " is not currently active.");
+                    }
                     authorities.add(new SimpleGrantedAuthority("ROLE_EMPLOYEE"));
-                  //  custCode = tempUser.getCustCode();
-/*
-                    System.out.println("tempUser.getEmpno()"+tempUser.getEmpno());
-                    System.out.println("getUserId"+tempUser.getUserId());
-                    System.out.println("getCall_yn"+tempUser.getCall_yn());
-                    System.out.println("getWork_gubn"+tempUser.getWork_gubn());
-                    System.out.println("getPosition"+tempUser.getPosition());
-                    System.out.println("getEmpName"+tempUser.getEmp_Name());
-*/
                 }
             } else if ("1".equals(user.getGubn())) { // 거래처 직원
                 tcntUser = tcnt01EmpMapper.findByUserId(userid);
-                if (tcntUser != null) {
-                    authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-                    custCode = tcntUser.getCust_grade();
-
-
-
-                    System.out.println("getCustCode"+tcntUser.getCustCode());
-                    System.out.println("getEmpno"+tcntUser.getEmpno());
-                    System.out.println("getUse_yn"+tcntUser.getUse_yn());
-                    System.out.println("getEmp_name"+tcntUser.getEmp_name());
-                    System.out.println("getId"+tcntUser.getId());
-                    System.out.println("getCust_gubn"+tcntUser.getCust_grade());
-
-
+                if (tcntUser == null) {
+                    throw new AccountExpiredException("User with userid: " + userid + " is not currently active.");
                 }
+                authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+                custCode = tcntUser.getCust_grade();
             }
 
-            return new CustomUserDetails(userid, user.getPw(), authorities, custCode,tempUser,tcntUser);
+            return new CustomUserDetails(userid, user.getPw(), authorities, custCode, tempUser, tcntUser);
         } catch (UserNotConfirmedException e) {
             logger.info(e.getMessage());
             throw e;
@@ -94,4 +78,5 @@ public class CustomUserDetailsService implements UserDetailsService {
             throw new InternalAuthenticationServiceException("Error authenticating user: " + userid, e);
         }
     }
+
 }

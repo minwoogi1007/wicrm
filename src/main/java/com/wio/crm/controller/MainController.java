@@ -38,6 +38,8 @@ public class MainController {
         Map<String, Object> tcntEmpData = dashboardService.getTcntEmp();
         if(tcntEmpData!=null){
             model.addAllAttributes(tcntEmpData);
+        }else{
+            return "redirect:/sign-in";
         }
 
 

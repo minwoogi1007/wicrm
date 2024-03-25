@@ -35,9 +35,14 @@ public class DashboardService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         // 현재 사용자의 CustomUserDetails 객체에서 custCode 추출
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+        String tempUserGrade ="";
         String custGrade = "";
+
         Map<String, Object> data = new HashMap<>();
-        if(userDetails.getTcntUserInfo() == null){
+
+        if(userDetails.getTempUserInfo()!= null){
+            tempUserGrade = userDetails.getTempUserInfo().getPosition();
             data.put("dataForA", "A 등급 사용자에 대한 데이터");
         }else{
              custGrade = userDetails.getTcntUserInfo().getCust_grade();
@@ -45,8 +50,7 @@ public class DashboardService {
 
         if ("A".equals(custGrade)) {
             data.put("dataForA", "A 등급 사용자에 대한 데이터");
-        }
-        // 내부 직원 정보 접근
+        }        // 내부 직원 정보 접근
         else if ("B".equals(custGrade)) {
             // 여기에 B 등급 사용자를 위한 데이터 준비 로직 추가
             data.put("dataForB", "B 등급 사용자에 대한 데이터");
