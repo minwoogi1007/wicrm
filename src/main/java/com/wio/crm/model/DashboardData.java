@@ -96,6 +96,73 @@ public class DashboardData {
     private String MONTH;
     private int countMonthSum;
 
+    private String DPOINTSUM;
+
+    private String DPOINTCHARGE;
+    private String DPOINTUSE;
+    private String DPOINTUSEDAY;
+
+    private String DPOINTUSEWEEK;
+
+
+    private int SUM_POINT;
+    private String POINT_DATE;
+
+    public String getDPOINTSUM() {
+        return DPOINTSUM;
+    }
+
+    public void setDPOINTSUM(String DPOINTSUM) {
+        this.DPOINTSUM = DPOINTSUM;
+    }
+
+    public String getDPOINTCHARGE() {
+        return DPOINTCHARGE;
+    }
+
+    public void setDPOINTCHARGE(String DPOINTCHARGE) {
+        this.DPOINTCHARGE = DPOINTCHARGE;
+    }
+
+    public String getDPOINTUSE() {
+        return DPOINTUSE;
+    }
+
+    public void setDPOINTUSE(String DPOINTUSE) {
+        this.DPOINTUSE = DPOINTUSE;
+    }
+
+    public String getDPOINTUSEDAY() {
+        return DPOINTUSEDAY;
+    }
+
+    public void setDPOINTUSEDAY(String DPOINTUSEDAY) {
+        this.DPOINTUSEDAY = DPOINTUSEDAY;
+    }
+
+    public String getDPOINTUSEWEEK() {
+        return DPOINTUSEWEEK;
+    }
+
+    public void setDPOINTUSEWEEK(String DPOINTUSEWEEK) {
+        this.DPOINTUSEWEEK = DPOINTUSEWEEK;
+    }
+
+    public int getSUM_POINT() {
+        return SUM_POINT;
+    }
+
+    public void setSUM_POINT(int SUM_POINT) {
+        this.SUM_POINT = SUM_POINT;
+    }
+
+    public String getPOINT_DATE() {
+        return POINT_DATE;
+    }
+
+    public void setPOINT_DATE(String POINT_DATE) {
+        this.POINT_DATE = POINT_DATE;
+    }
 
     public String getWEEK() {
         return WEEK;

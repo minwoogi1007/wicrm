@@ -2,6 +2,9 @@ package com.wio.crm.service;
 
 import com.wio.crm.config.CustomUserDetails;
 import com.wio.crm.mapper.DashboardMapper;
+import com.wio.crm.mapper.Tcnt01EmpMapper;
+import com.wio.crm.mapper.Temp01Mapper;
+import com.wio.crm.mapper.TipdwMapper;
 import com.wio.crm.model.DashboardData;
 import com.wio.crm.model.Tcnt01Emp;
 import com.wio.crm.model.Temp01;
@@ -25,10 +28,13 @@ import java.util.Map;
 public class DashboardService {
 
     private final DashboardMapper dashboardMapper;
-
+    private final Tcnt01EmpMapper tcnt01EmpMapper;
+    private final Temp01Mapper temp01Mapper;
     @Autowired
-    public DashboardService(DashboardMapper dashboardMapper) {
+    public DashboardService(Tcnt01EmpMapper tcnt01EmpMapper, Temp01Mapper temp01Mapper, DashboardMapper dashboardMapper) {
         this.dashboardMapper = dashboardMapper;
+        this.tcnt01EmpMapper = tcnt01EmpMapper;
+        this.temp01Mapper = temp01Mapper;
     }
 
     public Map<String, Object> getTcntEmp() {
@@ -77,7 +83,7 @@ public class DashboardService {
         data.put("card-data-2", card2Data);
         data.put("card-data-3", dashConSum);
         data.put("pointlist-data", pointList);
-        printUserDetails();
+
         return data;
     }
     //로그인 유저별 코드 (거래처 는 업체 코드)
@@ -91,10 +97,10 @@ public class DashboardService {
 
         // 거래처 직원 정보 접근
         if (userDetails.getTcntUserInfo() != null) {
-            System.out.println("CustCode from Tcnt01Emp: " + userDetails.getTcntUserInfo().getCustCode());
-            System.out.println("CustCode from Tcnt01Emp: "+userDetails.getTcntUserInfo().getUserId());
-            System.out.println("CustCode from Tcnt01Emp: "+userDetails.getTcntUserInfo().getCust_grade());
-            System.out.println("CustCode from Tcnt01Emp: "+userDetails.getTcntUserInfo().getCust_gubn());
+            //System.out.println("CustCode from Tcnt01Emp: " + userDetails.getTcntUserInfo().getCustCode());
+            //System.out.println("getUserId from Tcnt01Emp: "+userDetails.getTcntUserInfo().getUserId());
+            //System.out.println("getCust_grade from Tcnt01Emp: "+userDetails.getTcntUserInfo().getCust_grade());
+            //System.out.println("getCust_gubn from Tcnt01Emp: "+userDetails.getTcntUserInfo().getCust_gubn());
             return userDetails.getTcntUserInfo().getCustCode();
         }
 
@@ -214,5 +220,47 @@ public class DashboardService {
                 }
             }
         }
+    }
+    public Map<String, Object> getDashBoardPoint(String username) {
+
+        Map<String, Object> data = new HashMap<>();
+        // 데이터베이스 조회
+        String custCode=getCurrentUserCustCode();
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+        DashboardData point = null;
+        List<DashboardData> pointList = null;
+        System.out.println("userDetails.getTcntUserInfo()===="+userDetails.getTcntUserInfo());
+        System.out.println("userDetails.getTempUserInfo()===="+userDetails.getTempUserInfo());
+        // 사용자 유형에 따른 처리
+        // 거래처 사용자인 경우
+        if (userDetails.getTcntUserInfo() != null) {
+            String gubn = userDetails.getTcntUserInfo().getCust_grade(); // 안전하게 gubn 값을 가져옵니다.
+            System.out.println("gubn===="+gubn);
+
+            if ("A".equals(gubn)) {
+                // A 유형 사용자를 위한 로직
+                point = dashboardMapper.getPoint(custCode);
+                pointList = dashboardMapper.getPointList(custCode);
+            } else if ("B".equals(gubn)) {
+                // B 유형 사용자를 위한 로직
+                // B 유형 사용자에 대한 처리 로직 추가
+            }
+        } else if (userDetails.getTempUserInfo() != null) {
+            // 내부 직원 사용자인 경우
+            // 내부 직원 사용자에 대한 처리 로직 추가
+            point = dashboardMapper.getPoint(custCode);
+            pointList = dashboardMapper.getPointList(custCode);
+        } else {
+            // 알 수 없는 사용자 유형 또는 누락된 정보 처리
+            // 오류 처리 로직 추가 또는 기본 데이터 설정
+        }
+
+        data.put("point", point);
+        data.put("pointList", pointList);
+
+        return data;
     }
 }

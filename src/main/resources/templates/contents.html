@@ -319,7 +319,7 @@
                             <div class="card-header rounded bgi-no-repeat bgi-size-cover bgi-position-y-top bgi-position-x-center align-items-start h-250px" style="background-image:url('/assets/media/svg/shapes/top-green.png')" data-bs-theme="light">
                                 <!--begin::Title-->
                                 <h3 class="card-title align-items-start flex-column text-white pt-15">
-                                    <span class="fw-bold fs-2x mb-3">마일리지 정보</span>
+                                    <span class="fw-bold fs-2 mb-1">마일리지 현황</span>
 
                                 </h3>
                                 <!--end::Title-->
@@ -340,21 +340,18 @@
                                             <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5">
                                                 <!--begin::Symbol-->
                                                 <div class="symbol symbol-30px me-5 mb-8">
-                                                        <span class="symbol-label">
-                                                            <i class="ki-duotone ki-flask fs-1 text-primary">
-                                                                <span class="path1"></span>
-                                                                <span class="path2"></span>
-                                                            </i>
-                                                        </span>
+                                                    <span class="symbol-label">
+                                                        <div id="todayDate"></div>
+                                                    </span>
                                                 </div>
                                                 <!--end::Symbol-->
                                                 <!--begin::Stats-->
                                                 <div class="m-0">
                                                     <!--begin::Number-->
-                                                    <span class="text-gray-700 fw-bolder d-block fs-2qx lh-1 ls-n1 mb-1">37</span>
+                                                    <span class="text-gray-700 fw-bolder d-block fs-2 lh-1 ls-n1 mb-1">37</span>
                                                     <!--end::Number-->
                                                     <!--begin::Desc-->
-                                                    <span class="text-gray-500 fw-semibold fs-6">일간</span>
+                                                    <span class="text-gray-500 fw-semibold fs-8">오늘</span>
                                                     <!--end::Desc-->
                                                 </div>
                                                 <!--end::Stats-->
@@ -369,20 +366,17 @@
                                                 <!--begin::Symbol-->
                                                 <div class="symbol symbol-30px me-5 mb-8">
                                                     <span class="symbol-label">
-                                                        <i class="ki-duotone ki-bank fs-1 text-primary">
-                                                            <span class="path1"></span>
-                                                            <span class="path2"></span>
-                                                        </i>
+                                                        <div id="thisWeek"></div>
                                                     </span>
                                                 </div>
                                                 <!--end::Symbol-->
                                                 <!--begin::Stats-->
                                                 <div class="m-0">
                                                     <!--begin::Number-->
-                                                    <span class="text-gray-700 fw-bolder d-block fs-2qx lh-1 ls-n1 mb-1">6</span>
+                                                    <span class="text-gray-700 fw-bolder d-block fs-2 lh-1 ls-n1 mb-1">6</span>
                                                     <!--end::Number-->
                                                     <!--begin::Desc-->
-                                                    <span class="text-gray-500 fw-semibold fs-6">주간</span>
+                                                    <span class="text-gray-500 fw-semibold fs-8">이번주</span>
                                                     <!--end::Desc-->
                                                 </div>
                                                 <!--end::Stats-->
@@ -397,21 +391,17 @@
                                                 <!--begin::Symbol-->
                                                 <div class="symbol symbol-30px me-5 mb-8">
                                                 <span class="symbol-label">
-                                                    <i class="ki-duotone ki-award fs-1 text-primary">
-                                                        <span class="path1"></span>
-                                                        <span class="path2"></span>
-                                                        <span class="path3"></span>
-                                                    </i>
+                                                    <div id="currentMonth"></div>
                                                 </span>
                                                 </div>
                                                 <!--end::Symbol-->
                                                 <!--begin::Stats-->
                                                 <div class="m-0">
                                                     <!--begin::Number-->
-                                                    <span class="text-gray-700 fw-bolder d-block fs-2qx lh-1 ls-n1 mb-1">4,7</span>
+                                                    <span class="text-gray-700 fw-bolder d-block fs-2 lh-1 ls-n1 mb-1">4,7</span>
                                                     <!--end::Number-->
                                                     <!--begin::Desc-->
-                                                    <span class="text-gray-500 fw-semibold fs-6">월간</span>
+                                                    <span class="text-gray-500 fw-semibold fs-8">충전</span>
                                                     <!--end::Desc-->
                                                 </div>
                                                 <!--end::Stats-->
@@ -426,21 +416,44 @@
                                                 <!--begin::Symbol-->
                                                 <div class="symbol symbol-30px me-5 mb-8">
                                                     <span class="symbol-label">
-                                                        <i class="ki-duotone ki-timer fs-1 text-primary">
-                                                            <span class="path1"></span>
-                                                            <span class="path2"></span>
-                                                            <span class="path3"></span>
-                                                        </i>
+                                                        잔여
                                                     </span>
                                                 </div>
+                                                <script>
+                                                    document.addEventListener('DOMContentLoaded', function() {
+                                                        const monthNames = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
+                                                        // 현재 날짜 정보
+                                                        const currentDate = new Date();
+                                                        const currentMonth = monthNames[currentDate.getMonth()];
+                                                        const todayDate = currentDate.getDate()+'일';
+                                                        const now = new Date();
+                                                        const startOfYear = new Date(now.getFullYear(), 0, 1); // 올해의 시작
+                                                        const pastDaysOfYear = (now - startOfYear) / (24 * 60 * 60 * 1000); // 올해 지난 날짜 수
+                                                        const weekNumber = Math.ceil((pastDaysOfYear + startOfYear.getDay() + 1) / 7); // 올해의 몇 번째 주 계산
+
+                                                        // "이번주는 올해의 몇 번째 주" 설정
+                                                        document.getElementById('thisWeek').innerText = `${weekNumber}주`;
+                                                        // "이번 달" 설정
+                                                        document.getElementById('currentMonth').innerText = currentMonth ;
+
+                                                        // "오늘" 설정
+                                                        document.getElementById('todayDate').innerText = todayDate ;
+
+                                                        // "이번주" 범위 계산
+                                                        const startOfWeek = new Date(currentDate.setDate(currentDate.getDate() - currentDate.getDay() + 1));
+                                                        const endOfWeek = new Date(startOfWeek.getTime() + 6 * 24 * 60 * 60 * 1000);
+
+
+                                                    });
+                                                </script>
                                                 <!--end::Symbol-->
                                                 <!--begin::Stats-->
                                                 <div class="m-0">
                                                     <!--begin::Number-->
-                                                    <span class="text-gray-700 fw-bolder d-block fs-2qx lh-1 ls-n1 mb-1">822</span>
+                                                    <span class="text-gray-700 fw-bolder d-block fs-2 lh-1 ls-n1 mb-1">822</span>
                                                     <!--end::Number-->
                                                     <!--begin::Desc-->
-                                                    <span class="text-gray-500 fw-semibold fs-6">년간</span>
+                                                    <span class="text-gray-500 fw-semibold fs-8">마일리지</span>
                                                     <!--end::Desc-->
                                                 </div>
                                                 <!--end::Stats-->
@@ -465,7 +478,7 @@
                                 <!--begin::Title-->
                                 <h3 class="card-title align-items-start flex-column">
                                     <span class="card-label fw-bold text-gray-900">마일리지</span>
-                                    <span class="text-gray-500 mt-1 fw-semibold fs-6">잔여 마일리지 안내</span>
+                                    <span class="text-gray-500 mt-1 fw-semibold fs-6">일별 사용 마일리지</span>
                                 </h3>
                                 <!--end::Title-->
                                 <!--begin::Toolbar-->
@@ -493,12 +506,12 @@
                                 <div class="px-9 mb-5">
                                     <!--begin::Statistics-->
                                     <div class="d-flex mb-2">
-                                        <span class="fs-4 fw-semibold text-gray-500 me-1">$</span>
-                                        <span class="fs-2hx fw-bold text-gray-800 me-2 lh-1 ls-n2">14,094</span>
+                                        <span class="fs-4 fw-semibold text-gray-500 me-1">₩</span>
+                                        <span class="fs-2hx fw-bold text-gray-800 me-2 lh-1 ls-n2"></span>
                                     </div>
                                     <!--end::Statistics-->
                                     <!--begin::Description-->
-                                    <span class="fs-6 fw-semibold text-gray-500"> $48,346 차감</span>
+                                    <span class="fs-6 fw-semibold text-gray-500"> 단위 : 백원</span>
                                     <!--end::Description-->
                                 </div>
                                 <!--end::Statistics-->

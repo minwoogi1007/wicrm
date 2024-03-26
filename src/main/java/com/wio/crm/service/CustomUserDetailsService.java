@@ -11,7 +11,6 @@ import com.wio.crm.model.Tipdw;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AccountExpiredException;
-import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -29,6 +28,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final Tcnt01EmpMapper tcnt01EmpMapper;
     private final Temp01Mapper temp01Mapper;
 
+    // 생성자를 통한 의존성 주입
     public CustomUserDetailsService(TipdwMapper tipdwMapper, Tcnt01EmpMapper tcnt01EmpMapper, Temp01Mapper temp01Mapper) {
         this.tipdwMapper = tipdwMapper;
         this.tcnt01EmpMapper = tcnt01EmpMapper;
@@ -36,47 +36,67 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String userid) throws UsernameNotFoundException {
-        try {
-            Tipdw user = tipdwMapper.findByUserId(userid);
+    public UserDetails loadUserByUsername(String userid) {
+        // 사용자 정보 조회 및 초기 검사 수행
+        Tipdw user = fetchUserByUserId(userid);
+        verifyUserConfirmationStatus(user);
 
-            if (user == null) {
-                throw new UsernameNotFoundException("User not found with userid: " + userid);
-            }
-            if ("N".equals(user.getConfirmYn())) {
-                throw new UserNotConfirmedException("User with userid: " + userid + " is not confirmed yet.");
-            }
-
-            List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-            String custCode = null;
-            Temp01 tempUser = null; // 내부직원 정보를 담을 객체
-            Tcnt01Emp tcntUser = null; // 거래처 직원 정보를 담을 객체
-
-            if ("0".equals(user.getGubn())) { // 내부 직원
-                tempUser = temp01Mapper.findByUserId(userid);
-                if (tempUser != null) {
-                    if (tempUser == null || "0".equals(tempUser.getWork_gubn())) {
-                        throw new AccountExpiredException("User with userid: " + userid + " is not currently active.");
-                    }
-                    authorities.add(new SimpleGrantedAuthority("ROLE_EMPLOYEE"));
-                }
-            } else if ("1".equals(user.getGubn())) { // 거래처 직원
-                tcntUser = tcnt01EmpMapper.findByUserId(userid);
-                if (tcntUser == null) {
-                    throw new AccountExpiredException("User with userid: " + userid + " is not currently active.");
-                }
-                authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-                custCode = tcntUser.getCust_grade();
-            }
-
-            return new CustomUserDetails(userid, user.getPw(), authorities, custCode, tempUser, tcntUser);
-        } catch (UserNotConfirmedException e) {
-            logger.info(e.getMessage());
-            throw e;
-        } catch (Exception e) {
-            logger.error("Error authenticating user: {}", userid, e);
-            throw new InternalAuthenticationServiceException("Error authenticating user: " + userid, e);
+        // 사용자 유형(내부 또는 외부 직원)에 따라 처리
+        if ("0".equals(user.getGubn())) {
+            return handleInternalEmployee(userid, user);
+        } else if ("1".equals(user.getGubn())) {
+            return handleExternalEmployee(userid, user);
+        } else {
+            logger.error("지원되지 않는 사용자 카테고리: {}", user.getGubn());
+            throw new IllegalArgumentException("지원되지 않는 사용자 카테고리");
         }
     }
 
+    // 사용자 ID로 사용자 정보 검색
+    private Tipdw fetchUserByUserId(String userid) {
+        Tipdw user = tipdwMapper.findByUserId(userid);
+        if (user == null) {
+            throw new UsernameNotFoundException("사용자 ID로 사용자를 찾을 수 없습니다: " + userid);
+        }
+        return user;
+    }
+
+    // 사용자의 승인 상태 확인
+    private void verifyUserConfirmationStatus(Tipdw user) {
+        if ("N".equals(user.getConfirmYn())) {
+            throw new UserNotConfirmedException("아직 승인되지 않은 사용자입니다: " + user.getUserid());
+        }
+    }
+
+    // 내부 직원 처리
+    private UserDetails handleInternalEmployee(String userid, Tipdw user) {
+        Temp01 tempUser = temp01Mapper.findByUserId(userid);
+        if (tempUser == null || "0".equals(tempUser.getWork_gubn())) {
+            throw new AccountExpiredException("현재 활성 상태가 아닌 사용자입니다: " + userid);
+        }
+
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_EMPLOYEE"));
+
+        return buildCustomUserDetails(user, tempUser, null, authorities);
+    }
+
+    // 외부 직원 처리
+    private UserDetails handleExternalEmployee(String userid, Tipdw user) {
+        Tcnt01Emp tcntUser = tcnt01EmpMapper.findByUserId(userid);
+        if (tcntUser == null) {
+            throw new AccountExpiredException("현재 활성 상태가 아닌 사용자입니다: " + userid);
+        }
+
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+
+        return buildCustomUserDetails(user, null, tcntUser, authorities);
+    }
+
+    // CustomUserDetails 객체 구성
+    private CustomUserDetails buildCustomUserDetails(Tipdw user, Temp01 tempUser, Tcnt01Emp tcntUser, List<SimpleGrantedAuthority> authorities) {
+        String custCode = tcntUser != null ? tcntUser.getCust_grade() : null;
+        return new CustomUserDetails(user.getUserid(), user.getPw(), authorities, custCode, tempUser, tcntUser);
+    }
 }

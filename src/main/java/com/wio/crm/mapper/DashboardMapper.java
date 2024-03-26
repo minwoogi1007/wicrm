@@ -29,5 +29,9 @@ public interface DashboardMapper {
     List<DashboardData> getWeeklySum(String custCode);
     List<DashboardData> getMonthlySum(String custCode);
 
+    DashboardData getPoint(String custCode);
+    List<DashboardData> getPointList(String custCode);
+
+
 
 }

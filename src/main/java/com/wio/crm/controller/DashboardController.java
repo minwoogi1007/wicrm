@@ -1,20 +1,12 @@
 package com.wio.crm.controller;
-
-import com.wio.crm.model.DashboardData;
 import com.wio.crm.service.DashboardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -87,6 +79,13 @@ public class DashboardController {
 
         String username = principal.getName();
         Map<String, Object> data = dashboardService.getMonthlySum(username);
+        return ResponseEntity.ok(data);
+    }
+    @GetMapping("/api/dashboard-point-data")
+    public ResponseEntity<Map<String, Object>> getDashBoardPoint(Principal principal) {
+
+        String username = principal.getName();
+        Map<String, Object> data = dashboardService.getDashBoardPoint(username);
         return ResponseEntity.ok(data);
     }
 }

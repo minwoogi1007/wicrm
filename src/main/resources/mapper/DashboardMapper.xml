@@ -676,4 +676,92 @@
     GROUP BY m.month_start
     ORDER BY m.month_start
     </select>
+    <select id="getPoint" resultType="com.wio.crm.model.DashboardData">
+        WITH DateInfo AS (
+            SELECT
+            TO_CHAR(SYSDATE, 'YYYYMM') AS CurrentMonth,
+            TO_CHAR(SYSDATE, 'YYYYMMDD') AS CurrentDay,
+            TRUNC(SYSDATE, 'IW') AS ThisWeekStart,
+            TRUNC(SYSDATE, 'IW') + 5 AS ThisWeekEnd
+            FROM DUAL
+        ),
+            AggregatedPoints AS (
+            SELECT
+            TP.CUST_CODE,
+            SUM(CASE WHEN TP.CALL_CODE IS NULL AND TP.PERSON_CODE IS NULL AND TP.POINT_CHARGE IS NOT NULL THEN TP.POINT ELSE 0 END) AS POINT_CHARGE,
+            SUM(CASE WHEN TP.CALL_CODE IS NOT NULL AND TP.PERSON_CODE IS NOT NULL AND TP.POINT_CHARGE IS NULL THEN TP.POINT ELSE 0 END) AS POINT_USE,
+            SUM(CASE WHEN TP.CALL_CODE IS NOT NULL AND TP.PERSON_CODE IS NOT NULL AND TP.POINT_CHARGE IS NULL AND TO_CHAR(TP.IN_DATE, 'YYYYMMDD') = CurrentDay THEN TP.POINT ELSE 0 END) AS POINT_USE_DAY,
+            <![CDATA[
+            SUM(CASE WHEN TP.CALL_CODE IS NOT NULL AND TP.PERSON_CODE IS NOT NULL AND TP.POINT_CHARGE IS NULL AND TP.IN_DATE >= ThisWeekStart AND TP.IN_DATE < ThisWeekEnd THEN TP.POINT ELSE 0 END) AS POINT_USE_WEEK
+            ]]>
+            FROM
+            TCNT01_POINT TP
+            INNER JOIN TCNT01 T ON TP.CUST_CODE = T.CUST_CODE
+            CROSS JOIN DateInfo
+            WHERE
+            T.USE_YN = '1'
+            <if test="custCode != null and !custCode.isEmpty()">
+                AND t.CUST_CODE =  #{custCode}
+            </if>
+            <![CDATA[
+            AND (
+            TO_CHAR(TP.IN_DATE, 'YYYYMM') = CurrentMonth
+            OR TP.IN_DATE >= ThisWeekStart
+            )
+             ]]>
+            GROUP BY
+            TP.CUST_CODE
+        ),
+        TotalPoints AS (
+            SELECT
+            SUM(POINT_CHARGE) AS DPOINTCHARGE,
+            SUM(POINT_USE)*-1 AS DPOINTUSE,
+            SUM(POINT_USE_DAY)*-1 AS DPOINTUSEDAY,
+            SUM(POINT_USE_WEEK)*-1 AS DPOINTUSEWEEK
+            FROM
+            AggregatedPoints
+        )
+        SELECT
+            (SELECT to_char(nvl(SUM(T.POINT),0),'999,999,999') FROM TCNT01_POINT T INNER JOIN TCNT01 T1 ON T.CUST_CODE = T1.CUST_CODE WHERE T1.USE_YN = '1') AS DPOINTSUM,
+            to_char(nvl(TP.DPOINTCHARGE,0),'999,999,999') as DPOINTCHARGE ,
+            to_char(nvl(TP.DPOINTUSE,0),'999,999,999')as DPOINTUSE,
+            to_char(nvl(TP.DPOINTUSEDAY,0),'999,999,999') as DPOINTUSEDAY,
+            to_char(nvl(TP.DPOINTUSEWEEK,0),'999,999,999') as DPOINTUSEWEEK
+        FROM
+        TotalPoints TP
+    </select>
+    <select id="getPointList" resultType="com.wio.crm.model.DashboardData">
+        WITH DateRange AS (
+            SELECT
+            TRUNC(SYSDATE, 'MM') AS MonthStart,
+            ADD_MONTHS(TRUNC(SYSDATE, 'MM'), 1) AS NextMonthStart
+            FROM DUAL
+        )
+        SELECT
+        SUM(A.POINT)*-1 AS SUM_POINT,
+        TO_CHAR(A.IN_DATE, 'YYYY-MM-DD') AS POINT_DATE
+        FROM
+        TCNT01_POINT A
+        JOIN TCNT01 B ON A.CUST_CODE = B.CUST_CODE
+        , DateRange D
+        WHERE
+        A.CALL_CODE IS NOT NULL
+        AND A.PERSON_CODE IS NOT NULL
+        AND A.POINT_CHARGE IS NULL
+        -- Uncomment and adjust the NOT IN clause as needed
+        -- AND A.CUST_CODE NOT IN ('P000000067', 'P000000094', 'P000000092', 'P000000197', 'P000000045')
+        AND B.USE_YN = '1'
+        <if test="custCode != null and !custCode.isEmpty()">
+            AND b.CUST_CODE =  #{custCode}
+        </if>
+        <![CDATA[
+        AND A.IN_DATE >= D.MonthStart
+
+        AND A.IN_DATE < D.NextMonthStart
+        ]]>
+        GROUP BY
+        TO_CHAR(A.IN_DATE, 'YYYY-MM-DD')
+        ORDER BY
+        POINT_DATE
+    </select>
 </mapper>

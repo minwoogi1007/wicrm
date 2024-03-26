@@ -22,6 +22,7 @@ $(document).ready(function() {
     fetchDailyData();
     fetchWeeklyData();
     fetchYearData();
+    fetchPoint();
     // ID를 사용하여 버튼 선택
     const customCount = document.getElementById('customCount');
     const timeCount = document.getElementById('timeCount');
@@ -48,6 +49,36 @@ $(document).ready(function() {
 
     function formatNumberWithCommas(number) {
         return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+    function fetchPoint(){
+        $.ajax({
+            url: "/api/dashboard-point-data", // 서버 엔드포인트
+            type: "GET",
+            success: function(response) {
+                //console.log(response);
+                // response는 각 카드 데이터를 포함하는 객체
+                Object.keys(response).forEach(function(key) {
+                    // 예: key = 'card-data-1'
+                    //console.log(key);
+
+                    if(key=="point"){
+                        const point = response[key];
+
+                    }else if(key=="pointList"){
+                        const pointList = response[key];
+
+
+
+                    }
+
+                });
+                KTCardsWidget17.init();
+            },
+            error: function(xhr, status, error) {
+                console.error("Data load failed:", error);
+            }
+        });
+
     }
     function fetchMonthData(){
         $.ajax({
