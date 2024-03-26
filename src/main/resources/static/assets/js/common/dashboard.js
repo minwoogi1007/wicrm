@@ -63,6 +63,17 @@ $(document).ready(function() {
 
                     if(key=="point"){
                         const point = response[key];
+                        console.log(point);
+                        console.log(point.dpointcharge);
+                        console.log(point.dpointuseweek);
+                        console.log(point.dpointuse);
+                        console.log(point.dpointsum);
+                        console.log(point.dpointuseday);
+                        $('#DPOINTSUM').text(point.dpointsum);
+                        $('#DPOINTUSEDAY').text(point.dpointuseday);
+                        $('#DPOINTUSEWEEK').text(point.dpointuseweek);
+                        $('#DPOINTCHARGE').text(point.dpointcharge);
+                        $('#DPOINTUSE').text("₩ " + point.dpointuse);
 
                     }else if(key=="pointList"){
                         const pointList = response[key];
@@ -72,7 +83,7 @@ $(document).ready(function() {
                     }
 
                 });
-                KTCardsWidget17.init();
+                KTChartsWidget3.init();
             },
             error: function(xhr, status, error) {
                 console.error("Data load failed:", error);
@@ -1579,9 +1590,7 @@ $(document).ready(function() {
             }
         }
     }();
-    "undefined" != typeof module && (module.exports = KTChartsWidget3), KTUtil.onDOMContentLoaded((function() {
-        KTChartsWidget3.init()
-    }));
+
 
     var KTChartsWidget3_1 = function() {
         var e = {

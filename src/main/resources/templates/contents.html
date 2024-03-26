@@ -313,7 +313,7 @@
                 <div th:if="${dataForA}">
                     <div class="row g-5 g-xl-10">
                     <!--begin::Col-->
-                    <div class="col-xl-4 mb-xl-10">
+                    <div class="col-xxl-4 mb-5 mb-xl-10" >
                         <div class="card card-flush h-xl-100">
                             <!--begin::Heading-->
                             <div class="card-header rounded bgi-no-repeat bgi-size-cover bgi-position-y-top bgi-position-x-center align-items-start h-250px" style="background-image:url('/assets/media/svg/shapes/top-green.png')" data-bs-theme="light">
@@ -348,7 +348,7 @@
                                                 <!--begin::Stats-->
                                                 <div class="m-0">
                                                     <!--begin::Number-->
-                                                    <span class="text-gray-700 fw-bolder d-block fs-2 lh-1 ls-n1 mb-1">37</span>
+                                                    <span id="DPOINTUSEDAY" class="text-gray-700 fw-bolder d-block fs-2 lh-1 ls-n1 mb-1"></span>
                                                     <!--end::Number-->
                                                     <!--begin::Desc-->
                                                     <span class="text-gray-500 fw-semibold fs-8">오늘</span>
@@ -373,7 +373,7 @@
                                                 <!--begin::Stats-->
                                                 <div class="m-0">
                                                     <!--begin::Number-->
-                                                    <span class="text-gray-700 fw-bolder d-block fs-2 lh-1 ls-n1 mb-1">6</span>
+                                                    <span id="DPOINTUSEWEEK" class="text-gray-700 fw-bolder d-block fs-2 lh-1 ls-n1 mb-1"></span>
                                                     <!--end::Number-->
                                                     <!--begin::Desc-->
                                                     <span class="text-gray-500 fw-semibold fs-8">이번주</span>
@@ -398,7 +398,7 @@
                                                 <!--begin::Stats-->
                                                 <div class="m-0">
                                                     <!--begin::Number-->
-                                                    <span class="text-gray-700 fw-bolder d-block fs-2 lh-1 ls-n1 mb-1">4,7</span>
+                                                    <span id="DPOINTCHARGE" class="text-gray-700 fw-bolder d-block fs-2 lh-1 ls-n1 mb-1"></span>
                                                     <!--end::Number-->
                                                     <!--begin::Desc-->
                                                     <span class="text-gray-500 fw-semibold fs-8">충전</span>
@@ -450,7 +450,7 @@
                                                 <!--begin::Stats-->
                                                 <div class="m-0">
                                                     <!--begin::Number-->
-                                                    <span class="text-gray-700 fw-bolder d-block fs-2 lh-1 ls-n1 mb-1">822</span>
+                                                    <span id="DPOINTSUM" class="text-gray-700 fw-bolder d-block fs-2 lh-1 ls-n1 mb-1"></span>
                                                     <!--end::Number-->
                                                     <!--begin::Desc-->
                                                     <span class="text-gray-500 fw-semibold fs-8">마일리지</span>
@@ -470,7 +470,7 @@
                         </div>
                     </div>
                     <!--오늘 처리 건수-->
-                    <div class="col-xl-8 mb-5 mb-xl-10">
+                    <div class="col-xxl-8 mb-5 mb-xl-10">
                         <!--begin::Chart widget 36-->
                         <div class="card card-flush overflow-hidden h-md-100">
                             <!--begin::Header-->
@@ -506,12 +506,12 @@
                                 <div class="px-9 mb-5">
                                     <!--begin::Statistics-->
                                     <div class="d-flex mb-2">
-                                        <span class="fs-4 fw-semibold text-gray-500 me-1">₩</span>
+                                        <span id="DPOINTUSE" class="fs-4 fw-semibold text-gray-500 me-1"></span>
                                         <span class="fs-2hx fw-bold text-gray-800 me-2 lh-1 ls-n2"></span>
                                     </div>
                                     <!--end::Statistics-->
                                     <!--begin::Description-->
-                                    <span class="fs-6 fw-semibold text-gray-500"> 단위 : 백원</span>
+                                    <span class="fs-6 fw-semibold text-gray-500"> </span>
                                     <!--end::Description-->
                                 </div>
                                 <!--end::Statistics-->
@@ -533,7 +533,7 @@
                 <div th:if="${dataForB}">
                     <div class="row g-5 g-xl-10">
                     <!--begin::Col-->
-                    <div class="col-xl-4 mb-xl-10">
+                    <div class="col-xxl-4 mb-5 mb-xl-10">
                         <div class="card card-flush h-xl-100">
                             <!--begin::Heading-->
                             <div class="card-header rounded bgi-no-repeat bgi-size-cover bgi-position-y-top bgi-position-x-center align-items-start h-250px" style="background-image:url('/assets/media/svg/shapes/top-green.png')" data-bs-theme="light">
@@ -677,7 +677,7 @@
                         </div>
                     </div>
                     <!--오늘 처리 건수-->
-                    <div class="col-xl-8 mb-5 mb-xl-10">
+                    <div class="col-xxl-8 mb-5 mb-xl-10">
                         <!--begin::Chart widget 36-->
                         <div class="card card-flush overflow-hidden h-md-100">
                             <!--begin::Header-->
