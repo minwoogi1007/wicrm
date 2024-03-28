@@ -953,16 +953,17 @@
                                         <!-- Table -->
                                         <table class="table table-striped gy-7 gs-7">
                                             <thead>
-                                            <tr class="fw-bold fs-6 text-gray-800 border-bottom border-gray-200">
+                                            <tr class="fw-bold fs-8 text-gray-800 border-bottom border-gray-200">
                                                 <th>상담원</th>
                                                 <th style="text-align: right;">일완료</th>
-                                                <th style="text-align: right;">일수수료</th>
-                                                <th style="text-align: right;">일매출</th>
-                                                <th style="text-align: right;">건당비용</th>
                                                 <th style="text-align: right;">월완료</th>
+                                                <th style="text-align: right;">건당</th>
+                                                <th style="text-align: right;">일수수료</th>
+
                                                 <th style="text-align: right;">월수수료</th>
+                                                <th style="text-align: right;">일매출</th>
                                                 <th style="text-align: right;">월매출</th>
-                                                <th style="text-align: right;">월매출 비율</th>
+                                                <th style="text-align: right;">비율</th>
                                             </tr>
                                             </thead>
                                             <tbody>
@@ -994,11 +995,13 @@
                                                 var row = '<tr>' +
                                                     '<td>' + item.EMP_NAME + '</td>' +
                                                     '<td  style="text-align: right;">' + item.DAILY_PRCSUM + '</td>' +
-                                                    '<td style="text-align: right;">' + item.DAILY_TOTAL + '</td>' +
-                                                    '<td style="text-align: right;">' + item.DAILY_POINTSUM + '</td>' +
-                                                    '<td style="text-align: right;">' + item.TOTAL_MONTHLY_CALLP + '</td>' +
                                                     '<td style="text-align: right;">' + item.MONTHLY_PRCSUM + '</td>' +
+                                                    '<td style="text-align: right;">' + item.TOTAL_MONTHLY_CALLP + '</td>' +
+                                                    '<td style="text-align: right;">' + item.DAILY_TOTAL + '</td>' +
                                                     '<td style="text-align: right;">' + item.MONTHLY_TOTAL + '</td>' +
+
+
+                                                    '<td style="text-align: right;">' + item.DAILY_POINTSUM + '</td>' +
                                                     '<td style="text-align: right;">' + item.MONTHLY_POINTSUM + '</td>' +
                                                     '<td style="text-align: right;">' + item.MONTHLY_POINTSUM_PERCENT + ' % </td>' +
                                                     '</tr>';

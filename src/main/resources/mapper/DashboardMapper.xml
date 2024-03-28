@@ -556,6 +556,31 @@
                                    ) GROUPED
                           ) CP ON TB.EMPNO = CP.EMPNO
                           GROUP BY E.EMP_NAME, CP.CALLP
+                          UNION ALL
+                          SELECT 'DAILY' AS PERIOD,
+                                 '관리자' AS EMP_NAME,
+                                 COUNT(POINT) AS PRCSUM,
+                                 SUM(POINT)*-1 AS POINTSUM,
+                                 0 AS CALLP ,
+                                 0 AS TOTAL
+                          FROM TCNT01_POINT A
+                          WHERE PERSON_CODE IS NULL
+                            AND POINT_CHARGE IS NOT NULL
+                            AND POINT<0
+                            AND TO_CHAR(IN_DATE, 'YYYYMMDD') = TO_CHAR(SYSDATE, 'YYYYMMDD')
+
+                          UNION ALL
+                          SELECT 'MONTHLY' AS PERIOD,
+                                 '관리자' AS EMP_NAME,
+                                 COUNT(POINT) AS PRCSUM,
+                                 SUM(POINT)*-1 AS POINTSUM,
+                                 0 AS CALLP ,
+                                 0 AS TOTAL
+                          FROM TCNT01_POINT A
+                          WHERE PERSON_CODE IS NULL
+                            AND POINT_CHARGE IS NOT NULL
+                            AND POINT<0
+                            AND TO_CHAR(IN_DATE, 'YYYYMM') = TO_CHAR(SYSDATE, 'YYYYMM')
                       )
                  GROUP BY EMP_NAME)
         GROUP BY ROLLUP(EMP_NAME)

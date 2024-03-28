@@ -24,7 +24,7 @@ public class BoardController {
         this.boardService = boardService;
     }
     @GetMapping("/board")
-    public String board(Model model, @RequestParam(required = false) String category) {
+    public String board(Model model, @RequestParam(name = "category", required = false) String category) {
         List<Board> posts;
         if (category != null) {
             posts = boardService.findPostsByCategory(category);

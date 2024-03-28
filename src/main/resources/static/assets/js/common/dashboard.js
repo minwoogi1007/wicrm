@@ -50,6 +50,11 @@ $(document).ready(function() {
     function formatNumberWithCommas(number) {
         return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
+    let pointMList =[];
+    let pointDay=[];
+    let pointMax;
+    let pointMin;
+    let formattedPointList=[];
     function fetchPoint(){
         $.ajax({
             url: "/api/dashboard-point-data", // 서버 엔드포인트
@@ -57,18 +62,15 @@ $(document).ready(function() {
             success: function(response) {
                 //console.log(response);
                 // response는 각 카드 데이터를 포함하는 객체
+                pointMList =[];
+                pointDay=[];
                 Object.keys(response).forEach(function(key) {
                     // 예: key = 'card-data-1'
                     //console.log(key);
 
                     if(key=="point"){
                         const point = response[key];
-                        console.log(point);
-                        console.log(point.dpointcharge);
-                        console.log(point.dpointuseweek);
-                        console.log(point.dpointuse);
-                        console.log(point.dpointsum);
-                        console.log(point.dpointuseday);
+
                         $('#DPOINTSUM').text(point.dpointsum);
                         $('#DPOINTUSEDAY').text(point.dpointuseday);
                         $('#DPOINTUSEWEEK').text(point.dpointuseweek);
@@ -76,13 +78,26 @@ $(document).ready(function() {
                         $('#DPOINTUSE').text("₩ " + point.dpointuse);
 
                     }else if(key=="pointList"){
-                        const pointList = response[key];
-
-
-
+                        const pointMileList= response[key];
+                        pointDay.push("");
+                        pointMList.push(0);
+                        pointMileList.forEach((item, index) => {
+                            pointMList.push(item.sum_POINT);
+                            pointDay.push(item.point_DATE);
+                        });
+                        pointDay.push("");
+                        pointMList.push(0);
+                        pointMax = Math.max(...pointMList);
+                        pointMin =Math.min(...pointMList);
                     }
 
+
                 });
+                console.log(pointMList);
+                 formattedPointList = pointMList.map(function(number) {
+                    return number.toLocaleString();
+                });
+                console.log(formattedPointList);
                 KTChartsWidget3.init();
             },
             error: function(xhr, status, error) {
@@ -1450,8 +1465,8 @@ $(document).ready(function() {
                         o = KTUtil.getCssVariableValue("--bs-success"),
                         i = {
                             series: [{
-                                name: "Sales",
-                                data: [18, 18, 20, 20, 18, 18, 22, 22, 20, 20, 18, 18, 20, 20, 18, 18, 20, 20, 22]
+                                name: "마일리지",
+                                data: pointMList
                             }],
                             chart: {
                                 fontFamily: "inherit",
@@ -1484,7 +1499,7 @@ $(document).ready(function() {
                                 colors: [o]
                             },
                             xaxis: {
-                                categories: ["", "Apr 02", "Apr 03", "Apr 04", "Apr 05", "Apr 06", "Apr 07", "Apr 08", "Apr 09", "Apr 10", "Apr 11", "Apr 12", "Apr 13", "Apr 14", "Apr 15", "Apr 16", "Apr 17", "Apr 18", ""],
+                                categories: pointDay,
                                 axisBorder: {
                                     show: !1
                                 },
@@ -1519,15 +1534,15 @@ $(document).ready(function() {
                             },
                             yaxis: {
                                 tickAmount: 4,
-                                max: 24,
-                                min: 10,
+                                max: pointMax,
+                                min: pointMin,
                                 labels: {
                                     style: {
                                         colors: l,
                                         fontSize: "12px"
                                     },
                                     formatter: function(e) {
-                                        return "$" + e + "K"
+                                        return e
                                     }
                                 }
                             },
@@ -1558,7 +1573,7 @@ $(document).ready(function() {
                                 },
                                 y: {
                                     formatter: function(e) {
-                                        return "$" + e + "K"
+                                        return e
                                     }
                                 }
                             },
