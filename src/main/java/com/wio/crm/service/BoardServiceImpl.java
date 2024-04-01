@@ -25,4 +25,14 @@ public class BoardServiceImpl implements BoardService {
     public List<Board> findAllPosts() {
         return boardMapper.findAllPosts();
     }
+
+    @Override
+    public Board selectPostById(int id) { // 반환 타입 추가
+        return boardMapper.selectPostById(id);
+    }
+
+    @Override
+    public void insertPost(Board board) { // 글쓰기 기능 구현
+        boardMapper.insertPost(board); // 가정: BoardMapper에 insertPost 메소드가 정의되어 있음
+    }
 }

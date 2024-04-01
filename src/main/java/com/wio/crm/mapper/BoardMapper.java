@@ -11,4 +11,9 @@ public interface BoardMapper {
     List<Board> findPostsByCategory(@Param("category") String category);
     List<Board> findAllPosts();
     List<Board> noticeBoardList();
+
+    void insertPost(Board board);
+    Board selectPostById(int id);
+
+
 }

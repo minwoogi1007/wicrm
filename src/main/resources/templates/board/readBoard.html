@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/main}">
+<!--begin::Main-->
+<!-- Include Summernote CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-bs4.css" rel="stylesheet">
+
+<div layout:fragment="content">
+    <!--begin::Content wrapper-->
+    <div class="d-flex flex-column flex-column-fluid">
+        <!--begin::Toolbar-->
+        <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+            <!--begin::Toolbar container-->
+            <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                <!--begin::Page title-->
+                <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                    <!--begin::Title-->
+                    <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">공지사항</h1>
+                    <!--end::Title-->
+                    <!--begin::Breadcrumb-->
+                    <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                        <!--begin::Item-->
+                        <li class="breadcrumb-item text-muted">
+                            <a href="/main" class="text-muted text-hover-primary">Home</a>
+                        </li>
+                        <!--end::Item-->
+                        <!--begin::Item-->
+                        <li class="breadcrumb-item">
+                            <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                        </li>
+                        <!--end::Item-->
+                        <!--begin::Item-->
+                        <li class="breadcrumb-item text-muted">게시판</li>
+                        <!--end::Item-->
+                        <!--begin::Item-->
+                        <li class="breadcrumb-item">
+                            <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                        </li>
+                        <!--end::Item-->
+                        <!--begin::Item-->
+                        <li class="breadcrumb-item text-muted">사내게시판</li>
+                        <!--end::Item-->
+                    </ul>
+                    <!--end::Breadcrumb-->
+                </div>
+                <!--end::Page title-->
+                <!--begin::Actions-->
+                <div class="d-flex align-items-center gap-2 gap-lg-3">
+                    <!--begin::Filter menu-->
+                    <div class="d-flex">
+                        <select name="campaign-type" data-control="select2" data-hide-search="true" class="form-select form-select-sm bg-body border-body w-175px">
+                            <option value="Twitter" selected="selected">Select Campaign</option>
+                            <option value="Twitter">Twitter Campaign</option>
+                            <option value="Twitter">Facebook Campaign</option>
+                            <option value="Twitter">Adword Campaign</option>
+                            <option value="Twitter">Carbon Campaign</option>
+                        </select>
+                        <a href="#" class="btn btn-icon btn-sm btn-success flex-shrink-0 ms-4" data-bs-toggle="modal" data-bs-target="#kt_modal_create_campaign">
+                            <i class="ki-duotone ki-plus fs-2"></i>
+                        </a>
+                    </div>
+                    <!--end::Filter menu-->
+                    <!--begin::Secondary button-->
+                    <!--end::Secondary button-->
+                    <!--begin::Primary button-->
+                    <!--end::Primary button-->
+                </div>
+                <!--end::Actions-->
+            </div>
+            <!--end::Toolbar container-->
+        </div>
+        <!--end::Toolbar-->
+        <!--begin::Content-->
+        <div id="kt_app_content" class="app-content flex-column-fluid">
+            <!--begin::Content container-->
+            <div id="kt_app_content_container" class="app-container container-xxl">
+                <!--begin::Products-->
+                <div class="card card-flush">
+                    <!--begin::Card header-->
+                    <div class="card-header align-items-center py-5 gap-2 gap-md-5">
+                        <!--begin::Card title-->
+                        <div class="card-title">
+                            <!--begin::Search-->
+                            <div class="d-flex align-items-center position-relative my-1">
+                                <i class="ki-duotone ki-magnifier fs-3 position-absolute ms-4">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                                <input type="text" data-kt-ecommerce-order-filter="search" class="form-control form-control-solid w-250px ps-12" placeholder="Search Report" />
+                            </div>
+                            <!--end::Search-->
+                            <!--begin::Export buttons-->
+                            <div id="kt_ecommerce_report_customer_orders_export" class="d-none"></div>
+                            <!--end::Export buttons-->
+                        </div>
+                        <!--end::Card title-->
+                        <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
+                            <!--begin::Daterangepicker
+                            <input class="form-control form-control-solid w-100 mw-250px" placeholder="Pick date range" id="kt_ecommerce_report_customer_orders_daterangepicker" />-->
+                            <!--end::Daterangepicker-->
+                            <!--begin::Filter-->
+
+                            <!--end::Filter-->
+                            <!--begin::Export dropdown-->
+
+                            <!--<button type="button" class="btn btn-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                              <i class="ki-duotone ki-exit-up fs-2">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                              </i>다운로드</button>-->
+                            <!--begin::Menu-->
+                            <!--<div id="kt_ecommerce_report_customer_orders_export_menu" class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-100px py-4" data-kt-menu="true">
+
+                              <div class="menu-item px-3">
+                                <a href="#" class="menu-link px-3" data-kt-ecommerce-export="copy">복사</a>
+                              </div>
+
+                              <div class="menu-item px-3">
+                                <a href="#" class="menu-link px-3" data-kt-ecommerce-export="excel">엑셀받기</a>
+                              </div>
+
+                              <div class="menu-item px-3">
+                                <a href="#" class="menu-link px-3" data-kt-ecommerce-export="csv">CSV</a>
+                              </div>
+
+                              <div class="menu-item px-3">
+                                <a href="#" class="menu-link px-3" data-kt-ecommerce-export="pdf">PDF</a>
+                              </div>-->
+                            <!--end::Menu item
+                          </div>-->
+                            <!--end::Menu-->
+                            <!--end::Export dropdown-->
+                        </div>
+                        <!--end::Card toolbar-->
+                    </div>
+                    <!--end::Card header-->
+                    <!--begin::Card body-->
+                    <div class="card-body pt-0">
+                        <!--begin::Table-->
+                        <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_ecommerce_report_customer_orders_table">
+                            <thead>
+
+                            <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
+                                <th class="min-w-100px">NO</th>
+                                <th class="min-w-125px">제목</th>
+                                <th class="min-w-100px">작성자</th>
+                                <th class="min-w-125px">작성일</th>
+                                <th class="text-end min-w-75px">조회수</th>
+                            </tr>
+                            </thead>
+                            <tbody class="fw-semibold text-gray-600">
+
+                            <tr th:each="list:${list}">
+
+                                <td th:text="${list.GNO}"></td>
+
+                                <td th:text="${list.SUBJECT}"></td>
+
+                                <td th:text="${list.ID}"></td>
+
+                                <td th:text="${list.IN_DATE}"></td>
+
+                                <td th:text="${list.HIT}" class="text-end"></td>
+
+                            </tr>
+
+
+                            </tbody>
+                        </table>
+                        <!--end::Table-->
+                    </div>
+
+                    <!--end::Card body-->
+                </div>
+                <!--end::Products-->
+            </div>
+            <!--end::Content container-->
+        </div>
+        <!--end::Content-->
+        <script src="/assets/plugins/global/plugins.bundle.js"></script>
+        <script src="/assets/js/board/scripts.bundle.js"></script>
+        <script src="/assets/js/custom/apps/ecommerce/reports/customer-orders/customer-orders.js"></script>
+    </div>
+    <!--end::Content wrapper-->
+
+    <!--end:::Main-->
+
+
+</div>
+<!--begin::Custom Javascript(used for this page only)-->
+<!--end::Custom Javascript-->

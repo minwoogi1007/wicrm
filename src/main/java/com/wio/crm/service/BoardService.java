@@ -19,5 +19,6 @@ public interface BoardService {
 
     List<Board> findPostsByCategory(String category);
     List<Board> findAllPosts(); // 모든 게시글 조회
-
+    Board selectPostById(int id); // 글 읽기 기능 추가
+    void insertPost(Board board); // 글쓰기 기능 추가
 }
