@@ -15,7 +15,8 @@
 	<link href="/assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
 	<link href="/assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
 	<!--end::Global Stylesheets Bundle-->
-
+	<meta id="_csrf" name="_csrf" th:content="${_csrf.token}"/>
+	<meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}"/>
 </head>
 <!--end::Head-->
 <!--begin::Body-->
@@ -80,6 +81,7 @@
 					<!--begin::Form-->
 					<form class="form w-100" novalidate="novalidate" id="kt_sign_in_form" th:action="@{/login}" method="post">
 						<!--begin::Heading-->
+						<input type="hidden" name="gubn" id="gubn" value=""/>
 						<div class="text-center mb-11">
 							<!--begin::Title-->
 							<h1 class="text-gray-900 fw-bolder mb-3"><img alt="Logo" src="/assets/media/logos/mainLogo.png" class="h-40px h-lg-50px" />Sign In</h1>
@@ -138,7 +140,7 @@
 
 							<div class="col-md-6">
 
-								<a href="#" class="btn btn-flex btn-outline btn-text-gray-700 btn-active-color-primary bg-state-light flex-center text-nowrap w-100" data-bs-toggle="modal" data-bs-target="#kt_modal_new_target">
+								<a href="#" class="btn btn-flex btn-outline btn-text-gray-700 btn-active-color-primary bg-state-light flex-center text-nowrap w-100" data-bs-toggle="modal" data-bs-target="#kt_modal_new_target" data-gubn="1">
 
 									<img alt="Logo" src="/assets/media/svg/brand-logos/icons7.png" class="h-15px me-3"d  />직원 신청</a>
 
@@ -146,7 +148,7 @@
 
 							<div class="col-md-6">
 
-								<a href="#" class="btn btn-flex btn-outline btn-text-gray-700 btn-active-color-primary bg-state-light flex-center text-nowrap w-100">
+								<a href="#" class="btn btn-flex btn-outline btn-text-gray-700 btn-active-color-primary bg-state-light flex-center text-nowrap w-100" data-bs-toggle="modal" data-bs-target="#kt_modal_new_target" data-gubn="0">
 
 									<img alt="Logo" src="/assets/media/svg/brand-logos/icons8.png" class="h-15px me-3" />업체 직원 신청</a>
 
@@ -178,7 +180,7 @@
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h3 class="modal-title">직원 아이디 신청</h3>
+						<h3 class="modal-title">아이디 신청</h3>
 
 						<!--begin::Close-->
 						<div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
@@ -188,6 +190,15 @@
 					</div>
 
 					<div class="modal-body">
+						<!-- CSRF 토큰을 포함한 폼 시작 -->
+						<form id="applyUserIdForm" th:action="@{/apply-userid}" method="post">
+							<!-- 업체명 입력 필드, 기본적으로 숨김 -->
+						<div class="row mb-6" id="companyNameRow" style="display: none;">
+							<label class="col-lg-3 col-form-label required fw-semibold fs-6">업체명</label>
+							<div class="col-lg-8">
+								<input type="text" name="companyName" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" />
+							</div>
+						</div>
 						<div class="row mb-6">
 							<!--begin::Label-->
 							<label class="col-lg-3 col-form-label required fw-semibold fs-6">이름</label>
@@ -215,8 +226,9 @@
 							<div class="col-lg-8"> <!-- col-lg-8이었던 부분을 col-lg-9로 변경하여 부모 div가 전체 행을 차지하도록 함 -->
 								<div class="row"> <!-- 아이디 입력과 조회 버튼을 위한 내부 row -->
 									<div class="col-lg-10 fv-row"> <!-- 아이디 입력 필드 -->
-										<input type="text" name="appUserId" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" />
+										<input type="text" name="appUserId"  class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"   />
 									</div>
+									<div id="userIdAvailability" class="mt-2"></div>
 
 								</div>
 							</div>
@@ -226,7 +238,7 @@
 							<div class="col-lg-8">
 								<div class="row">
 									<div class="col-lg-10 fv-row">
-										<input type="text" name="pass1" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" />
+										<input type="password" name="pass1" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" />
 									</div>
 
 								</div>
@@ -237,19 +249,36 @@
 							<div class="col-lg-8">
 								<div class="row">
 									<div class="col-lg-10 fv-row">
-										<input type="text" name="pass22" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" />
+										<input type="password" name="pass22" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" />
 									</div>
 
 								</div>
 							</div>
 						</div>
-
+						</form>
 					</div>
-
 					<div class="modal-footer">
 						<button type="button" class="btn btn-light" data-bs-dismiss="modal">취소</button>
-						<button type="button" class="btn btn-primary">신청</button>
+						<button type="button" id="applyUserIdButton" class="btn btn-primary">신청</button>
 					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- 성공 메시지 모달 -->
+	<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="successModalLabel">신청 완료</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					신청이 완료 되었습니다. 담당자 승인 후에 로그인 가능합니다.
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
 				</div>
 			</div>
 		</div>
@@ -257,13 +286,123 @@
 	<!--end::Authentication - Sign-in-->
 </div>
 <script>
-	document.getElementById('appUserId').addEventListener('keypress', function(event) {
-		// 입력된 키가 영문자가 아닌 경우 입력을 방지합니다.
-		if (event.keyCode < 65 || event.keyCode > 122 || (event.keyCode > 90 && event.keyCode < 97)) {
-			event.preventDefault();
+	document.addEventListener('DOMContentLoaded', function() {
+		// CSRF 토큰과 헤더 이름을 가져옵니다.
+		var csrfToken = $("meta[name='_csrf']").attr("content");
+		var csrfHeaderName = $("meta[name='_csrf_header']").attr("content");
+
+		var userIdInput = document.querySelector('[name="appUserId"]');
+		var userNameInput = document.querySelector('[name="fname"]');
+		var applyButton = document.getElementById('applyUserIdButton');
+		var availabilityDiv = document.getElementById('userIdAvailability');
+		var companyNameRow = document.getElementById('companyNameRow');
+		var isUserIdAvailable = false; // 사용자 ID 사용 가능 여부를 저장하는 변수
+
+		$(document).ready(function() {
+		// 모달 창이 열릴 때의 로직을 설정합니다.
+			$('[data-bs-toggle="modal"]').on('click', function() {
+				const gubn = $(this).attr('data-gubn');
+				// gubn 값에 따라 업체명 입력 필드의 표시 여부를 결정합니다.
+				if(gubn === "0") {
+					$('#companyNameRow').show();
+				} else {
+					$('#companyNameRow').hide();
+				}
+				// 모달 내의 입력 필드 초기화
+				$('#applyUserIdForm')[0].reset();
+				availabilityDiv.textContent = "";
+				isUserIdAvailable = false; // 모달을 열 때마다 사용자 ID 사용 가능 여부를 초기화합니다.
+
+			});
+		});
+
+		userIdInput.addEventListener('keyup', function(event) {
+			checkReg(event);
+			checkUserIdAvailability();
+		});
+
+		applyButton.addEventListener('click', function() {
+			var userId = userIdInput.value;
+			var userName = userNameInput.value;
+			var password = document.querySelector('[name="pass1"]').value;
+			var passwordConfirm = document.querySelector('[name="pass22"]').value;
+			var gubn = $('#gubn').val();
+			var companyName = (gubn === "0") ? document.querySelector('[name="companyName"]').value : "";
+
+			if (!isUserIdAvailable) {
+				alert("이미 사용 중인 아이디입니다. 다른 아이디를 입력해주세요.");
+				userIdInput.focus();
+				availabilityDiv.textContent = "";
+				return;
+			}
+			if (password !== passwordConfirm) {
+				alert('비밀번호가 일치하지 않습니다.');
+				return;
+			}
+
+			// 필수 입력 값 확인
+			if (!userName.trim() || !userId.trim() || !password.trim() || !passwordConfirm.trim() || (gubn === "0" && !companyName.trim())) {
+				alert('모든 필수 입력 항목을 채워주세요.');
+				return; // 필수 입력 값 중 하나라도 빠져있다면 함수 실행을 중지
+			}
+			// Ajax 요청 부분
+			$.ajax({
+				url: '/apply-userid',
+				type: 'POST',
+				contentType: 'application/json',
+				data: JSON.stringify({ userName: userName, userId: userId, password: password, gubn: gubn, companyName: companyName }),
+				beforeSend: function(xhr) {
+					xhr.setRequestHeader(csrfHeaderName, csrfToken);
+				},
+				success: function() {
+					$('#kt_modal_new_target').modal('hide');
+
+					// 새로운 모달 띄우기
+					$('#successModal').modal('show');
+				},
+				error: function(xhr, status, error) {
+					alert('에러 발생: ' + error);
+				}
+			});
+		});
+
+		// 입력값 검증 함수
+		function checkReg(event) {
+			const regExp = /[^0-9a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣]/g; // 영문, 숫자, 한글만 허용
+			if (regExp.test(event.target.value)) {
+				event.target.value = event.target.value.replace(regExp, '');
+				alert("영문, 숫자, 한글만 입력 가능합니다.");
+			}
+		}
+
+		// 사용자 ID의 사용 가능 여부를 검사하는 함수
+		function checkUserIdAvailability() {
+			var userId = userIdInput.value;
+			if (userId.length > 0) {
+				$.ajax({
+					url: '/check-userid-availability',
+					type: 'GET',
+					data: { userId: userId },
+					success: function(response) {
+						isUserIdAvailable = response.isAvailable; // 전역 변수 업데이트
+						availabilityDiv.textContent = response.isAvailable ? "사용 가능한 아이디입니다." : "이미 사용 중인 아이디입니다.";
+						availabilityDiv.style.color = response.isAvailable ? "green" : "red";
+					},
+					error: function() {
+						availabilityDiv.textContent = "아이디 확인 중 에러가 발생했습니다.";
+						availabilityDiv.style.color = "red";
+					}
+				});
+			} else {
+				availabilityDiv.textContent = "";
+			}
 		}
 	});
 </script>
+
+
+
+
 <!--end::Root-->
 <!--begin::Javascript-->
 <script>var hostUrl = "/assets/";</script>

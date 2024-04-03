@@ -30,12 +30,13 @@ public class SecurityConfig {
                         //.requestMatchers("/**").hasAuthority("ROLE_EMPLOYEE")
                         //.requestMatchers("/superuser/**").hasAuthority("ROLE_SUPERUSER")
                         .requestMatchers("/empl/dashboard-employee").hasAuthority("ROLE_EMPLOYEE")
-                        .requestMatchers("/encrypt-passwords", "/encryption","/check-userid-availability").permitAll() // 여기에 /encryption 추가
+                        .requestMatchers("/encrypt-passwords", "/encryption","/check-userid-availability","/apply-userid").permitAll() // 여기에 /encryption 추가
 
                         .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginPage("/login")
                         .usernameParameter("userId")  // 'userId'로 사용자 이름 파라미터 설정
+
                         .failureHandler(ajaxAuthenticationFailureHandler)  // 여기에 핸들러 추가
                         .failureHandler(customAuthenticationFailureHandler)
                         .successHandler(customSuccessHandler) // 로그인 성공 핸들러
