@@ -5,16 +5,27 @@ public class UserInfo {
     private String password;
     private String userName;
     private String  gubn;
+
+    private String companyName;
     // 기본 생성자
     public UserInfo() {
     }
 
     // 모든 필드를 포함하는 생성자
-    public UserInfo(String userId, String password,String userName , String gubn) {
+    public UserInfo(String userId, String password,String userName , String gubn,String companyName) {
         this.userId = userId;
         this.password = password;
         this.userName = userName;
         this.gubn = gubn;
+        this.companyName = companyName;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
 
     public String getGubn() {

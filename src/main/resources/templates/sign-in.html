@@ -249,7 +249,7 @@
 							<div class="col-lg-8">
 								<div class="row">
 									<div class="col-lg-10 fv-row">
-										<input type="password" name="pass22" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" />
+										<input type="password" name="pass2" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" />
 									</div>
 
 								</div>
@@ -292,16 +292,22 @@
 		var csrfHeaderName = $("meta[name='_csrf_header']").attr("content");
 
 		var userIdInput = document.querySelector('[name="appUserId"]');
+
+		var passwordInput = document.querySelector('[name="pass1"]');
+		var confirmPasswordInput = document.querySelector('[name="pass2"]');
+
 		var userNameInput = document.querySelector('[name="fname"]');
 		var applyButton = document.getElementById('applyUserIdButton');
 		var availabilityDiv = document.getElementById('userIdAvailability');
 		var companyNameRow = document.getElementById('companyNameRow');
 		var isUserIdAvailable = false; // 사용자 ID 사용 가능 여부를 저장하는 변수
+		let gubn ="";
+
 
 		$(document).ready(function() {
 		// 모달 창이 열릴 때의 로직을 설정합니다.
 			$('[data-bs-toggle="modal"]').on('click', function() {
-				const gubn = $(this).attr('data-gubn');
+				gubn = $(this).attr('data-gubn');
 				// gubn 값에 따라 업체명 입력 필드의 표시 여부를 결정합니다.
 				if(gubn === "0") {
 					$('#companyNameRow').show();
@@ -317,18 +323,37 @@
 		});
 
 		userIdInput.addEventListener('keyup', function(event) {
+
 			checkReg(event);
 			checkUserIdAvailability();
+		});
+
+// 비밀번호 검증 함수
+
+// 이벤트 리스너 등록
+		passwordInput.addEventListener('keyup', function(event) {
+
+			checkReg(event);
+		});
+		confirmPasswordInput.addEventListener('keyup', function(event) {
+
+			checkReg(event);
 		});
 
 		applyButton.addEventListener('click', function() {
 			var userId = userIdInput.value;
 			var userName = userNameInput.value;
 			var password = document.querySelector('[name="pass1"]').value;
-			var passwordConfirm = document.querySelector('[name="pass22"]').value;
-			var gubn = $('#gubn').val();
-			var companyName = (gubn === "0") ? document.querySelector('[name="companyName"]').value : "";
+			var passwordConfirm = document.querySelector('[name="pass2"]').value;
 
+			var companyName = (gubn === "0") ? document.querySelector('[name="companyName"]').value : "";
+			console.log("gubn==="+gubn);
+			console.log("companyName==="+companyName);
+			// 필수 입력 값 확인
+			if (!userName.trim() || !userId.trim() || !password.trim() || !passwordConfirm.trim() || (gubn === "0" && !companyName.trim())) {
+				alert('모든 필수 입력 항목을 채워주세요.');
+				return; // 필수 입력 값 중 하나라도 빠져있다면 함수 실행을 중지
+			}
 			if (!isUserIdAvailable) {
 				alert("이미 사용 중인 아이디입니다. 다른 아이디를 입력해주세요.");
 				userIdInput.focus();
@@ -339,12 +364,13 @@
 				alert('비밀번호가 일치하지 않습니다.');
 				return;
 			}
-
-			// 필수 입력 값 확인
-			if (!userName.trim() || !userId.trim() || !password.trim() || !passwordConfirm.trim() || (gubn === "0" && !companyName.trim())) {
-				alert('모든 필수 입력 항목을 채워주세요.');
-				return; // 필수 입력 값 중 하나라도 빠져있다면 함수 실행을 중지
+			// Check password length and character content
+			if (password.length < 8 || !/^[A-Za-z0-9]+$/.test(password)) {
+				alert('비밀번호는 8자 이상이며 영문 대소문자와 숫자만 포함할 수 있습니다.');
+				return;
 			}
+
+
 			// Ajax 요청 부분
 			$.ajax({
 				url: '/apply-userid',
@@ -368,8 +394,11 @@
 
 		// 입력값 검증 함수
 		function checkReg(event) {
-			const regExp = /[^0-9a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣]/g; // 영문, 숫자, 한글만 허용
+			console.log(event.target.value);
+
+			const regExp = /[^0-9a-zA-Z]/g; // 영문과 숫자만 허용
 			if (regExp.test(event.target.value)) {
+				console.log("2");
 				event.target.value = event.target.value.replace(regExp, '');
 				alert("영문, 숫자, 한글만 입력 가능합니다.");
 			}
