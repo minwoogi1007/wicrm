@@ -21,6 +21,7 @@ public class LoginService {
         System.out.println(userInfo);
 
         userMapper.insertUser(userInfo);
+
         // gubn에 따른 처리 로직
         if (userInfo.getGubn().equals("0")) {
             // 업체 직원인 경우

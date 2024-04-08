@@ -36,7 +36,7 @@
                     <div id="menuList"></div>
 
                     <script th:inline="javascript">
-                        /*<![CDATA[*/
+                            /*<![CDATA[*/
                         const menuList = [[${session.USER_MENUS}]];
                         /*]]>*/
                         let menu_s=0;
@@ -46,154 +46,117 @@
                         let html = '';
                         menuList.forEach(function(item,index) {
 
-                            if( item.MENU_DIV =='M'){
-                                if(index !== 0 ){
-                                    html +='</div></div></div></div></div>\n';
-                                }
-                                html +='</div><div  id ="'+item.MENU_NM+'" data-kt-menu-trigger="click" class="menu-item menu-accordion">';
+                        if( item.MENU_DIV =='M'){
+                        if(index !== 0 ){
+                        html +='</div></div></div></div></div>\n';
+                    }
+                        html +='</div><div  id ="'+item.MENU_NM+'" data-kt-menu-trigger="click" class="menu-item menu-accordion">';
 
-                                html +='<span class="menu-link">\n';
-                                html +='<span class="menu-icon">\n';
-                                if(item.MENU_CD =='1010000'){
-                                    html +='<i class="ki-duotone ki-code fs-2">\n' ;
-                                }else if(item.MENU_CD =='1020000'){
-                                    html +='<i class="ki-duotone ki-user fs-2">\n' ;
-                                }else if(item.MENU_CD =='1030000'){
-                                    html +='<i class="ki-duotone ki-bank fs-2">\n' ;
-                                }else if(item.MENU_CD =='1040000'){
-                                    html +='<i class="ki-duotone ki-wallet fs-2">\n' ;
-                                }else if(item.MENU_CD =='1050000'){
-                                    html +='<i class="ki-duotone ki-abstract-36 fs-2">\n' ;
-                                }else if(item.MENU_CD =='1060000'){
-                                    html +='<i class="ki-duotone ki-profile-user fs-2">\n' ;
-                                }else if(item.MENU_CD =='1030000'){
-                                    html +='<i class="ki-duotone ki-lock-2 fs-2">\n' ;
-                                }else if(item.MENU_CD =='1070000'){
-                                    html +='<i class="ki-duotone ki-phone fs-2">\n' ;
-                                }else if(item.MENU_CD =='1080000'){
-                                    html +='<i class="ki-duotone ki-chart-simple-3 fs-2">\n' ;
-                                }else if(item.MENU_CD =='1135'){
-                                    html +='<i class="ki-duotone ki-user-edit  fs-2">\n' ;
-                                }else if(item.MENU_CD =='1090000'){
-                                    html +='<i class="ki-duotone ki-subtitle fs-2">\n' ;
-                                }else if(item.MENU_CD =='1186'){
-                                    html +='<i class="ki-duotone ki-abstract-11 fs-2">\n' ;
-                                }
+                        html +='<span class="menu-link">\n';
+                        html +='<span class="menu-icon">\n';
+                        if(item.MENU_CD =='1010000'){
+                        html +='<i class="ki-duotone ki-code fs-2">\n' ;
+                    }else if(item.MENU_CD =='1020000'){
+                        html +='<i class="ki-duotone ki-user fs-2">\n' ;
+                    }else if(item.MENU_CD =='1030000'){
+                        html +='<i class="ki-duotone ki-bank fs-2">\n' ;
+                    }else if(item.MENU_CD =='1040000'){
+                        html +='<i class="ki-duotone ki-wallet fs-2">\n' ;
+                    }else if(item.MENU_CD =='1050000'){
+                        html +='<i class="ki-duotone ki-abstract-36 fs-2">\n' ;
+                    }else if(item.MENU_CD =='1060000'){
+                        html +='<i class="ki-duotone ki-profile-user fs-2">\n' ;
+                    }else if(item.MENU_CD =='1030000'){
+                        html +='<i class="ki-duotone ki-lock-2 fs-2">\n' ;
+                    }else if(item.MENU_CD =='1070000'){
+                        html +='<i class="ki-duotone ki-phone fs-2">\n' ;
+                    }else if(item.MENU_CD =='1080000'){
+                        html +='<i class="ki-duotone ki-chart-simple-3 fs-2">\n' ;
+                    }else if(item.MENU_CD =='1135'){
+                        html +='<i class="ki-duotone ki-user-edit  fs-2">\n' ;
+                    }else if(item.MENU_CD =='1090000'){
+                        html +='<i class="ki-duotone ki-subtitle fs-2">\n' ;
+                    }else if(item.MENU_CD =='1186'){
+                        html +='<i class="ki-duotone ki-abstract-11 fs-2">\n' ;
+                    }
 
-                                html +='<span class="path1"></span>\n' +
-                                    '<span class="path2"></span>\n' +
-                                    '<span class="path3"></span>\n' +
-                                    '<span class="path4"></span>\n' +
-                                    '</i>\n' +
-                                    '</span>\n' +
-                                    '<span class="menu-title fw-bolder ">'+item.MENU_NM+'</span>\n' +
-                                    '<span class="menu-arrow"></span>\n' +
-                                    '</span>\n' +
-                                    '<div class="menu-sub menu-sub-accordion">';
-                                menu_s=0;
-                            }else if(item.MENU_DIV=='L'){
+                        html +='<span class="path1"></span>\n' +
+                        '<span class="path2"></span>\n' +
+                        '<span class="path3"></span>\n' +
+                        '<span class="path4"></span>\n' +
+                        '</i>\n' +
+                        '</span>\n' +
+                        '<span class="menu-title fw-bolder ">'+item.MENU_NM+'</span>\n' +
+                        '<span class="menu-arrow"></span>\n' +
+                        '</span>\n' +
+                        '<div class="menu-sub menu-sub-accordion">';
+                        menu_s=0;
+                    }else if(item.MENU_DIV=='L'){
+                            if(menu_s==0){
+                        html +='<div id ="'+item.MENU_NM+'" data-kt-menu-trigger="click" class="menu-item menu-accordion">';
+                        }else{
+                            html +='</div><div id ="'+item.MENU_NM+'" data-kt-menu-trigger="click" class="menu-item menu-accordion">';
+                        }
+                            html +='<span class="menu-link">\n' +
 
-                                if(menu_s==0){
-                                    html +='<div id ="'+item.MENU_NM+'" data-kt-menu-trigger="click" class="menu-item menu-accordion">';
-                                }else{
-                                    html +='</div><div id ="'+item.MENU_NM+'" data-kt-menu-trigger="click" class="menu-item menu-accordion">';
-                                }
-                                html +='<span class="menu-link">\n' +
+                            '<span class="menu-bullet">\n' +
+                            '<span class="bullet bullet-dot"></span>\n' +
+                            '</span>\n' +
+                            '<span class="menu-title">'+item.MENU_NM+'</span>\n' +
+                            '<span class="menu-arrow"></span>'+
+                            '</span>';
+                            menu_s++;
+                            menu_b=0;
+                    }else if(item.MENU_DIV=='C'){
 
-                                    '<span class="menu-bullet">\n' +
-                                    '<span class="bullet bullet-dot"></span>\n' +
-                                    '</span>\n' +
-                                    '<span class="menu-title">'+item.MENU_NM+'</span>\n' +
-                                    '<span class="menu-arrow"></span>'+
-                                    '</span>';
-                                menu_s++;
-                                menu_b=0;
-                            }else if(item.MENU_DIV=='C'){
+                        if(menu_b==0){
 
-                                if(menu_b==0){
+                        html +='<div class="menu-sub menu-sub-accordion">';
+                    }
+                        html +='<div  class="menu-item">\n'+
+                        '<a class="menu-link" href="' + item.PROG_NM + '">\n' +
+                        '<span class="menu-bullet">\n' +
+                        '<span class="bullet bullet-dot"></span>\n' +
+                        '</span>\n' +
+                        '<span class="menu-title">'+item.MENU_NM+'</span>\n' +
+                        '</a>\n' +
+                        '</div>';
+                        menu_b++;
+                    }
 
-                                    html +='<div class="menu-sub menu-sub-accordion">';
-                                }
-                                html +='<div  class="menu-item">\n'+
-                                    '<a class="menu-link" href="' + item.PROG_NM + '">\n' +
-                                    '<span class="menu-bullet">\n' +
-                                    '<span class="bullet bullet-dot"></span>\n' +
-                                    '</span>\n' +
-                                    '<span class="menu-title">'+item.MENU_NM+'</span>\n' +
-                                    '</a>\n' +
-                                    '</div>';
-                                menu_b++;
-                            }
-
-                        });
+                    });
                         menu_s=0;
                         menu_b=0;
                         html +='</div></div></div></div>';
+                    //console.log(html);
+                    document.getElementById('menuList').innerHTML = html;
 
-                        document.getElementById('menuList').innerHTML = html;
+                            document.addEventListener('DOMContentLoaded', function() {
+                                // 현재 페이지의 URL 경로와 쿼리 스트링을 포함하여 가져옵니다.
+                                const currentPath = window.location.pathname + window.location.search;
+                                console.log(currentPath);
+                                // 현재 URL과 일치하는 모든 메뉴 링크를 찾습니다.
+                                const activeLinks = document.querySelectorAll(`.menu-item a[href="${currentPath}"]`);
+                                console.log(activeLinks);
+                                // 해당 링크가 존재하면 실행
+                                activeLinks.forEach(activeLink => {
+                                    // 가장 가까운 소메뉴 아이템에 'active' 클래스를 추가합니다.
+                                    activeLink.classList.add('active');
 
-
-                        // 메뉴 링크에 클릭 이벤트 리스너 추가
-                        document.querySelectorAll('.menu-link').forEach(link => {
-                            link.addEventListener('click', function() {
-                                const menuPath = this.getAttribute('href');// 현재 클릭된 항목에서 가장 가까운 .menu-item.menu-accordion 찾기
-                                const menuName = this.querySelector('.menu-title').textContent;
-
-                                const closestMenuAccordion = this.closest('.menu-item.menu-accordion');
-                                // 두 단계 위의 .menu-item.menu-accordion 찾기
-                                const parentMenuAccordion = closestMenuAccordion.parentElement.closest('.menu-item.menu-accordion');
-
-                                // 선택된 메뉴 정보를 localStorage에 저장
-                                localStorage.setItem('activeMenuPath', menuPath);
-                                localStorage.setItem('menuName', menuName); // 클릭된 메뉴의 아이디 값 저장
-
-                                if (closestMenuAccordion) {
-                                    localStorage.setItem('activeSubMenuId', closestMenuAccordion.id || closestMenuAccordion.getAttribute('data-id'));
-                                }
-                                if (parentMenuAccordion) {
-                                    localStorage.setItem('activeMainMenuId', parentMenuAccordion.id || parentMenuAccordion.getAttribute('data-id'));
-                                }
-                            });
-                        });
-
-
-                        // 페이지 로딩 시 저장된 메뉴 활성화
-                        document.addEventListener('DOMContentLoaded', () => {
-                            const activeMenuPath = localStorage.getItem('activeMenuPath');
-                            const activeSubMenuId  = localStorage.getItem('activeSubMenuId');
-                            const activeMainMenuId  = localStorage.getItem('activeMainMenuId');
-
-                            if (activeMenuPath) {
-                                document.querySelectorAll('.menu-link').forEach(link => {
-                                    if (link.getAttribute('href') === activeMenuPath) {
-                                        link.classList.add('active'); // 현재 선택된 메뉴 항목 활성화
+                                    // 상위 메뉴 아이템들에 대해 'here'와 'show' 클래스를 추가합니다.
+                                    let parent = activeLink.closest('.menu-sub-accordion');
+                                    while (parent) {
+                                        const parentItem = parent.closest('.menu-item.menu-accordion');
+                                        if (parentItem) {
+                                            parentItem.classList.add('here', 'show');
+                                            // 상위 메뉴 아이템을 찾기 위해 다시 설정합니다.
+                                            parent = parentItem.closest('.menu-sub-accordion');
+                                        } else {
+                                            break; // 상위 메뉴 아이템이 없으면 종료합니다.
+                                        }
                                     }
                                 });
-                            }
-
-                            if (activeSubMenuId) {
-                                const activeSubMenu = document.getElementById(activeSubMenuId) || document.querySelector(`[data-id="${activeSubMenuId}"]`);
-                                if (activeSubMenu) {
-                                    // 여기서 필요한 클래스 추가
-                                    activeSubMenu.classList.add('here', 'show');
-                                }
-                            }
-
-                            if (activeMainMenuId) {
-                                const activeMainMenu = document.getElementById(activeMainMenuId) || document.querySelector(`[data-id="${activeMainMenuId}"]`);
-                                if (activeMainMenu) {
-                                    // 여기서 필요한 클래스 추가
-                                    activeMainMenu.classList.add('here', 'show');
-                                }
-                            }
-
-                                localStorage.removeItem('activeMenuPath');
-                                localStorage.removeItem('activeSubMenuId');
-                                localStorage.removeItem('activeMainMenuId');
-
-                        });
-
-
+                            });;
                     </script>
 
 
