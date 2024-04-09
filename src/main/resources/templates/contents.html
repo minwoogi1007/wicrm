@@ -1,10 +1,8 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-    layout:decorate="~{/main}">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{/main}">
 
 <div layout:fragment="content">
-        <!--begin::Content wrapper-->
+    <!--begin::Content wrapper-->
     <div class="d-flex flex-column flex-column-fluid">
         <!--begin::Toolbar-->
         <th:block th:replace="~{/fragments/pageHeader :: pageHeader}"></th:block>
@@ -21,17 +19,17 @@
                     <!--begin::Col-->
                     <div class="col-md-6 col-lg-6 col-xl-6 col-xxl-3 mb-md-5 mb-xl-10">
                         <!--begin::Card widget 20-->
-                        <div id="card-data-1" class="card card-flush bgi-no-repeat bgi-size-contain bgi-position-x-end h-md-50 mb-5 mb-xl-10" style="background-color: #3E97FF;background-image:url('/assets/media/svg/shapes/widget-bg-1.png')" >
+                        <div id="card-data-1" class="card card-flush bgi-no-repeat bgi-size-contain bgi-position-x-end h-md-50 mb-5 mb-xl-10" style="background-color: #3E97FF;background-image:url('/assets/media/svg/shapes/widget-bg-1.png')">
 
                             <!--begin::Header-->
                             <div class="card-header pt-5">
                                 <!--begin::Title-->
                                 <div class="card-title d-flex flex-column">
                                     <!--begin::Amount-->
-                                    <span  id="count-sum-card-data-1" class="fs-2hx fw-bold text-white me-2 lh-1 ls-n2"></span>
+                                    <span id="count-sum-card-data-1" class="fs-2hx fw-bold text-white me-2 lh-1 ls-n2"></span>
                                     <!--end::Amount-->
                                     <!--begin::Subtitle-->
-                                    <span  class="text-white opacity-75 pt-1 fw-semibold fs-6">Call</span>
+                                    <span class="text-white opacity-75 pt-1 fw-semibold fs-6">Call</span>
                                     <!--end::Subtitle-->
                                 </div>
                                 <!--end::Title-->
@@ -42,11 +40,11 @@
                                 <!--begin::Progress-->
                                 <div class="d-flex align-items-center flex-column mt-3 w-100">
                                     <div class="d-flex justify-content-between fw-bold fs-6 text-white opacity-75 w-100 mt-auto mb-2">
-                                        <span id="count-com-card-data-1" ></span>
-                                        <span id="count-rate-card-data-1" ></span>
+                                        <span id="count-com-card-data-1"></span>
+                                        <span id="count-rate-card-data-1"></span>
                                     </div>
                                     <div class="h-8px mx-3 w-100 bg-white bg-opacity-50 rounded">
-                                        <div class="bg-white rounded h-8px progress-bar " role="progressbar"  aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div class="bg-white rounded h-8px progress-bar " role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
                                 </div>
                                 <!--end::Progress-->
@@ -94,7 +92,7 @@
 
                                         </div>
                                         <!--begin::Number-->
-                                        <span id="count-todayCom-card-data-3"class="text-gray-900 fw-bolder fs-6"></span>
+                                        <span id="count-todayCom-card-data-3" class="text-gray-900 fw-bolder fs-6"></span>
                                         <!--end::Number-->
                                         <span id="count-yesterdayCom-card-data-3" class="text-gray-500 fw-bold fs-6"></span>
 
@@ -122,7 +120,7 @@
 
                                         </div>
                                         <!--begin::Number-->
-                                        <span id="count-todayMiss-card-data-3"class="text-gray-900 fw-bolder fs-6"></span>
+                                        <span id="count-todayMiss-card-data-3" class="text-gray-900 fw-bolder fs-6"></span>
                                         <!--end::Number-->
                                         <span id="count-yesterdayMiss-card-data-3" class="text-gray-500 fw-bold fs-6"></span>
                                         <button type="button" class="btn btn-icon btn-sm h-auto btn-color-gray-500 btn-active-color-primary justify-content-end">
@@ -150,7 +148,7 @@
 
                                         </div>
                                         <!--begin::Number-->
-                                        <span id="count-todayEme-card-data-3"class="text-gray-900 fw-bolder fs-6"></span>
+                                        <span id="count-todayEme-card-data-3" class="text-gray-900 fw-bolder fs-6"></span>
                                         <!--end::Number-->
                                         <span id="count-yesterdayEme-card-data-3" class="text-gray-500 fw-bold fs-6"></span>
                                         <button type="button" class="btn btn-icon btn-sm h-auto btn-color-gray-500 btn-active-color-primary justify-content-end">
@@ -174,7 +172,7 @@
                     <div class="col-md-6 col-lg-6 col-xl-6 col-xxl-3 mb-md-5 mb-xl-10">
                         <!--begin::Card widget 17-->
                         <!-- 오늘 비용 계산-->
-                        <div  class="card card-flush h-md-50 mb-5 mb-xl-10">
+                        <div class="card card-flush h-md-50 mb-5 mb-xl-10">
                             <!--begin::Header-->
                             <div id="card-data-2" class="card-header pt-5">
                                 <!--begin::Title-->
@@ -188,10 +186,10 @@
                                         <!--end::Amount-->
                                         <!--begin::Badge-->
                                         <span id="count-per-card-data-2" class="badge badge-light-success fs-base">
-                                                            <i class="ki-duotone ki-arrow-up fs-5 text-success ms-n1">
-                                                                <span class="path1"></span>
-                                                                <span class="path2"></span>
-                                                            </i></span>
+                                            <i class="ki-duotone ki-arrow-up fs-5 text-success ms-n1">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                            </i></span>
                                         <!--end::Badge-->
                                     </div>
                                     <!--end::Info-->
@@ -209,7 +207,7 @@
                                 </div>
                                 <!--end::Chart-->
                                 <!--begin::Labels-->
-                                <div id ="pointlist"  class="d-flex flex-column content-justify-center flex-row-fluid">
+                                <div id="pointlist" class="d-flex flex-column content-justify-center flex-row-fluid">
                                     <!--begin::Label-->
 
                                     <!--end::Label-->
@@ -233,7 +231,7 @@
                                         <!--end::Amount-->
                                         <!--begin::Badge-->
 
-                                        <span  id="percentColor" class="badge badge-light-su fs-base">
+                                        <span id="percentColor" class="badge badge-light-su fs-base">
                                             <div id="directionIcon"></div>
                                             <span id="percent"></span>
 
@@ -254,11 +252,11 @@
                                 <!--begin::Progress-->
                                 <div class="d-flex align-items-center flex-column mt-3 w-100">
                                     <div class="d-flex justify-content-between w-100 mt-auto mb-2">
-                                        <span  id="thisMonth" class="fw-bolder fs-6 text-gray-900"></span>
-                                        <span  id="percentChange" class="fw-bold fs-6 text-gray-500"></span>
+                                        <span id="thisMonth" class="fw-bolder fs-6 text-gray-900"></span>
+                                        <span id="percentChange" class="fw-bold fs-6 text-gray-500"></span>
                                     </div>
                                     <div class="h-8px mx-3 w-100 bg-light-success rounded">
-                                        <div id ="progressbarMonth" class="bg-success rounded h-8px" role="progressbar"  aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div id="progressbarMonth" class="bg-success rounded h-8px" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
                                 </div>
                                 <!--end::Progress-->
@@ -275,7 +273,7 @@
                                 <!--begin::Title-->
                                 <h3 class="card-title align-items-start flex-column">
                                     <span class="card-label fw-bolder text-gray-900">시간대별 인입</span>
-                                    <span id="callSum"class="text-gray-500 mt-1 fw-semibold fs-6"></span>
+                                    <span id="callSum" class="text-gray-500 mt-1 fw-semibold fs-6"></span>
                                 </h3>
                                 <!--end::Title-->
                                 <!--begin::Toolbar-->
@@ -312,428 +310,428 @@
                 <!--begin::Row-->
                 <div th:if="${dataForA}">
                     <div class="row g-5 g-xl-10">
-                    <!--begin::Col-->
-                    <div class="col-xxl-4 mb-5 mb-xl-10" >
-                        <div class="card card-flush h-xl-100">
-                            <!--begin::Heading-->
-                            <div class="card-header rounded bgi-no-repeat bgi-size-cover bgi-position-y-top bgi-position-x-center align-items-start h-250px" style="background-image:url('/assets/media/svg/shapes/top-green.png')" data-bs-theme="light">
-                                <!--begin::Title-->
-                                <h3 class="card-title align-items-start flex-column text-white pt-15">
-                                    <span class="fw-bold fs-2 mb-1">마일리지 현황</span>
+                        <!--begin::Col-->
+                        <div class="col-xxl-4 mb-5 mb-xl-10">
+                            <div class="card card-flush h-xl-100">
+                                <!--begin::Heading-->
+                                <div class="card-header rounded bgi-no-repeat bgi-size-cover bgi-position-y-top bgi-position-x-center align-items-start h-250px" style="background-image:url('/assets/media/svg/shapes/top-green.png')" data-bs-theme="light">
+                                    <!--begin::Title-->
+                                    <h3 class="card-title align-items-start flex-column text-white pt-15">
+                                        <span class="fw-bold fs-2 mb-1">마일리지 현황</span>
 
-                                </h3>
-                                <!--end::Title-->
-                                <!--begin::Toolbar-->
+                                    </h3>
+                                    <!--end::Title-->
+                                    <!--begin::Toolbar-->
 
-                                <!--end::Toolbar-->
-                            </div>
-                            <!--end::Heading-->
-                            <!--begin::Body-->
-                            <div class="card-body mt-n20">
-                                <!--begin::Stats-->
-                                <div class="mt-n20 position-relative">
-                                    <!--begin::Row-->
-                                    <div class="row g-3 g-lg-6">
-                                        <!--begin::Col-->
-                                        <div class="col-6">
-                                            <!--begin::Items-->
-                                            <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5">
-                                                <!--begin::Symbol-->
-                                                <div class="symbol symbol-30px me-5 mb-8">
-                                                    <span class="symbol-label">
-                                                        <div id="todayDate"></div>
-                                                    </span>
+                                    <!--end::Toolbar-->
+                                </div>
+                                <!--end::Heading-->
+                                <!--begin::Body-->
+                                <div class="card-body mt-n20">
+                                    <!--begin::Stats-->
+                                    <div class="mt-n20 position-relative">
+                                        <!--begin::Row-->
+                                        <div class="row g-3 g-lg-6">
+                                            <!--begin::Col-->
+                                            <div class="col-6">
+                                                <!--begin::Items-->
+                                                <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5">
+                                                    <!--begin::Symbol-->
+                                                    <div class="symbol symbol-30px me-5 mb-8">
+                                                        <span class="symbol-label">
+                                                            <div id="todayDate"></div>
+                                                        </span>
+                                                    </div>
+                                                    <!--end::Symbol-->
+                                                    <!--begin::Stats-->
+                                                    <div class="m-0">
+                                                        <!--begin::Number-->
+                                                        <span id="DPOINTUSEDAY" class="text-gray-700 fw-bolder d-block fs-2 lh-1 ls-n1 mb-1"></span>
+                                                        <!--end::Number-->
+                                                        <!--begin::Desc-->
+                                                        <span class="text-gray-500 fw-semibold fs-8">오늘</span>
+                                                        <!--end::Desc-->
+                                                    </div>
+                                                    <!--end::Stats-->
                                                 </div>
-                                                <!--end::Symbol-->
-                                                <!--begin::Stats-->
-                                                <div class="m-0">
-                                                    <!--begin::Number-->
-                                                    <span id="DPOINTUSEDAY" class="text-gray-700 fw-bolder d-block fs-2 lh-1 ls-n1 mb-1"></span>
-                                                    <!--end::Number-->
-                                                    <!--begin::Desc-->
-                                                    <span class="text-gray-500 fw-semibold fs-8">오늘</span>
-                                                    <!--end::Desc-->
-                                                </div>
-                                                <!--end::Stats-->
+                                                <!--end::Items-->
                                             </div>
-                                            <!--end::Items-->
-                                        </div>
-                                        <!--end::Col-->
-                                        <!--begin::Col-->
-                                        <div class="col-6">
-                                            <!--begin::Items-->
-                                            <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5">
-                                                <!--begin::Symbol-->
-                                                <div class="symbol symbol-30px me-5 mb-8">
-                                                    <span class="symbol-label">
-                                                        <div id="thisWeek"></div>
-                                                    </span>
+                                            <!--end::Col-->
+                                            <!--begin::Col-->
+                                            <div class="col-6">
+                                                <!--begin::Items-->
+                                                <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5">
+                                                    <!--begin::Symbol-->
+                                                    <div class="symbol symbol-30px me-5 mb-8">
+                                                        <span class="symbol-label">
+                                                            <div id="thisWeek"></div>
+                                                        </span>
+                                                    </div>
+                                                    <!--end::Symbol-->
+                                                    <!--begin::Stats-->
+                                                    <div class="m-0">
+                                                        <!--begin::Number-->
+                                                        <span id="DPOINTUSEWEEK" class="text-gray-700 fw-bolder d-block fs-2 lh-1 ls-n1 mb-1"></span>
+                                                        <!--end::Number-->
+                                                        <!--begin::Desc-->
+                                                        <span class="text-gray-500 fw-semibold fs-8">이번주</span>
+                                                        <!--end::Desc-->
+                                                    </div>
+                                                    <!--end::Stats-->
                                                 </div>
-                                                <!--end::Symbol-->
-                                                <!--begin::Stats-->
-                                                <div class="m-0">
-                                                    <!--begin::Number-->
-                                                    <span id="DPOINTUSEWEEK" class="text-gray-700 fw-bolder d-block fs-2 lh-1 ls-n1 mb-1"></span>
-                                                    <!--end::Number-->
-                                                    <!--begin::Desc-->
-                                                    <span class="text-gray-500 fw-semibold fs-8">이번주</span>
-                                                    <!--end::Desc-->
-                                                </div>
-                                                <!--end::Stats-->
+                                                <!--end::Items-->
                                             </div>
-                                            <!--end::Items-->
-                                        </div>
-                                        <!--end::Col-->
-                                        <!--begin::Col-->
-                                        <div class="col-6">
-                                            <!--begin::Items-->
-                                            <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5">
-                                                <!--begin::Symbol-->
-                                                <div class="symbol symbol-30px me-5 mb-8">
-                                                <span class="symbol-label">
-                                                    <div id="currentMonth"></div>
-                                                </span>
+                                            <!--end::Col-->
+                                            <!--begin::Col-->
+                                            <div class="col-6">
+                                                <!--begin::Items-->
+                                                <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5">
+                                                    <!--begin::Symbol-->
+                                                    <div class="symbol symbol-30px me-5 mb-8">
+                                                        <span class="symbol-label">
+                                                            <div id="currentMonth"></div>
+                                                        </span>
+                                                    </div>
+                                                    <!--end::Symbol-->
+                                                    <!--begin::Stats-->
+                                                    <div class="m-0">
+                                                        <!--begin::Number-->
+                                                        <span id="DPOINTCHARGE" class="text-gray-700 fw-bolder d-block fs-2 lh-1 ls-n1 mb-1"></span>
+                                                        <!--end::Number-->
+                                                        <!--begin::Desc-->
+                                                        <span class="text-gray-500 fw-semibold fs-8">충전</span>
+                                                        <!--end::Desc-->
+                                                    </div>
+                                                    <!--end::Stats-->
                                                 </div>
-                                                <!--end::Symbol-->
-                                                <!--begin::Stats-->
-                                                <div class="m-0">
-                                                    <!--begin::Number-->
-                                                    <span id="DPOINTCHARGE" class="text-gray-700 fw-bolder d-block fs-2 lh-1 ls-n1 mb-1"></span>
-                                                    <!--end::Number-->
-                                                    <!--begin::Desc-->
-                                                    <span class="text-gray-500 fw-semibold fs-8">충전</span>
-                                                    <!--end::Desc-->
-                                                </div>
-                                                <!--end::Stats-->
+                                                <!--end::Items-->
                                             </div>
-                                            <!--end::Items-->
-                                        </div>
-                                        <!--end::Col-->
-                                        <!--begin::Col-->
-                                        <div class="col-6">
-                                            <!--begin::Items-->
-                                            <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5">
-                                                <!--begin::Symbol-->
-                                                <div class="symbol symbol-30px me-5 mb-8">
-                                                    <span class="symbol-label">
-                                                        잔여
-                                                    </span>
+                                            <!--end::Col-->
+                                            <!--begin::Col-->
+                                            <div class="col-6">
+                                                <!--begin::Items-->
+                                                <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5">
+                                                    <!--begin::Symbol-->
+                                                    <div class="symbol symbol-30px me-5 mb-8">
+                                                        <span class="symbol-label">
+                                                            잔여
+                                                        </span>
+                                                    </div>
+                                                    <script>
+                                                        document.addEventListener('DOMContentLoaded', function() {
+                                                            const monthNames = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
+                                                            // 현재 날짜 정보
+                                                            const currentDate = new Date();
+                                                            const currentMonth = monthNames[currentDate.getMonth()];
+                                                            const todayDate = currentDate.getDate() + '일';
+                                                            const now = new Date();
+                                                            const startOfYear = new Date(now.getFullYear(), 0, 1); // 올해의 시작
+                                                            const pastDaysOfYear = (now - startOfYear) / (24 * 60 * 60 * 1000); // 올해 지난 날짜 수
+                                                            const weekNumber = Math.ceil((pastDaysOfYear + startOfYear.getDay() + 1) / 7); // 올해의 몇 번째 주 계산
+
+                                                            // "이번주는 올해의 몇 번째 주" 설정
+                                                            document.getElementById('thisWeek').innerText = `${weekNumber}주`;
+                                                            // "이번 달" 설정
+                                                            document.getElementById('currentMonth').innerText = currentMonth;
+
+                                                            // "오늘" 설정
+                                                            document.getElementById('todayDate').innerText = todayDate;
+
+                                                            // "이번주" 범위 계산
+                                                            const startOfWeek = new Date(currentDate.setDate(currentDate.getDate() - currentDate.getDay() + 1));
+                                                            const endOfWeek = new Date(startOfWeek.getTime() + 6 * 24 * 60 * 60 * 1000);
+
+
+                                                        });
+                                                    </script>
+                                                    <!--end::Symbol-->
+                                                    <!--begin::Stats-->
+                                                    <div class="m-0">
+                                                        <!--begin::Number-->
+                                                        <span id="DPOINTSUM" class="text-gray-700 fw-bolder d-block fs-2 lh-1 ls-n1 mb-1"></span>
+                                                        <!--end::Number-->
+                                                        <!--begin::Desc-->
+                                                        <span class="text-gray-500 fw-semibold fs-8">마일리지</span>
+                                                        <!--end::Desc-->
+                                                    </div>
+                                                    <!--end::Stats-->
                                                 </div>
-                                                <script>
-                                                    document.addEventListener('DOMContentLoaded', function() {
-                                                        const monthNames = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
-                                                        // 현재 날짜 정보
-                                                        const currentDate = new Date();
-                                                        const currentMonth = monthNames[currentDate.getMonth()];
-                                                        const todayDate = currentDate.getDate()+'일';
-                                                        const now = new Date();
-                                                        const startOfYear = new Date(now.getFullYear(), 0, 1); // 올해의 시작
-                                                        const pastDaysOfYear = (now - startOfYear) / (24 * 60 * 60 * 1000); // 올해 지난 날짜 수
-                                                        const weekNumber = Math.ceil((pastDaysOfYear + startOfYear.getDay() + 1) / 7); // 올해의 몇 번째 주 계산
-
-                                                        // "이번주는 올해의 몇 번째 주" 설정
-                                                        document.getElementById('thisWeek').innerText = `${weekNumber}주`;
-                                                        // "이번 달" 설정
-                                                        document.getElementById('currentMonth').innerText = currentMonth ;
-
-                                                        // "오늘" 설정
-                                                        document.getElementById('todayDate').innerText = todayDate ;
-
-                                                        // "이번주" 범위 계산
-                                                        const startOfWeek = new Date(currentDate.setDate(currentDate.getDate() - currentDate.getDay() + 1));
-                                                        const endOfWeek = new Date(startOfWeek.getTime() + 6 * 24 * 60 * 60 * 1000);
-
-
-                                                    });
-                                                </script>
-                                                <!--end::Symbol-->
-                                                <!--begin::Stats-->
-                                                <div class="m-0">
-                                                    <!--begin::Number-->
-                                                    <span id="DPOINTSUM" class="text-gray-700 fw-bolder d-block fs-2 lh-1 ls-n1 mb-1"></span>
-                                                    <!--end::Number-->
-                                                    <!--begin::Desc-->
-                                                    <span class="text-gray-500 fw-semibold fs-8">마일리지</span>
-                                                    <!--end::Desc-->
-                                                </div>
-                                                <!--end::Stats-->
+                                                <!--end::Items-->
                                             </div>
-                                            <!--end::Items-->
+                                            <!--end::Col-->
                                         </div>
-                                        <!--end::Col-->
+                                        <!--end::Row-->
                                     </div>
-                                    <!--end::Row-->
+                                    <!--end::Stats-->
                                 </div>
-                                <!--end::Stats-->
+                                <!--end::Body-->
                             </div>
-                            <!--end::Body-->
                         </div>
-                    </div>
-                    <!--오늘 처리 건수-->
-                    <div class="col-xxl-8 mb-5 mb-xl-10">
-                        <!--begin::Chart widget 36-->
-                        <div class="card card-flush overflow-hidden h-md-100">
-                            <!--begin::Header-->
-                            <div class="card-header py-5">
-                                <!--begin::Title-->
-                                <h3 class="card-title align-items-start flex-column">
-                                    <span class="card-label fw-bold text-gray-900">마일리지</span>
-                                    <span class="text-gray-500 mt-1 fw-semibold fs-6">일별 사용 마일리지</span>
-                                </h3>
-                                <!--end::Title-->
-                                <!--begin::Toolbar-->
-                                <div class="card-toolbar">
-                                    <!--begin::Menu-->
-                                    <button class="btn btn-icon btn-color-gray-500 btn-active-color-primary justify-content-end" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-overflow="true">
-                                        <i class="ki-duotone ki-dots-square fs-1">
-                                            <span class="path1"></span>
-                                            <span class="path2"></span>
-                                            <span class="path3"></span>
-                                            <span class="path4"></span>
-                                        </i>
-                                    </button>
-                                    <!--begin::Menu 2-->
+                        <!--오늘 처리 건수-->
+                        <div class="col-xxl-8 mb-5 mb-xl-10">
+                            <!--begin::Chart widget 36-->
+                            <div class="card card-flush overflow-hidden h-md-100">
+                                <!--begin::Header-->
+                                <div class="card-header py-5">
+                                    <!--begin::Title-->
+                                    <h3 class="card-title align-items-start flex-column">
+                                        <span class="card-label fw-bold text-gray-900">마일리지</span>
+                                        <span class="text-gray-500 mt-1 fw-semibold fs-6">일별 사용 마일리지</span>
+                                    </h3>
+                                    <!--end::Title-->
+                                    <!--begin::Toolbar-->
+                                    <div class="card-toolbar">
+                                        <!--begin::Menu-->
+                                        <button class="btn btn-icon btn-color-gray-500 btn-active-color-primary justify-content-end" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-overflow="true">
+                                            <i class="ki-duotone ki-dots-square fs-1">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                                <span class="path3"></span>
+                                                <span class="path4"></span>
+                                            </i>
+                                        </button>
+                                        <!--begin::Menu 2-->
 
-                                    <!--end::Menu 2-->
-                                    <!--end::Menu-->
+                                        <!--end::Menu 2-->
+                                        <!--end::Menu-->
+                                    </div>
+                                    <!--end::Toolbar-->
                                 </div>
-                                <!--end::Toolbar-->
-                            </div>
-                            <!--end::Header-->
-                            <!--begin::Card body-->
-                            <div class="card-body d-flex justify-content-between flex-column pb-1 px-0">
-                                <!--begin::Statistics-->
-                                <div class="px-9 mb-5">
+                                <!--end::Header-->
+                                <!--begin::Card body-->
+                                <div class="card-body d-flex justify-content-between flex-column pb-1 px-0">
                                     <!--begin::Statistics-->
-                                    <div class="d-flex mb-2">
-                                        <span id="DPOINTUSE" class="fs-4 fw-semibold text-gray-500 me-1"></span>
-                                        <span class="fs-2hx fw-bold text-gray-800 me-2 lh-1 ls-n2"></span>
+                                    <div class="px-9 mb-5">
+                                        <!--begin::Statistics-->
+                                        <div class="d-flex mb-2">
+                                            <span id="DPOINTUSE" class="fs-4 fw-semibold text-gray-500 me-1"></span>
+                                            <span class="fs-2hx fw-bold text-gray-800 me-2 lh-1 ls-n2"></span>
+                                        </div>
+                                        <!--end::Statistics-->
+                                        <!--begin::Description-->
+                                        <span class="fs-6 fw-semibold text-gray-500"> </span>
+                                        <!--end::Description-->
                                     </div>
                                     <!--end::Statistics-->
-                                    <!--begin::Description-->
-                                    <span class="fs-6 fw-semibold text-gray-500"> </span>
-                                    <!--end::Description-->
+                                    <!--begin::Chart-->
+                                    <div id="kt_charts_widget_3" class="min-h-auto ps-4 pe-6" style="height: 300px"></div>
+                                    <!--end::Chart-->
                                 </div>
-                                <!--end::Statistics-->
-                                <!--begin::Chart-->
-                                <div id="kt_charts_widget_3" class="min-h-auto ps-4 pe-6" style="height: 300px"></div>
-                                <!--end::Chart-->
+                                <!--end::Card body-->
                             </div>
-                            <!--end::Card body-->
+                            <!--end::Chart widget 36-->
                         </div>
-                        <!--end::Chart widget 36-->
+                        <!--end::Col-->
+                        <!--begin::Col-->
+                        <!--end::Col-->
                     </div>
-                    <!--end::Col-->
-                    <!--begin::Col-->
-                    <!--end::Col-->
-                </div>
                 </div>
                 <!--end::Row-->
                 <!--begin::Row-->
                 <div th:if="${dataForB}">
                     <div class="row g-5 g-xl-10">
-                    <!--begin::Col-->
-                    <div class="col-xxl-4 mb-5 mb-xl-10">
-                        <div class="card card-flush h-xl-100">
-                            <!--begin::Heading-->
-                            <div class="card-header rounded bgi-no-repeat bgi-size-cover bgi-position-y-top bgi-position-x-center align-items-start h-250px" style="background-image:url('/assets/media/svg/shapes/top-green.png')" data-bs-theme="light">
-                                <!--begin::Title-->
-                                <h3 class="card-title align-items-start flex-column text-white pt-15">
-                                    <span class="fw-bold fs-2x mb-3">콜 현황</span>
+                        <!--begin::Col-->
+                        <div class="col-xxl-4 mb-5 mb-xl-10">
+                            <div class="card card-flush h-xl-100">
+                                <!--begin::Heading-->
+                                <div class="card-header rounded bgi-no-repeat bgi-size-cover bgi-position-y-top bgi-position-x-center align-items-start h-250px" style="background-image:url('/assets/media/svg/shapes/top-green.png')" data-bs-theme="light">
+                                    <!--begin::Title-->
+                                    <h3 class="card-title align-items-start flex-column text-white pt-15">
+                                        <span class="fw-bold fs-2x mb-3">콜 현황</span>
 
-                                </h3>
-                                <!--end::Title-->
-                                <!--begin::Toolbar-->
+                                    </h3>
+                                    <!--end::Title-->
+                                    <!--begin::Toolbar-->
 
-                                <!--end::Toolbar-->
-                            </div>
-                            <!--end::Heading-->
-                            <!--begin::Body-->
-                            <div class="card-body mt-n20">
-                                <!--begin::Stats-->
-                                <div class="mt-n20 position-relative">
-                                    <!--begin::Row-->
-                                    <div class="row g-3 g-lg-6">
-                                        <!--begin::Col-->
-                                        <div class="col-6">
-                                            <!--begin::Items-->
-                                            <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5">
-                                                <!--begin::Symbol-->
-                                                <div class="symbol symbol-30px me-5 mb-8">
+                                    <!--end::Toolbar-->
+                                </div>
+                                <!--end::Heading-->
+                                <!--begin::Body-->
+                                <div class="card-body mt-n20">
+                                    <!--begin::Stats-->
+                                    <div class="mt-n20 position-relative">
+                                        <!--begin::Row-->
+                                        <div class="row g-3 g-lg-6">
+                                            <!--begin::Col-->
+                                            <div class="col-6">
+                                                <!--begin::Items-->
+                                                <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5">
+                                                    <!--begin::Symbol-->
+                                                    <div class="symbol symbol-30px me-5 mb-8">
                                                         <span class="symbol-label">
                                                             <i class="ki-duotone ki-flask fs-1 text-primary">
                                                                 <span class="path1"></span>
                                                                 <span class="path2"></span>
                                                             </i>
                                                         </span>
+                                                    </div>
+                                                    <!--end::Symbol-->
+                                                    <!--begin::Stats-->
+                                                    <div class="m-0">
+                                                        <!--begin::Number-->
+                                                        <span class="text-gray-700 fw-bolder d-block fs-2qx lh-1 ls-n1 mb-1">37</span>
+                                                        <!--end::Number-->
+                                                        <!--begin::Desc-->
+                                                        <span class="text-gray-500 fw-semibold fs-6">일간</span>
+                                                        <!--end::Desc-->
+                                                    </div>
+                                                    <!--end::Stats-->
                                                 </div>
-                                                <!--end::Symbol-->
-                                                <!--begin::Stats-->
-                                                <div class="m-0">
-                                                    <!--begin::Number-->
-                                                    <span class="text-gray-700 fw-bolder d-block fs-2qx lh-1 ls-n1 mb-1">37</span>
-                                                    <!--end::Number-->
-                                                    <!--begin::Desc-->
-                                                    <span class="text-gray-500 fw-semibold fs-6">일간</span>
-                                                    <!--end::Desc-->
-                                                </div>
-                                                <!--end::Stats-->
+                                                <!--end::Items-->
                                             </div>
-                                            <!--end::Items-->
-                                        </div>
-                                        <!--end::Col-->
-                                        <!--begin::Col-->
-                                        <div class="col-6">
-                                            <!--begin::Items-->
-                                            <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5">
-                                                <!--begin::Symbol-->
-                                                <div class="symbol symbol-30px me-5 mb-8">
-                                                    <span class="symbol-label">
-                                                        <i class="ki-duotone ki-bank fs-1 text-primary">
-                                                            <span class="path1"></span>
-                                                            <span class="path2"></span>
-                                                        </i>
-                                                    </span>
+                                            <!--end::Col-->
+                                            <!--begin::Col-->
+                                            <div class="col-6">
+                                                <!--begin::Items-->
+                                                <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5">
+                                                    <!--begin::Symbol-->
+                                                    <div class="symbol symbol-30px me-5 mb-8">
+                                                        <span class="symbol-label">
+                                                            <i class="ki-duotone ki-bank fs-1 text-primary">
+                                                                <span class="path1"></span>
+                                                                <span class="path2"></span>
+                                                            </i>
+                                                        </span>
+                                                    </div>
+                                                    <!--end::Symbol-->
+                                                    <!--begin::Stats-->
+                                                    <div class="m-0">
+                                                        <!--begin::Number-->
+                                                        <span class="text-gray-700 fw-bolder d-block fs-2qx lh-1 ls-n1 mb-1">6</span>
+                                                        <!--end::Number-->
+                                                        <!--begin::Desc-->
+                                                        <span class="text-gray-500 fw-semibold fs-6">주간</span>
+                                                        <!--end::Desc-->
+                                                    </div>
+                                                    <!--end::Stats-->
                                                 </div>
-                                                <!--end::Symbol-->
-                                                <!--begin::Stats-->
-                                                <div class="m-0">
-                                                    <!--begin::Number-->
-                                                    <span class="text-gray-700 fw-bolder d-block fs-2qx lh-1 ls-n1 mb-1">6</span>
-                                                    <!--end::Number-->
-                                                    <!--begin::Desc-->
-                                                    <span class="text-gray-500 fw-semibold fs-6">주간</span>
-                                                    <!--end::Desc-->
-                                                </div>
-                                                <!--end::Stats-->
+                                                <!--end::Items-->
                                             </div>
-                                            <!--end::Items-->
-                                        </div>
-                                        <!--end::Col-->
-                                        <!--begin::Col-->
-                                        <div class="col-6">
-                                            <!--begin::Items-->
-                                            <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5">
-                                                <!--begin::Symbol-->
-                                                <div class="symbol symbol-30px me-5 mb-8">
-                                                <span class="symbol-label">
-                                                    <i class="ki-duotone ki-award fs-1 text-primary">
-                                                        <span class="path1"></span>
-                                                        <span class="path2"></span>
-                                                        <span class="path3"></span>
-                                                    </i>
-                                                </span>
+                                            <!--end::Col-->
+                                            <!--begin::Col-->
+                                            <div class="col-6">
+                                                <!--begin::Items-->
+                                                <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5">
+                                                    <!--begin::Symbol-->
+                                                    <div class="symbol symbol-30px me-5 mb-8">
+                                                        <span class="symbol-label">
+                                                            <i class="ki-duotone ki-award fs-1 text-primary">
+                                                                <span class="path1"></span>
+                                                                <span class="path2"></span>
+                                                                <span class="path3"></span>
+                                                            </i>
+                                                        </span>
+                                                    </div>
+                                                    <!--end::Symbol-->
+                                                    <!--begin::Stats-->
+                                                    <div class="m-0">
+                                                        <!--begin::Number-->
+                                                        <span class="text-gray-700 fw-bolder d-block fs-2qx lh-1 ls-n1 mb-1">4,7</span>
+                                                        <!--end::Number-->
+                                                        <!--begin::Desc-->
+                                                        <span class="text-gray-500 fw-semibold fs-6">월간</span>
+                                                        <!--end::Desc-->
+                                                    </div>
+                                                    <!--end::Stats-->
                                                 </div>
-                                                <!--end::Symbol-->
-                                                <!--begin::Stats-->
-                                                <div class="m-0">
-                                                    <!--begin::Number-->
-                                                    <span class="text-gray-700 fw-bolder d-block fs-2qx lh-1 ls-n1 mb-1">4,7</span>
-                                                    <!--end::Number-->
-                                                    <!--begin::Desc-->
-                                                    <span class="text-gray-500 fw-semibold fs-6">월간</span>
-                                                    <!--end::Desc-->
-                                                </div>
-                                                <!--end::Stats-->
+                                                <!--end::Items-->
                                             </div>
-                                            <!--end::Items-->
-                                        </div>
-                                        <!--end::Col-->
-                                        <!--begin::Col-->
-                                        <div class="col-6">
-                                            <!--begin::Items-->
-                                            <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5">
-                                                <!--begin::Symbol-->
-                                                <div class="symbol symbol-30px me-5 mb-8">
-                                                    <span class="symbol-label">
-                                                        <i class="ki-duotone ki-timer fs-1 text-primary">
-                                                            <span class="path1"></span>
-                                                            <span class="path2"></span>
-                                                            <span class="path3"></span>
-                                                        </i>
-                                                    </span>
+                                            <!--end::Col-->
+                                            <!--begin::Col-->
+                                            <div class="col-6">
+                                                <!--begin::Items-->
+                                                <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5">
+                                                    <!--begin::Symbol-->
+                                                    <div class="symbol symbol-30px me-5 mb-8">
+                                                        <span class="symbol-label">
+                                                            <i class="ki-duotone ki-timer fs-1 text-primary">
+                                                                <span class="path1"></span>
+                                                                <span class="path2"></span>
+                                                                <span class="path3"></span>
+                                                            </i>
+                                                        </span>
+                                                    </div>
+                                                    <!--end::Symbol-->
+                                                    <!--begin::Stats-->
+                                                    <div class="m-0">
+                                                        <!--begin::Number-->
+                                                        <span class="text-gray-700 fw-bolder d-block fs-2qx lh-1 ls-n1 mb-1">822</span>
+                                                        <!--end::Number-->
+                                                        <!--begin::Desc-->
+                                                        <span class="text-gray-500 fw-semibold fs-6">년간</span>
+                                                        <!--end::Desc-->
+                                                    </div>
+                                                    <!--end::Stats-->
                                                 </div>
-                                                <!--end::Symbol-->
-                                                <!--begin::Stats-->
-                                                <div class="m-0">
-                                                    <!--begin::Number-->
-                                                    <span class="text-gray-700 fw-bolder d-block fs-2qx lh-1 ls-n1 mb-1">822</span>
-                                                    <!--end::Number-->
-                                                    <!--begin::Desc-->
-                                                    <span class="text-gray-500 fw-semibold fs-6">년간</span>
-                                                    <!--end::Desc-->
-                                                </div>
-                                                <!--end::Stats-->
+                                                <!--end::Items-->
                                             </div>
-                                            <!--end::Items-->
+                                            <!--end::Col-->
                                         </div>
-                                        <!--end::Col-->
+                                        <!--end::Row-->
                                     </div>
-                                    <!--end::Row-->
+                                    <!--end::Stats-->
                                 </div>
-                                <!--end::Stats-->
+                                <!--end::Body-->
                             </div>
-                            <!--end::Body-->
                         </div>
-                    </div>
-                    <!--오늘 처리 건수-->
-                    <div class="col-xxl-8 mb-5 mb-xl-10">
-                        <!--begin::Chart widget 36-->
-                        <div class="card card-flush overflow-hidden h-md-100">
-                            <!--begin::Header-->
-                            <div class="card-header py-5">
-                                <!--begin::Title-->
-                                <h3 class="card-title align-items-start flex-column">
-                                    <span class="card-label fw-bold text-gray-900">일별 콜 현황</span>
-                                    <span class="text-gray-500 mt-1 fw-semibold fs-6">이번달 콜</span>
-                                </h3>
-                                <!--end::Title-->
-                                <!--begin::Toolbar-->
-                                <div class="card-toolbar">
-                                    <!--begin::Menu-->
-                                    <button class="btn btn-icon btn-color-gray-500 btn-active-color-primary justify-content-end" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-overflow="true">
-                                        <i class="ki-duotone ki-dots-square fs-1">
-                                            <span class="path1"></span>
-                                            <span class="path2"></span>
-                                            <span class="path3"></span>
-                                            <span class="path4"></span>
-                                        </i>
-                                    </button>
-                                    <!--begin::Menu 2-->
+                        <!--오늘 처리 건수-->
+                        <div class="col-xxl-8 mb-5 mb-xl-10">
+                            <!--begin::Chart widget 36-->
+                            <div class="card card-flush overflow-hidden h-md-100">
+                                <!--begin::Header-->
+                                <div class="card-header py-5">
+                                    <!--begin::Title-->
+                                    <h3 class="card-title align-items-start flex-column">
+                                        <span class="card-label fw-bold text-gray-900">일별 콜 현황</span>
+                                        <span class="text-gray-500 mt-1 fw-semibold fs-6">이번달 콜</span>
+                                    </h3>
+                                    <!--end::Title-->
+                                    <!--begin::Toolbar-->
+                                    <div class="card-toolbar">
+                                        <!--begin::Menu-->
+                                        <button class="btn btn-icon btn-color-gray-500 btn-active-color-primary justify-content-end" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-overflow="true">
+                                            <i class="ki-duotone ki-dots-square fs-1">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                                <span class="path3"></span>
+                                                <span class="path4"></span>
+                                            </i>
+                                        </button>
+                                        <!--begin::Menu 2-->
 
-                                    <!--end::Menu 2-->
-                                    <!--end::Menu-->
+                                        <!--end::Menu 2-->
+                                        <!--end::Menu-->
+                                    </div>
+                                    <!--end::Toolbar-->
                                 </div>
-                                <!--end::Toolbar-->
-                            </div>
-                            <!--end::Header-->
-                            <!--begin::Card body-->
-                            <div class="card-body d-flex justify-content-between flex-column pb-1 px-0">
-                                <!--begin::Statistics-->
-                                <div class="px-9 mb-5">
+                                <!--end::Header-->
+                                <!--begin::Card body-->
+                                <div class="card-body d-flex justify-content-between flex-column pb-1 px-0">
                                     <!--begin::Statistics-->
-                                    <div class="d-flex mb-2">
-                                        <span class="fs-4 fw-semibold text-gray-500 me-1">$</span>
-                                        <span class="fs-2hx fw-bold text-gray-800 me-2 lh-1 ls-n2">14,094</span>
+                                    <div class="px-9 mb-5">
+                                        <!--begin::Statistics-->
+                                        <div class="d-flex mb-2">
+                                            <span class="fs-4 fw-semibold text-gray-500 me-1">$</span>
+                                            <span class="fs-2hx fw-bold text-gray-800 me-2 lh-1 ls-n2">14,094</span>
+                                        </div>
+                                        <!--end::Statistics-->
+                                        <!--begin::Description-->
+                                        <span class="fs-6 fw-semibold text-gray-500"> $48,346 차감</span>
+                                        <!--end::Description-->
                                     </div>
                                     <!--end::Statistics-->
-                                    <!--begin::Description-->
-                                    <span class="fs-6 fw-semibold text-gray-500"> $48,346 차감</span>
-                                    <!--end::Description-->
+                                    <!--begin::Chart-->
+                                    <div id="kt_charts_widget_3_1" class="min-h-auto ps-4 pe-6" style="height: 300px"></div>
+                                    <!--end::Chart-->
                                 </div>
-                                <!--end::Statistics-->
-                                <!--begin::Chart-->
-                                <div id="kt_charts_widget_3_1" class="min-h-auto ps-4 pe-6" style="height: 300px"></div>
-                                <!--end::Chart-->
+                                <!--end::Card body-->
                             </div>
-                            <!--end::Card body-->
+                            <!--end::Chart widget 36-->
                         </div>
-                        <!--end::Chart widget 36-->
+                        <!--end::Col-->
+                        <!--begin::Col-->
+                        <!--end::Col-->
                     </div>
-                    <!--end::Col-->
-                    <!--begin::Col-->
-                    <!--end::Col-->
-                </div>
                 </div>
                 <!--end::Row-->
                 <!--begin::Row-->
@@ -929,97 +927,98 @@
                 </div>
                 <!--end::Row-->
                 <div th:if="${isEmployee}" class="row gx-5 gx-xl-10">
-                <!--begin::Row-->
+                    <!--begin::Row-->
 
                     <div class="col-xxl-6 mb-5 mb-xl-6">
-                            <div class="card card-flush h-md-100">
-                                <div class="card-header pt-5">
-                                    <h3 class="card-title align-items-start flex-column">
-                                        <span class="card-label fw-bold text-gray-800">상담원 처리 현황</span>
-                                    </h3>
-                                    <div class="card-toolbar">
-                                        <button id="employee" class="btn btn-icon btn-color-gray-500 btn-active-color-primary justify-content-end">
-                                            <i class="ki-duotone ki-arrows-circle fs-1 text-gray-500 me-n1">
-                                                <span class="path1"></span>
-                                                <span class="path2"></span>
-                                            </i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="card-body pt-6">
-                                    <div class="table-responsive">
-                                        <!-- Loading message -->
-                                        <div class="table-loading-message" style="display:none;">Loading...</div>
-                                        <!-- Table -->
-                                        <table class="table table-striped gy-7 gs-7">
-                                            <thead>
-                                            <tr class="fw-bold fs-8 text-gray-800 border-bottom border-gray-200">
-                                                <th>상담원</th>
-                                                <th style="text-align: right;">일완료</th>
-                                                <th style="text-align: right;">월완료</th>
-                                                <th style="text-align: right;">건당</th>
-                                                <th style="text-align: right;">일수수료</th>
-
-                                                <th style="text-align: right;">월수수료</th>
-                                                <th style="text-align: right;">일매출</th>
-                                                <th style="text-align: right;">월매출</th>
-                                                <th style="text-align: right;">비율</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            </tbody>
-                                        </table>
-                                    </div>
+                        <div class="card card-flush h-md-100">
+                            <div class="card-header pt-5">
+                                <h3 class="card-title align-items-start flex-column">
+                                    <span class="card-label fw-bold text-gray-800">상담원 처리 현황</span>
+                                </h3>
+                                <div class="card-toolbar">
+                                    <button id="employee" class="btn btn-icon btn-color-gray-500 btn-active-color-primary justify-content-end">
+                                        <i class="ki-duotone ki-arrows-circle fs-1 text-gray-500 me-n1">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                        </i>
+                                    </button>
                                 </div>
                             </div>
+                            <div class="card-body pt-6">
+                                <div class="table-responsive">
+                                    <!-- Loading message -->
+                                    <div class="table-loading-message" style="display:none;">Loading...</div>
+                                    <!-- Table -->
+                                    <table class="table table-striped gy-7 gs-7">
+                                        <thead>
+                                        <tr class="fw-bold fs-8 text-gray-800 border-bottom border-gray-200">
+                                            <th>상담원</th>
+                                            <th style="text-align: right;">일완료</th>
+                                            <th style="text-align: right;">월완료</th>
+                                            <th style="text-align: right;">건당</th>
+                                            <th style="text-align: right;">일수수료</th>
+
+                                            <th style="text-align: right;">월수수료</th>
+                                            <th style="text-align: right;">일매출</th>
+                                            <th style="text-align: right;">월매출</th>
+                                            <th style="text-align: right;">비율</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <script th:inline="javascript">
-                            $(document).ready(function() {
-                                const employeeButton = document.getElementById('employee');
-                                employeeButton.addEventListener('click', employeeList);
-                                employeeList();
-                                function employeeList() {
-                                    // Show loading message
-                                    $('.table-loading-message').show();
-                                    $('.table tbody').empty(); // Clear the table
+                        $(document).ready(function() {
+                            const employeeButton = document.getElementById('employee');
+                            employeeButton.addEventListener('click', employeeList);
+                            employeeList();
 
-                                    $.ajax({
-                                        url: '/empl/dashboard-employee',
-                                        type: 'GET',
-                                        success: function(response) {
-                                            var tableBody = $('.table tbody');
+                            function employeeList() {
+                                // Show loading message
+                                $('.table-loading-message').show();
+                                $('.table tbody').empty(); // Clear the table
 
-                                            // Dynamically add data to the table
-                                            $.each(response.employeeList, function(i, item) {
-                                                var row = '<tr>' +
-                                                    '<td>' + item.EMP_NAME + '</td>' +
-                                                    '<td  style="text-align: right;">' + item.DAILY_PRCSUM + '</td>' +
-                                                    '<td style="text-align: right;">' + item.MONTHLY_PRCSUM + '</td>' +
-                                                    '<td style="text-align: right;">' + item.TOTAL_MONTHLY_CALLP + '</td>' +
-                                                    '<td style="text-align: right;">' + item.DAILY_TOTAL + '</td>' +
-                                                    '<td style="text-align: right;">' + item.MONTHLY_TOTAL + '</td>' +
+                                $.ajax({
+                                    url: '/empl/dashboard-employee',
+                                    type: 'GET',
+                                    success: function(response) {
+                                        var tableBody = $('.table tbody');
+
+                                        // Dynamically add data to the table
+                                        $.each(response.employeeList, function(i, item) {
+                                            var row = '<tr>' +
+                                                '<td>' + item.EMP_NAME + '</td>' +
+                                                '<td  style="text-align: right;">' + item.DAILY_PRCSUM + '</td>' +
+                                                '<td style="text-align: right;">' + item.MONTHLY_PRCSUM + '</td>' +
+                                                '<td style="text-align: right;">' + item.TOTAL_MONTHLY_CALLP + '</td>' +
+                                                '<td style="text-align: right;">' + item.DAILY_TOTAL + '</td>' +
+                                                '<td style="text-align: right;">' + item.MONTHLY_TOTAL + '</td>' +
 
 
-                                                    '<td style="text-align: right;">' + item.DAILY_POINTSUM + '</td>' +
-                                                    '<td style="text-align: right;">' + item.MONTHLY_POINTSUM + '</td>' +
-                                                    '<td style="text-align: right;">' + item.MONTHLY_POINTSUM_PERCENT + ' % </td>' +
-                                                    '</tr>';
-                                                tableBody.append(row);
-                                            });
+                                                '<td style="text-align: right;">' + item.DAILY_POINTSUM + '</td>' +
+                                                '<td style="text-align: right;">' + item.MONTHLY_POINTSUM + '</td>' +
+                                                '<td style="text-align: right;">' + item.MONTHLY_POINTSUM_PERCENT + ' % </td>' +
+                                                '</tr>';
+                                            tableBody.append(row);
+                                        });
 
-                                            // Hide loading message
-                                            $('.table-loading-message').hide();
-                                        },
-                                        error: function(xhr, status, error) {
-                                            console.error("Error: " + status + " " + error);
-                                            // Hide loading message in case of error as well
-                                            $('.table-loading-message').hide();
-                                        }
-                                    });
-                                }
-                            });
-                        </script>
+                                        // Hide loading message
+                                        $('.table-loading-message').hide();
+                                    },
+                                    error: function(xhr, status, error) {
+                                        console.error("Error: " + status + " " + error);
+                                        // Hide loading message in case of error as well
+                                        $('.table-loading-message').hide();
+                                    }
+                                });
+                            }
+                        });
+                    </script>
                     <div class="col-xxl-6 mb-5 mb-xl-10">
                         <div class="card card-flush h-md-100">
                             <div class="card-header pt-5">
@@ -1027,7 +1026,7 @@
                                     <span class="card-label fw-bold text-gray-800">상담원 시간대 현황</span>
                                 </h3>
                                 <div class="card-toolbar">
-                                    <button  class="btn btn-icon btn-color-gray-500 btn-active-color-primary justify-content-end">
+                                    <button class="btn btn-icon btn-color-gray-500 btn-active-color-primary justify-content-end">
                                         <i class="ki-duotone ki-arrows-circle fs-1 text-gray-500 me-n1">
                                             <span class="path1"></span>
                                             <span class="path2"></span>
@@ -1045,18 +1044,17 @@
                                         type: 'radar',
                                         data: {
                                             labels: ['일완료', '일수수료', '일매출', '월완료', '월수수료', '월매출'],
-                                            datasets: [
-                                                {
-                                                    label: '권김단아',
-                                                    data: [3, 1500, 4500, 171, 85500, 139500],
-                                                    fill: true,
-                                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                                                    borderColor: 'rgba(255, 99, 132, 1)',
-                                                    pointBackgroundColor: 'rgba(255, 99, 132, 1)',
-                                                    pointBorderColor: '#fff',
-                                                    pointHoverBackgroundColor: '#fff',
-                                                    pointHoverBorderColor: 'rgba(255, 99, 132, 1)'
-                                                },
+                                            datasets: [{
+                                                label: '권김단아',
+                                                data: [3, 1500, 4500, 171, 85500, 139500],
+                                                fill: true,
+                                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                                borderColor: 'rgba(255, 99, 132, 1)',
+                                                pointBackgroundColor: 'rgba(255, 99, 132, 1)',
+                                                pointBorderColor: '#fff',
+                                                pointHoverBackgroundColor: '#fff',
+                                                pointHoverBorderColor: 'rgba(255, 99, 132, 1)'
+                                            },
                                                 {
                                                     label: '김민영',
                                                     data: [7, 3500, 10500, 143, 71500, 213000],
@@ -1083,23 +1081,25 @@
                             </div>
                         </div>
                     </div>
-                <!--end::Row-->
-                <!--begin::Row-->
+                    <!--end::Row-->
+                    <!--begin::Row-->
 
-                <!--end::Row-->
+                    <!--end::Row-->
                 </div>
-            <!--end::Content container-->
-        </div>
-        <!--end::Content-->
+                <!--end::Content container-->
+            </div>
+            <!--end::Content-->
 
-    </div>
-    <!--end::Content wrapper-->
-    <!--begin::Footer-->
-    <script src="/assets/js/board/scripts.bundle.js"></script>
-    <script src="/assets/js/common/dashboard.js"></script><!--dashboard-->
+        </div>
+        <!--end::Content wrapper-->
+        <!--begin::Footer-->
+        <script src="/assets/js/board/scripts.bundle.js"></script>
+        <script src="/assets/js/common/dashboard.js"></script>
+        <!--dashboard-->
+        <script src="/assets/plugins/global/plugins.bundle.js"></script>
 
 
         <!--end::Footer-->
-</div>
+    </div>
 
 </div>
