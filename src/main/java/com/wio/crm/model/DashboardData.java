@@ -108,6 +108,57 @@ public class DashboardData {
     private int SUM_POINT;
     private String POINT_DATE;
 
+    private String SUMCOM;
+
+    private String SUMMISS;
+    private String SUMMILE;
+    private String SUMLOSS;
+    private String CUST_NAME;
+    private String SUMMONTH;
+
+    private String SUMLOSSMONTH;
+
+
+    public String getCUST_NAME() {
+        return CUST_NAME;
+    }
+
+    public void setCUST_NAME(String CUST_NAME) {
+        this.CUST_NAME = CUST_NAME;
+    }
+
+    public String getSUMCOM() {
+        return SUMCOM;
+    }
+
+    public void setSUMCOM(String SUMCOM) {
+        this.SUMCOM = SUMCOM;
+    }
+
+    public String getSUMMISS() {
+        return SUMMISS;
+    }
+
+    public void setSUMMISS(String SUMMISS) {
+        this.SUMMISS = SUMMISS;
+    }
+
+    public String getSUMMILE() {
+        return SUMMILE;
+    }
+
+    public void setSUMMILE(String SUMMILE) {
+        this.SUMMILE = SUMMILE;
+    }
+
+    public String getSUMLOSS() {
+        return SUMLOSS;
+    }
+
+    public void setSUMLOSS(String SUMLOSS) {
+        this.SUMLOSS = SUMLOSS;
+    }
+
     public String getDPOINTSUM() {
         return DPOINTSUM;
     }

@@ -945,7 +945,7 @@
                                 </div>
                             </div>
                             <div class="card-body pt-6">
-                                <div class="table-responsive">
+                                <div class="table-responsive"  id="employee-table">
                                     <!-- Loading message -->
                                     <div class="table-loading-message" style="display:none;">Loading...</div>
                                     <!-- Table -->
@@ -953,15 +953,14 @@
                                         <thead>
                                         <tr class="fw-bold fs-8 text-gray-800 border-bottom border-gray-200">
                                             <th>상담원</th>
-                                            <th style="text-align: right;">일완료</th>
-                                            <th style="text-align: right;">월완료</th>
-                                            <th style="text-align: right;">건당</th>
-                                            <th style="text-align: right;">일수수료</th>
-
-                                            <th style="text-align: right;">월수수료</th>
-                                            <th style="text-align: right;">일매출</th>
-                                            <th style="text-align: right;">월매출</th>
-                                            <th style="text-align: right;">비율</th>
+                                            <th style="text-align: center;">일완료</th>
+                                            <th style="text-align: center;">월완료</th>
+                                            <th style="text-align: center;">건당</th>
+                                            <th style="text-align: center;">일수수료</th>
+                                            <th style="text-align: center;">월수수료</th>
+                                            <th style="text-align: center;">일매출</th>
+                                            <th style="text-align: center;">월매출</th>
+                                            <th style="text-align: center;">비율</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -972,61 +971,15 @@
                         </div>
                     </div>
 
-                    <script th:inline="javascript">
-                        $(document).ready(function() {
-                            const employeeButton = document.getElementById('employee');
-                            employeeButton.addEventListener('click', employeeList);
-                            employeeList();
 
-                            function employeeList() {
-                                // Show loading message
-                                $('.table-loading-message').show();
-                                $('.table tbody').empty(); // Clear the table
-
-                                $.ajax({
-                                    url: '/empl/dashboard-employee',
-                                    type: 'GET',
-                                    success: function(response) {
-                                        var tableBody = $('.table tbody');
-
-                                        // Dynamically add data to the table
-                                        $.each(response.employeeList, function(i, item) {
-                                            var row = '<tr>' +
-                                                '<td>' + item.EMP_NAME + '</td>' +
-                                                '<td  style="text-align: right;">' + item.DAILY_PRCSUM + '</td>' +
-                                                '<td style="text-align: right;">' + item.MONTHLY_PRCSUM + '</td>' +
-                                                '<td style="text-align: right;">' + item.TOTAL_MONTHLY_CALLP + '</td>' +
-                                                '<td style="text-align: right;">' + item.DAILY_TOTAL + '</td>' +
-                                                '<td style="text-align: right;">' + item.MONTHLY_TOTAL + '</td>' +
-
-
-                                                '<td style="text-align: right;">' + item.DAILY_POINTSUM + '</td>' +
-                                                '<td style="text-align: right;">' + item.MONTHLY_POINTSUM + '</td>' +
-                                                '<td style="text-align: right;">' + item.MONTHLY_POINTSUM_PERCENT + ' % </td>' +
-                                                '</tr>';
-                                            tableBody.append(row);
-                                        });
-
-                                        // Hide loading message
-                                        $('.table-loading-message').hide();
-                                    },
-                                    error: function(xhr, status, error) {
-                                        console.error("Error: " + status + " " + error);
-                                        // Hide loading message in case of error as well
-                                        $('.table-loading-message').hide();
-                                    }
-                                });
-                            }
-                        });
-                    </script>
                     <div class="col-xxl-6 mb-5 mb-xl-10">
                         <div class="card card-flush h-md-100">
                             <div class="card-header pt-5">
                                 <h3 class="card-title align-items-start flex-column">
-                                    <span class="card-label fw-bold text-gray-800">상담원 시간대 현황</span>
+                                    <span class="card-label fw-bold text-gray-800">업체 처리 현황</span>
                                 </h3>
                                 <div class="card-toolbar">
-                                    <button class="btn btn-icon btn-color-gray-500 btn-active-color-primary justify-content-end">
+                                    <button id="custom" class="btn btn-icon btn-color-gray-500 btn-active-color-primary justify-content-end">
                                         <i class="ki-duotone ki-arrows-circle fs-1 text-gray-500 me-n1">
                                             <span class="path1"></span>
                                             <span class="path2"></span>
@@ -1034,53 +987,119 @@
                                     </button>
                                 </div>
                             </div>
-                            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-                            <div class="card-body pt-6">
-                                <canvas id="radarChart" width="400" height="400"></canvas>
 
-                                <script>
-                                    var ctx = document.getElementById('radarChart').getContext('2d');
-                                    var radarChart = new Chart(ctx, {
-                                        type: 'radar',
-                                        data: {
-                                            labels: ['일완료', '일수수료', '일매출', '월완료', '월수수료', '월매출'],
-                                            datasets: [{
-                                                label: '권김단아',
-                                                data: [3, 1500, 4500, 171, 85500, 139500],
-                                                fill: true,
-                                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                                                borderColor: 'rgba(255, 99, 132, 1)',
-                                                pointBackgroundColor: 'rgba(255, 99, 132, 1)',
-                                                pointBorderColor: '#fff',
-                                                pointHoverBackgroundColor: '#fff',
-                                                pointHoverBorderColor: 'rgba(255, 99, 132, 1)'
-                                            },
-                                                {
-                                                    label: '김민영',
-                                                    data: [7, 3500, 10500, 143, 71500, 213000],
-                                                    fill: true,
-                                                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                                                    borderColor: 'rgba(54, 162, 235, 1)',
-                                                    pointBackgroundColor: 'rgba(54, 162, 235, 1)',
-                                                    pointBorderColor: '#fff',
-                                                    pointHoverBackgroundColor: '#fff',
-                                                    pointHoverBorderColor: 'rgba(54, 162, 235, 1)'
-                                                },
-                                                // 다른 상담원에 대한 데이터셋 추가 가능
-                                            ]
-                                        },
-                                        options: {
-                                            elements: {
-                                                line: {
-                                                    borderWidth: 3
-                                                }
-                                            }
-                                        },
-                                    });
-                                </script>
+                            <div class="card-body pt-6">
+                                <div class="table-responsive"  id="custom-table">
+                                    <!-- Loading message -->
+                                    <div class="table-loading-message" style="display:none;">Loading...</div>
+                                    <!-- Table -->
+                                    <table class="table table-striped gy-7 gs-7">
+                                        <thead>
+                                        <tr class="fw-bold fs-8 text-gray-800 border-bottom border-gray-200">
+                                            <th>업체</th>
+                                            <th style="text-align: center;">처리완료</th>
+                                            <th style="text-align: center;">월처리완료</th>
+                                            <th style="text-align: center;">미수신</th>
+                                            <th style="text-align: center;">월미수신</th>
+                                            <th style="text-align: center;">매출</th>
+                                            <th style="text-align: center;">월매출</th>
+                                            <th style="text-align: center;">LOSS</th>
+                                            <th style="text-align: center;">월LOSS</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <script th:inline="javascript">
+                        $(document).ready(function() {
+                            const employeeButton = document.getElementById('employee');
+                            employeeButton.addEventListener('click', employeeList);
+                            employeeList();
+
+                            function employeeList() {
+                                // Show loading message for 상담원 처리 현황
+                                $('#employee-table .table-loading-message').show();
+                                $('#employee-table tbody').empty(); // Clear the employee table
+
+                                $.ajax({
+                                    url: '/empl/dashboard-employee',
+                                    type: 'GET',
+                                    success: function(response) {
+                                        var tableBody = $('#employee-table tbody');
+                                        console.log(response.employeeList);
+                                        // Dynamically add data to the employee table
+                                        $.each(response.employeeList, function(i, item) {
+                                            var row = '<tr>' +
+                                                '<td>' + item.EMP_NAME + '</td>' +
+                                                '<td style="text-align: right;">' + item.DAILY_PRCSUM + '</td>' +
+                                                '<td style="text-align: right;">' + item.MONTHLY_PRCSUM + '</td>' +
+                                                '<td style="text-align: right;">' + item.TOTAL_MONTHLY_CALLP + '</td>' +
+                                                '<td style="text-align: right;">' + item.DAILY_TOTAL + '</td>' +
+                                                '<td style="text-align: right;">' + item.MONTHLY_TOTAL + '</td>' +
+                                                '<td style="text-align: right;">' + item.DAILY_POINTSUM + '</td>' +
+                                                '<td style="text-align: right;">' + item.MONTHLY_POINTSUM + '</td>' +
+                                                '<td style="text-align: right;">' + item.MONTHLY_POINTSUM_PERCENT + ' % </td>' +
+                                                '</tr>';
+                                            tableBody.append(row);
+                                        });
+
+                                        // Hide loading message for 상담원 처리 현황
+                                        $('#employee-table .table-loading-message').hide();
+                                    },
+                                    error: function(xhr, status, error) {
+                                        console.error("Error: " + status + " " + error);
+                                        $('#employee-table .table-loading-message').hide(); // Hide loading message in case of error as well
+                                    }
+                                });
+                            }
+
+                            // Similar setup for the 업체 처리 현황, with appropriate IDs or class selectors
+                            const customButton = document.getElementById('custom');
+                            customButton.addEventListener('click', customList);
+                            customList();
+
+                            function customList() {
+                                // Show loading message for 상담원 처리 현황
+                                $('#custom-table .table-loading-message').show();
+                                $('#custom-table tbody').empty(); // Clear the employee table
+
+                                $.ajax({
+                                    url: '/empl/dashboard-custom',
+                                    type: 'GET',
+                                    success: function(response) {
+                                        var tableBody = $('#custom-table tbody');
+console.log(response.customList);
+                                        $.each(response.customList, function(i, item) {
+                                            var row = '<tr>' +
+                                                '<td>' + item.CUST_NAME + '</td>' +
+                                                '<td style="text-align: right;">' + item.SUMCOM + '</td>' +
+                                                '<td style="text-align: right;">' + item.SUMCOMMONTH + '</td>' +
+                                                '<td style="text-align: right;">' + item.SUMMISS + '</td>' +
+                                                '<td style="text-align: right;">' + item.SUMMISSMONTH + '</td>' +
+                                                '<td style="text-align: right;">' + item.SUMMILE + '</td>' +
+                                                '<td style="text-align: right;">' + item.SUMMONTH + '</td>' +
+                                                '<td style="text-align: right;">' + item.SUMLOSS + '</td>' +
+                                                '<td style="text-align: right;">' + item.SUMLOSSMONTH + '</td>' +
+                                                '</tr>';
+                                            tableBody.append(row);
+                                        });
+
+                                        // Hide loading message for 상담원 처리 현황
+                                        $('#custom-table .table-loading-message').hide();
+                                    },
+                                    error: function(xhr, status, error) {
+                                        console.error("Error: " + status + " " + error);
+                                        $('#custom-table .table-loading-message').hide(); // Hide loading message in case of error as well
+                                    }
+                                });
+                            }
+                        });
+                    </script>
                     <!--end::Row-->
                     <!--begin::Row-->
 

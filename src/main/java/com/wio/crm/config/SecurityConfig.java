@@ -29,7 +29,7 @@ public class SecurityConfig {
                         //.requestMatchers("/company/**").hasAuthority("ROLE_COMPANY")
                         //.requestMatchers("/**").hasAuthority("ROLE_EMPLOYEE")
                         //.requestMatchers("/superuser/**").hasAuthority("ROLE_SUPERUSER")
-                        .requestMatchers("/empl/dashboard-employee").hasAuthority("ROLE_EMPLOYEE")
+                        .requestMatchers("/empl").hasAuthority("ROLE_EMPLOYEE")
                         .requestMatchers("/encrypt-passwords", "/encryption","/check-userid-availability","/apply-userid").permitAll() // 여기에 /encryption 추가
 
                         .anyRequest().authenticated())

@@ -60,6 +60,16 @@ public class DashboardController {
         return ResponseEntity.ok(data);
     }
 
+    @GetMapping("/empl/dashboard-custom")
+    @PreAuthorize("hasAuthority('ROLE_EMPLOYEE')")
+    public  ResponseEntity<Map<String, Object>> getCustomList() {
+
+
+        Map<String, Object> data = dashboardService.getCustomList();
+        return ResponseEntity.ok(data);
+    }
+
+
     @GetMapping("/api/dashboard-daily-data")
     public ResponseEntity<Map<String, Object>> getDailyAve(Principal principal) {
 

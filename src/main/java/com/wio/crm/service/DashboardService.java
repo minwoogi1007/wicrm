@@ -140,6 +140,13 @@ public class DashboardService {
         data.put("employeeList", dashboardMapper.getEmployeeList());
         return data;
     }
+    public Map<String, Object> getCustomList() {
+        checkUserRole();
+        Map<String, Object> data = new HashMap<>();
+
+        data.put("customList", dashboardMapper.getCustomList());
+        return data;
+    }
 
     public Map<String, Object> getDailyAve(String username) {
         String custCode = getCurrentUserCustCode();

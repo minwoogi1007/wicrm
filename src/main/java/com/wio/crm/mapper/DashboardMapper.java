@@ -23,7 +23,7 @@ public interface DashboardMapper {
     DashboardData getDashboardMonth(String custCode);
 
     List<DashboardData> getEmployeeList();
-
+    List<DashboardData> getCustomList();
     List<DashboardData> getDailyAve(String custCode);
 
     List<DashboardData> getWeeklySum(String custCode);
