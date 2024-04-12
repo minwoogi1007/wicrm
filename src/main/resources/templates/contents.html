@@ -1031,7 +1031,7 @@
                                     type: 'GET',
                                     success: function(response) {
                                         var tableBody = $('#employee-table tbody');
-                                        console.log(response.employeeList);
+
                                         // Dynamically add data to the employee table
                                         $.each(response.employeeList, function(i, item) {
                                             var row = '<tr>' +
@@ -1073,7 +1073,7 @@
                                     type: 'GET',
                                     success: function(response) {
                                         var tableBody = $('#custom-table tbody');
-console.log(response.customList);
+
                                         $.each(response.customList, function(i, item) {
                                             var row = '<tr>' +
                                                 '<td>' + item.CUST_NAME + '</td>' +

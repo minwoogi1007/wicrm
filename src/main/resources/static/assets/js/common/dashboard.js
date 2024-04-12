@@ -93,11 +93,11 @@ $(document).ready(function() {
 
 
                 });
-                console.log(pointMList);
+
                  formattedPointList = pointMList.map(function(number) {
                     return number.toLocaleString();
                 });
-                console.log(formattedPointList);
+
                 KTChartsWidget3.init();
             },
             error: function(xhr, status, error) {
