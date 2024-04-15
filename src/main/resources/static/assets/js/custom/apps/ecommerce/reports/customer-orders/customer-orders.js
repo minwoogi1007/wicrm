@@ -1,4 +1,3 @@
-
 var KTAppEcommerceReportCustomerOrders = function() {
     var t, e;
     return {
@@ -16,24 +15,21 @@ var KTAppEcommerceReportCustomerOrders = function() {
                     e = moment(),
                     r = $("#kt_ecommerce_report_customer_orders_daterangepicker");
 
-                // daterangepicker 설정 변경
                 r.daterangepicker({
                     startDate: t,
                     endDate: e,
                     ranges: {
-                        Today: [moment(), moment()],
-                        Yesterday: [moment().subtract(1, "days"), moment().subtract(1, "days")],
-                        "Last 7 Days": [moment().subtract(6, "days"), moment()],
-                        "Last 30 Days": [moment().subtract(29, "days"), moment()],
-                        "This Month": [moment().startOf("month"), moment().endOf("month")],
-                        "Last Month": [moment().subtract(1, "month").startOf("month"), moment().subtract(1, "month").endOf("month")]
+                        오늘: [moment(), moment()],
+                        어제: [moment().subtract(1, "days"), moment().subtract(1, "days")],
+                        "지난 7일": [moment().subtract(6, "days"), moment()],
+                        "지난 30일": [moment().subtract(29, "days"), moment()],
+                        "이번달": [moment().startOf("month"), moment().endOf("month")],
+                        "지난달": [moment().subtract(1, "month").startOf("month"), moment().subtract(1, "month").endOf("month")]
                     },
                     locale: {
-                        // 'daterangepicker'의 날짜 형식을 'YYYYMMDD'로 설정
                         format: 'YYYY/MM/DD'
                     }
                 }, function(start, end) {
-                    // 선택된 날짜 범위를 'YYYYMMDD' 형식으로 업데이트
                     r.html(start.format('YYYY/MM/DD') + '  ~  ' + end.format('YYYY/MM/DD'));
                 });
             })(), (() => {
@@ -59,9 +55,7 @@ var KTAppEcommerceReportCustomerOrders = function() {
                         document.querySelector(".dt-buttons .buttons-" + e).click()
                     }))
                 }))
-            })(), document.querySelector('[data-kt-ecommerce-order-filter="search"]').addEventListener("keyup", (function(t) {
-                e.search(t.target.value).draw()
-            })), (() => {
+            })(), (() => {
                 const t = document.querySelector('[data-kt-ecommerce-order-filter="status"]');
                 $(t).on("change", (t => {
                     let r = t.target.value;
