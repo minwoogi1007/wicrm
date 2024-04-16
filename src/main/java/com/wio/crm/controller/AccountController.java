@@ -9,4 +9,8 @@ public class AccountController {
     public String account() {
         return "account/account";
     }
+    @GetMapping("/accountM")
+    public String accountM() {
+        return "account/accountUpate";
+    }
 }
