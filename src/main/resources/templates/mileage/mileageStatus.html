@@ -90,7 +90,8 @@
                                                                 <span class="path1"></span>
                                                                 <span class="path2"></span>
                                                             </i>
-                                                            <div class="ms-2">4,571
+                                                            <div class="ms-2">
+                                                                <span th:text="${mileage.remainingMileage}"></span>
                                                                 <span class="text-muted fs-4 fw-semibold"> 남음</span></div>
                                                         </div>
 
@@ -111,7 +112,7 @@
                                                         <span class="path3"></span>
                                                     </i>
                                                     <div class="text-white fw-bold fs-2 mt-5">마일리지 업체</div>
-                                                    <div class="fw-semibold text-white">충전</div>
+                                                    <div class="fw-semibold text-white">충전(2024년 오픈예정)</div>
                                                 </div>
                                                 <!--end::Body-->
                                             </a>
@@ -124,7 +125,7 @@
                                         <div class="card-header border-0">
                                             <!--begin::Card title-->
                                             <div class="card-title">
-                                                <h2>결제 현황</h2>
+                                                <h2>충전/차감 현황</h2>
                                             </div>
                                             <!--end::Card title-->
                                         </div>
@@ -135,103 +136,28 @@
                                             <table class="table align-middle table-row-dashed gy-5" id="kt_table_customers_payment">
                                                 <thead class="border-bottom border-gray-200 fs-7 fw-bold">
                                                 <tr class="text-start text-muted text-uppercase gs-0">
-                                                    <th class="min-w-100px">일자</th>
+
+                                                    <th style="text-align: center;" class="min-w-100px">일자</th>
                                                     <th>구분</th>
-                                                    <th>충전</th>
-                                                    <th>내용</th>
+                                                    <th style="text-align: center;">충전</th>
+                                                    <th style="text-align: center;">내용</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody class="fs-6 fw-semibold text-gray-600">
-                                                <tr>
+                                                <tr th:each="transaction : ${transactions}">
+                                                    <td style="text-align: center;" th:text="${transaction.CHARGE_DATE}"></td>
+
                                                     <td>
-                                                        <a href="apps/ecommerce/sales/details.html" class="text-gray-600 text-hover-primary mb-1">#15100</a>
+                                                        <div th:switch="${transaction.CHARGE_GUBN}">
+                                                            <span  th:case="'C'" class="badge badge-light-success">충전</span>
+                                                            <span  th:case="'D'" class="badge badge-light-success">충전</span>
+                                                        </div>
                                                     </td>
-                                                    <td>
-                                                        <span class="badge badge-light-success">Successful</span>
-                                                    </td>
-                                                    <td>$1,200.00</td>
-                                                    <td> </td>
+                                                    <td th:text="${transaction.CHARGE_POINT}" style="text-align: right;"></td>
+
+                                                    <td th:text="${transaction.POINT_CHARGE}" style="text-align: center;"></td>
                                                 </tr>
-                                                <tr>
-                                                    <td>
-                                                        <a href="apps/ecommerce/sales/details.html" class="text-gray-600 text-hover-primary mb-1">#15021</a>
-                                                    </td>
-                                                    <td>
-                                                        <span class="badge badge-light-success">Successful</span>
-                                                    </td>
-                                                    <td>$79.00</td>
-                                                    <td> </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <a href="apps/ecommerce/sales/details.html" class="text-gray-600 text-hover-primary mb-1">#14617</a>
-                                                    </td>
-                                                    <td>
-                                                        <span class="badge badge-light-success">Successful</span>
-                                                    </td>
-                                                    <td>$5,500.00</td>
-                                                    <td> </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <a href="apps/ecommerce/sales/details.html" class="text-gray-600 text-hover-primary mb-1">#15516</a>
-                                                    </td>
-                                                    <td>
-                                                        <span class="badge badge-light-warning">Pending</span>
-                                                    </td>
-                                                    <td>$880.00</td>
-                                                    <td> </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <a href="apps/ecommerce/sales/details.html" class="text-gray-600 text-hover-primary mb-1">#15414</a>
-                                                    </td>
-                                                    <td>
-                                                        <span class="badge badge-light-success">Successful</span>
-                                                    </td>
-                                                    <td>$7,650.00</td>
-                                                    <td> </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <a href="apps/ecommerce/sales/details.html" class="text-gray-600 text-hover-primary mb-1">#15022</a>
-                                                    </td>
-                                                    <td>
-                                                        <span class="badge badge-light-success">Successful</span>
-                                                    </td>
-                                                    <td>$375.00</td>
-                                                    <td> </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <a href="apps/ecommerce/sales/details.html" class="text-gray-600 text-hover-primary mb-1">#14542</a>
-                                                    </td>
-                                                    <td>
-                                                        <span class="badge badge-light-success">Successful</span>
-                                                    </td>
-                                                    <td>$129.00</td>
-                                                    <td> </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <a href="apps/ecommerce/sales/details.html" class="text-gray-600 text-hover-primary mb-1">#15786</a>
-                                                    </td>
-                                                    <td>
-                                                        <span class="badge badge-light-danger">Rejected</span>
-                                                    </td>
-                                                    <td>$450.00</td>
-                                                    <td> </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <a href="apps/ecommerce/sales/details.html" class="text-gray-600 text-hover-primary mb-1">#14460</a>
-                                                    </td>
-                                                    <td>
-                                                        <span class="badge badge-light-warning">Pending</span>
-                                                    </td>
-                                                    <td>$8,700.00</td>
-                                                    <td> </td>
-                                                </tr>
+
                                                 </tbody>
                                             </table>
                                             <!--end::Table-->
