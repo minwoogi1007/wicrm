@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wio.crm.mapper.MileageMapper">
+    <select id="getRemainingMileage"  resultType="com.wio.crm.model.Mileage">
+        SELECT TO_CHAR(NVL(SUM(POINT),0),'999,999,999,999')  remainingMileage
+        FROM TCNT01_POINT
+        <if test="custCode != null and !custCode.isEmpty()">
+        WHERE cust_code = #{custCode}
+        </if>
+    </select>
+    <select id="getAllTransactions" resultType="com.wio.crm.model.Transaction">
+
+        SELECT
+            X.CUST_CODE AS PRTN_CD,
+            (SELECT CUST_NAME FROM TCNT01 WHERE CUST_CODE= X.CUST_CODE ) CUST_NAME ,
+            x.issue_date AS CHARGE_DATE,
+            X.SERL_NO AS CHARGE_SERL_NO,
+            TO_CHAR(NVL(X.POINT,0),'999,999,999,999') AS CHARGE_POINT,
+            <![CDATA[
+            CASE WHEN X.POINT<0 THEN 'D'
+                 ELSE 'C' END AS CHARGE_GUBN ,
+            ]]>
+            X.IO_GUBN AS CHARGE_SP,
+            X.SAUP_GUBN AS CHARGE_PSTOR_CD,
+            X.EMPNO AS CHARGE_EMPNO,
+            X.PROJCT_CODE AS CHARGE_PRO_CD,
+            X.SITE_CODE AS CHARGE_SITE_CD,
+            X.CALL_CODE AS CHARGE_CALL_CD,
+            X.IN_DATE AS CHARGE_INS_DATE,
+            X.IN_EMPNO AS CHARGE_INS_EMPNO,
+            X.POINT_CHARGE AS POINT_CHARGE
+        FROM TCNT01_POINT X
+        WHERE  X.IO_GUBN = 'I'
+          AND X.PROJCT_CODE IS NULL
+        <if test="custCode != null and !custCode.isEmpty()">
+            AND X.cust_code = #{custCode}
+        </if>
+        ORDER BY X.IN_DATE DESC
+    </select>
+</mapper>

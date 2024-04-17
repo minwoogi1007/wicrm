@@ -50,7 +50,7 @@
                         if(index !== 0 ){
                         html +='</div></div></div></div></div>\n';
                     }
-                        html +='</div><div  id ="'+item.MENU_NM+'" data-kt-menu-trigger="click" class="menu-item menu-accordion">';
+                        html +='</div><div  id ="'+item.MENU_NM+'" data-kt-menu-trigger="click" class="menu-item menu-accordion fs-4">';
 
                         html +='<span class="menu-link">\n';
                         html +='<span class="menu-icon">\n';
@@ -86,23 +86,23 @@
                         '<span class="path4"></span>\n' +
                         '</i>\n' +
                         '</span>\n' +
-                        '<span class="menu-title fw-bolder ">'+item.MENU_NM+'</span>\n' +
+                        '<span class="menu-title fw-bolder fs-4">'+item.MENU_NM+'</span>\n' +
                         '<span class="menu-arrow"></span>\n' +
                         '</span>\n' +
                         '<div class="menu-sub menu-sub-accordion">';
                         menu_s=0;
                     }else if(item.MENU_DIV=='L'){
                             if(menu_s==0){
-                        html +='<div id ="'+item.MENU_NM+'" data-kt-menu-trigger="click" class="menu-item menu-accordion">';
+                        html +='<div id ="'+item.MENU_NM+'" data-kt-menu-trigger="click" class="menu-item menu-accordion fs-4">';
                         }else{
-                            html +='</div><div id ="'+item.MENU_NM+'" data-kt-menu-trigger="click" class="menu-item menu-accordion">';
+                            html +='</div><div id ="'+item.MENU_NM+'" data-kt-menu-trigger="click" class="menu-item menu-accordion fs-4">';
                         }
                             html +='<span class="menu-link">\n' +
 
                             '<span class="menu-bullet">\n' +
                             '<span class="bullet bullet-dot"></span>\n' +
                             '</span>\n' +
-                            '<span class="menu-title">'+item.MENU_NM+'</span>\n' +
+                            '<span class="menu-title fs-4">'+item.MENU_NM+'</span>\n' +
                             '<span class="menu-arrow"></span>'+
                             '</span>';
                             menu_s++;
@@ -114,11 +114,11 @@
                         html +='<div class="menu-sub menu-sub-accordion">';
                     }
                         html +='<div  class="menu-item">\n'+
-                        '<a class="menu-link" href="' + item.PROG_NM + '">\n' +
+                        '<a class="menu-link fs-4" href="' + item.PROG_NM + '">\n' +
                         '<span class="menu-bullet">\n' +
                         '<span class="bullet bullet-dot"></span>\n' +
                         '</span>\n' +
-                        '<span class="menu-title">'+item.MENU_NM+'</span>\n' +
+                        '<span class="menu-title fs-4">'+item.MENU_NM+'</span>\n' +
                         '</a>\n' +
                         '</div>';
                         menu_b++;
