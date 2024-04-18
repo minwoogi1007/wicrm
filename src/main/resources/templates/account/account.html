@@ -59,12 +59,12 @@
                     <!--begin::Basic info-->
                     <div class="card mb-5 mb-xl-10">
                         <!--begin::Card header-->
-                        <div class="card-header border-0 cursor-pointer" role="button" data-bs-toggle="collapse" data-bs-target="#kt_account_profile_details" aria-expanded="true" aria-controls="kt_account_profile_details">
+                        <div class="card-header border-0"  >
                             <!--begin::Card title-->
                             <div class="card-title m-0">
                                 <h3 class="fw-bold m-0">상세 정보</h3>
                             </div>
-                            <a href="/account/accountM" class="btn btn-sm btn-primary align-self-center">수정</a>
+                            <a th:href="@{/accountM}" class="btn btn-sm btn-primary align-self-center">Edit Profile</a>
                             <!--end::Card title-->
                         </div>
                         <!--begin::Card header-->
@@ -80,21 +80,21 @@
                                     <!--begin::Input group-->
                                     <div class="row mb-6">
                                         <!--begin::Label-->
-                                        <label class="col-lg-4 fw-semibold text-muted">이름</label>
+                                        <label class="col-lg-4 fw-semibold fs-5 text-muted">이름</label>
                                         <!--end::Label-->
                                         <!--begin::Col-->
                                         <div class="col-lg-8">
-                                            <span class="fw-bold fs-6 text-gray-800"></span>
+                                            <span class="fw-bold fs-6 text-gray-800" th:text="${accountInfo.emp_name}"></span>
                                         </div>
                                         <!--end::Col-->
                                     </div>
                                     <div class="row mb-6">
                                         <!--begin::Label-->
-                                        <label class="col-lg-4 fw-semibold text-muted">ID</label>
+                                        <label class="col-lg-4 fw-semibold  fs-5 text-muted">ID</label>
                                         <!--end::Label-->
                                         <!--begin::Col-->
                                         <div class="col-lg-8">
-                                            <span class="fw-bold fs-6 text-gray-800"></span>
+                                            <span class="fw-bold fs-6 text-gray-800"  th:text="${accountInfo.userId}"></span>
                                         </div>
                                         <!--end::Col-->
                                     </div>
@@ -102,11 +102,11 @@
                                     <!--begin::Input group-->
                                     <div class="row mb-6">
                                         <!--begin::Label-->
-                                        <label class="col-lg-4 fw-semibold text-muted">회사명</label>
+                                        <label class="col-lg-4 fw-semibold  fs-5 text-muted">회사명</label>
                                         <!--end::Label-->
                                         <!--begin::Col-->
                                         <div class="col-lg-8 fv-row">
-                                            <span class="fw-semibold text-gray-800 fs-6"></span>
+                                            <span class="fw-semibold text-gray-800 fs-6"  th:text="${accountInfo.cust_name}"></span>
                                         </div>
                                         <!--end::Col-->
                                     </div>
@@ -114,7 +114,7 @@
                                     <!--begin::Input group-->
                                     <div class="row mb-6">
                                         <!--begin::Label-->
-                                        <label class="col-lg-4 fw-semibold text-muted">전화번호
+                                        <label class="col-lg-4 fw-semibold fs-5 text-muted">전화번호
                                             <span class="ms-1" data-bs-toggle="tooltip" >
 													<i class="ki-duotone ki-information fs-7">
 														<span class="path1"></span>
@@ -125,7 +125,7 @@
                                         <!--end::Label-->
                                         <!--begin::Col-->
                                         <div class="col-lg-8 d-flex align-items-center">
-                                            <span class="fw-bold fs-6 text-gray-800 me-2"></span>
+                                            <span class="fw-bold fs-6 text-gray-800 me-2" th:text="${accountInfo.hand_phone}"></span>
                                         </div>
                                         <!--end::Label-->
                                         <!--begin::Col-->
@@ -134,7 +134,7 @@
                                     </div>
                                     <div class="row mb-6">
                                         <!--begin::Label-->
-                                        <label class="col-lg-4 fw-semibold text-muted">이메일
+                                        <label class="col-lg-4 fw-semibold fs-5 text-muted">이메일
                                             <span class="ms-1" data-bs-toggle="tooltip" >
 													<i class="ki-duotone ki-information fs-7">
 														<span class="path1"></span>
@@ -145,7 +145,7 @@
                                         <!--end::Label-->
                                         <!--begin::Col-->
                                         <div class="col-lg-8 d-flex align-items-center">
-                                            <span class="fw-bold fs-6 text-gray-800 me-2"></span>
+                                            <span class="fw-bold fs-6 text-gray-800 me-2" th:text="${accountInfo.email}"></span>
                                         </div>
                                         <!--end::Col-->
                                     </div>
@@ -153,11 +153,11 @@
                                     <!--begin::Input group-->
                                     <div class="row mb-6">
                                         <!--begin::Label-->
-                                        <label class="col-lg-4 fw-semibold text-muted">홈페이지</label>
+                                        <label class="col-lg-4 fw-semibold fs-5 text-muted">홈페이지</label>
                                         <!--end::Label-->
                                         <!--begin::Col-->
                                         <div class="col-lg-8">
-                                            <a href="#" class="fw-semibold fs-6 text-gray-800 text-hover-primary"></a>
+                                            <a href="#" class="fw-semibold fs-6 text-gray-800 text-hover-primary" th:text="${accountInfo.homePage}"></a>
                                         </div>
                                         <!--end::Col-->
                                     </div>
@@ -182,11 +182,11 @@
                                         <!--begin::Col-->
 
                                             <!--begin::Options-->
-                                            <label class="col-lg-4 fw-semibold text-muted">담당자 연락 가능 방법</label>
+                                            <label class="col-lg-4 fw-semibold  fs-5 text-muted">담당자 연락 가능 방법</label>
                                             <!--end::Label-->
                                             <!--begin::Col-->
                                             <div class="col-lg-8">
-                                                <span class="fw-bold fs-6 text-gray-800">Email, 전화</span>
+                                                <span class="fw-bold fs-6 text-gray-800"></span>
                                             </div>
                                             <!--end::Options-->
                                         <!--end::Col-->
@@ -195,11 +195,11 @@
                                     <!--begin::Input group-->
                                     <div class="row mb-0">
                                         <!--begin::Label-->
-                                        <label class="col-lg-4 fw-semibold text-muted">관리자</label>
+                                        <label class="col-lg-4 fw-semibold fs-5 text-muted">관리자</label>
                                         <!--begin::Label-->
                                         <!--begin::Label-->
                                         <div class="col-lg-8">
-                                            <span class="fw-semibold fs-6 text-gray-800">Yes</span>
+                                            <span class="fw-semibold fs-6 text-gray-800"></span>
                                         </div>
                                         <!--begin::Label-->
                                     </div>
@@ -211,6 +211,9 @@
                                 <!--end::Actions-->
                             </form>
                             <!--end::Form-->
+                        </div>
+                        <div class="card-footer d-flex justify-content-end py-6 px-9">
+
                         </div>
                         <!--end::Content-->
                     </div>

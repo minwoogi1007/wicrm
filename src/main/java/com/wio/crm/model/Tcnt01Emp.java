@@ -24,6 +24,56 @@ public class Tcnt01Emp {
 
     private String cust_grade;
 
+    private String tel_no;
+
+    private String hand_phone;
+
+    private String email;
+
+    private String homePage;
+
+    private String cust_name;
+
+    public String getTel_no() {
+        return tel_no;
+    }
+
+    public void setTel_no(String tel_no) {
+        this.tel_no = tel_no;
+    }
+
+    public String getHand_phone() {
+        return hand_phone;
+    }
+
+    public void setHand_phone(String hand_phone) {
+        this.hand_phone = hand_phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getHomePage() {
+        return homePage;
+    }
+
+    public void setHomePage(String homePage) {
+        this.homePage = homePage;
+    }
+
+    public String getCust_name() {
+        return cust_name;
+    }
+
+    public void setCust_name(String cust_name) {
+        this.cust_name = cust_name;
+    }
+
     public String getCust_grade() {
         return cust_grade;
     }
