@@ -13,12 +13,16 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 @Service
 public class AccountService {
 
     @Autowired
     private AccountMapper accountMapper;
+    private static final Logger logger = LoggerFactory.getLogger(AccountService.class);
 
     private String getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -42,5 +46,18 @@ public class AccountService {
         data.put("accountInfo", accountInfo);
 
         return data;
+    }
+    public boolean updateAccount(Tcnt01Emp account) {
+        try {
+            String userId = getCurrentUserId();
+            account.setUserId(userId);
+            // Assuming AccountRepository extends JpaRepository
+            logger.info("Updating account: {}", account);
+            accountMapper.updateAccount(account);
+            return true;
+        } catch (Exception e) {
+            // Log the exception (use a proper logging framework)
+            return false;
+        }
     }
 }

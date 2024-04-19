@@ -64,7 +64,7 @@
                             <div class="card-title m-0">
                                 <h3 class="fw-bold m-0">상세 정보</h3>
                             </div>
-                            <a th:href="@{/accountM}" class="btn btn-sm btn-primary align-self-center">Edit Profile</a>
+                            <a th:href="@{/account/accountM}" class="btn btn-sm btn-primary align-self-center">Edit Profile</a>
                             <!--end::Card title-->
                         </div>
                         <!--begin::Card header-->
@@ -161,25 +161,8 @@
                                         </div>
                                         <!--end::Col-->
                                     </div>
-                                    <!--end::Input group-->
-                                    <!--begin::Input group-->
 
-                                    <!--end::Input group-->
-                                    <!--begin::Input group-->
-
-                                    <!--end::Input group-->
-                                    <!--begin::Input group-->
-
-                                    <!--end::Input group-->
-                                    <!--begin::Input group-->
-
-                                    <!--end::Input group-->
-                                    <!--begin::Input group-->
                                     <div class="row mb-6">
-                                        <!--begin::Label-->
-
-                                        <!--end::Label-->
-                                        <!--begin::Col-->
 
                                             <!--begin::Options-->
                                             <label class="col-lg-4 fw-semibold  fs-5 text-muted">담당자 연락 가능 방법</label>
@@ -188,8 +171,7 @@
                                             <div class="col-lg-8">
                                                 <span class="fw-bold fs-6 text-gray-800"></span>
                                             </div>
-                                            <!--end::Options-->
-                                        <!--end::Col-->
+
                                     </div>
                                     <!--end::Input group-->
                                     <!--begin::Input group-->
@@ -205,10 +187,6 @@
                                     </div>
                                     <!--end::Input group-->
                                 </div>
-                                <!--end::Card body-->
-                                <!--begin::Actions-->
-
-                                <!--end::Actions-->
                             </form>
                             <!--end::Form-->
                         </div>
@@ -217,31 +195,51 @@
                         </div>
                         <!--end::Content-->
                     </div>
-                    <!--end::Basic info-->
-                    <!--begin::Sign-in Method-->
+                    <!-- Modal HTML -->
+                    <div th:if="${param.success}" class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
 
-                    <!--end::Sign-in Method-->
-                    <!--begin::Connected Accounts-->
-
-                    <!--end::Connected Accounts-->
-                    <!--begin::Notifications-->
-
-                    <!--end::Notifications-->
-                    <!--begin::Notifications-->
-
-                    <!--end::Notifications-->
-                    <!--begin::Deactivate Account-->
-
-                    <!--end::Deactivate Account-->
+                                <div class="modal-body">
+                                    업데이트 완료
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Error Modal -->
+                    <div th:if="${param.error}" class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-body">
+                                    업데이트 실패
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">닫기</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Script to automatically open the modal when the page loads if the 'success' parameter is present -->
+                    <script th:inline="javascript">
+                        /*<![CDATA[*/
+                        $(document).ready(function() {
+                            if (/*[[${param.success}]]*/) {
+                                $('#successModal').modal('show');
+                            } else if (/*[[${param.error}]]*/) {
+                                $('#errorModal').modal('show');
+                            }
+                        });
+                        /*]]>*/
+                    </script>
                 </div>
                 <!--end::Content container-->
             </div>
             <!--end::Content-->
         </div>
-        <!--end::Content wrapper-->
-        <!--begin::Footer-->
 
-        <!--end::Footer-->
     </div>
 
 </div>

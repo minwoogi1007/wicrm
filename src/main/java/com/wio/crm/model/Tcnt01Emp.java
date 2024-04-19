@@ -34,6 +34,20 @@ public class Tcnt01Emp {
 
     private String cust_name;
 
+
+
+    @Override
+    public String toString() {
+        return "Tcnt01Emp{" +
+                "userId='" + userId + '\'' +
+                ", emp_name='" + emp_name + '\'' +
+                ", email='" + email + '\'' +
+                ", handPhone='" + hand_phone + '\'' +
+                ", homePage='" + homePage + '\'' +
+                ", tel_no='" + tel_no + '\'' +
+                // Include other fields here
+                '}';
+    }
     public String getTel_no() {
         return tel_no;
     }

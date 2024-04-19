@@ -24,4 +24,14 @@
         WHERE A.CUST_CODE = B.CUST_CODE
           AND USERID= #{custCode}
     </select>
+
+    <update id="updateAccount">
+        UPDATE N_TCNT01_EMP
+        SET
+            emp_name = #{empName},
+            email = #{email},
+            hand_phone = #{handPhone},
+            HOMEPAGE = #{homePage}
+        WHERE USERID = #{userId}
+    </update>
 </mapper>

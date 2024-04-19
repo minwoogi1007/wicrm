@@ -134,29 +134,30 @@
                             document.addEventListener('DOMContentLoaded', function() {
                                 // 현재 페이지의 URL 경로와 쿼리 스트링을 포함하여 가져옵니다.
                                 const currentPath = window.location.pathname + window.location.search;
-                                console.log(currentPath);
-                                // 현재 URL과 일치하는 모든 메뉴 링크를 찾습니다.
-                                const activeLinks = document.querySelectorAll(`.menu-item a[href="${currentPath}"]`);
-                                console.log(activeLinks);
-                                // 해당 링크가 존재하면 실행
-                                activeLinks.forEach(activeLink => {
-                                    // 가장 가까운 소메뉴 아이템에 'active' 클래스를 추가합니다.
-                                    activeLink.classList.add('active');
+                                console.log('Current Path:', currentPath);
 
-                                    // 상위 메뉴 아이템들에 대해 'here'와 'show' 클래스를 추가합니다.
-                                    let parent = activeLink.closest('.menu-sub-accordion');
-                                    while (parent) {
-                                        const parentItem = parent.closest('.menu-item.menu-accordion');
-                                        if (parentItem) {
-                                            parentItem.classList.add('here', 'show');
-                                            // 상위 메뉴 아이템을 찾기 위해 다시 설정합니다.
-                                            parent = parentItem.closest('.menu-sub-accordion');
-                                        } else {
-                                            break; // 상위 메뉴 아이템이 없으면 종료합니다.
+                                // 모든 메뉴 링크를 순회하며 현재 URL이 메뉴 링크의 href 속성에 포함되는지 확인합니다.
+                                const menuLinks = document.querySelectorAll('.menu-item a');
+                                menuLinks.forEach(link => {
+                                    const linkPath = link.getAttribute('href');
+                                    if (currentPath.startsWith(linkPath)) {
+                                        // 해당 링크에 'active' 클래스를 추가합니다.
+                                        link.classList.add('active');
+
+                                        // 상위 메뉴 아이템들에 'here'와 'show' 클래스를 추가합니다.
+                                        let parent = link.closest('.menu-sub-accordion');
+                                        while (parent) {
+                                            const parentItem = parent.closest('.menu-item.menu-accordion');
+                                            if (parentItem) {
+                                                parentItem.classList.add('here', 'show');
+                                                parent = parentItem.closest('.menu-sub-accordion');
+                                            } else {
+                                                break; // 상위 메뉴 아이템이 없으면 종료합니다.
+                                            }
                                         }
                                     }
                                 });
-                            });;
+                            });
                     </script>
 
 
