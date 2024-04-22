@@ -1,5 +1,6 @@
 package com.wio.crm.mapper;
 
+import com.wio.crm.model.Account;
 import com.wio.crm.model.Tcnt01Emp;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -8,6 +9,6 @@ import org.apache.ibatis.annotations.Param;
 public interface AccountMapper {
     Tcnt01Emp getAccount(String userId);
 
-    void updateAccount(@Param("account") Tcnt01Emp account);
+    void updateAccount(Account account);
 
 }

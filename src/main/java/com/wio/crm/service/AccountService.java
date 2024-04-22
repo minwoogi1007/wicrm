@@ -2,6 +2,7 @@ package com.wio.crm.service;
 
 import com.wio.crm.config.CustomUserDetails;
 import com.wio.crm.mapper.AccountMapper;
+import com.wio.crm.model.Account;
 import com.wio.crm.model.Mileage;
 import com.wio.crm.model.Tcnt01Emp;
 import com.wio.crm.model.Transaction;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -47,7 +49,8 @@ public class AccountService {
 
         return data;
     }
-    public boolean updateAccount(Tcnt01Emp account) {
+    @Transactional
+    public boolean updateAccount(Account account) {
         try {
             String userId = getCurrentUserId();
             account.setUserId(userId);

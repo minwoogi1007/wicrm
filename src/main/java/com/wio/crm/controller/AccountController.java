@@ -1,5 +1,6 @@
 package com.wio.crm.controller;
 
+import com.wio.crm.model.Account;
 import com.wio.crm.model.Mileage;
 import com.wio.crm.model.Tcnt01Emp;
 import com.wio.crm.model.Transaction;
@@ -51,10 +52,10 @@ public class AccountController {
 
         return "account/accountUpdate";
     }
-    @PostMapping("/account/update")
-    public String updateAccount(@ModelAttribute("accountInfo") Tcnt01Emp account, RedirectAttributes redirectAttributes) {
-        boolean updateStatus = accountService.updateAccount(account);
 
+    @PostMapping("/account/update")
+    public String updateAccount(Account account, Model model) {
+        boolean updateStatus = accountService.updateAccount(account);
         // Check if the update was successful and add the appropriate flash message
         String redirectUrl = "redirect:/account";
         redirectUrl += updateStatus ? "?success=true" : "?error=true";

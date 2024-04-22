@@ -67,6 +67,7 @@
                         <div id="kt_account_settings_profile_details" class="collapse show">
                             <!--begin::Form-->
                             <form id="kt_account_profile_details_form" class="form" th:action="@{/account/update}" th:object="${accountInfo}" method="post">
+
                                 <!--begin::Card body-->
                                 <div class="card-body border-top p-9">
                                     <div class="row mb-6">
@@ -79,7 +80,7 @@
                                             <div class="row">
                                                 <!--begin::Col-->
                                                 <div class="col-lg-6 fv-row">
-                                                    <input type="text" name="fname" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" th:field="*{emp_name}" />
+                                                    <input type="text" name="emp_name" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" th:field="*{emp_name}" />
                                                 </div>
                                                 <!--end::Col-->
                                                 <!--begin::Col-->
@@ -98,7 +99,7 @@
                                         <!--end::Label-->
                                         <!--begin::Col-->
                                         <div class="col-lg-8 fv-row">
-                                            <input type="text" name="company" class="form-control form-control-lg form-control-solid" placeholder="회사명"th:field="*{cust_name}" readonly />
+                                            <input type="text" class="form-control form-control-lg form-control-solid" placeholder="회사명"th:field="*{cust_name}" readonly />
                                         </div>
                                         <!--end::Col-->
                                     </div>
@@ -119,7 +120,7 @@
                                         <!--end::Label-->
                                         <!--begin::Col-->
                                         <div class="col-lg-8 fv-row">
-                                            <input type="tel" name="phone" class="form-control form-control-lg form-control-solid" placeholder="" th:field="*{hand_phone}" />
+                                            <input type="tel"  class="form-control form-control-lg form-control-solid" placeholder="" th:field="*{hand_phone}" />
                                         </div>
                                         <!--end::Col-->
                                     </div>
@@ -138,7 +139,7 @@
                                         <!--end::Label-->
                                         <!--begin::Col-->
                                         <div class="col-lg-8 fv-row">
-                                            <input type="tel" name="phone" class="form-control form-control-lg form-control-solid" placeholder=""  th:field="*{email}" />
+                                            <input type="tel"  class="form-control form-control-lg form-control-solid" placeholder=""  th:field="*{email}" />
                                         </div>
                                         <!--end::Col-->
                                     </div>
@@ -150,7 +151,7 @@
                                         <!--end::Label-->
                                         <!--begin::Col-->
                                         <div class="col-lg-8 fv-row">
-                                            <input type="text" name="website" class="form-control form-control-lg form-control-solid" placeholder="사이트" th:field="*{homePage}" />
+                                            <input type="text"   class="form-control form-control-lg form-control-solid" placeholder="사이트" th:field="*{homePage}" />
                                         </div>
                                         <!--end::Col-->
                                     </div>

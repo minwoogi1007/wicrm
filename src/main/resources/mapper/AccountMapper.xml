@@ -30,6 +30,7 @@
         SET
             emp_name = #{empName},
             email = #{email},
+            tel_no = #{tel_no},
             hand_phone = #{handPhone},
             HOMEPAGE = #{homePage}
         WHERE USERID = #{userId}
