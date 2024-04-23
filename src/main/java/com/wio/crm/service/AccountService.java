@@ -51,16 +51,13 @@ public class AccountService {
     }
     @Transactional
     public boolean updateAccount(Account account) {
-        try {
-            String userId = getCurrentUserId();
-            account.setUserId(userId);
-            // Assuming AccountRepository extends JpaRepository
-            logger.info("Updating account: {}", account);
-            accountMapper.updateAccount(account);
-            return true;
-        } catch (Exception e) {
-            // Log the exception (use a proper logging framework)
-            return false;
-        }
+
+        String userId = getCurrentUserId();
+        account.setUserId(userId);
+        // Assuming AccountRepository extends JpaRepository
+        logger.info("Updating account: {}", account);
+        accountMapper.updateAccount(account);
+        return accountMapper.updateAccount(account) > 0;
+
     }
 }

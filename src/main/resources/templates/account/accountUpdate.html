@@ -1,9 +1,50 @@
-<!DOCTYPE html>
+
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{/main}">
 <!--begin::Main-->
+
+<meta name="_csrf" th:content="${_csrf.token}"/>
+<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 <div layout:fragment="content">
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(document).ready(function() {
+            var csrfToken = $("meta[name='_csrf']").attr("content");
+            var csrfHeader = $("meta[name='_csrf_header']").attr("content");
+
+            $('#kt_account_profile_details_submit').click(function(event) {
+                alert();
+                event.preventDefault();
+                var accountData = {
+                    empName: $("#emp_name").val(),
+                    email: $("#email").val(),
+                    handPhone: $("#hand_phone").val(),
+                    homePage: $("#homePage").val()
+                };
+
+                $.ajax({
+                    url: '/api/account/update',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(accountData),
+                    beforeSend: function(xhr) {
+                        console.log(csrfToken);
+                        xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken); // Ensure this header is being set
+                    },
+                    success: function(response) {
+                        alert('계정 정보가 성공적으로 업데이트되었습니다.');
+                        window.location.href = '/account/update'; // 사용자를 /account/update 경로로 리다이렉트합니다.
+
+                    },
+                    error: function(xhr, status, error) {
+                        alert('업데이트 실패: ' + xhr.responseText);
+                    }
+                });
+            });
+        });
+        /*]]>*/
+    </script>
     <div class="app-main flex-column flex-row-fluid" id="kt_app_main">
         <!--begin::Content wrapper-->
         <div class="d-flex flex-column flex-column-fluid">
@@ -66,7 +107,9 @@
                         <!--begin::Content-->
                         <div id="kt_account_settings_profile_details" class="collapse show">
                             <!--begin::Form-->
-                            <form id="kt_account_profile_details_form" class="form" th:action="@{/account/update}" th:object="${accountInfo}" method="post">
+                                <form id="kt_account_profile_details_form" class="form" th:action="@{/account/update}" th:object="${accountInfo}" method="post">
+                                    <input type="hidden" name="_csrf" value="${_csrf.token}">
+
 
                                 <!--begin::Card body-->
                                 <div class="card-body border-top p-9">
@@ -80,7 +123,7 @@
                                             <div class="row">
                                                 <!--begin::Col-->
                                                 <div class="col-lg-6 fv-row">
-                                                    <input type="text" name="emp_name" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0" th:field="*{emp_name}" />
+                                                    <input type="text" id="emp_name" name="emp_name" class="form-control form-control-lg form-control-solid" th:field="*{emp_name}" />
                                                 </div>
                                                 <!--end::Col-->
                                                 <!--begin::Col-->
@@ -99,7 +142,7 @@
                                         <!--end::Label-->
                                         <!--begin::Col-->
                                         <div class="col-lg-8 fv-row">
-                                            <input type="text" class="form-control form-control-lg form-control-solid" placeholder="회사명"th:field="*{cust_name}" readonly />
+                                            <input type="text" id="cust_name" name="emp_name" class="form-control form-control-lg form-control-solid" th:field="*{cust_name}"readonly />
                                         </div>
                                         <!--end::Col-->
                                     </div>
@@ -120,7 +163,7 @@
                                         <!--end::Label-->
                                         <!--begin::Col-->
                                         <div class="col-lg-8 fv-row">
-                                            <input type="tel"  class="form-control form-control-lg form-control-solid" placeholder="" th:field="*{hand_phone}" />
+                                            <input type="tel" id="hand_phone" class="form-control form-control-lg form-control-solid" th:field="*{hand_phone}" />
                                         </div>
                                         <!--end::Col-->
                                     </div>
@@ -139,7 +182,7 @@
                                         <!--end::Label-->
                                         <!--begin::Col-->
                                         <div class="col-lg-8 fv-row">
-                                            <input type="tel"  class="form-control form-control-lg form-control-solid" placeholder=""  th:field="*{email}" />
+                                            <input type="text" id="email" class="form-control form-control-lg form-control-solid" th:field="*{email}" />
                                         </div>
                                         <!--end::Col-->
                                     </div>
@@ -151,7 +194,7 @@
                                         <!--end::Label-->
                                         <!--begin::Col-->
                                         <div class="col-lg-8 fv-row">
-                                            <input type="text"   class="form-control form-control-lg form-control-solid" placeholder="사이트" th:field="*{homePage}" />
+                                            <input type="text" id="homePage" class="form-control form-control-lg form-control-solid" th:field="*{homePage}" />
                                         </div>
                                         <!--end::Col-->
                                     </div>

@@ -9,6 +9,6 @@ import org.apache.ibatis.annotations.Param;
 public interface AccountMapper {
     Tcnt01Emp getAccount(String userId);
 
-    void updateAccount(Account account);
+    int updateAccount(Account account);
 
 }

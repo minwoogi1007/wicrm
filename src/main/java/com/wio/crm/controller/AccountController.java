@@ -1,20 +1,16 @@
 package com.wio.crm.controller;
 
 import com.wio.crm.model.Account;
-import com.wio.crm.model.Mileage;
 import com.wio.crm.model.Tcnt01Emp;
-import com.wio.crm.model.Transaction;
 import com.wio.crm.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -22,44 +18,51 @@ public class AccountController {
 
     @Autowired
     private AccountService accountService;
-    @GetMapping("/account")
-    public String account(Model model,@RequestParam(value = "success", required = false, defaultValue="false") boolean success) {
-        Map<String, Object> accountInfo = accountService.getAccount();
 
+    // GET 요청: 계정 정보 페이지
+    @GetMapping("/account")
+    public String account(Model model, @RequestParam(value = "success", required = false) boolean success) {
+        Map<String, Object> accountInfo = accountService.getAccount();
         Tcnt01Emp account = (Tcnt01Emp) accountInfo.get("accountInfo");
+
+        // 계정 정보가 없는 경우, 사용자 정의 예외를 발생시킵니다.
         if (account == null) {
             throw new RuntimeException("Account information is missing!");
         }
 
-        System.out.println("success======"+success);
-
-        if (success) {
-            model.addAttribute("success", true);
-        }
+        // 성공적으로 업데이트가 되었을 경우, 모델에 성공 플래그를 추가합니다.
+        model.addAttribute("success", success);
         model.addAttribute("accountInfo", account);
-        return "account/account";
+
+        return "account/account";  // Thymeleaf 템플릿 반환
     }
-    @GetMapping("/account/accountM")
+
+    // GET 요청: 계정 정보 수정 페이지
+    @GetMapping("/account/update")
     public String accountM(Model model) {
         Map<String, Object> accountInfo = accountService.getAccount();
-
         Tcnt01Emp account = (Tcnt01Emp) accountInfo.get("accountInfo");
+
         if (account == null) {
             throw new RuntimeException("Account information is missing!");
         }
 
         model.addAttribute("accountInfo", account);
-
-        return "account/accountUpdate";
+        return "account/accountUpdate";  // 계정 정보 수정 페이지 반환
     }
 
-    @PostMapping("/account/update")
-    public String updateAccount(Account account, Model model) {
-        boolean updateStatus = accountService.updateAccount(account);
-        // Check if the update was successful and add the appropriate flash message
-        String redirectUrl = "redirect:/account";
-        redirectUrl += updateStatus ? "?success=true" : "?error=true";
-
-        return redirectUrl;
+    // POST 요청으로 계정 정보 업데이트 (AJAX)
+    @PostMapping("/api/account/update")
+    public ResponseEntity<String> updateAccount(@RequestBody Account account) {
+        try {
+            boolean updated = accountService.updateAccount(account);
+            if (updated) {
+                return ResponseEntity.ok("Account updated successfully");
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to update account");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred: " + e.getMessage());
+        }
     }
 }

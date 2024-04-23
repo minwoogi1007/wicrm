@@ -8,6 +8,16 @@ public class Account {
     private String homePage;
     private String userId;
 
+    private String cust_name;
+
+    public String getCust_name() {
+        return cust_name;
+    }
+
+    public void setCust_name(String cust_name) {
+        this.cust_name = cust_name;
+    }
+
     // Getters and Setters
 
     public String getEmp_name() {
