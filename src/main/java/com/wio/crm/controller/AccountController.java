@@ -56,6 +56,8 @@ public class AccountController {
     public ResponseEntity<String> updateAccount(@RequestBody Account account) {
         try {
             boolean updated = accountService.updateAccount(account);
+
+            System.out.println("account========"+account);
             if (updated) {
                 return ResponseEntity.ok("Account updated successfully");
             } else {

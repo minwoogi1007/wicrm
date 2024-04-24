@@ -28,10 +28,9 @@
     <update id="updateAccount">
         UPDATE N_TCNT01_EMP
         SET
-            emp_name = #{empName},
+            emp_name = #{emp_name},
             email = #{email},
-            hand_phone = #{handPhone},
-            HOMEPAGE = #{homePage}
+            hand_phone = #{hand_phone}
         WHERE USERID = #{userId}
     </update>
 </mapper>
