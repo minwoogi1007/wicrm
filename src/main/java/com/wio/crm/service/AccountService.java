@@ -9,6 +9,7 @@ import com.wio.crm.model.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -59,5 +60,24 @@ public class AccountService {
         accountMapper.updateAccount(account);
         return accountMapper.updateAccount(account) > 0;
 
+    }
+
+    private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    @Transactional
+    public boolean checkCurrentPassword(String username, String currentPassword) {
+        Tcnt01Emp user = accountMapper.findUserByUsername(username);
+        System.out.println(currentPassword);
+        System.out.println(username);
+        System.out.println(user.getPassword());
+        return passwordEncoder.matches(currentPassword, user.getPassword());
+    }
+    @Transactional
+    public void changeUserPassword(String username, String newPassword) {
+        String encodedPassword = passwordEncoder.encode(newPassword);
+
+        System.out.println(encodedPassword);
+        System.out.println(newPassword);
+        accountMapper.updateUserPassword(username, encodedPassword);
     }
 }

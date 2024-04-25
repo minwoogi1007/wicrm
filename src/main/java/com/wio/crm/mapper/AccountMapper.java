@@ -11,4 +11,7 @@ public interface AccountMapper {
 
     int updateAccount(Account account);
 
+    Tcnt01Emp findUserByUsername(String username);
+    void updateUserPassword(String username, String password);
+
 }

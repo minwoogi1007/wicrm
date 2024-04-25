@@ -1,16 +1,21 @@
 package com.wio.crm.controller;
 
+import com.wio.crm.dto.PasswordChangeDto;
 import com.wio.crm.model.Account;
 import com.wio.crm.model.Tcnt01Emp;
 import com.wio.crm.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.Collections;
 import java.util.Map;
 
 @Controller
@@ -66,5 +71,23 @@ public class AccountController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred: " + e.getMessage());
         }
+    }
+
+    @PostMapping("/api/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody PasswordChangeDto passwordChangeDto,
+                                            Authentication authentication) {
+        String username = authentication.getName();
+
+        if (!accountService.checkCurrentPassword(username, passwordChangeDto.getCurrentPassword())) {
+            System.out.println(passwordChangeDto.getCurrentPassword());
+            System.out.println(username);
+            // 비밀번호가 틀린 경우 클라이언트에 에러 메시지 전송
+            return ResponseEntity
+                    .badRequest()
+                    .body(Collections.singletonMap("error", "현재 비밀번호가 정확하지 않습니다."));
+        }
+
+        accountService.changeUserPassword(username, passwordChangeDto.getNewPassword());
+        return ResponseEntity.ok(Collections.singletonMap("message", "비밀번호가 성공적으로 변경되었습니다."));
     }
 }

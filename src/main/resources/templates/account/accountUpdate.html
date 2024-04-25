@@ -10,12 +10,88 @@
     <script th:inline="javascript">
         /*<![CDATA[*/
         $(document).ready(function() {
+
+            $('#kt_signin_password_button').click(function() {
+                $('#passwordChangeModal').modal('show');
+            });
+
+            $('#passwordChangeForm').submit(function(event) {
+                event.preventDefault();
+                var currentPassword = $('#currentPassword').val();
+                var newPassword = $('#newPassword').val();
+                var confirmNewPassword = $('#confirmNewPassword').val();
+
+                if (newPassword !== confirmNewPassword) {
+                    alert('새 비밀번호가 일치하지 않습니다.');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/api/change-password',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        currentPassword: currentPassword,
+                        newPassword: newPassword
+                    }),
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+                    },
+                    success: function(response) {
+                        alert('비밀번호가 변경되었습니다.');
+                        $('#passwordChangeModal').modal('hide');
+                    },
+                    error: function(xhr) {
+                        // 서버로부터 오류 응답 처리
+                        var response = JSON.parse(xhr.responseText);
+                        alert(response.error);
+                    }
+                });
+
+            });
+
             var csrfToken = $("meta[name='_csrf']").attr("content");
             var csrfHeader = $("meta[name='_csrf_header']").attr("content");
+            function checkChanges() {
+                var fieldsToCheck = ['#emp_name', '#email', '#hand_phone'];
+                var hasChanged = false;
+
+                fieldsToCheck.forEach(function(field) {
+                    var original = $(field).data('original') || ""; // `undefined`를 빈 문자열로 처리
+                    var currentValue = $(field).val();
+                    if (original !== currentValue) {
+                        hasChanged = true;
+                    }
+                });
+
+                return hasChanged;
+            }
+            // 취소 버튼 클릭 이벤트
+            $('#kt_account_profile_details_cancel').click(function(event) {
+                event.preventDefault(); // 기본 동작 중단
+                event.stopPropagation(); // 이벤트 버블링 중단
+                event.stopImmediatePropagation(); // 현재 요소의 다른 이벤트 핸들러 중단
+                if (checkChanges()) {
+                    if (confirm('변경된 사항이 있습니다. 취소하시겠습니까?')) {
+                        history.back(); // 사용자가 '확인'을 눌렀을 때 이전 페이지로 이동
+                    }
+                    // 사용자가 '취소'를 누르면 아무 동작도 하지 않음
+                    else {
+                        console.log("User cancelled"); // 사용자가 취소를 클릭한 경우
+                    }
+                } else {
+                    history.back();// 변경사항이 없으면 바로 이전 페이지로 이동
+                }
+            });
+
 
             $('#kt_account_profile_details_submit').click(function(event) {
 
                 event.preventDefault();
+                if (!checkChanges()) {
+                    alert('변경된 사항이 없습니다.');
+                    return; // 변경사항 없으면 여기서 함수 종료
+                }
                 var accountData = {
                     emp_name: $("#emp_name").val(),
                     email: $("#email").val(),
@@ -24,6 +100,7 @@
                 };
 
                 $.ajax({
+
                     url: '/api/account/update',
                     type: 'POST',
                     contentType: 'application/json',
@@ -104,7 +181,8 @@
                                 <h3 class="fw-bold m-0">정보 수정</h3>
                             </div>
                             <div class="d-flex align-items-center justify-content-end">
-                                <button type="button" class="btn btn-sm btn-secondary align-self-center" id="kt_account_profile_details_cancel" onclick="history.back();">취소</button>
+
+                                <button type="button" class="btn btn-sm btn-secondary align-self-center" id="kt_account_profile_details_cancel">취소</button>
                                 <button type="submit" class="btn btn-sm btn-primary align-self-center" id="kt_account_profile_details_submit">저장</button>
                             </div>
                             <!--end::Card title-->
@@ -129,7 +207,7 @@
                                             <div class="row">
                                                 <!--begin::Col-->
                                                 <div class="col-lg-6 fv-row">
-                                                    <input type="text" id="emp_name" name="emp_name" class="form-control form-control-lg form-control-solid" th:field="*{emp_name}" />
+                                                    <input type="text" id="emp_name" name="emp_name" class="form-control form-control-lg form-control-solid" th:field="*{emp_name}" th:attr="data-original=${accountInfo.emp_name}" />
                                                 </div>
                                                 <!--end::Col-->
                                                 <!--begin::Col-->
@@ -160,7 +238,7 @@
                                         <!--end::Label-->
                                         <!--begin::Col-->
                                         <div class="col-lg-8 fv-row">
-                                            <input type="tel" id="hand_phone" class="form-control form-control-lg form-control-solid" th:field="*{hand_phone}" />
+                                            <input type="tel" id="hand_phone" class="form-control form-control-lg form-control-solid" th:field="*{hand_phone}" th:attr="data-original=${accountInfo.hand_phone}" />
                                         </div>
                                         <!--end::Col-->
                                     </div>
@@ -173,7 +251,7 @@
                                         <!--end::Label-->
                                         <!--begin::Col-->
                                         <div class="col-lg-8 fv-row">
-                                            <input type="text" id="email" class="form-control form-control-lg form-control-solid" th:field="*{email}" />
+                                            <input type="text" id="email" class="form-control form-control-lg form-control-solid" th:field="*{email}"  th:attr="data-original=${accountInfo.email}"/>
                                         </div>
                                         <!--end::Col-->
                                     </div>
@@ -261,13 +339,13 @@
                                 <div class="row mb-0">
                                     <label class="col-lg-4 col-form-label fw-semibold fs-6 text-muted">홈페이지</label>
                                     <div class="col-lg-8">
-                                        <a href="#" class="fw-semibold fs-6 text-gray-800 text-hover-primary" th:field="${homePage}"></a>
+                                        <a href="#" class="fw-semibold fs-6 text-gray-800 text-hover-primary" th:field="${homePage}"  ></a>
                                     </div>
                                 </div>
                                 <div class="row mb-0">
                                     <label class="col-lg-4 col-form-label fw-semibold fs-6 text-muted">전화번호</label>
                                     <div class="col-lg-8">
-                                        <span class="fw-bold fs-6 text-gray-800" th:field="${tel_no}"></span>
+                                        <span class="fw-bold fs-6 text-gray-800" th:field="${tel_no}" ></span>
                                     </div>
                                 </div>
                                 <div class="row mb-0">
@@ -299,7 +377,7 @@
                                     <!--begin::Label-->
                                     <div id="kt_signin_email">
                                         <div class="fs-6 fw-bold mb-1">ID</div>
-                                        <div class="fw-semibold text-gray-600"></div>
+                                        <div class="fw-semibold text-gray-600" ></div>
                                     </div>
                                 </div>
                                 <!--end::Email Address-->
@@ -315,36 +393,53 @@
                                     </div>
                                     <!--end::Label-->
                                     <!--begin::Edit-->
-                                    <div id="kt_signin_password_edit" class="flex-row-fluid d-none">
-                                        <!--begin::Form-->
-                                        <form id="kt_signin_change_password" class="form" novalidate="novalidate">
-                                            <div class="row mb-1">
-                                                <div class="col-lg-4">
-                                                    <div class="fv-row mb-0">
-                                                        <label for="currentpassword" class="form-label fs-6 fw-bold mb-3">기존 비밀번호</label>
-                                                        <input type="password" class="form-control form-control-lg form-control-solid" name="currentpassword" id="currentpassword" />
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="fv-row mb-0">
-                                                        <label for="newpassword" class="form-label fs-6 fw-bold mb-3">새로운 비밀번호</label>
-                                                        <input type="password" class="form-control form-control-lg form-control-solid" name="newpassword" id="newpassword" />
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="fv-row mb-0">
-                                                        <label for="confirmpassword" class="form-label fs-6 fw-bold mb-3">비밀번호 확인</label>
-                                                        <input type="password" class="form-control form-control-lg form-control-solid" name="confirmpassword" id="confirmpassword" />
-                                                    </div>
+                                    <!-- 비밀번호 변경 모달 -->
+                                    <!-- Modal -->
+                                    <!-- 비밀번호 변경 모달 -->
+                                    <div class="modal fade" id="passwordChangeModal" tabindex="-1" role="dialog" aria-labelledby="passwordChangeModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-body scroll-y px-10 px-lg-15 pt-0 pb-15">
+                                                    <!-- Form 시작 -->
+                                                    <form id="passwordChangeForm" class="form">
+                                                        <!-- 제목 -->
+                                                        <div class="mb-13 text-center">
+                                                            <h1 class="mb-3">비밀번호 변경</h1>
+                                                        </div>
+                                                        <!-- 현재 비밀번호 입력 -->
+                                                        <div class="d-flex flex-column mb-8 fv-row">
+                                                            <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                                                                <span class="required">현재 비밀번호</span>
+                                                            </label>
+                                                            <input type="password" id="currentPassword" class="form-control form-control-solid" placeholder="현재 비밀번호 입력" required />
+                                                        </div>
+                                                        <!-- 새 비밀번호 입력 -->
+                                                        <div class="d-flex flex-column mb-8 fv-row">
+                                                            <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                                                                <span class="required">새 비밀번호</span>
+                                                            </label>
+                                                            <input type="password" id="newPassword" class="form-control form-control-solid" placeholder="새 비밀번호 입력" required />
+                                                        </div>
+                                                        <!-- 새 비밀번호 확인 입력 -->
+                                                        <div class="d-flex flex-column mb-8 fv-row">
+                                                            <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                                                                <span class="required">새 비밀번호 확인</span>
+                                                            </label>
+                                                            <input type="password" id="confirmNewPassword" class="form-control form-control-solid" placeholder="새 비밀번호 확인" required />
+                                                        </div>
+                                                        <!-- 액션 버튼 -->
+                                                        <div class="text-center">
+                                                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">취소</button>
+                                                            <button type="submit" class="btn btn-primary">
+                                                                <span class="indicator-label">저장</span>
+                                                            </button>
+                                                        </div>
+                                                    </form>
                                                 </div>
                                             </div>
-
-                                            <div class="d-flex">
-                                                <button id="kt_password_submit" type="button" class="btn btn-primary me-2 px-6">저장</button>
-                                                <button id="kt_password_cancel" type="button" class="btn btn-color-gray-500 btn-active-light-primary px-6">취소</button>
-                                            </div>
-                                        </form>
+                                        </div>
                                     </div>
+
                                     <div id="kt_signin_password_button" class="ms-auto">
                                         <button class="btn btn-light btn-active-light-primary">비밀번호 수정</button>
                                     </div>
