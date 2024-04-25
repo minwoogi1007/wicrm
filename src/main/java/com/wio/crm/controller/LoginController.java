@@ -35,10 +35,12 @@ public class LoginController {
     public String login() {
         return "sign-in";
     }
-    @GetMapping("/logout")
-    public String logout() {
+
+
+    //@GetMapping("/logout")
+    /*public String logout() {
         return "sign-in";
-    }
+    }*/
 
     @GetMapping("/check-userid-availability")
     @ResponseBody

@@ -1,9 +1,128 @@
-<!DOCTYPE html>
+
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{/main}">
 <!--begin::Main-->
+
+<meta name="_csrf" th:content="${_csrf.token}"/>
+<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 <div layout:fragment="content">
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(document).ready(function() {
+
+            $('#kt_signin_password_button').click(function() {
+                $('#passwordChangeModal').modal('show');
+            });
+
+            $('#passwordChangeForm').submit(function(event) {
+                event.preventDefault();
+                var currentPassword = $('#currentPassword').val();
+                var newPassword = $('#newPassword').val();
+                var confirmNewPassword = $('#confirmNewPassword').val();
+
+                if (newPassword !== confirmNewPassword) {
+                    alert('새 비밀번호가 일치하지 않습니다.');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/api/change-password',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        currentPassword: currentPassword,
+                        newPassword: newPassword
+                    }),
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+                    },
+                    success: function(response) {
+                        alert('비밀번호가 변경되었습니다.');
+                        $('#passwordChangeModal').modal('hide');
+                    },
+                    error: function(xhr) {
+                        // 서버로부터 오류 응답 처리
+                        var response = JSON.parse(xhr.responseText);
+                        alert(response.error);
+                    }
+                });
+
+            });
+
+            var csrfToken = $("meta[name='_csrf']").attr("content");
+            var csrfHeader = $("meta[name='_csrf_header']").attr("content");
+            function checkChanges() {
+                var fieldsToCheck = ['#emp_name', '#email', '#hand_phone'];
+                var hasChanged = false;
+
+                fieldsToCheck.forEach(function(field) {
+                    var original = $(field).data('original') || ""; // `undefined`를 빈 문자열로 처리
+                    var currentValue = $(field).val();
+                    if (original !== currentValue) {
+                        hasChanged = true;
+                    }
+                });
+
+                return hasChanged;
+            }
+            // 취소 버튼 클릭 이벤트
+            $('#kt_account_profile_details_cancel').click(function(event) {
+                event.preventDefault(); // 기본 동작 중단
+                event.stopPropagation(); // 이벤트 버블링 중단
+                event.stopImmediatePropagation(); // 현재 요소의 다른 이벤트 핸들러 중단
+                if (checkChanges()) {
+                    if (confirm('변경된 사항이 있습니다. 취소하시겠습니까?')) {
+                        history.back(); // 사용자가 '확인'을 눌렀을 때 이전 페이지로 이동
+                    }
+                    // 사용자가 '취소'를 누르면 아무 동작도 하지 않음
+                    else {
+                        console.log("User cancelled"); // 사용자가 취소를 클릭한 경우
+                    }
+                } else {
+                    history.back();// 변경사항이 없으면 바로 이전 페이지로 이동
+                }
+            });
+
+
+            $('#kt_account_profile_details_submit').click(function(event) {
+
+                event.preventDefault();
+                if (!checkChanges()) {
+                    alert('변경된 사항이 없습니다.');
+                    return; // 변경사항 없으면 여기서 함수 종료
+                }
+                var accountData = {
+                    emp_name: $("#emp_name").val(),
+                    email: $("#email").val(),
+                    hand_phone: $("#hand_phone").val(),
+                    homePage: $("#homePage").val()
+                };
+
+                $.ajax({
+
+                    url: '/api/account/update',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(accountData),
+                    beforeSend: function(xhr) {
+                        console.log(csrfToken);
+                        xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken); // Ensure this header is being set
+                    },
+                    success: function(response) {
+                        console.log('Update Success:', response);  // 로그 추가
+                        alert('계정 정보가 성공적으로 업데이트되었습니다.');
+                        window.location.href = '/account'; // 사용자를 /account/update 경로로 리다이렉트합니다.
+
+                    },
+                    error: function(xhr, status, error) {
+                        alert('업데이트 실패: ' + xhr.responseText);
+                    }
+                });
+            });
+        });
+        /*]]>*/
+    </script>
     <div class="app-main flex-column flex-row-fluid" id="kt_app_main">
         <!--begin::Content wrapper-->
         <div class="d-flex flex-column flex-column-fluid">
@@ -20,7 +139,7 @@
                         <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
                             <!--begin::Item-->
                             <li class="breadcrumb-item text-muted">
-                                <a href="index.html" class="text-muted text-hover-primary">Home</a>
+                                <a href="/main" class="text-muted text-hover-primary">Home</a>
                             </li>
                             <!--end::Item-->
                             <!--begin::Item-->
@@ -34,10 +153,6 @@
                         </ul>
                         <!--end::Breadcrumb-->
                     </div>
-                    <!--end::Page title-->
-                    <!--begin::Actions-->
-
-                    <!--end::Actions-->
                 </div>
                 <!--end::Toolbar container-->
             </div>
@@ -57,12 +172,18 @@
                     <!--end::Navbar-->
 
                     <!--begin::Basic info-->
+                    <form id="kt_account_profile_details_form" class="form" th:action="@{/account/update}" th:object="${accountInfo}" method="post">
                     <div class="card mb-5 mb-xl-10">
                         <!--begin::Card header-->
-                        <div class="card-header border-0 cursor-pointer" role="button" data-bs-toggle="collapse" data-bs-target="#kt_account_profile_details" aria-expanded="true" aria-controls="kt_account_profile_details">
+                        <div class="card-header border-0"  >
                             <!--begin::Card title-->
                             <div class="card-title m-0">
-                                <h3 class="fw-bold m-0">계정 정보 수정</h3>
+                                <h3 class="fw-bold m-0">정보 수정</h3>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-end">
+
+                                <button type="button" class="btn btn-sm btn-secondary align-self-center" id="kt_account_profile_details_cancel">취소</button>
+                                <button type="submit" class="btn btn-sm btn-primary align-self-center" id="kt_account_profile_details_submit">저장</button>
                             </div>
                             <!--end::Card title-->
                         </div>
@@ -70,13 +191,12 @@
                         <!--begin::Content-->
                         <div id="kt_account_settings_profile_details" class="collapse show">
                             <!--begin::Form-->
-                            <form id="kt_account_profile_details_form" class="form">
+
+                                    <input type="hidden" name="_csrf" value="${_csrf.token}">
+
+
                                 <!--begin::Card body-->
                                 <div class="card-body border-top p-9">
-                                    <!--begin::Input group-->
-
-                                    <!--end::Input group-->
-                                    <!--begin::Input group-->
                                     <div class="row mb-6">
                                         <!--begin::Label-->
                                         <label class="col-lg-4 col-form-label required fw-semibold fs-6">이름</label>
@@ -87,7 +207,7 @@
                                             <div class="row">
                                                 <!--begin::Col-->
                                                 <div class="col-lg-6 fv-row">
-                                                    <input type="text" name="fname" class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"  value="Max" />
+                                                    <input type="text" id="emp_name" name="emp_name" class="form-control form-control-lg form-control-solid" th:field="*{emp_name}" th:attr="data-original=${accountInfo.emp_name}" />
                                                 </div>
                                                 <!--end::Col-->
                                                 <!--begin::Col-->
@@ -100,16 +220,7 @@
                                     </div>
                                     <!--end::Input group-->
                                     <!--begin::Input group-->
-                                    <div class="row mb-6">
-                                        <!--begin::Label-->
-                                        <label class="col-lg-4 col-form-label required fw-semibold fs-6">회사명</label>
-                                        <!--end::Label-->
-                                        <!--begin::Col-->
-                                        <div class="col-lg-8 fv-row">
-                                            <input type="text" name="company" class="form-control form-control-lg form-control-solid" placeholder="회사명"  />
-                                        </div>
-                                        <!--end::Col-->
-                                    </div>
+
                                     <!--end::Input group-->
                                     <!--begin::Input group-->
                                     <div class="row mb-6">
@@ -127,7 +238,7 @@
                                         <!--end::Label-->
                                         <!--begin::Col-->
                                         <div class="col-lg-8 fv-row">
-                                            <input type="tel" name="phone" class="form-control form-control-lg form-control-solid" placeholder=""  />
+                                            <input type="tel" id="hand_phone" class="form-control form-control-lg form-control-solid" th:field="*{hand_phone}" th:attr="data-original=${accountInfo.hand_phone}" />
                                         </div>
                                         <!--end::Col-->
                                     </div>
@@ -135,47 +246,19 @@
                                         <!--begin::Label-->
                                         <label class="col-lg-4 col-form-label fw-semibold fs-6">
                                             <span class="required">email</span>
-                                            <span class="ms-1" data-bs-toggle="tooltip" title="메일 유형 체크">
-																<i class="ki-duotone ki-information-5 text-gray-500 fs-6">
-																	<span class="path1"></span>
-																	<span class="path2"></span>
-																	<span class="path3"></span>
-																</i>
-															</span>
+
                                         </label>
                                         <!--end::Label-->
                                         <!--begin::Col-->
                                         <div class="col-lg-8 fv-row">
-                                            <input type="tel" name="phone" class="form-control form-control-lg form-control-solid" placeholder=""  />
-                                        </div>
-                                        <!--end::Col-->
-                                    </div>
-                                    <!--end::Input group-->
-                                    <!--begin::Input group-->
-                                    <div class="row mb-6">
-                                        <!--begin::Label-->
-                                        <label class="col-lg-4 col-form-label fw-semibold fs-6">홈페이지</label>
-                                        <!--end::Label-->
-                                        <!--begin::Col-->
-                                        <div class="col-lg-8 fv-row">
-                                            <input type="text" name="website" class="form-control form-control-lg form-control-solid" placeholder="사이트"  />
+                                            <input type="text" id="email" class="form-control form-control-lg form-control-solid" th:field="*{email}"  th:attr="data-original=${accountInfo.email}"/>
                                         </div>
                                         <!--end::Col-->
                                     </div>
                                     <!--end::Input group-->
                                     <!--begin::Input group-->
 
-                                    <!--end::Input group-->
-                                    <!--begin::Input group-->
 
-                                    <!--end::Input group-->
-                                    <!--begin::Input group-->
-
-                                    <!--end::Input group-->
-                                    <!--begin::Input group-->
-
-                                    <!--end::Input group-->
-                                    <!--begin::Input group-->
                                     <div class="row mb-6">
                                         <!--begin::Label-->
                                         <label class="col-lg-4 col-form-label required fw-semibold fs-6">담당자 연락 가능 방법</label>
@@ -217,25 +300,71 @@
                                         <!--begin::Label-->
                                     </div>
                                     <!--end::Input group-->
+
+                                    <!--begin::Card body-->
+
                                 </div>
+
                                 <!--end::Card body-->
                                 <!--begin::Actions-->
-                                <div class="card-footer d-flex justify-content-end py-6 px-9">
-                                    <button type="submit" class="btn btn-primary" id="kt_account_profile_details_submit">저장</button>
-                                </div>
+
+
                                 <!--end::Actions-->
-                            </form>
+
                             <!--end::Form-->
                         </div>
+
                         <!--end::Content-->
                     </div>
+                        <div class="card mb-5 mb-xl-10">
+                            <!--begin::Card header-->
+                            <div class="card-header border-0">
+                                <div class="card-title m-0">
+                                    <h3 class="fw-bold m-0">회사 정보</h3>
+                                </div>
+                            </div>
+                            <!--begin::Card body-->
+                            <div class="card-body border-top p-9">
+
+                                <div class="row mb-6">
+                                    <!--begin::Label-->
+                                    <label class="col-lg-4 col-form-label required fw-semibold fs-6">회사명</label>
+                                    <!--end::Label-->
+                                    <!--begin::Col-->
+                                    <div class="col-lg-8 fv-row">
+                                        <input type="text" id="cust_name" name="emp_name" class="form-control form-control-lg form-control-solid" th:field="*{cust_name}"readonly />
+                                    </div>
+                                    <!--end::Col-->
+                                </div>
+                                <div class="row mb-0">
+                                    <label class="col-lg-4 col-form-label fw-semibold fs-6 text-muted">홈페이지</label>
+                                    <div class="col-lg-8">
+                                        <a href="#" class="fw-semibold fs-6 text-gray-800 text-hover-primary" th:field="${homePage}"  ></a>
+                                    </div>
+                                </div>
+                                <div class="row mb-0">
+                                    <label class="col-lg-4 col-form-label fw-semibold fs-6 text-muted">전화번호</label>
+                                    <div class="col-lg-8">
+                                        <span class="fw-bold fs-6 text-gray-800" th:field="${tel_no}" ></span>
+                                    </div>
+                                </div>
+                                <div class="row mb-0">
+                                    <label class="col-lg-4 col-form-label fw-semibold fs-6 text-muted">주소</label>
+                                    <div class="col-lg-8">
+                                        <span class="fw-bold fs-6 text-gray-800"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--end::Card body-->
+                        </div>
+                    </form>
                     <!--end::Basic info-->
                     <!--begin::Sign-in Method-->
                     <div class="card mb-5 mb-xl-10">
                         <!--begin::Card header-->
                         <div class="card-header border-0 cursor-pointer" role="button" data-bs-toggle="collapse" data-bs-target="#kt_account_signin_method">
                             <div class="card-title m-0">
-                                <h3 class="fw-bold m-0">로그인 방법</h3>
+                                <h3 class="fw-bold m-0">로그인 계정</h3>
                             </div>
                         </div>
                         <!--end::Card header-->
@@ -248,15 +377,8 @@
                                     <!--begin::Label-->
                                     <div id="kt_signin_email">
                                         <div class="fs-6 fw-bold mb-1">ID</div>
-                                        <div class="fw-semibold text-gray-600"></div>
+                                        <div class="fw-semibold text-gray-600" ></div>
                                     </div>
-                                    <!--end::Label-->
-                                    <!--begin::Edit-->
-
-                                    <!--end::Edit-->
-                                    <!--begin::Action-->
-
-                                    <!--end::Action-->
                                 </div>
                                 <!--end::Email Address-->
                                 <!--begin::Separator-->
@@ -271,85 +393,76 @@
                                     </div>
                                     <!--end::Label-->
                                     <!--begin::Edit-->
-                                    <div id="kt_signin_password_edit" class="flex-row-fluid d-none">
-                                        <!--begin::Form-->
-                                        <form id="kt_signin_change_password" class="form" novalidate="novalidate">
-                                            <div class="row mb-1">
-                                                <div class="col-lg-4">
-                                                    <div class="fv-row mb-0">
-                                                        <label for="currentpassword" class="form-label fs-6 fw-bold mb-3">기존 비밀번호</label>
-                                                        <input type="password" class="form-control form-control-lg form-control-solid" name="currentpassword" id="currentpassword" />
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="fv-row mb-0">
-                                                        <label for="newpassword" class="form-label fs-6 fw-bold mb-3">새로운 비밀번호</label>
-                                                        <input type="password" class="form-control form-control-lg form-control-solid" name="newpassword" id="newpassword" />
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="fv-row mb-0">
-                                                        <label for="confirmpassword" class="form-label fs-6 fw-bold mb-3">비밀번호 확인</label>
-                                                        <input type="password" class="form-control form-control-lg form-control-solid" name="confirmpassword" id="confirmpassword" />
-                                                    </div>
+                                    <!-- 비밀번호 변경 모달 -->
+                                    <!-- Modal -->
+                                    <!-- 비밀번호 변경 모달 -->
+                                    <div class="modal fade" id="passwordChangeModal" tabindex="-1" role="dialog" aria-labelledby="passwordChangeModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-body scroll-y px-10 px-lg-15 pt-0 pb-15">
+                                                    <!-- Form 시작 -->
+                                                    <form id="passwordChangeForm" class="form">
+                                                        <!-- 제목 -->
+                                                        <div class="mb-13 text-center">
+                                                            <h1 class="mb-3">비밀번호 변경</h1>
+                                                        </div>
+                                                        <!-- 현재 비밀번호 입력 -->
+                                                        <div class="d-flex flex-column mb-8 fv-row">
+                                                            <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                                                                <span class="required">현재 비밀번호</span>
+                                                            </label>
+                                                            <input type="password" id="currentPassword" class="form-control form-control-solid" placeholder="현재 비밀번호 입력" required />
+                                                        </div>
+                                                        <!-- 새 비밀번호 입력 -->
+                                                        <div class="d-flex flex-column mb-8 fv-row">
+                                                            <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                                                                <span class="required">새 비밀번호</span>
+                                                            </label>
+                                                            <input type="password" id="newPassword" class="form-control form-control-solid" placeholder="새 비밀번호 입력" required />
+                                                        </div>
+                                                        <!-- 새 비밀번호 확인 입력 -->
+                                                        <div class="d-flex flex-column mb-8 fv-row">
+                                                            <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                                                                <span class="required">새 비밀번호 확인</span>
+                                                            </label>
+                                                            <input type="password" id="confirmNewPassword" class="form-control form-control-solid" placeholder="새 비밀번호 확인" required />
+                                                        </div>
+                                                        <!-- 액션 버튼 -->
+                                                        <div class="text-center">
+                                                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">취소</button>
+                                                            <button type="submit" class="btn btn-primary">
+                                                                <span class="indicator-label">저장</span>
+                                                            </button>
+                                                        </div>
+                                                    </form>
                                                 </div>
                                             </div>
-
-                                            <div class="d-flex">
-                                                <button id="kt_password_submit" type="button" class="btn btn-primary me-2 px-6">저장</button>
-                                                <button id="kt_password_cancel" type="button" class="btn btn-color-gray-500 btn-active-light-primary px-6">취소</button>
-                                            </div>
-                                        </form>
-                                        <!--end::Form-->
+                                        </div>
                                     </div>
-                                    <!--end::Edit-->
-                                    <!--begin::Action-->
+
                                     <div id="kt_signin_password_button" class="ms-auto">
                                         <button class="btn btn-light btn-active-light-primary">비밀번호 수정</button>
                                     </div>
-                                    <!--end::Action-->
                                 </div>
-                                <!--end::Password-->
-                                <!--begin::Notice-->
-                                <div class="notice d-flex bg-light-primary rounded border-primary border border-dashed p-6">
-                                    <!--begin::Icon-->
-                                    <i class="ki-duotone ki-shield-tick fs-2tx text-primary me-4">
-                                        <span class="path1"></span>
-                                        <span class="path2"></span>
-                                    </i>
-                                    <!--end::Icon-->
-                                    <!--begin::Wrapper-->
 
-                                    <!--end::Wrapper-->
-                                </div>
-                                <!--end::Notice-->
                             </div>
                             <!--end::Card body-->
                         </div>
-                        <!--end::Content-->
+
                     </div>
-                    <!--end::Sign-in Method-->
-                    <!--begin::Connected Accounts-->
 
-                    <!--end::Connected Accounts-->
-                    <!--begin::Notifications-->
+                    <div class="card mb-5 mb-xl-10">
+                        <!--begin::Card header-->
 
-                    <!--end::Notifications-->
-                    <!--begin::Notifications-->
+                        <!--end::Card body-->
+                    </div>
 
-                    <!--end::Notifications-->
-                    <!--begin::Deactivate Account-->
-
-                    <!--end::Deactivate Account-->
                 </div>
                 <!--end::Content container-->
             </div>
-            <!--end::Content-->
-        </div>
-        <!--end::Content wrapper-->
-        <!--begin::Footer-->
 
-        <!--end::Footer-->
+        </div>
+
     </div>
 
 </div>

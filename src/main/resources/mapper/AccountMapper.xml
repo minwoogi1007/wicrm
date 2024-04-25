@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wio.crm.mapper.AccountMapper">
+
+    <select id="getAccount"  resultType="com.wio.crm.model.Tcnt01Emp">
+        SELECT
+            A.USERID,
+            A.CUST_CODE custCode,
+            B.CUST_NAME ,
+            A.EMPNO,
+            A.EMP_NAME,
+            A.USERID,
+            A.DEPART,
+            A.POSITION,
+            A.ZIP_NO,
+            A.ADDR,
+            A.TEL_NO,
+            A.FEX_NO,
+            A.HAND_PHONE,
+            A.EMAIL,
+            A.RMK,
+            A.USE_YN,
+            A.ADMIN,
+            B.HOMEPAGE
+        FROM N_TCNT01_EMP A, TCNT01 B
+        WHERE A.CUST_CODE = B.CUST_CODE
+          AND USERID= #{custCode}
+    </select>
+
+    <update id="updateAccount">
+        UPDATE N_TCNT01_EMP
+        SET
+            emp_name = #{emp_name},
+            email = #{email},
+            hand_phone = #{hand_phone}
+        WHERE USERID = #{userId}
+    </update>
+
+
+
+    <select id="findUserByUsername" resultType="com.wio.crm.model.Tcnt01Emp">
+        SELECT USERID userId , PW  password FROM N_TIPDW WHERE USERID = #{username}
+    </select>
+    <update id="updateUserPassword">
+        UPDATE N_TIPDW SET PW = #{password} WHERE USERID = #{username}
+    </update>
+</mapper>
