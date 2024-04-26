@@ -65,19 +65,19 @@ public class AccountService {
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Transactional
-    public boolean checkCurrentPassword(String username, String currentPassword) {
-        Tcnt01Emp user = accountMapper.findUserByUsername(username);
-        System.out.println(currentPassword);
-        System.out.println(username);
-        System.out.println(user.getPassword());
+    public boolean checkCurrentPassword(String currentPassword) {
+        String userId = getCurrentUserId();
+
+        Tcnt01Emp user = accountMapper.findUserByUsername(userId);
+        System.out.println("user==========="+user.getPassword());
+
         return passwordEncoder.matches(currentPassword, user.getPassword());
     }
     @Transactional
-    public void changeUserPassword(String username, String newPassword) {
+    public void changeUserPassword(String newPassword) {
+        String userId = getCurrentUserId();
         String encodedPassword = passwordEncoder.encode(newPassword);
 
-        System.out.println(encodedPassword);
-        System.out.println(newPassword);
-        accountMapper.updateUserPassword(username, encodedPassword);
+        accountMapper.updateUserPassword(userId, encodedPassword);
     }
 }

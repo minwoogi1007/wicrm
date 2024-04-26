@@ -29,11 +29,10 @@
                 $.ajax({
                     url: '/api/change-password',
                     type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({
+                    data: {
                         currentPassword: currentPassword,
                         newPassword: newPassword
-                    }),
+                    },
                     beforeSend: function(xhr) {
                         xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
                     },
@@ -42,9 +41,8 @@
                         $('#passwordChangeModal').modal('hide');
                     },
                     error: function(xhr) {
-                        // 서버로부터 오류 응답 처리
                         var response = JSON.parse(xhr.responseText);
-                        alert(response.error);
+                        alert(response.error); // 서버로부터 받은 오류 메시지 표시
                     }
                 });
 

@@ -74,20 +74,24 @@ public class AccountController {
     }
 
     @PostMapping("/api/change-password")
-    public ResponseEntity<?> changePassword(@RequestBody PasswordChangeDto passwordChangeDto,
-                                            Authentication authentication) {
-        String username = authentication.getName();
-
-        if (!accountService.checkCurrentPassword(username, passwordChangeDto.getCurrentPassword())) {
-            System.out.println(passwordChangeDto.getCurrentPassword());
-            System.out.println(username);
-            // 비밀번호가 틀린 경우 클라이언트에 에러 메시지 전송
+    public ResponseEntity<?> changePassword(@RequestParam String currentPassword, @RequestParam String newPassword) {
+        if (!accountService.checkCurrentPassword(currentPassword)) {
+            // 현재 비밀번호 검증 실패
             return ResponseEntity
                     .badRequest()
                     .body(Collections.singletonMap("error", "현재 비밀번호가 정확하지 않습니다."));
         }
 
-        accountService.changeUserPassword(username, passwordChangeDto.getNewPassword());
-        return ResponseEntity.ok(Collections.singletonMap("message", "비밀번호가 성공적으로 변경되었습니다."));
+        // 비밀번호 변경 로직
+        try {
+            // 비밀번호 변경 시도
+            accountService.changeUserPassword(newPassword);
+            return ResponseEntity.ok(Collections.singletonMap("message", "비밀번호가 성공적으로 변경되었습니다."));
+        } catch (Exception e) {
+            // 비밀번호 변경 중 예외 발생
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("error", "비밀번호 변경에 실패했습니다."));
+        }
     }
 }
