@@ -10,6 +10,16 @@ public class Account {
 
     private String cust_name;
 
+    private String password;
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public String getCust_name() {
         return cust_name;
     }

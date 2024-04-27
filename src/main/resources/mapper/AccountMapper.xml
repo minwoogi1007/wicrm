@@ -39,9 +39,9 @@
 
 
     <select id="findUserByUsername" resultType="com.wio.crm.model.Tcnt01Emp">
-        SELECT USERID userId , PW  password FROM N_TIPDW WHERE USERID = #{username}
+        SELECT PW  password FROM N_TIPDW WHERE USERID = #{userId}
     </select>
     <update id="updateUserPassword">
-        UPDATE N_TIPDW SET PW = #{password} WHERE USERID = #{username}
+        UPDATE N_TIPDW SET PW = #{password} WHERE USERID = #{userId}
     </update>
 </mapper>
