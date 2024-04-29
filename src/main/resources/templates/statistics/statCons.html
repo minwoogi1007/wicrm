@@ -3,6 +3,8 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{/main}">
 <!--begin::Main-->
+<meta name="_csrf" th:content="${_csrf.token}"/>
+<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 <div layout:fragment="content">
     <div class="d-flex flex-column flex-column-fluid">
         <!--begin::Toolbar-->
@@ -50,6 +52,7 @@
 
         <!--end::Toolbar-->
         <!--begin::Content-->
+        <form id="searchForm"  onsubmit="return false;">
         <div id="kt_app_content" class="app-content flex-column-fluid">
             <!--begin::Content container-->
             <div id="kt_app_content_container" class="app-container container-xxl">
@@ -65,6 +68,8 @@
                             <!--begin::Export buttons-->
                             <div id="kt_ecommerce_report_customer_orders_export" class="d-none"></div>
                             <div class="position-relative w-md-260px me-md-2">
+                                <input type="hidden" id="hidden_start_date" name="start_date">
+                                <input type="hidden" id="hidden_end_date" name="end_date">
                             <input class="form-control form-control-solid w-100 mw-250px" placeholder="Pick date range" id="kt_ecommerce_report_customer_orders_daterangepicker" readonly />
                             </div>
                             <!--end::Export buttons-->
@@ -142,15 +147,7 @@
                             </thead>
                             <tbody class="fw-semibold text-gray-600">
 
-                            <tr th:each="list:${list}">
 
-                                <td th:text="${list.GNO}"></td>
-
-                                <td th:text="${list.SUBJECT}"></td>
-
-                                <td th:text="${list.ID}"></td>
-
-                            </tr>
 
 
                             </tbody>
@@ -164,10 +161,12 @@
             </div>
             <!--end::Content container-->
         </div>
+        </form>
         <!--end::Content-->
         <script src="/assets/js/stat/statCons.js"></script>
         <script src="/assets/plugins/global/plugins.bundle.js"></script>
         <script src="/assets/js/board/scripts.bundle.js"></script>
         <script src="/assets/js/stat/stat.js"></script>
     </div>
+
 </div>

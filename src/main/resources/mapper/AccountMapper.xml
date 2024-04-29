@@ -38,7 +38,7 @@
 
 
 
-    <select id="findUserByUsername" resultType="com.wio.crm.model.Tcnt01Emp">
+    <select id="findUserByUsername" resultType="com.wio.crm.model.Account">
         SELECT PW  password FROM N_TIPDW WHERE USERID = #{userId}
     </select>
     <update id="updateUserPassword">

@@ -150,7 +150,7 @@
                                                     <td>
                                                         <div th:switch="${transaction.CHARGE_GUBN}">
                                                             <span  th:case="'C'" class="badge badge-light-success">충전</span>
-                                                            <span  th:case="'D'" class="badge badge-light-success">충전</span>
+                                                            <span  th:case="'D'" class="badge badge-light-warning">차감</span>
                                                         </div>
                                                     </td>
                                                     <td th:text="${transaction.CHARGE_POINT}" style="text-align: right;"></td>

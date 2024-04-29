@@ -1,80 +1,99 @@
-"use strict";
+document.getElementById('searchForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    updateDataTable();
+});
+
+function updateDataTable() {
+    const startDate = document.getElementById('hidden_start_date').value;
+    const endDate = document.getElementById('hidden_end_date').value;
+
+    fetch(`/api/searchCons?start_date=${startDate}&end_date=${endDate}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            // Include CSRF token as necessary
+        }
+    })
+        .then(response => response.json())
+        .then(data => {
+            const tableBody = document.getElementById('kt_ecommerce_report_customer_orders_table').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = '';
+            if (data.length === 0) {
+                const row = tableBody.insertRow();
+                const cell = row.insertCell(0);
+                cell.textContent = "조회된 데이터가 없습니다";
+                cell.colSpan = 3;
+                cell.style.textAlign = 'center';
+            } else {
+                data.forEach(item => {
+                    const row = tableBody.insertRow();
+                    const cellDate = row.insertCell(0);
+                    const cellType = row.insertCell(1);
+                    const cellTotal = row.insertCell(2);
+
+                    cellDate.textContent = item.indate;
+                    cellType.textContent = item.csname;
+                    cellTotal.textContent = item.cscountst;
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error loading the data:', error);
+            const row = tableBody.insertRow();
+            const cell = row.insertCell(0);
+            cell.textContent = "데이터를 불러오는 중 오류가 발생했습니다";
+            cell.colSpan = 3;
+            cell.style.textAlign = 'center';
+        });
+}
 
 var KTAppEcommerceReportCustomerOrders = function() {
     var table, dataTable;
+    var hiddenStartDate, hiddenEndDate;
     return {
         init: function() {
             table = document.querySelector("#kt_ecommerce_report_customer_orders_table");
-            if (table) {
-                // 날짜 데이터 초기화 및 설정
-                table.querySelectorAll("tbody tr").forEach((row) => {
-                    const cells = row.querySelectorAll("td"),
-                        dateValue = moment(cells[3].innerHTML, "YYYY MMM DD, LT").format();
-                    cells[3].setAttribute("data-order", dateValue);
-                });
+            dataTable = $(table).DataTable({
+                info: false,
+                order: [],
+                pageLength: 10,
+                dom: 'Bfrtip',    // This parameter ensures that DataTables' buttons are active.
+                buttons: [       // Define buttons for export functionality.
+                    'copyHtml5',
+                    'excelHtml5',  // Ensure the Excel button is defined.
+                    'csvHtml5',
+                    'pdfHtml5'
+                ]
+            });
 
-                // DataTable 초기화
-                dataTable = $(table).DataTable({
-                    info: false,
-                    order: [],
-                    pageLength: 10
-                });
+            var dateRangePicker = $("#kt_ecommerce_report_customer_orders_daterangepicker");
+            hiddenStartDate = document.getElementById('hidden_start_date');
+            hiddenEndDate = document.getElementById('hidden_end_date');
 
-                // 날짜 범위 선택기 설정
-                var today = moment(),
-                    dateRangePicker = $("#kt_ecommerce_report_customer_orders_daterangepicker");
+            dateRangePicker.daterangepicker({
+                startDate: moment(),
+                endDate: moment(),
+                ranges: {
+                    '오늘': [moment(), moment()],
+                    '어제': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    '지난 7일': [moment().subtract(6, 'days'), moment()],
+                    '지난 30일': [moment().subtract(29, 'days'), moment()],
+                    '이번달': [moment().startOf('month'), moment().endOf('month')],
+                    '지난달': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                },
+                locale: {
+                    format: 'YYYY/MM/DD'
+                }
+            }, function(start, end) {
+                hiddenStartDate.value = start.format('YYYYMMDD');
+                hiddenEndDate.value = end.format('YYYYMMDD');
+                updateDataTable();
+            });
 
-                dateRangePicker.daterangepicker({
-                    startDate: today,
-                    endDate: today,
-                    ranges: {
-                        '오늘': [today, today],
-                        '어제': [moment().subtract(1, "days"), moment().subtract(1, "days")],
-                        '지난 7일': [moment().subtract(6, "days"), moment()],
-                        '지난 30일': [moment().subtract(29, "days"), moment()],
-                        '이번달': [moment().startOf("month"), moment().endOf("month")],
-                        '지난달': [moment().subtract(1, "month").startOf("month"), moment().subtract(1, "month").endOf("month")]
-                    },
-                    locale: {
-                        format: 'YYYY/MM/DD'
-                    },
-                    alwaysShowCalendars: true
-                }, function(start, end) {
-                    dateRangePicker.html(start.format('YYYY/MM/DD') + ' ~ ' + end.format('YYYY/MM/DD'));
-                    dataTable.draw();
-                });
-
-                // 처음 페이지 로드 시 '오늘' 날짜로 필터링
-                dateRangePicker.data('daterangepicker').setStartDate(today);
-                dateRangePicker.data('daterangepicker').setEndDate(today);
-                dateRangePicker.data('daterangepicker').clickApply();
-
-                // 내보내기 버튼 설정
-                const reportTitle = "Customer Orders Report";
-                new $.fn.dataTable.Buttons(table, {
-                    buttons: [
-                        {extend: "copyHtml5", title: reportTitle},
-                        {extend: "excelHtml5", title: reportTitle},
-                        {extend: "csvHtml5", title: reportTitle},
-                        {extend: "pdfHtml5", title: reportTitle}
-                    ]
-                }).container().appendTo($("#kt_ecommerce_report_customer_orders_export"));
-
-                document.querySelectorAll("#kt_ecommerce_report_customer_orders_export_menu [data-kt-ecommerce-export]").forEach((button) => {
-                    button.addEventListener("click", (event) => {
-                        event.preventDefault();
-                        const format = event.target.getAttribute("data-kt-ecommerce-export");
-                        document.querySelector(".dt-buttons .buttons-" + format).click();
-                    });
-                });
-
-                // 상태 필터 설정
-                const statusFilter = document.querySelector('[data-kt-ecommerce-order-filter="status"]');
-                $(statusFilter).on("change", (event) => {
-                    const searchVal = event.target.value === "all" ? "" : event.target.value;
-                    dataTable.column(2).search(searchVal).draw();
-                });
-            }
+            // Set the initial dates and trigger data update
+            dateRangePicker.data('daterangepicker').setStartDate(moment());
+            dateRangePicker.data('daterangepicker').setEndDate(moment());
+            dateRangePicker.data('daterangepicker').clickApply();
         }
     }
 }();

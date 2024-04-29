@@ -68,10 +68,10 @@ public class AccountService {
     public boolean checkCurrentPassword(String currentPassword) {
         String userId = getCurrentUserId();
 
-        Tcnt01Emp user = accountMapper.findUserByUsername(userId);
-        System.out.println("user==========="+user.getPassword());
+        Account account = accountMapper.findUserByUsername(userId);
+        System.out.println("user==========="+account.getPassword());
 
-        return passwordEncoder.matches(currentPassword, user.getPassword());
+        return passwordEncoder.matches(currentPassword, account.getPassword());
     }
     @Transactional
     public void changeUserPassword(String newPassword) {
