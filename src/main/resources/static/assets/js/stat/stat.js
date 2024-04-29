@@ -56,14 +56,7 @@ var KTAppEcommerceReportCustomerOrders = function() {
             dataTable = $(table).DataTable({
                 info: false,
                 order: [],
-                pageLength: 10,
-                dom: 'Bfrtip',    // This parameter ensures that DataTables' buttons are active.
-                buttons: [       // Define buttons for export functionality.
-                    'copyHtml5',
-                    'excelHtml5',  // Ensure the Excel button is defined.
-                    'csvHtml5',
-                    'pdfHtml5'
-                ]
+                pageLength: 10
             });
 
             var dateRangePicker = $("#kt_ecommerce_report_customer_orders_daterangepicker");
