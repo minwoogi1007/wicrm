@@ -2,14 +2,7 @@ package com.wio.crm.model;
 
 public class Tcnt01Emp {
 
-    public Tcnt01Emp(String custCode, String empno, String use_yn, String emp_name, String id , String cust_gubn) {
-        this.custCode = custCode;
-        this.empno = empno;
-        this.use_yn = use_yn;
-        this.emp_name = emp_name;
-        this.id = id;
-        this.cust_gubn=cust_gubn;
-    }
+
     private String custCode;
     private String empno;
     // ... (Other fields)
@@ -34,8 +27,6 @@ public class Tcnt01Emp {
 
     private String cust_name;
 
-    private String password;
-
     private int hasEmail;
 
     private int hasPhone;
@@ -54,14 +45,6 @@ public class Tcnt01Emp {
 
     public void setHasPhone(int hasPhone) {
         this.hasPhone = hasPhone;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     @Override

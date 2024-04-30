@@ -42,18 +42,22 @@ public class AccountService {
     public Map<String, Object> getAccount() {
         Map<String, Object> data = new HashMap<>();
         String userId = getCurrentUserId();
-        System.out.println("custCode-===" + userId);
+        logger.debug("Fetching account for custCode: {}", userId);
 
-        Tcnt01Emp accountInfo = accountMapper.getAccount(userId);
-        System.out.println("=======================service==============="+accountInfo);
+        try {
+            Tcnt01Emp accountInfo = accountMapper.getAccount(userId);
+            logger.debug("Account info retrieved: {}", accountInfo);
 
-        if (accountInfo != null) {
-            System.out.println(accountInfo); // 여기서 상세 필드 값도 출력해 볼 수 있습니다.
-        } else {
-            System.out.println("No account found for userId: " + userId);
+            if (accountInfo != null) {
+                logger.debug("Detailed Account Info: {}", accountInfo);
+            } else {
+                logger.debug("No account found for userId: {}", userId);
+            }
+
+            data.put("accountInfo", accountInfo);
+        } catch (Exception e) {
+            logger.error("Error fetching account info for userId: {}", userId, e);
         }
-
-        data.put("accountInfo", accountInfo);
 
         return data;
     }
