@@ -1,6 +1,5 @@
-
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns="http://www.w3.org/1999/html"
       layout:decorate="~{/main}">
 <!--begin::Main-->
 
@@ -224,7 +223,7 @@
                                     <div class="row mb-6">
                                         <!--begin::Label-->
                                         <label class="col-lg-4 col-form-label fw-semibold fs-6">
-                                            <span class="required">전화번호</span>
+                                            <span>전화번호</span>
                                             <span class="ms-1" data-bs-toggle="tooltip" title="연락 가능한 번호">
 																<i class="ki-duotone ki-information-5 text-gray-500 fs-6">
 																	<span class="path1"></span>
@@ -243,7 +242,7 @@
                                     <div class="row mb-6">
                                         <!--begin::Label-->
                                         <label class="col-lg-4 col-form-label fw-semibold fs-6">
-                                            <span class="required">email</span>
+                                            <span>email</span>
 
                                         </label>
                                         <!--end::Label-->
@@ -267,13 +266,15 @@
                                             <div class="d-flex align-items-center mt-3">
                                                 <!--begin::Option-->
                                                 <label class="form-check form-check-custom form-check-inline form-check-solid me-5">
-                                                    <input class="form-check-input" name="communication[]" type="checkbox" value="1" />
+                                                    <span class="fw-semibold ps-2 fs-6" th:field="*{hasEmail}"> </span>
+                                                    <input class="form-check-input" name="communication[]" type="checkbox" value="1" th:checked="${hasEmail == 1}" />
                                                     <span class="fw-semibold ps-2 fs-6">Email</span>
                                                 </label>
                                                 <!--end::Option-->
                                                 <!--begin::Option-->
                                                 <label class="form-check form-check-custom form-check-inline form-check-solid">
-                                                    <input class="form-check-input" name="communication[]" type="checkbox" value="2" />
+                                                    <span class="fw-semibold ps-2 fs-6" th:field="*{hasPhone}"> </span>
+                                                    <input class="form-check-input" name="communication[]" type="checkbox" value="2"  th:checked="${hasPhone == 1}"/>
                                                     <span class="fw-semibold ps-2 fs-6">전화</span>
                                                 </label>
                                                 <!--end::Option-->

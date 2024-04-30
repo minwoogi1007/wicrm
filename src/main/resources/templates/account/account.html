@@ -151,7 +151,12 @@
                                             <!--end::Label-->
                                             <!--begin::Col-->
                                             <div class="col-lg-8">
-                                                <span class="fw-bold fs-6 text-gray-800"></span>
+                                                <div class="col-lg-8">
+                                                    <span class="fw-bold fs-6 text-gray-800" th:if="${accountInfo.hasPhone == 1}" th:text="'전화'"></span>
+                                                    <span class="fw-bold fs-6 text-gray-800" th:if="${accountInfo.hasPhone != 1}" th:text="''"></span>
+                                                    <span class="fw-bold fs-6 text-gray-800" th:if="${accountInfo.hasEmail == 1}" th:text="' 이메일'"></span>
+                                                    <span class="fw-bold fs-6 text-gray-800" th:if="${accountInfo.hasEmail != 1}" th:text="''"></span>
+                                                </div>
                                             </div>
 
                                     </div>
