@@ -45,6 +45,13 @@ public class AccountService {
         System.out.println("custCode-===" + userId);
 
         Tcnt01Emp accountInfo = accountMapper.getAccount(userId);
+        System.out.println("=======================service==============="+accountInfo);
+
+        if (accountInfo != null) {
+            System.out.println(accountInfo); // 여기서 상세 필드 값도 출력해 볼 수 있습니다.
+        } else {
+            System.out.println("No account found for userId: " + userId);
+        }
 
         data.put("accountInfo", accountInfo);
 

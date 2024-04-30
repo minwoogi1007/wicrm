@@ -4,24 +4,25 @@
 
     <select id="getAccount"  resultType="com.wio.crm.model.Tcnt01Emp">
         SELECT
-            A.USERID,
-            A.CUST_CODE custCode,
-            B.CUST_NAME ,
-            A.EMPNO,
-            A.EMP_NAME,
-            A.USERID,
-            A.DEPART,
-            A.POSITION,
-            A.ZIP_NO,
-            A.ADDR,
-            A.TEL_NO,
-            A.FEX_NO,
-            A.HAND_PHONE,
-            A.EMAIL,
-            A.RMK,
-            A.USE_YN,
-            A.ADMIN,
-            B.HOMEPAGE
+            A.USERID as userId,
+            A.CUST_CODE as custCode,
+            B.CUST_NAME as cust_name,
+            A.EMPNO  as  empno,
+            A.EMP_NAME as  emp_name,
+            A.DEPART  ,
+            A.POSITION  ,
+            A.ZIP_NO  ,
+            A.ADDR  ,
+            A.TEL_NO as  tel_no,
+            A.FEX_NO  ,
+            A.HAND_PHONE as  hand_phone,
+            A.EMAIL as  email,
+            A.RMK  ,
+            A.USE_YN as  use_yn,
+            A.ADMIN ,
+            B.HOMEPAGE as  homePage,
+            A.HAS_EMAIL as  hasEmail,
+            A.HAS_PHONE as hasPhone
         FROM N_TCNT01_EMP A, TCNT01 B
         WHERE A.CUST_CODE = B.CUST_CODE
           AND USERID= #{custCode}

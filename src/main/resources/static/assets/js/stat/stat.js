@@ -63,6 +63,11 @@ var KTAppEcommerceReportCustomerOrders = function() {
             hiddenStartDate = document.getElementById('hidden_start_date');
             hiddenEndDate = document.getElementById('hidden_end_date');
 
+            // Today's date setup
+            var today = moment();
+            hiddenStartDate.value = today.format('YYYYMMDD');
+            hiddenEndDate.value = today.format('YYYYMMDD');
+
             dateRangePicker.daterangepicker({
                 startDate: moment(),
                 endDate: moment(),
