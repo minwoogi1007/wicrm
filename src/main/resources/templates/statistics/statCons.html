@@ -165,7 +165,15 @@
         </div>
         </form>
         <!--end::Content-->
-        <script type="module" src="/assets/js/common/pagination.js"></script>
+        <script type="module">
+            import { Pagination } from '/assets/js/common/pagination.js';
+
+            document.addEventListener('DOMContentLoaded', function() {
+                const data = []; // 데이터 로드 로직 필요
+                const paginator = new Pagination(data, 10, 'data-container', 'pagination-container');
+                paginator.init();
+            });
+        </script>
         <script src="/assets/js/stat/statCons.js"></script>
         <script src="/assets/plugins/global/plugins.bundle.js"></script>
         <script src="/assets/js/board/scripts.bundle.js"></script>
