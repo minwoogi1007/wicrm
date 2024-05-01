@@ -31,6 +31,16 @@ public class Tcnt01Emp {
 
     private int hasPhone;
 
+    private String admin;
+
+    public String getAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(String admin) {
+        this.admin = admin;
+    }
+
     public int getHasEmail() {
         return hasEmail;
     }

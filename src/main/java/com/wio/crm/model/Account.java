@@ -12,6 +12,25 @@ public class Account {
 
     private String password;
 
+    private int hasEmail;
+    private int hasPhone;
+
+    public int getHasEmail() {
+        return hasEmail;
+    }
+
+    public void setHasEmail(int hasEmail) {
+        this.hasEmail = hasEmail;
+    }
+
+    public int getHasPhone() {
+        return hasPhone;
+    }
+
+    public void setHasPhone(int hasPhone) {
+        this.hasPhone = hasPhone;
+    }
+
     public String getPassword() {
         return password;
     }

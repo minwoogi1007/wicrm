@@ -9,6 +9,26 @@
     <script th:inline="javascript">
         /*<![CDATA[*/
         $(document).ready(function() {
+            var csrfToken = $("meta[name='_csrf']").attr("content");
+            var csrfHeader = $("meta[name='_csrf_header']").attr("content");
+
+            // 체크박스 초기 상태 저장
+            $('input').each(function() {
+                var isCheckbox = $(this).attr('type') === 'checkbox';
+                $(this).data('original', isCheckbox ? $(this).is(':checked') : $(this).val());
+            });
+            function hasFormChanged() {
+                var changed = false;
+                $('input').each(function() {
+                    var isCheckbox = $(this).attr('type') === 'checkbox';
+                    var currentValue = isCheckbox ? $(this).is(':checked') : $(this).val();
+                    if (currentValue !== $(this).data('original')) {
+                        changed = true;
+                        return false; // Break out of the loop
+                    }
+                });
+                return changed;
+            }
 
             $('#kt_signin_password_button').click(function() {
                 $('#passwordChangeModal').modal('show');
@@ -38,6 +58,7 @@
                     success: function(response) {
                         alert('비밀번호가 변경되었습니다.');
                         $('#passwordChangeModal').modal('hide');
+                        history.back();
                     },
                     error: function(xhr) {
                         var response = JSON.parse(xhr.responseText);
@@ -47,28 +68,14 @@
 
             });
 
-            var csrfToken = $("meta[name='_csrf']").attr("content");
-            var csrfHeader = $("meta[name='_csrf_header']").attr("content");
-            function checkChanges() {
-                var fieldsToCheck = ['#emp_name', '#email', '#hand_phone'];
-                var hasChanged = false;
 
-                fieldsToCheck.forEach(function(field) {
-                    var original = $(field).data('original') || ""; // `undefined`를 빈 문자열로 처리
-                    var currentValue = $(field).val();
-                    if (original !== currentValue) {
-                        hasChanged = true;
-                    }
-                });
 
-                return hasChanged;
-            }
             // 취소 버튼 클릭 이벤트
             $('#kt_account_profile_details_cancel').click(function(event) {
                 event.preventDefault(); // 기본 동작 중단
                 event.stopPropagation(); // 이벤트 버블링 중단
                 event.stopImmediatePropagation(); // 현재 요소의 다른 이벤트 핸들러 중단
-                if (checkChanges()) {
+                if (hasFormChanged()) {
                     if (confirm('변경된 사항이 있습니다. 취소하시겠습니까?')) {
                         history.back(); // 사용자가 '확인'을 눌렀을 때 이전 페이지로 이동
                     }
@@ -85,7 +92,7 @@
             $('#kt_account_profile_details_submit').click(function(event) {
 
                 event.preventDefault();
-                if (!checkChanges()) {
+                if (!hasFormChanged()) {
                     alert('변경된 사항이 없습니다.');
                     return; // 변경사항 없으면 여기서 함수 종료
                 }
@@ -93,7 +100,8 @@
                     emp_name: $("#emp_name").val(),
                     email: $("#email").val(),
                     hand_phone: $("#hand_phone").val(),
-                    homePage: $("#homePage").val()
+                    hasEmail: $("#hasEmail").is(':checked') ? 1 : 0,
+                    hasPhone: $("#hasPhone").is(':checked') ? 1 : 0
                 };
 
                 $.ajax({
@@ -117,6 +125,20 @@
                     }
                 });
             });
+            // 변경사항 검사 함수
+            function checkChanges() {
+                var hasChanges = false;
+                $('input[type="text"], input[type="tel"], input[type="email"], input[type="checkbox"]').each(function() {
+                    var original = $(this).data('original');
+                    var current = $(this).is(':checked') || $(this).val();
+                    if (original !== current) {
+                        hasChanges = true;
+                    }
+                });
+                return hasChanges;
+            }
+
+
         });
         /*]]>*/
     </script>
@@ -170,26 +192,26 @@
 
                     <!--begin::Basic info-->
                     <form id="kt_account_profile_details_form" class="form" th:action="@{/account/update}" th:object="${accountInfo}" method="post">
-                    <div class="card mb-5 mb-xl-10">
-                        <!--begin::Card header-->
-                        <div class="card-header border-0"  >
-                            <!--begin::Card title-->
-                            <div class="card-title m-0">
-                                <h3 class="fw-bold m-0">정보 수정</h3>
-                            </div>
-                            <div class="d-flex align-items-center justify-content-end">
+                        <div class="card mb-5 mb-xl-10">
+                            <!--begin::Card header-->
+                            <div class="card-header border-0"  >
+                                <!--begin::Card title-->
+                                <div class="card-title m-0">
+                                    <h3 class="fw-bold m-0">정보 수정</h3>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-end">
 
-                                <button type="button" class="btn btn-sm btn-secondary align-self-center" id="kt_account_profile_details_cancel">취소</button>
-                                <button type="submit" class="btn btn-sm btn-primary align-self-center" id="kt_account_profile_details_submit">저장</button>
+                                    <button type="button" class="btn btn-sm btn-secondary align-self-center" id="kt_account_profile_details_cancel">취소</button>
+                                    <button type="submit" class="btn btn-sm btn-primary align-self-center" id="kt_account_profile_details_submit">저장</button>
+                                </div>
+                                <!--end::Card title-->
                             </div>
-                            <!--end::Card title-->
-                        </div>
-                        <!--begin::Card header-->
-                        <!--begin::Content-->
-                        <div id="kt_account_settings_profile_details" class="collapse show">
-                            <!--begin::Form-->
+                            <!--begin::Card header-->
+                            <!--begin::Content-->
+                            <div id="kt_account_settings_profile_details" class="collapse show">
+                                <!--begin::Form-->
 
-                                    <input type="hidden" name="_csrf" value="${_csrf.token}">
+                                <input type="hidden" name="_csrf" value="${_csrf.token}">
 
 
                                 <!--begin::Card body-->
@@ -266,17 +288,17 @@
                                             <div class="d-flex align-items-center mt-3">
                                                 <!--begin::Option-->
                                                 <label class="form-check form-check-custom form-check-inline form-check-solid me-5">
-                                                    <span class="fw-semibold ps-2 fs-6" th:field="*{hasEmail}"> </span>
-                                                    <input class="form-check-input" name="communication[]" type="checkbox" value="1" th:checked="${hasEmail == 1}" />
+                                                    <input class="form-check-input" id="hasEmail" type="checkbox" name="hasEmail" value="1" th:checked="${accountInfo.hasEmail == 1}" />
                                                     <span class="fw-semibold ps-2 fs-6">Email</span>
                                                 </label>
-                                                <!--end::Option-->
-                                                <!--begin::Option-->
+
+                                                <!-- Phone Checkbox -->
                                                 <label class="form-check form-check-custom form-check-inline form-check-solid">
-                                                    <span class="fw-semibold ps-2 fs-6" th:field="*{hasPhone}"> </span>
-                                                    <input class="form-check-input" name="communication[]" type="checkbox" value="2"  th:checked="${hasPhone == 1}"/>
-                                                    <span class="fw-semibold ps-2 fs-6">전화</span>
+                                                    <input class="form-check-input" id="hasPhone" type="checkbox" name="hasPhone" value="1" th:checked="${accountInfo.hasPhone == 1}" />
+                                                    <span class="fw-semibold ps-2 fs-6">Phone</span>
                                                 </label>
+
+
                                                 <!--end::Option-->
                                             </div>
                                             <!--end::Options-->
@@ -284,20 +306,19 @@
                                         <!--end::Col-->
                                     </div>
                                     <!--end::Input group-->
-                                    <!--begin::Input group-->
+                                    <!--begin::Input group
                                     <div class="row mb-0">
-                                        <!--begin::Label-->
+
                                         <label class="col-lg-4 col-form-label fw-semibold fs-6">관리자</label>
-                                        <!--begin::Label-->
-                                        <!--begin::Label-->
+
                                         <div class="col-lg-8 d-flex align-items-center">
                                             <div class="form-check form-check-solid form-switch form-check-custom fv-row">
                                                 <input class="form-check-input w-45px h-30px" type="checkbox" id="admin" checked="checked" />
                                                 <label class="form-check-label" for="admin"></label>
                                             </div>
                                         </div>
-                                        <!--begin::Label-->
-                                    </div>
+
+                                    </div>-->
                                     <!--end::Input group-->
 
                                     <!--begin::Card body-->
@@ -310,11 +331,11 @@
 
                                 <!--end::Actions-->
 
-                            <!--end::Form-->
-                        </div>
+                                <!--end::Form-->
+                            </div>
 
-                        <!--end::Content-->
-                    </div>
+                            <!--end::Content-->
+                        </div>
                         <div class="card mb-5 mb-xl-10">
                             <!--begin::Card header-->
                             <div class="card-header border-0">

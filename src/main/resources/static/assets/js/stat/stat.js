@@ -4,6 +4,9 @@ document.getElementById('searchForm').addEventListener('submit', function(event)
 });
 
 function updateDataTable() {
+    const pageSize = 10; // Set the number of items per page
+    let currentPage = 1; // Current selected page
+
     const startDate = document.getElementById('hidden_start_date').value;
     const endDate = document.getElementById('hidden_end_date').value;
 
@@ -11,41 +14,62 @@ function updateDataTable() {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
-            // Include CSRF token as necessary
         }
     })
         .then(response => response.json())
         .then(data => {
-            const tableBody = document.getElementById('kt_ecommerce_report_customer_orders_table').getElementsByTagName('tbody')[0];
-            tableBody.innerHTML = '';
-            if (data.length === 0) {
-                const row = tableBody.insertRow();
-                const cell = row.insertCell(0);
-                cell.textContent = "조회된 데이터가 없습니다";
-                cell.colSpan = 3;
-                cell.style.textAlign = 'center';
-            } else {
-                data.forEach(item => {
-                    const row = tableBody.insertRow();
-                    const cellDate = row.insertCell(0);
-                    const cellType = row.insertCell(1);
-                    const cellTotal = row.insertCell(2);
-
-                    cellDate.textContent = item.indate;
-                    cellType.textContent = item.csname;
-                    cellTotal.textContent = item.cscountst;
-                });
-            }
+            renderTable(data, currentPage, pageSize);
+            setupPagination(data, pageSize);
         })
         .catch(error => {
             console.error('Error loading the data:', error);
-            const row = tableBody.insertRow();
-            const cell = row.insertCell(0);
-            cell.textContent = "데이터를 불러오는 중 오류가 발생했습니다";
-            cell.colSpan = 3;
-            cell.style.textAlign = 'center';
+            displayErrorMessage();
         });
 }
+
+function renderTable(data, currentPage, pageSize) {
+    const tableBody = document.getElementById('kt_ecommerce_report_customer_orders_table').getElementsByTagName('tbody')[0];
+    tableBody.innerHTML = '';
+
+    const start = (currentPage - 1) * pageSize;
+    const end = start + pageSize;
+    const paginatedItems = data.slice(start, end);
+
+    if (paginatedItems.length === 0) {
+        displayErrorMessage("조회된 데이터가 없습니다");
+        return;
+    }
+
+    paginatedItems.forEach(item => {
+        const row = tableBody.insertRow();
+        row.insertCell(0).textContent = item.indate;
+        row.insertCell(1).textContent = item.csname;
+        row.insertCell(2).textContent = item.cscountst;
+    });
+}
+
+function setupPagination(data, pageSize) {
+    const pageCount = Math.ceil(data.length / pageSize);
+    const paginationContainer = document.getElementById('pagination-container');
+    paginationContainer.innerHTML = '';
+
+    for (let i = 1; i <= pageCount; i++) {
+        const button = document.createElement('button');
+        button.textContent = i;
+        button.onclick = () => renderTable(data, i, pageSize);
+        paginationContainer.appendChild(button);
+    }
+}
+
+function displayErrorMessage(message = "데이터를 불러오는 중 오류가 발생했습니다") {
+    const tableBody = document.getElementById('kt_ecommerce_report_customer_orders_table').getElementsByTagName('tbody')[0];
+    const row = tableBody.insertRow();
+    const cell = row.insertCell(0);
+    cell.textContent = message;
+    cell.colSpan = 3;
+    cell.style.textAlign = 'center';
+}
+
 
 var KTAppEcommerceReportCustomerOrders = function() {
     var table, dataTable;
