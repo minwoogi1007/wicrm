@@ -22,7 +22,7 @@ public class StatController {
         return "statistics/statCons";
     }
 
-    @GetMapping("/statCons/searchCons")
+    @PostMapping("/statCons/searchCons")
     public String getConsultationStats(Model model,   @RequestParam("start_date") String startDate,
                                        @RequestParam("end_date") String endDate) {
         List<Statics> stats = statisticsService.getStatisticsCons(startDate, endDate);
