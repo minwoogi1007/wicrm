@@ -52,7 +52,7 @@
 
         <!--end::Toolbar-->
         <!--begin::Content-->
-
+        <form id="searchForm"  onsubmit="return false;">
         <div id="kt_app_content" class="app-content flex-column-fluid">
             <!--begin::Content container-->
             <div id="kt_app_content_container" class="app-container container-xxl">
@@ -61,7 +61,6 @@
                     <!--begin::Card header-->
                     <div class="card-header align-items-center py-5 gap-2 gap-md-5">
                         <!--begin::Card title-->
-                        <form id="searchForm" action="/api/searchCons" method="get">
                         <div class="card-title">
                             <!--begin::Search-->
                             <!--end::Search-->
@@ -76,9 +75,7 @@
                             <div class="d-flex align-items-center">
                                 <button type="submit" class="btn btn-primary me-5">조회</button>
                             </div>
-
                         </div>
-                        </form>
                         <!--end::Card title-->
                         <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
                             <!--begin::Daterangepicker-->
@@ -148,15 +145,15 @@
                             </tr>
                             </thead>
                             <tbody class="fw-semibold text-gray-600">
-                                <tr th:each="stats  : ${stats}">
-                                    <td style="text-align: center;" th:text="${stats.INDATE}"></td>
-                                    <td style="text-align: center;" th:text="${stats.CSNAME}"></td>
-                                    <td style="text-align: center;" th:text="${stats.CSCOUNTST}"></td>
-                                </tr>
+
+
+
+
                             </tbody>
 
                         </table>
 
+                        <div id="pagination-container" class="pagination"></div>
                         <!--end::Table-->
                     </div>
 
@@ -166,8 +163,9 @@
             </div>
             <!--end::Content container-->
         </div>
-
+        </form>
         <!--end::Content-->
+        <script type="module" src="/assets/js/common/pagination.js"></script>
         <script src="/assets/js/stat/statCons.js"></script>
         <script src="/assets/js/board/scripts.bundle.js"></script>
         <script src="/assets/js/stat/stat.js"></script>

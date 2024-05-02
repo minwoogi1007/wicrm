@@ -5,6 +5,7 @@ import com.wio.crm.model.Statics;
 import com.wio.crm.service.StatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -22,11 +23,11 @@ public class StatController {
     }
 
     @GetMapping("/api/searchCons")
-    @ResponseBody
-    public List<Statics> getConsultationStats(@RequestParam String start_date, @RequestParam String end_date) {
-        // Fetch data based on the dates
-        List<Statics> stats = statisticsService.getStatisticsCons(start_date, end_date);
-        return stats;
+    public String getConsultationStats(Model model,   @RequestParam("start_date") String startDate,
+                                       @RequestParam("end_date") String endDate) {
+        List<Statics> stats = statisticsService.getStatisticsCons(startDate, endDate);
+        model.addAttribute("stats", stats);
+        return "statistics/statCons"; // Ensure this points to the correct Thymeleaf template
     }
 
     @GetMapping("/statResult")

@@ -1,3 +1,4 @@
+// pagination.js
 export class Pagination {
     constructor(data, pageSize, containerId, paginationContainerId) {
         this.data = data;
@@ -9,10 +10,14 @@ export class Pagination {
 
     displayData(items) {
         const container = document.getElementById(this.containerId);
+        if (!container) {
+            console.error("Container not found: ", this.containerId);
+            return;
+        }
         container.innerHTML = '';
         items.forEach(item => {
             const itemElement = document.createElement('div');
-            itemElement.textContent = item.name; // 아이템의 'name' 속성 가정
+            itemElement.textContent = item.name || "No name provided"; // Adjust based on actual item property
             container.appendChild(itemElement);
         });
     }
@@ -20,34 +25,36 @@ export class Pagination {
     setupPagination() {
         const pageCount = Math.ceil(this.data.length / this.pageSize);
         const paginationContainer = document.getElementById(this.paginationContainerId);
+        if (!paginationContainer) {
+            console.error("Pagination container not found: ", this.paginationContainerId);
+            return;
+        }
         paginationContainer.innerHTML = '';
         const ul = document.createElement('ul');
         ul.className = 'pagination';
 
-        const addPageItem = (pageNum, text, isActive = false) => {
-            const li = document.createElement('li');
-            li.className = `page-item ${isActive ? 'active' : ''}`;
-            li.innerHTML = `<a class="page-link" href="#">${text}</a>`;
-            li.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.currentPage = pageNum;
+        for (let i = 1; i <= pageCount; i++) {
+            const pageItem = document.createElement('li');
+            pageItem.className = 'page-item ' + (this.currentPage === i ? 'active' : '');
+            const pageLink = document.createElement('a');
+            pageLink.className = 'page-link';
+            pageLink.href = '#';
+            pageLink.innerText = i;
+            pageLink.addEventListener('click', (event) => {
+                event.preventDefault();
+                this.currentPage = i;
                 this.paginate();
             });
-            ul.appendChild(li);
-        };
-
-        addPageItem(Math.max(1, this.currentPage - 1), '<i class="previous"></i>', false);
-        for (let i = 1; i <= pageCount; i++) {
-            addPageItem(i, i, this.currentPage === i);
+            pageItem.appendChild(pageLink);
+            ul.appendChild(pageItem);
         }
-        addPageItem(Math.min(pageCount, this.currentPage + 1), '<i class="next"></i>', false);
 
         paginationContainer.appendChild(ul);
     }
 
     paginate() {
         const startIndex = (this.currentPage - 1) * this.pageSize;
-        const endIndex = startIndex + this.pageSize;
+        const endIndex = Math.min(startIndex + this.pageSize, this.data.length);
         const paginatedItems = this.data.slice(startIndex, endIndex);
         this.displayData(paginatedItems);
     }
