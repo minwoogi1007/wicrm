@@ -46,4 +46,11 @@ public class StatisticsService {
             throw new RuntimeException("Error retrieving statistics", e);
         }
     }
+
+    public Map<String, Object> getStatisticsConsG(String start_date,  String end_date) {
+        String custCode = getCurrentCustcode();
+        Map<String, Object> data = new HashMap<>();
+        data.put("statCons", staticsMapper.getStatisticsConsG(start_date,end_date,custCode));
+        return data;
+    }
 }

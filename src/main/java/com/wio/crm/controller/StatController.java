@@ -4,10 +4,12 @@ import com.wio.crm.model.DateRange;
 import com.wio.crm.model.Statics;
 import com.wio.crm.service.StatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +31,13 @@ public class StatController {
         model.addAttribute("stats", stats);
         return "statistics/statCons"; // Ensure this points to the correct Thymeleaf template
     }
+    @GetMapping("/api/statCons/searchCons")
+    public ResponseEntity<Map<String, Object>> getStatisticsConsG(@RequestParam("start_date") String startDate,
+                                                                    @RequestParam("end_date") String endDate) {
 
+        Map<String, Object> data = statisticsService.getStatisticsConsG(startDate, endDate);
+        return ResponseEntity.ok(data);
+    }
     @GetMapping("/statResult")
     public String statResult() {
         return "statistics/statResult";

@@ -62,22 +62,22 @@
                     <div class="card-header align-items-center py-5 gap-2 gap-md-5">
                         <!--begin::Card title-->
                         <form id="searchForm" th:action="@{/statCons/searchCons}" method="post">
-                        <div class="card-title">
-                            <!--begin::Search-->
-                            <!--end::Search-->
-                            <!--begin::Export buttons-->
-                            <div id="kt_ecommerce_report_customer_orders_export" class="d-none"></div>
-                            <div class="position-relative w-md-260px me-md-2">
-                                <input type="hidden" id="hidden_start_date" name="start_date">
-                                <input type="hidden" id="hidden_end_date" name="end_date">
-                            <input class="form-control form-control-solid w-100 mw-250px" placeholder="Pick date range" id="kt_ecommerce_report_customer_orders_daterangepicker" readonly />
-                            </div>
-                            <!--end::Export buttons-->
-                            <div class="d-flex align-items-center">
-                                <button type="submit" class="btn btn-primary me-5">조회</button>
-                            </div>
+                            <div class="card-title">
+                                <!--begin::Search-->
+                                <!--end::Search-->
+                                <!--begin::Export buttons-->
+                                <div id="kt_ecommerce_report_customer_orders_export" class="d-none"></div>
+                                <div class="position-relative w-md-260px me-md-2">
+                                    <input type="hidden" id="hidden_start_date" name="start_date">
+                                    <input type="hidden" id="hidden_end_date" name="end_date">
+                                    <input class="form-control form-control-solid w-100 mw-250px" placeholder="Pick date range" id="kt_ecommerce_report_customer_orders_daterangepicker" readonly />
+                                </div>
+                                <!--end::Export buttons-->
+                                <div class="d-flex align-items-center">
+                                    <button type="submit" class="btn btn-primary me-5">조회</button>
+                                </div>
 
-                        </div>
+                            </div>
                         </form>
                         <!--end::Card title-->
                         <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
@@ -89,31 +89,24 @@
                             <!--end::Filter-->
                             <!--begin::Export dropdown-->
 
-                           <button type="button" class="btn btn-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
-                              <i class="ki-duotone ki-exit-up fs-2">
-                                <span class="path1"></span>
-                                <span class="path2"></span>
-                              </i>다운로드</button>
+                            <button type="button" class="btn btn-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                                <i class="ki-duotone ki-exit-up fs-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>다운로드</button>
                             <!--begin::Menu-->
                             <div id="kt_ecommerce_report_customer_orders_export_menu" class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-100px py-4" data-kt-menu="true">
 
-                              <div class="menu-item px-3">
+                            <div class="menu-item px-3">
                                 <a href="#" class="menu-link px-3" data-kt-ecommerce-export="copy">복사</a>
-                              </div>
+                            </div>
 
-                              <div class="menu-item px-3">
+                            <div class="menu-item px-3">
                                 <a href="#" class="menu-link px-3" data-kt-ecommerce-export="excel">엑셀받기</a>
-                              </div>
+                            </div>
 
-                              <div class="menu-item px-3">
-                                <a href="#" class="menu-link px-3" data-kt-ecommerce-export="csv">CSV</a>
-                              </div>
-
-                              <div class="menu-item px-3">
-                                <a href="#" class="menu-link px-3" data-kt-ecommerce-export="pdf">PDF</a>
-                              </div>
                             <!--end::Menu item-->
-                          </div>
+                        </div>
                             <!--end::Menu-->
                             <!--end::Export dropdown-->
                         </div>
@@ -122,23 +115,23 @@
                         <!--begin::Chart widget 8-->
 
 
-                            <!--end::Header-->
-                            <!--begin::Body-->
+                        <!--end::Header-->
+                        <!--begin::Body-->
 
-                            <!--begin::Chart-->
-                            <div id="kt_charts_widget_18_chart" class="h-325px w-100 min-h-auto ps-4 pe-6"></div>
-                            <!--end::Chart-->
+                        <!--begin::Chart-->
+                        <div id="kt_charts_widget_18_chart" class="h-325px w-100 min-h-auto ps-4 pe-6"></div>
+                        <!--end::Chart-->
 
-                            <!--end: Card Body-->
+                        <!--end: Card Body-->
 
-                                <!--end::Chart widget 8-->
+                        <!--end::Chart widget 8-->
 
                     </div>
                     <!--end::Card header-->
                     <!--begin::Card body-->
                     <div class="card-body pt-0">
                         <!--begin::Table-->
-                        <table class="table align-middle table-row-dashed fs-6 gy-5" id="statTable">
+                        <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_ecommerce_report_customer_orders_table">
                             <thead>
 
                             <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
@@ -148,11 +141,11 @@
                             </tr>
                             </thead>
                             <tbody class="fw-semibold text-gray-600">
-                                <tr th:each="stats  : ${stats}">
-                                    <td style="text-align: center;" th:text="${stats.INDATE}"></td>
-                                    <td style="text-align: center;" th:text="${stats.CSNAME}"></td>
-                                    <td style="text-align: center;" th:text="${stats.CSCOUNTST}"></td>
-                                </tr>
+                            <tr th:each="stats  : ${stats}">
+                                <td style="text-align: center;" th:text="${stats.INDATE}"></td>
+                                <td style="text-align: center;" th:text="${stats.CSNAME}"></td>
+                                <td style="text-align: center;" th:text="${stats.CSCOUNTST}"></td>
+                            </tr>
                             </tbody>
 
                         </table>

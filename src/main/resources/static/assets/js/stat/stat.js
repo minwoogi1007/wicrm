@@ -1,12 +1,9 @@
-
-
-
 var KTAppEcommerceReportCustomerOrders = function() {
     var table, dataTable;
     var hiddenStartDate, hiddenEndDate;
     return {
         init: function() {
-            table = document.querySelector("#statTable");
+            table = document.querySelector("#kt_ecommerce_report_customer_orders_table");
             dataTable = $(table).DataTable({
                 info: false,
                 order: [],
@@ -39,13 +36,27 @@ var KTAppEcommerceReportCustomerOrders = function() {
             }, function(start, end) {
                 hiddenStartDate.value = start.format('YYYYMMDD');
                 hiddenEndDate.value = end.format('YYYYMMDD');
-
+                $(document).trigger('dateRangeUpdated'); // 날짜가 변경되면 이벤트 트리거
             });
 
-            // Set the initial dates and trigger data update
-            dateRangePicker.data('daterangepicker').setStartDate(moment());
-            dateRangePicker.data('daterangepicker').setEndDate(moment());
-            dateRangePicker.data('daterangepicker').clickApply();
+            // 내보내기 버튼 설정
+            const reportTitle = "통계";
+            new $.fn.dataTable.Buttons(table, {
+                buttons: [
+                    {extend: "copyHtml5", title: reportTitle},
+                    {extend: "excelHtml5", title: reportTitle},
+                    {extend: "csvHtml5", title: reportTitle},
+                    {extend: "pdfHtml5", title: reportTitle}
+                ]
+            }).container().appendTo($("#kt_ecommerce_report_customer_orders_export"));
+
+            document.querySelectorAll("#kt_ecommerce_report_customer_orders_export_menu [data-kt-ecommerce-export]").forEach((button) => {
+                button.addEventListener("click", (event) => {
+                    event.preventDefault();
+                    const format = event.target.getAttribute("data-kt-ecommerce-export");
+                    document.querySelector(".dt-buttons .buttons-" + format).click();
+                });
+            });
         }
     }
 }();

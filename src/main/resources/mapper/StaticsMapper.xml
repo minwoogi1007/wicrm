@@ -19,5 +19,23 @@
         GROUP BY IN_DATE,CS_NAME,CS_TYPE
         ORDER BY  IN_DATE,CS_TYPE
     </select>
+    <select id="getStatisticsConsG"  resultType="com.wio.crm.model.Statics">
+        SELECT CS_TYPE CSTYPE,CS_NAME  CSNAME,SUM(CS_COUNT) CSCOUNT
+        FROM (
+                 SELECT TO_CHAR(IN_DATE,'YYYYMMDD') IN_DATE,
+                        CUST_CODE,
+                        CS_TYPE,
+                        (SELECT adm_sname FROM tsys01 WHERE adm_gubn ='4002' AND ADM_CODE=A.CS_TYPE) CS_NAME,
+                        COUNT(CS_TYPE)CS_COUNT
+                 FROM TBND01 A
+                 WHERE TO_CHAR(IN_DATE,'YYYYMMDD') BETWEEN #{start} AND #{end}
+                   AND CUST_CODE =#{custCode}
+                 GROUP BY TO_CHAR(IN_DATE,'YYYYMMDD'),CUST_CODE,CS_TYPE
+                 ORDER BY  CUST_CODE,CS_TYPE
+             )
+        GROUP BY CS_NAME,CS_TYPE
+        order by cs_type
+
+    </select>
 
 </mapper>
