@@ -10,6 +10,36 @@ public class Statics {
 
     private String CSCOUNT;
 
+    private String PRCGUBNCOUNT;
+
+    private String PRCGUBN;
+
+    private String PRCNAME;
+
+    public String getPRCGUBNCOUNT() {
+        return PRCGUBNCOUNT;
+    }
+
+    public void setPRCGUBNCOUNT(String PRCGUBNCOUNT) {
+        this.PRCGUBNCOUNT = PRCGUBNCOUNT;
+    }
+
+    public String getPRCGUBN() {
+        return PRCGUBN;
+    }
+
+    public void setPRCGUBN(String PRCGUBN) {
+        this.PRCGUBN = PRCGUBN;
+    }
+
+    public String getPRCNAME() {
+        return PRCNAME;
+    }
+
+    public void setPRCNAME(String PRCNAME) {
+        this.PRCNAME = PRCNAME;
+    }
+
     public String getINDATE() {
         return INDATE;
     }

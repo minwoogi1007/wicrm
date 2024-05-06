@@ -24,14 +24,16 @@ public class StatController {
         return "statistics/statCons";
     }
 
-    @PostMapping("/statCons/searchCons")
+    @PostMapping("/statCons/searchCons")  // 리스트
     public String getConsultationStats(Model model,   @RequestParam("start_date") String startDate,
                                        @RequestParam("end_date") String endDate) {
         List<Statics> stats = statisticsService.getStatisticsCons(startDate, endDate);
+        model.addAttribute("hidden_start_date", startDate);
+        model.addAttribute("hidden_end_date", endDate);
         model.addAttribute("stats", stats);
         return "statistics/statCons"; // Ensure this points to the correct Thymeleaf template
     }
-    @GetMapping("/api/statCons/searchCons")
+    @GetMapping("/api/statCons/searchCons")//그래프
     public ResponseEntity<Map<String, Object>> getStatisticsConsG(@RequestParam("start_date") String startDate,
                                                                     @RequestParam("end_date") String endDate) {
 
@@ -41,6 +43,23 @@ public class StatController {
     @GetMapping("/statResult")
     public String statResult() {
         return "statistics/statResult";
+    }
+
+    @PostMapping("/statResult/searchResult")  // 리스트
+    public String getConsultationResult(Model model,   @RequestParam("start_date") String startDate,
+                                       @RequestParam("end_date") String endDate) {
+        List<Statics> stats = statisticsService.getConsultationResult(startDate, endDate);
+        model.addAttribute("hidden_start_date", startDate);
+        model.addAttribute("hidden_end_date", endDate);
+        model.addAttribute("stats", stats);
+        return "statistics/statResult"; // Ensure this points to the correct Thymeleaf template
+    }
+    @GetMapping("/api/statResult/searchResult")//그래프
+    public ResponseEntity<Map<String, Object>> getConsultationResultG(@RequestParam("start_date") String startDate,
+                                                                  @RequestParam("end_date") String endDate) {
+
+        Map<String, Object> data = statisticsService.getConsultationResultG(startDate, endDate);
+        return ResponseEntity.ok(data);
     }
     @GetMapping("/statTime")
     public String statTime() {

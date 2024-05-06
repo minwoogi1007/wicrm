@@ -68,8 +68,8 @@
                                 <!--begin::Export buttons-->
                                 <div id="kt_ecommerce_report_customer_orders_export" class="d-none"></div>
                                 <div class="position-relative w-md-260px me-md-2">
-                                    <input type="hidden" id="hidden_start_date" name="start_date">
-                                    <input type="hidden" id="hidden_end_date" name="end_date">
+                                    <input type="hidden" id="hidden_start_date" name="start_date" th:value="${hidden_start_date}">
+                                    <input type="hidden" id="hidden_end_date" name="end_date" th:value="${hidden_end_date}">
                                     <input class="form-control form-control-solid w-100 mw-250px" placeholder="Pick date range" id="kt_ecommerce_report_customer_orders_daterangepicker" readonly />
                                 </div>
                                 <!--end::Export buttons-->
@@ -135,9 +135,9 @@
                             <thead>
 
                             <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
-                                <th class="min-w-100px">일자</th>
-                                <th class="min-w-125px">상담유형</th>
-                                <th class="min-w-100px">합계</th>
+                                <th style="text-align: center;" class="min-w-100px">일자</th>
+                                <th style="text-align: center;" class="min-w-125px">상담유형</th>
+                                <th style="text-align: center;" class="min-w-100px">합계</th>
                             </tr>
                             </thead>
                             <tbody class="fw-semibold text-gray-600">
@@ -161,9 +161,11 @@
         </div>
 
         <!--end::Content-->
-        <script src="/assets/js/stat/statCons.js"></script>
         <script src="/assets/js/board/scripts.bundle.js"></script>
         <script src="/assets/js/stat/stat.js"></script>
+        <script src="/assets/js/stat/statCons.js"></script>
+
+
     </div>
 
 </div>

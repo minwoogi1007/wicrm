@@ -1,6 +1,8 @@
 var KTAppEcommerceReportCustomerOrders = function() {
     var table, dataTable;
     var hiddenStartDate, hiddenEndDate;
+    var dateRangePicker;
+
     return {
         init: function() {
             table = document.querySelector("#kt_ecommerce_report_customer_orders_table");
@@ -10,18 +12,20 @@ var KTAppEcommerceReportCustomerOrders = function() {
                 pageLength: 10
             });
 
-            var dateRangePicker = $("#kt_ecommerce_report_customer_orders_daterangepicker");
+            dateRangePicker = $("#kt_ecommerce_report_customer_orders_daterangepicker");
             hiddenStartDate = document.getElementById('hidden_start_date');
             hiddenEndDate = document.getElementById('hidden_end_date');
 
+
             // Today's date setup
-            var today = moment();
-            hiddenStartDate.value = today.format('YYYYMMDD');
-            hiddenEndDate.value = today.format('YYYYMMDD');
+            // Check if hidden inputs have values and use them, otherwise set to today's date
+            var defaultStart = hiddenStartDate.value ? moment(hiddenStartDate.value, 'YYYYMMDD') : moment();
+            var defaultEnd = hiddenEndDate.value ? moment(hiddenEndDate.value, 'YYYYMMDD') : moment();
+
 
             dateRangePicker.daterangepicker({
-                startDate: moment(),
-                endDate: moment(),
+                startDate: defaultStart,
+                endDate: defaultEnd,
                 ranges: {
                     '오늘': [moment(), moment()],
                     '어제': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
@@ -31,13 +35,18 @@ var KTAppEcommerceReportCustomerOrders = function() {
                     '지난달': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
                 },
                 locale: {
-                    format: 'YYYY/MM/DD'
+                    format: 'YYYY/MM/DD',
+                    monthNames: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"]
                 }
             }, function(start, end) {
+
                 hiddenStartDate.value = start.format('YYYYMMDD');
                 hiddenEndDate.value = end.format('YYYYMMDD');
-                $(document).trigger('dateRangeUpdated'); // 날짜가 변경되면 이벤트 트리거
+                dateRangePicker.val(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
+                $(document).trigger('dateRangeUpdated'); // Trigger event when dates change
             });
+            dateRangePicker.val(defaultStart.format('YYYY/MM/DD') + ' - ' + defaultEnd.format('YYYY/MM/DD'));
+
 
             // 내보내기 버튼 설정
             const reportTitle = "통계";

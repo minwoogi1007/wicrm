@@ -58,20 +58,24 @@
                     <!--begin::Card header-->
                     <div class="card-header align-items-center py-5 gap-2 gap-md-5">
                         <!--begin::Card title-->
-                        <div class="card-title">
-                            <!--begin::Search-->
+                        <form id="searchForm" th:action="@{/statResult/searchResult}" method="post">
+                            <div class="card-title">
+                                <!--begin::Search-->
+                                <!--end::Search-->
+                                <!--begin::Export buttons-->
+                                <div id="kt_ecommerce_report_customer_orders_export" class="d-none"></div>
+                                <div class="position-relative w-md-260px me-md-2">
+                                    <input type="hidden" id="hidden_start_date" name="start_date" th:value="${hidden_start_date}">
+                                    <input type="hidden" id="hidden_end_date" name="end_date" th:value="${hidden_end_date}">
+                                    <input class="form-control form-control-solid w-100 mw-250px" placeholder="Pick date range" id="kt_ecommerce_report_customer_orders_daterangepicker" readonly />
+                                </div>
+                                <!--end::Export buttons-->
+                                <div class="d-flex align-items-center">
+                                    <button type="submit" class="btn btn-primary me-5">조회</button>
+                                </div>
 
-                            <!--end::Search-->
-                            <!--begin::Export buttons-->
-                            <div id="kt_ecommerce_report_customer_orders_export" class="d-none"></div>
-                            <div class="position-relative w-md-260px me-md-2">
-                                <input class="form-control form-control-solid w-100 mw-250px" placeholder="Pick date range" id="kt_ecommerce_report_customer_orders_daterangepicker" readonly />
                             </div>
-                            <!--end::Export buttons-->
-                            <div class="d-flex align-items-center">
-                                <button type="submit" class="btn btn-primary me-5">조회</button>
-                            </div>
-                        </div>
+                        </form>
                         <!--end::Card title-->
                         <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
                             <!--begin::Daterangepicker-->
@@ -98,13 +102,6 @@
                                     <a href="#" class="menu-link px-3" data-kt-ecommerce-export="excel">엑셀받기</a>
                                 </div>
 
-                                <div class="menu-item px-3">
-                                    <a href="#" class="menu-link px-3" data-kt-ecommerce-export="csv">CSV</a>
-                                </div>
-
-                                <div class="menu-item px-3">
-                                    <a href="#" class="menu-link px-3" data-kt-ecommerce-export="pdf">PDF</a>
-                                </div>
                                 <!--end::Menu item-->
                             </div>
                             <!--end::Menu-->
@@ -135,20 +132,20 @@
                             <thead>
 
                             <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
-                                <th class="min-w-100px">일자</th>
-                                <th class="min-w-125px">상담유형</th>
-                                <th class="min-w-100px">합계</th>
+                                <th style="text-align: center;" class="min-w-100px">일자</th>
+                                <th style="text-align: center;" class="min-w-125px">처리 결과</th>
+                                <th style="text-align: center;" class="min-w-100px">합계</th>
                             </tr>
                             </thead>
                             <tbody class="fw-semibold text-gray-600">
 
-                            <tr th:each="list:${list}">
+                            <tr th:each="stats:${stats}">
 
-                                <td th:text="${list.GNO}"></td>
+                                <td style="text-align: center;" th:text="${stats.INDATE}"></td>
 
-                                <td th:text="${list.SUBJECT}"></td>
+                                <td style="text-align: center;" th:text="${stats.PRCNAME}"></td>
 
-                                <td th:text="${list.ID}"></td>
+                                <td style="text-align: center;" th:text="${stats.PRCGUBNCOUNT}"></td>
 
                             </tr>
 
@@ -165,8 +162,9 @@
             <!--end::Content container-->
         </div>
         <!--end::Content-->
-        <script src="/assets/js/stat/statResult.js"></script>
         <script src="/assets/js/board/scripts.bundle.js"></script>
         <script src="/assets/js/stat/stat.js"></script>
+        <script src="/assets/js/stat/statResult.js"></script>
+
     </div>
 </div>

@@ -37,5 +37,29 @@
         order by cs_type
 
     </select>
+    <select id="getConsultationResult"  resultType="com.wio.crm.model.Statics">
+        SELECT TO_CHAR(IN_DATE,'YYYYMMDD') INDATE,COUNT(PRC_GUBN) PRCGUBNCOUNT ,(SELECT ADM_SNAME FROM TSYS01 WHERE ADM_GUBN='4003' AND ADM_CODE = A.PRC_GUBN) PRCNAME ,PRC_GUBN PRCGUBN
+        FROM TBND01 A
+        WHERE CUST_CODE = #{custCode}
+          AND TO_CHAR(IN_DATE,'YYYYMMDD') BETWEEN #{start} AND #{end}
+          <![CDATA[
+          AND PRC_GUBN <>'4'
+        ]]>
+        GROUP BY TO_CHAR(IN_DATE,'YYYYMMDD') , PRC_GUBN
+        ORDER BY  TO_CHAR(IN_DATE,'YYYYMMDD')
+    </select>
 
+    <select id="getConsultationResultG"  resultType="com.wio.crm.model.Statics">
+        SELECT COUNT(PRC_GUBN) PRCGUBNCOUNT,(SELECT ADM_SNAME FROM TSYS01 WHERE ADM_GUBN='4003' AND ADM_CODE = A.PRC_GUBN) PRCNAME
+        FROM TBND01  A
+        WHERE CUST_CODE = #{custCode}
+        AND TO_CHAR(IN_DATE,'YYYYMMDD') BETWEEN #{start} AND #{end}
+        <![CDATA[
+          AND PRC_GUBN <>'4'
+        ]]>
+        GROUP BY  PRC_GUBN
+        order by PRC_GUBN
+
+
+    </select>
 </mapper>

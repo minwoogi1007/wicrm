@@ -1,154 +1,100 @@
-
 $(document).ready(function() {
-    var KTChartsWidget18 = function() {
-        var e = {
-                self: null,
-                rendered: !1
+    var cons = [];
+    var consCount = [];
+
+    var hiddenStartDate = document.getElementById('hidden_start_date');
+    var hiddenEndDate = document.getElementById('hidden_end_date');
+
+    var colorPalette = ['#008FFB', '#00E396', '#FEB019', '#FF4560', '#775DD0', '#546E7A', '#26a69a', '#D10CE8'];
+
+    function fetchDailyData() {
+        $.ajax({
+            url: "/api/statResult/searchResult",
+            type: "GET",
+            data: {
+                start_date: hiddenStartDate.value,
+                end_date: hiddenEndDate.value
             },
-            t = function(e) {
-                var t = document.getElementById("kt_charts_widget_18_chart");
-                if (t) {
-                    var a = parseInt(KTUtil.css(t, "height")),
-                        l = KTUtil.getCssVariableValue("--bs-gray-900"),
-                        r = KTUtil.getCssVariableValue("--bs-border-dashed-color"),
-                        o = {
-                            series: [{
-                                name: "Spent time",
-                                data: [54, 42, 75, 110, 23, 87, 50]
-                            }],
-                            chart: {
-                                fontFamily: "inherit",
-                                type: "bar",
-                                height: a,
-                                toolbar: {
-                                    show: !1
-                                }
-                            },
-                            plotOptions: {
-                                bar: {
-                                    horizontal: !1,
-                                    columnWidth: ["28%"],
-                                    borderRadius: 5,
-                                    dataLabels: {
-                                        position: "top"
-                                    },
-                                    startingShape: "flat"
-                                }
-                            },
-                            legend: {
-                                show: !1
-                            },
-                            dataLabels: {
-                                enabled: !0,
-                                offsetY: -28,
-                                style: {
-                                    fontSize: "13px",
-                                    colors: [l]
-                                },
-                                formatter: function(e) {
-                                    return e
-                                }
-                            },
-                            stroke: {
-                                show: !0,
-                                width: 2,
-                                colors: ["transparent"]
-                            },
-                            xaxis: {
-                                categories: ["QA Analysis", "Marketing", "Web Dev", "Maths", "Front-end Dev", "Physics", "Phylosophy"],
-                                axisBorder: {
-                                    show: !1
-                                },
-                                axisTicks: {
-                                    show: !1
-                                },
-                                labels: {
-                                    style: {
-                                        colors: KTUtil.getCssVariableValue("--bs-gray-500"),
-                                        fontSize: "13px"
-                                    }
-                                },
-                                crosshairs: {
-                                    fill: {
-                                        gradient: {
-                                            opacityFrom: 0,
-                                            opacityTo: 0
-                                        }
-                                    }
-                                }
-                            },
-                            yaxis: {
-                                labels: {
-                                    style: {
-                                        colors: KTUtil.getCssVariableValue("--bs-gray-500"),
-                                        fontSize: "13px"
-                                    },
-                                    formatter: function(e) {
-                                        return e + "H"
-                                    }
-                                }
-                            },
-                            fill: {
-                                opacity: 1
-                            },
-                            states: {
-                                normal: {
-                                    filter: {
-                                        type: "none",
-                                        value: 0
-                                    }
-                                },
-                                hover: {
-                                    filter: {
-                                        type: "none",
-                                        value: 0
-                                    }
-                                },
-                                active: {
-                                    allowMultipleDataPointsSelection: !1,
-                                    filter: {
-                                        type: "none",
-                                        value: 0
-                                    }
-                                }
-                            },
-                            tooltip: {
-                                style: {
-                                    fontSize: "12px"
-                                },
-                                y: {
-                                    formatter: function(e) {
-                                        return +e + " hours"
-                                    }
-                                }
-                            },
-                            colors: [KTUtil.getCssVariableValue("--bs-primary"), KTUtil.getCssVariableValue("--bs-primary-light")],
-                            grid: {
-                                borderColor: r,
-                                strokeDashArray: 4,
-                                yaxis: {
-                                    lines: {
-                                        show: !0
-                                    }
+            success: function(response) {
+                cons = [];
+                consCount = [];
+                response.statCons.forEach(function(item) {
+                    cons.push(item.prcname);
+                    consCount.push(item.prcgubncount);
+                });
+
+                var preparedData = cons.map((name, index) => ({
+                    x: name,
+                    y: consCount[index],
+                    fillColor: colorPalette[index % colorPalette.length]
+                }));
+
+                KTChartsWidget18.init(preparedData);
+            },
+            error: function(xhr, status, error) {
+                console.error("Data load failed:", error);
+            }
+        });
+    }
+
+    var KTChartsWidget18 = function() {
+        var chartInstance = null;
+
+        return {
+            init: function(data) {
+                var chartElement = document.getElementById("kt_charts_widget_18_chart");
+                if (chartElement) {
+                    var options = {
+                        series: [{
+                            name: "처리 결과",
+                            data: data
+                        }],
+                        chart: {
+                            type: 'bar',
+                            height: 350,
+                            toolbar: {
+                                show: false
+                            }
+                        },
+                        plotOptions: {
+                            bar: {
+                                borderRadius: 4,
+                                columnWidth: '50%',
+                                dataLabels: {
+                                    position: 'top', // Ensure labels are positioned at the top of the bar
                                 }
                             }
-                        };
-                    e.self = new ApexCharts(t, o), setTimeout((function() {
-                        e.self.render(), e.rendered = !0
-                    }), 200)
+                        },
+                        dataLabels: {
+                            enabled: true,
+                            offsetY: -20, // Adjust this value to move the label up above the bar
+                            style: {
+                                fontSize: '12px',
+                                colors: ['#333'] // Making sure the text is visible against most backgrounds
+                            },
+                            formatter: function(val, opts) {
+                                return opts.w.config.series[opts.seriesIndex].data[opts.dataPointIndex].y + ' 건';
+                            }
+                        },
+                        xaxis: {
+                            categories: data.map(d => d.x)
+                        },
+                        colors: data.map(d => d.fillColor),
+                        fill: {
+                            opacity: 1
+                        }
+                    };
+
+                    if (chartInstance) {
+                        chartInstance.updateOptions(options, true); // Force a redraw
+                    } else {
+                        chartInstance = new ApexCharts(chartElement, options);
+                        chartInstance.render();
+                    }
                 }
-            };
-        return {
-            init: function() {
-                t(e), KTThemeMode.on("kt.thememode.change", (function() {
-                    e.rendered && e.self.destroy(), t(e)
-                }))
             }
-        }
+        };
     }();
-    "undefined" != typeof module && (module.exports = KTChartsWidget18), KTUtil.onDOMContentLoaded((function() {
-        KTChartsWidget18.init()
-    }));
 
-
+    fetchDailyData();
 });
