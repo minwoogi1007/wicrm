@@ -19,8 +19,13 @@ var KTAppEcommerceReportCustomerOrders = function() {
 
             // Today's date setup
             // Check if hidden inputs have values and use them, otherwise set to today's date
-            var defaultStart = hiddenStartDate.value ? moment(hiddenStartDate.value, 'YYYYMMDD') : moment();
-            var defaultEnd = hiddenEndDate.value ? moment(hiddenEndDate.value, 'YYYYMMDD') : moment();
+            var today = moment().format('YYYYMMDD'); // Format today's date as 'YYYYMMDD'
+            var defaultStart = hiddenStartDate.value && moment(hiddenStartDate.value, 'YYYYMMDD', true).isValid()
+                ? moment(hiddenStartDate.value, 'YYYYMMDD')
+                : moment();
+            var defaultEnd = hiddenEndDate.value && moment(hiddenEndDate.value, 'YYYYMMDD', true).isValid()
+                ? moment(hiddenEndDate.value, 'YYYYMMDD')
+                : moment();
 
 
             dateRangePicker.daterangepicker({
@@ -44,6 +49,8 @@ var KTAppEcommerceReportCustomerOrders = function() {
                 hiddenEndDate.value = end.format('YYYYMMDD');
                 dateRangePicker.val(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
                 $(document).trigger('dateRangeUpdated'); // Trigger event when dates change
+
+
             });
             dateRangePicker.val(defaultStart.format('YYYY/MM/DD') + ' - ' + defaultEnd.format('YYYY/MM/DD'));
 

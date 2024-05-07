@@ -58,7 +58,7 @@
                     <!--begin::Card header-->
                     <div class="card-header align-items-center py-5 gap-2 gap-md-5">
                         <!--begin::Card title-->
-                        <form id="searchForm" th:action="@{/statResult/searchResult}" method="post">
+                        <form id="searchForm" th:action="@{/statTime/searchTime}" method="post">
                             <div class="card-title">
                                 <!--begin::Search-->
                                 <!--end::Search-->
@@ -128,24 +128,40 @@
                     <!--begin::Card body-->
                     <div class="card-body pt-0">
                         <!--begin::Table-->
-                        <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_ecommerce_report_customer_orders_table">
+                        <table class="table align-middle table-row-dashed table-striped fs-6 gy-5" id="kt_ecommerce_report_customer_orders_table">
                             <thead>
 
                             <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
-                                <th class="min-w-100px">일자</th>
-                                <th class="min-w-125px">상담유형</th>
-                                <th class="min-w-100px">합계</th>
+
+                                <th style="text-align: center;" class="min-w-100px">일자</th>
+                                <th style="text-align: center;" class="min-w-150px">처리</th>
+                                <th style="text-align: center;" class="min-w-50px">09</th>
+                                <th style="text-align: center;" class="min-w-50px">10</th>
+                                <th style="text-align: center;" class="min-w-50px">11</th>
+                                <th style="text-align: center;" class="min-w-50px">12</th>
+                                <th style="text-align: center;" class="min-w-50px">13</th>
+                                <th style="text-align: center;" class="min-w-50px">14</th>
+                                <th style="text-align: center;" class="min-w-50px">15</th>
+                                <th style="text-align: center;" class="min-w-50px">16</th>
+                                <th style="text-align: center;" class="min-w-50px">17</th>
+                                <th style="text-align: center;" class="min-w-50px">18</th>
                             </tr>
                             </thead>
                             <tbody class="fw-semibold text-gray-600">
 
-                            <tr th:each="list:${list}">
-
-                                <td th:text="${list.GNO}"></td>
-
-                                <td th:text="${list.SUBJECT}"></td>
-
-                                <td th:text="${list.ID}"></td>
+                            <tr th:each="stats:${stats}">
+                                <td style="text-align: center;" th:text="${stats.INDATE}"></td>
+                                <td style="text-align: center;" th:text="${stats.CSNAME}"></td>
+                                <td style="text-align: center;" th:text="${stats.HOUR09}"></td>
+                                <td style="text-align: center;" th:text="${stats.HOUR10}"></td>
+                                <td style="text-align: center;" th:text="${stats.HOUR11}"></td>
+                                <td style="text-align: center;" th:text="${stats.HOUR12}"></td>
+                                <td style="text-align: center;" th:text="${stats.HOUR13}"></td>
+                                <td style="text-align: center;" th:text="${stats.HOUR14}"></td>
+                                <td style="text-align: center;" th:text="${stats.HOUR15}"></td>
+                                <td style="text-align: center;" th:text="${stats.HOUR16}"></td>
+                                <td style="text-align: center;" th:text="${stats.HOUR17}"></td>
+                                <td style="text-align: center;" th:text="${stats.HOUR18}"></td>
 
                             </tr>
 

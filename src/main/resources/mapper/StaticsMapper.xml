@@ -48,17 +48,160 @@
         GROUP BY TO_CHAR(IN_DATE,'YYYYMMDD') , PRC_GUBN
         ORDER BY  TO_CHAR(IN_DATE,'YYYYMMDD')
     </select>
-
     <select id="getConsultationResultG"  resultType="com.wio.crm.model.Statics">
-        SELECT COUNT(PRC_GUBN) PRCGUBNCOUNT,(SELECT ADM_SNAME FROM TSYS01 WHERE ADM_GUBN='4003' AND ADM_CODE = A.PRC_GUBN) PRCNAME
-        FROM TBND01  A
+        SELECT COUNT(PRC_GUBN) PRCGUBNCOUNT ,(SELECT ADM_SNAME FROM TSYS01 WHERE ADM_GUBN='4003' AND ADM_CODE = A.PRC_GUBN) PRCNAME ,PRC_GUBN PRCGUBN
+        FROM TBND01 A
         WHERE CUST_CODE = #{custCode}
-        AND TO_CHAR(IN_DATE,'YYYYMMDD') BETWEEN #{start} AND #{end}
-        <![CDATA[
+          AND TO_CHAR(IN_DATE,'YYYYMMDD') BETWEEN #{start} AND #{end}
+          <![CDATA[
           AND PRC_GUBN <>'4'
         ]]>
-        GROUP BY  PRC_GUBN
-        order by PRC_GUBN
+        GROUP BY PRC_GUBN
+    </select>
+
+
+    <select id="getConsultationTime"  resultType="com.wio.crm.model.Statics">
+        SELECT * FROM (
+        SELECT '2 상담처리 발신' CSNAME,TO_CHAR(IN_DATE,'YYYYMMDD')INDATE,SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '09', 1, 0)) HOUR09
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '10', 1, 0)) HOUR10
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '11', 1, 0)) HOUR11
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '12', 1, 0)) HOUR12
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '13', 1, 0)) HOUR13
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '14', 1, 0)) HOUR14
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '15', 1, 0)) HOUR15
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '16', 1, 0)) HOUR16
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '17', 1, 0)) HOUR17
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '18', 1, 0)) HOUR18
+        FROM TBND01
+        WHERE CUST_CODE = #{custCode}
+        AND RING_ID ='undefined'
+        AND PRC_GUBN ='2'
+        AND TO_CHAR(IN_DATE,'YYYYMMDD') BETWEEN #{start} AND #{end}
+        group by TO_CHAR(IN_DATE,'YYYYMMDD')
+        UNION ALL
+        SELECT '1 상담처리 수신' STATS,TO_CHAR(IN_DATE,'YYYYMMDD') ,SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '09', 1, 0)) HOUR_09_C
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '10', 1, 0)) HOUR_10_C
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '11', 1, 0)) HOUR_11_C
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '12', 1, 0)) HOUR_12_C
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '13', 1, 0)) HOUR_13_C
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '14', 1, 0)) HOUR_14_C
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '15', 1, 0)) HOUR_15_C
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '16', 1, 0)) HOUR_16_C
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '17', 1, 0)) HOUR_17_C
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '18', 1, 0)) HOUR_18_C
+        FROM TBND01
+        WHERE CUST_CODE = #{custCode}
+        AND PRC_GUBN ='2'
+      <![CDATA[
+      AND RING_ID <>'undefined'
+      ]]>
+        AND TO_CHAR(IN_DATE,'YYYYMMDD') BETWEEN #{start} AND #{end}
+        group by TO_CHAR(IN_DATE,'YYYYMMDD')
+        UNION ALL
+        SELECT '3 수신' STATS,REPLACE(substr(calldate,0,10),'-')
+        ,SUM(DECODE(substr(calldate,12,2), '09', 1, 0)) HOUR_09_M
+        , SUM(DECODE(substr(calldate,12,2), '10', 1, 0)) HOUR_10_M
+        , SUM(DECODE(substr(calldate,12,2), '11', 1, 0)) HOUR_11_M
+        , SUM(DECODE(substr(calldate,12,2), '12', 1, 0)) HOUR_12_M
+        , SUM(DECODE(substr(calldate,12,2), '13', 1, 0)) HOUR_13_M
+        , SUM(DECODE(substr(calldate,12,2), '14', 1, 0)) HOUR_14_M
+        , SUM(DECODE(substr(calldate,12,2), '15', 1, 0)) HOUR_15_M
+        , SUM(DECODE(substr(calldate,12,2), '16', 1, 0)) HOUR_16_M
+        , SUM(DECODE(substr(calldate,12,2), '17', 1, 0)) HOUR_17_M
+        , SUM(DECODE(substr(calldate,12,2), '18', 1, 0)) HOUR_18_M
+        FROM CALL_LOG_D
+        WHERE REPLACE(substr(calldate,0,10),'-')  BETWEEN #{start} AND #{end}
+        AND CUST_CODE = #{custCode}
+        AND RESULT='ANSWER'
+        AND CONTEXT = 'inbound'
+        GROUP BY REPLACE(substr(calldate,0,10),'-')
+        UNION ALL
+        SELECT '4 발신' STATS,REPLACE(substr(calldate,0,10),'-'),SUM(DECODE(substr(calldate,12,2), '09', 1, 0)) HOUR_09_M
+        , SUM(DECODE(substr(calldate,12,2), '10', 1, 0)) HOUR_10_M
+        , SUM(DECODE(substr(calldate,12,2), '11', 1, 0)) HOUR_11_M
+        , SUM(DECODE(substr(calldate,12,2), '12', 1, 0)) HOUR_12_M
+        , SUM(DECODE(substr(calldate,12,2), '13', 1, 0)) HOUR_13_M
+        , SUM(DECODE(substr(calldate,12,2), '14', 1, 0)) HOUR_14_M
+        , SUM(DECODE(substr(calldate,12,2), '15', 1, 0)) HOUR_15_M
+        , SUM(DECODE(substr(calldate,12,2), '16', 1, 0)) HOUR_16_M
+        , SUM(DECODE(substr(calldate,12,2), '17', 1, 0)) HOUR_17_M
+        , SUM(DECODE(substr(calldate,12,2), '18', 1, 0)) HOUR_18_M
+        FROM CALL_LOG_D
+        WHERE REPLACE(substr(calldate,0,10),'-')  BETWEEN #{start} AND #{end}
+        AND CUST_CODE = #{custCode}
+        AND CONTEXT = 'outbound'
+        GROUP BY REPLACE(substr(calldate,0,10),'-')
+        )ORDER BY INDATE ,CSNAME
+
+
+    </select>
+    <select id="getConsultationTimeG"  resultType="com.wio.crm.model.Statics">
+        SELECT * FROM (
+        SELECT '2' CSNAME,SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '09', 1, 0)) HOUR09
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '10', 1, 0)) HOUR10
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '11', 1, 0)) HOUR11
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '12', 1, 0)) HOUR_12
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '13', 1, 0)) HOUR13
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '14', 1, 0)) HOUR14
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '15', 1, 0)) HOUR15
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '16', 1, 0)) HOUR16
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '17', 1, 0)) HOUR17
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '18', 1, 0)) HOUR18
+        FROM TBND01 WHERE CUST_CODE = #{custCode}
+        AND RING_ID ='undefined'
+        AND PRC_GUBN ='2'
+        AND TO_CHAR(IN_DATE,'YYYYMMDD') BETWEEN #{start} AND #{end}
+        UNION ALL
+        SELECT '1' STATS,SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '09', 1, 0)) HOUR09
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '10', 1, 0)) HOUR10
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '11', 1, 0)) HOUR11
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '12', 1, 0)) HOUR_12
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '13', 1, 0)) HOUR13
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '14', 1, 0)) HOUR14
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '15', 1, 0)) HOUR15
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '16', 1, 0)) HOUR16
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '17', 1, 0)) HOUR17
+        , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '18', 1, 0)) HOUR18
+        FROM TBND01 WHERE CUST_CODE = #{custCode}
+        AND PRC_GUBN ='2'
+        <![CDATA[
+                      AND RING_ID <>'undefined'
+      ]]>
+        AND TO_CHAR(IN_DATE,'YYYYMMDD') BETWEEN #{start} AND #{end}
+        UNION ALL
+        SELECT '3' STATS
+        ,SUM(DECODE(substr(calldate,12,2), '09', 1, 0)) HOUR_09_M
+        , SUM(DECODE(substr(calldate,12,2), '10', 1, 0)) HOUR_10_M
+        , SUM(DECODE(substr(calldate,12,2), '11', 1, 0)) HOUR_11_M
+        , SUM(DECODE(substr(calldate,12,2), '12', 1, 0)) HOUR_12_M
+        , SUM(DECODE(substr(calldate,12,2), '13', 1, 0)) HOUR_13_M
+        , SUM(DECODE(substr(calldate,12,2), '14', 1, 0)) HOUR_14_M
+        , SUM(DECODE(substr(calldate,12,2), '15', 1, 0)) HOUR_15_M
+        , SUM(DECODE(substr(calldate,12,2), '16', 1, 0)) HOUR_16_M
+        , SUM(DECODE(substr(calldate,12,2), '17', 1, 0)) HOUR_17_M
+        , SUM(DECODE(substr(calldate,12,2), '18', 1, 0)) HOUR_18_M
+        FROM CALL_LOG_D
+        WHERE REPLACE(substr(calldate,0,10),'-')  BETWEEN #{start} AND #{end}
+        AND CUST_CODE = #{custCode}
+        AND RESULT='ANSWER'
+        AND CONTEXT = 'inbound'
+        UNION ALL
+        SELECT '4' STATS,SUM(DECODE(substr(calldate,12,2), '09', 1, 0)) HOUR_09_M
+        , SUM(DECODE(substr(calldate,12,2), '10', 1, 0)) HOUR_10_M
+        , SUM(DECODE(substr(calldate,12,2), '11', 1, 0)) HOUR_11_M
+        , SUM(DECODE(substr(calldate,12,2), '12', 1, 0)) HOUR_12_M
+        , SUM(DECODE(substr(calldate,12,2), '13', 1, 0)) HOUR_13_M
+        , SUM(DECODE(substr(calldate,12,2), '14', 1, 0)) HOUR_14_M
+        , SUM(DECODE(substr(calldate,12,2), '15', 1, 0)) HOUR_15_M
+        , SUM(DECODE(substr(calldate,12,2), '16', 1, 0)) HOUR_16_M
+        , SUM(DECODE(substr(calldate,12,2), '17', 1, 0)) HOUR_17_M
+        , SUM(DECODE(substr(calldate,12,2), '18', 1, 0)) HOUR_18_M
+        FROM CALL_LOG_D
+        WHERE REPLACE(substr(calldate,0,10),'-')  BETWEEN #{start} AND #{end}
+        AND CUST_CODE = #{custCode}
+        AND CONTEXT = 'outbound'
+        )ORDER BY CSNAME
+
 
 
     </select>

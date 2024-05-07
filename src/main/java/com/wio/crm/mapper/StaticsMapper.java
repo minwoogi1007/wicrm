@@ -16,4 +16,7 @@ public interface StaticsMapper {
     List<Statics> getConsultationResult(@Param("start") String start, @Param("end") String end, @Param("custCode") String custCode);
     List<Statics> getConsultationResultG(@Param("start") String start, @Param("end") String end, @Param("custCode") String custCode);
 
+    List<Statics> getConsultationTime(@Param("start") String start, @Param("end") String end, @Param("custCode") String custCode);
+    List<Statics> getConsultationTimeG(@Param("start") String start, @Param("end") String end, @Param("custCode") String custCode);
+
 }

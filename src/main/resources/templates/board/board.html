@@ -82,7 +82,7 @@
           <!--begin::Card body-->
           <div class="card-body pt-0">
             <!--begin::Table-->
-            <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_ecommerce_report_customer_orders_table">
+            <table class="table align-middle table-striped table-row-dashed fs-6 gy-5" id="kt_ecommerce_report_customer_orders_table">
               <thead>
 
               <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
@@ -95,7 +95,7 @@
               </thead>
               <tbody class="fw-semibold text-gray-600">
 
-              <tr th:each="list:${list}">
+              <tr th:each="list:${list}"><input type="hidden" th:value="${list.UNO}" id="uno" />
 
                 <td th:text="${list.GNO}"></td>
 

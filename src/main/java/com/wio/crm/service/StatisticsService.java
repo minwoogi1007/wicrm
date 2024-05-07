@@ -70,4 +70,21 @@ public class StatisticsService {
         data.put("statCons", staticsMapper.getConsultationResultG(start_date,end_date,custCode));
         return data;
     }
+
+    public List<Statics> getConsultationTime( String start_date,  String end_date) {
+        String custCode = getCurrentCustcode(); // 고객 코드 조회
+
+        try {
+            return staticsMapper.getConsultationTime(start_date, end_date, custCode);
+        } catch (Exception e) {
+            throw new RuntimeException("Error retrieving statistics", e);
+        }
+    }
+
+    public Map<String, Object> getConsultationTimeG(String start_date,  String end_date) {
+        String custCode = getCurrentCustcode();
+        Map<String, Object> data = new HashMap<>();
+        data.put("statCons", staticsMapper.getConsultationTimeG(start_date,end_date,custCode));
+        return data;
+    }
 }
