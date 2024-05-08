@@ -95,7 +95,7 @@ public class BoardController {
     }
 
     // 글 읽기
-    @GetMapping("/post/{id}")
+    @GetMapping("/board/{id}")
     public String readPost(@PathVariable("id") int id, Model model) {
         Board post = boardService.selectPostById(id);
         model.addAttribute("post", post);
