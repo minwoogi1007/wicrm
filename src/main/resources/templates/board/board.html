@@ -31,12 +31,7 @@
             <li class="breadcrumb-item text-muted">게시판</li>
             <!--end::Item-->
             <!--begin::Item-->
-            <li class="breadcrumb-item">
-              <span class="bullet bg-gray-500 w-5px h-2px"></span>
-            </li>
-            <!--end::Item-->
-            <!--begin::Item-->
-            <li class="breadcrumb-item text-muted">사내게시판</li>
+
             <!--end::Item-->
           </ul>
           <!--end::Breadcrumb-->
@@ -65,7 +60,7 @@
                   <span class="path1"></span>
                   <span class="path2"></span>
                 </i>
-                <input type="text" data-kt-ecommerce-order-filter="search" class="form-control form-control-solid w-250px ps-12" placeholder="Search Report" />
+                <input type="text" data-kt-ecommerce-order-filter="search" class="form-control form-control-solid w-250px ps-12" placeholder="조회" />
               </div>
               <!--end::Search-->
               <!--begin::Export buttons-->
@@ -74,7 +69,7 @@
             </div>
             <!--end::Card title-->
             <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
-
+              <a href="/board/create" class="btn btn-primary">글쓰기</a>
             </div>
             <!--end::Card toolbar-->
           </div>
@@ -86,20 +81,20 @@
               <thead>
 
               <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
-                <th class="min-w-100px">NO</th>
+                <th class="min-w-50px">NO</th>
                 <th class="min-w-125px">제목</th>
-                <th class="min-w-100px">작성자</th>
-                <th class="min-w-125px">작성일</th>
+                <th class="min-w-80px">작성자</th>
+                <th class="min-w-80px">작성일</th>
                 <th class="text-end min-w-75px">조회수</th>
               </tr>
               </thead>
               <tbody class="fw-semibold text-gray-600">
 
-              <tr th:each="list:${list}"><input type="hidden" th:value="${list.UNO}" id="uno" />
+              <tr th:each="list:${list}" th:data-id="${list.UNO}" onclick="redirectToPost(this)">
 
                 <td th:text="${list.GNO}"></td>
 
-                <td th:text="${list.SUBJECT}"   >
+                <td data-bs-toggle="tooltip" data-bs-placement="bottom"  th:title="${list.SUBJECTFULL}"><a th:href="@{'/board/readBoard'(id=${list.UNO})}" th:text="${list.SUBJECT}"></a>
 
                 </td>
                 <td th:text="${list.ID}"></td>
@@ -122,6 +117,12 @@
       </div>
       <!--end::Content container-->
     </div>
+    <script>
+      function redirectToPost(element) {
+        var postId = element.getAttribute('data-id');
+        window.location.href = `/board/readBoard?id=${postId}`; // URL을 쿼리 파라미터로 사용
+      }
+    </script>
     <!--end::Content-->
     <script src="/assets/plugins/global/plugins.bundle.js"></script>
     <script src="/assets/js/board/scripts.bundle.js"></script>

@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,13 +82,13 @@ public class BoardController {
     }
 
     // 글쓰기 폼 페이지로 이동
-    @GetMapping("/create")
+    @GetMapping("/board/create")
     public String createForm() {
         return "board/createBoard"; // Thymeleaf 템플릿 이름
     }
 
     // 글쓰기 처리
-    @PostMapping("/create")
+    @PostMapping("/board/create")
     public String createPost(Board board, @RequestParam("image") MultipartFile image) {
         // 이미지 처리 로직은 생략. Board 객체에 이미지 정보를 설정하는 부분 필요
         boardService.insertPost(board);
@@ -95,10 +96,12 @@ public class BoardController {
     }
 
     // 글 읽기
-    @GetMapping("/board/{id}")
-    public String readPost(@PathVariable("id") int id, Model model) {
+    @GetMapping("/board/readBoard")
+    public String readPost(@RequestParam("id") String id, Model model) {
+        System.out.println(id);
+
         Board post = boardService.selectPostById(id);
         model.addAttribute("post", post);
-        return "board/readBoard"; // Thymeleaf 템플릿 이름
+        return "board/readBoard";// Thymeleaf 템플릿 이름
     }
 }

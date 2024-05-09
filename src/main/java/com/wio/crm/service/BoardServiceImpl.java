@@ -1,8 +1,11 @@
 package com.wio.crm.service;
 
+import com.wio.crm.config.CustomUserDetails;
 import com.wio.crm.mapper.BoardMapper;
 import com.wio.crm.model.Board;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,6 +14,17 @@ import java.util.List;
 public class BoardServiceImpl implements BoardService {
     private final BoardMapper boardMapper;
 
+    private String getCurrentCustcode() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
+            return ""; // Early return for null or incorrect type
+        }
+
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+        // Using a ternary operator to simplify code
+        return userDetails.getTcntUserInfo() != null ? userDetails.getTcntUserInfo().getCustCode() : "";
+    }
     @Autowired
     public BoardServiceImpl(BoardMapper boardMapper) {
         this.boardMapper = boardMapper;
@@ -27,8 +41,9 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public Board selectPostById(int id) { // 반환 타입 추가
-        return boardMapper.selectPostById(id);
+    public Board selectPostById(String id) { // 반환 타입 추가
+        String custCode = getCurrentCustcode(); // 고객 코드 조회
+        return boardMapper.selectPostById(id,custCode);
     }
 
     @Override

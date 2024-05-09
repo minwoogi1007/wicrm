@@ -9,6 +9,8 @@ public class Board {
     private String ID;
     private String PASSWD;
     private String SUBJECT;
+
+    private String SUBJECTFULL;
     private String CONTENT;
     private String HIT;
     private String IN_DATE;
@@ -21,7 +23,13 @@ public class Board {
     private String NOCODE;
     private String RE_COUNT;
 
+    public String getSUBJECTFULL() {
+        return SUBJECTFULL;
+    }
 
+    public void setSUBJECTFULL(String SUBJECTFULL) {
+        this.SUBJECTFULL = SUBJECTFULL;
+    }
 
     public String getRE_COUNT() {
         return RE_COUNT;

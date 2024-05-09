@@ -15,7 +15,11 @@
             --ROW_NUMBER() OVER (ORDER BY a.GNO DESC) AS rownum,
             a.UNO,
             a.GNO,
-            a.SUBJECT,
+            a.SUBJECT AS SUBJECTFULL,
+            CASE
+                WHEN LENGTH(a.SUBJECT) > 20 THEN SUBSTR(a.SUBJECT, 1, 19) || '...'
+                ELSE a.SUBJECT
+            END AS SUBJECT,
             a.ID,
             SUBSTR(a.IN_DATE,0,10) AS IN_DATE,
             a.REPLY_DEPTH,
@@ -30,8 +34,27 @@
           AND a.REPLY_DEPTH = 'A'
           AND a.DELCODE IS NULL
           AND a.SUBJECT IS NOT NULL
-          and substr(a.in_date,0,10) > '2023-01-01'
+          and substr(a.in_date,0,10) > '2024-01-01'
         ORDER BY a.GNO DESC, a.REPLY_DEPTH
 
     </select>
+    <select id="selectPostById" resultType="com.wio.crm.model.Board">
+        SELECT
+            gno,
+            uno,
+            REPLY_DEPTH,
+            CAT_GROUP,
+            SUBJECT,
+            EMPNM,
+            IN_DATE,
+            ID,
+            CONTENT,
+            ATT_FILE
+        FROM BOARD_CALL
+        WHERE CAT_GROUP = #{custCode}
+          AND uno=#{id}
+
+
+    </select>
+
 </mapper>

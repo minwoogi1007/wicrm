@@ -13,7 +13,7 @@ public interface BoardMapper {
     List<Board> noticeBoardList();
 
     void insertPost(Board board);
-    Board selectPostById(int id);
+    Board selectPostById(String id,String custCode);
 
 
 }
