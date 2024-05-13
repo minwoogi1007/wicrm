@@ -71,7 +71,7 @@
                                     <!--end::Input group-->
                                     <!--begin:Action-->
                                     <div class="d-flex align-items-center">
-                                        <button type="submit" class="btn btn-primary me-5">조회</button>
+                                        <button type="button" id="searchButton" class="btn btn-primary me-5">조회</button>
                                         <a href="#" id="kt_horizontal_search_advanced_link" class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#kt_advanced_search_form">상세조회</a>
                                     </div>
                                     <!--end:Action-->
@@ -296,7 +296,11 @@
                                                     <a href="#" class="btn btn-light btn-sm">View</a>
                                                 </td>
                                             </tr>
-
+                                            <nav aria-label="Page navigation example">
+                                                <ul class="pagination" id="pagination">
+                                                    <!-- 페이지 번호는 JavaScript에서 동적으로 생성됩니다. -->
+                                                </ul>
+                                            </nav>
                                             </tbody>
                                         </table>
                                         <!--end::Table-->
@@ -314,6 +318,68 @@
                 <!--end::Content container-->
             </div>
             <!--end::Content-->
+            <script>
+                $(document).ready(function() {
+                    $('#searchButton').click(function() {
+                        var formData = {
+                            startDate: $('input[name="hidden_start_date"]').val(),
+                            endDate: $('input[name="hidden_end_date"]').val()
+                        };
+
+                        $.ajax({
+                            url: '/api/consultations',
+                            type: 'GET',
+                            data: formData,
+                            success: function(data) {
+                                var tbody = $('#kt_project_users_table tbody');
+                                tbody.empty();
+                                data.forEach(function(consult) {
+                                    tbody.append(
+                                        '<tr>' +
+                            '<td>${consult.date}</td>' +
+                            '<td><span class="badge badge-light-danger fw-bold px-4 py-3">${consult.type}</span></td>' +
+                            '<td>${consult.time}</td>' +
+                            '<td>${consult.site}</td>' +
+                            '<td>' +
+                                '<div class="d-flex align-items-center">' +
+                                    '<div class="d-flex flex-column justify-content-center">' +
+                                        '<a href="" class="mb-1 text-gray-800 text-hover-primary">${consult.content}</a>' +
+                                        '<div class="fw-semibold fs-6 text-gray-500">${consult.details}</div>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</td>' +
+                            '<td>${consult.comments}</td>' +
+                            '<td>${consult.status}</td>' +
+                            '<td>${consult.category}</td>' +
+                            '<td class="text-end"><a href="#" class="btn btn-light btn-sm">View</a></td>' +
+                        '</tr>'
+                                    );
+                                });
+                                // 페이지네이션 업데이트
+                                updatePagination(response.total, 10);
+                            },
+                            error: function(error) {
+                                console.log('Error fetching data:', error);
+                            }
+                        });
+                    });
+                });
+                function updatePagination(total, pageSize) {
+                    var pageCount = Math.ceil(total / pageSize);
+                    var pagination = $('#pagination');
+                    pagination.empty();
+                    for (let i = 1; i <= pageCount; i++) {
+                        pagination.append(`<li class="page-item"><a class="page-link" href="#" onclick="loadPage(${i}, ${pageSize});">${i}</a></li>`);
+                    }
+                }
+
+                function loadPage(page, pageSize) {
+                    // 여기에 페이지 변경 시 로드할 데이터 로직 구현
+                    console.log(`Loading page ${page} with size ${pageSize}`);
+                    // 이 부분에 AJAX 호출 로직을 다시 적용하여 페이지 데이터를 로드할 수 있습니다.
+                }
+            </script>
+
         </div>
         <!--end::Content wrapper-->
         <!--begin::Footer-->

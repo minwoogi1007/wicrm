@@ -1,0 +1,19 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wio.crm.mapper.ConsMapper">
+    <select id="selectList" resultType="com.wio.crm.model.Consultation">
+        SELECT *
+        FROM TBND01
+        WHERE CUST_CODE = #{custCode}
+          AND TO_CHAR(IN_DATE, 'YYYYMMDD') BETWEEN #{startDate} AND #{endDate}
+        ORDER BY
+            CASE WHEN EMG_GUBN = '1' THEN 0 ELSE 1 END,
+            IN_DATE DESC
+            LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="countTotal" resultType="int" parameterType="map">
+        SELECT COUNT(*) FROM TBND01
+        WHERE TO_CHAR(IN_DATE, 'YYYYMMDD') BETWEEN #{startDate} AND #{endDate}
+    </select>
+
+</mapper>
