@@ -86,7 +86,7 @@
                                 <div class="row g-8 mb-8">
                                     <div class="col-xxl-12">
                                         <div class="row g-8">
-                                            <div class="col-lg-4">
+                                            <div class="col-lg-3">
                                                 <label class="fs-6 form-label fw-bold text-gray-900">상담일</label>
                                                 <div class="position-relative w-md-260px me-md-2">
                                                     <input type="hidden" id="hidden_start_date" name="hidden_start_date" th:value="${hidden_start_date}">
@@ -94,7 +94,7 @@
                                                     <input class="form-control form-control-solid w-100 mw-250px" placeholder="Pick date range" id="kt_ecommerce_report_customer_orders_daterangepicker" readonly />
                                                 </div>
                                             </div>
-                                            <div class="col-lg-2">
+                                            <div class="col-lg-3">
                                                 <label class="fs-6 form-label fw-bold text-gray-900">처리상태</label>
                                                 <select id="status" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Status" data-hide-search="true">
                                                     <option value="all" th:selected="true" th:text="'전체'"></option>
@@ -166,7 +166,11 @@
                         </div>
                         <div class="d-flex flex-wrap my-1">
                             <div class="d-flex my-0">
-                                <a href="#" id="downloadExcelButton" class="btn btn-success"><i class="fas fa-envelope-open-text fs-4 me-2"></i> 엑셀 다운로드</a>
+                                <button type="button" id="downloadExcelButton" class="btn btn-light-primary" data-kt-menu-placement="bottom-end">
+                                <i class="ki-duotone ki-exit-up fs-2">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>다운로드</button>
 
                             </div>
                         </div>
@@ -587,9 +591,7 @@
                     $('#searchButton').click(function() {
                         loadPage(1); // Load first page on search
                     });
-                    $('#downloadExcelButton').click(function(event) {
-                        event.preventDefault(); // 기본 동작을 막습니다.
-
+                    $('#downloadExcelButton').click(function() {
                         var hiddenStartDate = $('input[name="hidden_start_date"]').val() || getToday();
                         var hiddenEndDate = $('input[name="hidden_end_date"]').val() || getToday();
                         var status = $('#status').val();
@@ -613,7 +615,6 @@
                             keyword: keyword
                         });
                         window.location.href = '/api/consultations/excel?' +formData;
-
                     });
                 });
 
