@@ -29,6 +29,7 @@ public class SecurityConfig {
                         ).csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 )
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/consultations").hasAuthority("ROLE_USER")
                         .requestMatchers("/empl").hasAuthority("ROLE_EMPLOYEE")
                         .requestMatchers("/encrypt-passwords", "/encryption","/check-userid-availability","/apply-userid").permitAll()
                         .anyRequest().authenticated())

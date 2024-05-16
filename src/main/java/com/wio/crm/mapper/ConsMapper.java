@@ -17,7 +17,7 @@ public interface ConsMapper {
      */
     List<Consultation> selectList(@Param("s") String s, @Param("params") Map<String, Object> params);
 
-    int countTotal(Map<String, Object> params);
+    int countTotal(@Param("params") Map<String, Object> params);
 
-
+    List<Consultation> selectAllForExcel( @Param("params") Map<String, Object> params);
 }

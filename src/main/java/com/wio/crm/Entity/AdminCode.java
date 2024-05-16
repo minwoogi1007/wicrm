@@ -37,4 +37,13 @@ public class AdminCode {
     public void setAdmSname(String admSname) {
         this.admSname = admSname;
     }
+
+    @Override
+    public String toString() {
+        return "AdminCode{" +
+                "admCode='" + admCode + '\'' +
+                ", admGubn='" + admGubn + '\'' +
+                ", admSname='" + admSname + '\'' +
+                '}';
+    }
 }
