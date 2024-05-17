@@ -1,6 +1,8 @@
 package com.wio.crm.mapper;
 
+import com.wio.crm.model.Comment;
 import com.wio.crm.model.Consultation;
+import com.wio.crm.model.History;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -20,4 +22,14 @@ public interface ConsMapper {
     int countTotal(@Param("params") Map<String, Object> params);
 
     List<Consultation> selectAllForExcel( @Param("params") Map<String, Object> params);
+
+    Consultation selectConsultationDetails(@Param("params") Map<String, Object> params);
+
+    List<Comment> getComments(@Param("params") Map<String, Object> params);
+
+    List<History> getHistory(@Param("params") Map<String, Object> params);
+
+    void insertComment(@Param("comment") Comment comment);
+
+
 }

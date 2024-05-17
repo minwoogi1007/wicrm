@@ -260,5 +260,111 @@
         </if>
         ) main_query
     </select>
+    <select id="selectConsultationDetails" resultType="com.wio.crm.model.Consultation">
+        SELECT A.CUST_CODE as custCode,
+               A.PROJECT_CODE as projectCode,
+               A.PERSON_CODE as personCode,
+               A.CALL_CODE as callCode,
+               TO_CHAR(A.IN_DATE,'YYYYMMDD') as inDate,
+               TO_CHAR(A.IN_DATE, 'HH24:MI:SS')as inTime,
+               (SELECT ADM_SNAME FROM TSYS01 WHERE ADM_GUBN='4002'AND  ADM_CODE=A.CS_TYPE) as csType,
+               (SELECT ADM_SNAME FROM TSYS01 WHERE ADM_GUBN='4003'AND  ADM_CODE=A.PRC_GUBN) as prcGubn,
+               (SELECT ADM_SNAME FROM TSYS01 WHERE ADM_GUBN='5000'AND  ADM_CODE=A.BUY_GUBN)  as buyGubn,
+               NVL((SELECT PERSON_NAME FROM TPER01 WHERE PERSON_CODE = A.PERSON_CODE AND CUST_CODE = #{params.custCode}), ' ') as empNo,
+               (SELECT TEL_NO FROM TPER01 WHERE PERSON_CODE=A.PERSON_CODE AND CUST_CODE = #{params.custCode}) as custTell,
+               A.CS_NOTE AS csNote,
+               A.EMG_GUBN as emgGubn,
+               NVL(A.CS_DATE,'') as csDate,
+               NVL(A.CS_BANK,'') as csBank,
+               NVL(A.CS_NAME,'') as csName,
+               NVL(A.CS_CASH,'') as csCash,
+               A.PRC_NOTE as prcNote
+        FROM TBND01 A
+        WHERE A.CUST_CODE = #{params.custCode}
+          AND A.PROJECT_CODE = #{params.projectCode}
+          AND A.PERSON_CODE = #{params.personCode}
+          AND A.CALL_CODE = #{params.callCode}
+    </select>
+    <select id="selectConsultationPerson" resultType="com.wio.crm.model.Consultation">
+        SELECT A.CUST_CODE as custCode,
+               A.PROJECT_CODE as projectCode,
+               A.PERSON_CODE as personCode,
+               A.CALL_CODE as callCode,
+               TO_CHAR(A.IN_DATE,'YYYYMMDD HH24:MI:SS') as inDate,
+               (SELECT ADM_SNAME FROM TSYS01 WHERE ADM_GUBN='4002'AND  ADM_CODE=A.CS_TYPE) as csType,
+               (SELECT ADM_SNAME FROM TSYS01 WHERE ADM_GUBN='4003'AND  ADM_CODE=A.PRC_GUBN) as prcGubn,
+               (SELECT ADM_SNAME FROM TSYS01 WHERE ADM_GUBN='5000'AND  ADM_CODE=A.BUY_GUBN)  as buyGubn,
+               NVL((SELECT PERSON_NAME FROM TPER01 WHERE PERSON_CODE = A.PERSON_CODE AND CUST_CODE = #{params.custCode}), ' ') as empNo,
+               (SELECT TEL_NO FROM TPER01 WHERE PERSON_CODE=A.PERSON_CODE AND CUST_CODE = #{params.custCode}) as custTell,
+               A.CS_NOTE AS csNote,
+               A.EMG_GUBN as emgGubn,
+               NVL(A.CS_DATE,'') as csDate,
+               NVL(A.CS_BANK,'') as csBank,
+               NVL(A.CS_NAME,'') as csName,
+               NVL(A.CS_CASH,'') as csCash,
+               A.PRC_NOTE as prcNote
+        FROM TBND01 A
+        WHERE PERSON_CODE={params.personCode}
+        ORDER BY IN_DATE DESC
+    </select>
+
+    <select id="getComments" resultType="com.wio.crm.model.Comment">
+        SELECT B.SERL_NO as serlNo,
+               B.USER_ID as userId,
+               B.CONTEXT as conText,
+               B.SAUP_GUBN as saupGubn,
+               B.DEL_GUBN as delGubn,
+               B.CONFIRM_YN as confirmYn,
+               TO_CHAR(B.IN_DATE,'YYYYMMDD HH24:MI:SS') as inDate
+        FROM TBND01_MEMO B
+        WHERE B.CUST_CODE = #{params.custCode}
+          AND B.PROJECT_CODE = #{params.projectCode}
+          AND B.PERSON_CODE = #{params.personCode}
+          AND B.CALL_CODE = #{params.callCode}
+        ORDER BY B.SERL_NO
+    </select>
+    <select id="getHistory" resultType="com.wio.crm.model.History">
+        SELECT CS_NOTE as csNote,
+               (SELECT ADM_SNAME FROM TSYS01 WHERE ADM_GUBN='4003'AND  ADM_CODE=A.PRC_GUBN) as prcGubn,
+               PRC_NOTE as prcNote,
+               TO_CHAR(A.IN_DATE,'YYYYMMDD') as inDate,
+               TO_CHAR(A.IN_DATE, 'HH24:MI:SS')as inTime
+        FROM TBND01 A
+        WHERE CUST_CODE = #{params.custCode}
+          AND PROJECT_CODE = #{params.projectCode}
+          AND PERSON_CODE = #{params.personCode}
+        ORDER BY IN_DATE DESC
+    </select>
+    <insert id="insertComment">
+        INSERT INTO TBND01_MEMO(
+            CUST_CODE,
+            PROJECT_CODE,
+            PERSON_CODE,
+            CALL_CODE,
+            SERL_NO,
+            USER_ID,
+            CONTEXT,
+            DEL_GUBN,
+            IN_DATE,
+            IN_EMPNO
+        ) VALUES (
+                     #{comment.custCode},
+                     #{comment.projectCode},
+                     #{comment.personCode},
+                     #{comment.callCode},
+                     (SELECT NVL(MAX(TO_NUMBER(SERL_NO,'999,999,999')),0)+1
+                      FROM TBND01_MEMO
+                      WHERE CUST_CODE = #{comment.custCode}
+                        AND PROJECT_CODE = #{comment.projectCode}
+                        AND PERSON_CODE = #{comment.personCode}
+                        AND CALL_CODE = #{comment.callCode}
+                     ),
+                     #{comment.userId},
+                     #{comment.conText},
+                     '0',
+                     SYSDATE,
+                     #{comment.userId}
+                 )
+    </insert>
 
 </mapper>

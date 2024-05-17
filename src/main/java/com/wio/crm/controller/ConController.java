@@ -1,7 +1,9 @@
 package com.wio.crm.controller;
 
 import com.wio.crm.Entity.AdminCode;
+import com.wio.crm.model.Comment;
 import com.wio.crm.model.Consultation;
+import com.wio.crm.model.History;
 import com.wio.crm.service.AdminCodeService;
 import com.wio.crm.service.ConService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -13,8 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -62,12 +63,7 @@ public class ConController {
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String mall,
             @RequestParam(required = false) String filter,
-            @RequestParam(required = false) String keyword,
-            Principal principal) {
-// Log authenticated user details for debugging
-        System.out.println("Authenticated user: " + principal.getName());
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("Authorities: " + authentication.getAuthorities());
+            @RequestParam(required = false) String keyword) {
 
 
         List<Consultation> consultations = conService.getConsultations(page, pageSize, startDate, endDate, status, type, mall, keyword,filter);
@@ -78,6 +74,26 @@ public class ConController {
         response.put("total", total);
 
         return ResponseEntity.ok(response);
+    }
+    @GetMapping("/api/consultations/details")
+    public ResponseEntity<Map<String, Object>> getConsultationDetails(@RequestParam String projectCode,
+                                                                              @RequestParam String personCode,
+                                                                              @RequestParam String callCode) {
+        Consultation consultation = conService.getConsultationDetails( projectCode, personCode, callCode);
+        List<Comment> comments = conService.getComments( projectCode, personCode, callCode);
+        List<History> history = conService.getHistory( projectCode, personCode, callCode); // 추가된 부분
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("data", consultation);
+        response.put("total", comments);
+        response.put("history", history);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/api/consultations/addComment")
+    public ResponseEntity<Void> addComment(@RequestBody Comment request) {
+        conService.addComment(request);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/api/consultations/excel")
@@ -156,4 +172,6 @@ public class ConController {
 
         response.getOutputStream().write(out.toByteArray());
     }
+
+
 }

@@ -1,23 +1,16 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{/main}">
-<!--begin::Main-->
-<!-- Load Bootstrap CSS -->
-<!-- Bootstrap CSS -->
 
-<script>
-    ClassicEditor
-        .create(document.querySelector('#kt_docs_ckeditor_classic'))
-        .then(editor => {
-            console.log(editor);
-        })
-        .catch(error => {
-            console.error(error);
-        });
-</script>
-
-<div layout:fragment="content">
+<head>
+    <meta charset="utf-8">
+    <title>Create Board</title>
+    <!-- Load Summernote CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-bs4.min.css" rel="stylesheet">
+    <!-- Global Stylesheets Bundle -->
+    <link href="/assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
+    <link href="/assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
     <!--begin::Content wrapper-->
     <div class="d-flex flex-column flex-column-fluid">
         <!--begin::Toolbar-->
@@ -44,13 +37,11 @@
                         <!--begin::Item-->
                         <li class="breadcrumb-item text-muted">게시판</li>
                         <!--end::Item-->
-
                     </ul>
                     <!--end::Breadcrumb-->
                 </div>
                 <!--end::Page title-->
                 <!--begin::Actions-->
-
                 <!--end::Actions-->
             </div>
             <!--end::Toolbar container-->
@@ -64,56 +55,49 @@
                 <div class="card card-flush">
                     <!--begin::Card body-->
                     <!--begin::Table-->
-
                     <!--begin::Body-->
                     <div class="card-body p-lg-10">
                         <!--begin::Latest posts-->
                         <div class="mb-15">
                             <!--begin::Title-->
                             <div class="d-flex justify-content-between align-items-center text-gray-900 mb-7">
-
-
                                 <div class="container">
-                                    <textarea name="kt_docs_ckeditor_classic" id="kt_docs_ckeditor_classic"></textarea>
+                                    <textarea name="summernote" id="summernote"></textarea>
                                 </div>
-
                             </div>
                             <!--end::Title-->
-                            <!--begin::Separator-->
-                            <!--end::Separator-->
-                            <!--begin::Feature post-->
-
-                            <!--end::Feature post-->
-                            <!--begin::Posts-->
-
-                            <!--end::Posts-->
                         </div>
                         <!--end::Latest posts-->
-                        <!--begin::Section-->
-
-                        <!--end::latest instagram-->
                     </div>
                     <!--end::Body-->
-
-                    <!--end::Table-->
-
-                    <!--end::Card body-->
                 </div>
                 <!--end::Products-->
             </div>
             <!--end::Content container-->
         </div>
-
         <!--end::Content-->
-        <script src="/assets/plugins/global/plugins.bundle.js"></script>
-        <script src="/assets/js/board/scripts.bundle.js"></script>
-        <script src="/assets/js/custom/apps/ecommerce/reports/customer-orders/customer-orders.js"></script>
     </div>
     <!--end::Content wrapper-->
+    <!--begin::Footer-->
+    <script src="/assets/plugins/global/plugins.bundle.js"></script>
+    <script src="/assets/js/board/scripts.bundle.js"></script>
+    <script src="/assets/js/custom/apps/ecommerce/reports/customer-orders/customer-orders.js"></script>
+    <!--end::Footer-->
 
-    <!--end:::Main-->
-
-
+    <!-- Load Summernote JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-bs4.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#summernote').summernote({
+                height: 300,                 // set editor height
+                minHeight: null,             // set minimum height of editor
+                maxHeight: null,             // set maximum height of editor
+                focus: true                  // set focus to editable area after initializing summernote
+            });
+        });
+    </script>
 </div>
-<!--begin::Custom Javascript(used for this page only)-->
-<!--end::Custom Javascript-->
+</body>
+</html>

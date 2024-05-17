@@ -2,7 +2,9 @@ package com.wio.crm.service;
 
 import com.wio.crm.config.CustomUserDetails;
 import com.wio.crm.mapper.ConsMapper;
+import com.wio.crm.model.Comment;
 import com.wio.crm.model.Consultation;
+import com.wio.crm.model.History;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,12 +13,24 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+
 @Service
 public class ConService {
 
     @Autowired
     private ConsMapper consMapper;
+    private String getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
+            return ""; // Early return for null or incorrect type
+        }
 
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+        // Using a ternary operator to simplify code
+        return userDetails.getTcntUserInfo() != null ? userDetails.getTcntUserInfo().getUserId() : "";
+    }
     private String getCurrentCustcode() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
@@ -75,6 +89,48 @@ public class ConService {
 
         return consMapper.selectAllForExcel(params);
     }
+    public Consultation getConsultationDetails( String projectCode, String personCode, String callCode) {
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("custCode", getCurrentCustcode());
+        params.put("projectCode", projectCode);
+        params.put("personCode", personCode);
+        params.put("callCode", callCode);
+        return consMapper.selectConsultationDetails(params);
+    }
+
+
+    public List<Comment> getComments( String projectCode, String personCode, String callCode) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("custCode", getCurrentCustcode());
+        params.put("projectCode", projectCode);
+        params.put("personCode", personCode);
+        params.put("callCode", callCode);
+        return consMapper.getComments(params);
+    }
+
+    public List<History> getHistory(String projectCode, String personCode, String callCode) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("custCode", getCurrentCustcode());
+        params.put("projectCode", projectCode);
+        params.put("personCode", personCode);
+        params.put("callCode", callCode);
+        return consMapper.getHistory(params);
+    }
+
+
+
+    public void addComment(Comment request) {
+        Comment comment = new Comment();
+        comment.setUserId(getCurrentUserId());
+        comment.setConText(request.getConText());
+        comment.setCustCode(request.getCustCode());
+        comment.setProjectCode(request.getProjectCode());
+        comment.setPersonCode(request.getPersonCode());
+        comment.setCallCode(request.getCallCode());
+        consMapper.insertComment(comment);
+    }
+
 
 }
 

@@ -104,4 +104,9 @@ public class BoardController {
         model.addAttribute("post", post);
         return "board/readBoard";// Thymeleaf 템플릿 이름
     }
+
+    @GetMapping("/createBoard")
+    public String createBoard() {
+        return "board/createBoard";
+    }
 }

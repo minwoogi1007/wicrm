@@ -2,6 +2,7 @@ package com.wio.crm.model;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 public class Consultation {
     private String custCode;
@@ -45,6 +46,25 @@ public class Consultation {
 
     private String countRe;
     private String projectName;
+
+    private Consultation consultation;
+    private List<Comment> comments;
+
+    public Consultation getConsultation() {
+        return consultation;
+    }
+
+    public void setConsultation(Consultation consultation) {
+        this.consultation = consultation;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
+    }
 
     public String getProjectName() {
         return projectName;
