@@ -3,6 +3,8 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{/main}">
 <!--begin::Main-->
+<meta name="_csrf" th:content="${_csrf.token}"/>
+<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 <div layout:fragment="content">
     <!--begin::Content wrapper-->
   <div class="d-flex flex-column flex-column-fluid">
@@ -13,7 +15,7 @@
         <!--begin::Page title-->
         <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
           <!--begin::Title-->
-          <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">공지사항</h1>
+          <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">상담유형</h1>
           <!--end::Title-->
           <!--begin::Breadcrumb-->
           <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
@@ -31,7 +33,6 @@
             <li class="breadcrumb-item text-muted">게시판</li>
             <!--end::Item-->
             <!--begin::Item-->
-
             <!--end::Item-->
           </ul>
           <!--end::Breadcrumb-->
@@ -43,96 +44,96 @@
       </div>
       <!--end::Toolbar container-->
     </div>
-    <!--end::Toolbar-->
-    <!--begin::Content-->
-    <div id="kt_app_content" class="app-content flex-column-fluid">
-      <!--begin::Content container-->
-      <div id="kt_app_content_container" class="app-container container-xxl">
-        <!--begin::Products-->
-        <div class="card card-flush">
-          <!--begin::Card header-->
-          <div class="card-header align-items-center py-5 gap-2 gap-md-5">
-            <!--begin::Card title-->
-            <div class="card-title">
-              <!--begin::Search-->
-              <div class="d-flex align-items-center position-relative my-1">
-                <i class="ki-duotone ki-magnifier fs-3 position-absolute ms-4">
-                  <span class="path1"></span>
-                  <span class="path2"></span>
-                </i>
-                <input type="text" data-kt-ecommerce-order-filter="search" class="form-control form-control-solid w-250px ps-12" placeholder="조회" />
+      <!--end::Toolbar-->
+      <!--begin::Content-->
+      <div id="kt_app_content" class="app-content flex-column-fluid">
+        <!--begin::Content container-->
+        <div id="kt_app_content_container" class="app-container container-xxl">
+          <!--begin::Products-->
+          <div class="card card-flush">
+            <!--begin::Card header-->
+            <div class="card-header align-items-center py-5 gap-2 gap-md-5">
+              <!--begin::Card title-->
+              <div class="card-title">
+                <!--begin::Search-->
+                <div class="d-flex align-items-center position-relative my-1">
+                  <i class="ki-duotone ki-magnifier fs-3 position-absolute ms-4">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                  </i>
+                  <input type="text" data-kt-ecommerce-order-filter="search" class="form-control form-control-solid w-250px ps-12" placeholder="조회" />
+                </div>
+                <!--end::Search-->
+                <!--begin::Export buttons-->
+                <div id="kt_ecommerce_report_customer_orders_export" class="d-none"></div>
+                <!--end::Export buttons-->
               </div>
-              <!--end::Search-->
-              <!--begin::Export buttons-->
-              <div id="kt_ecommerce_report_customer_orders_export" class="d-none"></div>
-              <!--end::Export buttons-->
+              <!--end::Card title-->
+              <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
+                <a href="/board/create" class="btn btn-primary">글쓰기</a>
+              </div>
+              <!--end::Card toolbar-->
             </div>
-            <!--end::Card title-->
-            <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
-              <a href="/board/create" class="btn btn-primary">글쓰기</a>
+            <!--end::Card header-->
+            <!--begin::Card body-->
+            <div class="card-body pt-0">
+              <!--begin::Table-->
+              <table class="table align-middle table-striped table-row-dashed fs-6 gy-5" id="kt_ecommerce_report_customer_orders_table">
+                <thead>
+
+                <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
+                  <th class="min-w-50px">NO</th>
+                  <th class="min-w-125px">제목</th>
+                  <th class="min-w-80px">작성자</th>
+                  <th class="min-w-80px">작성일</th>
+                  <th class="text-end min-w-75px">조회수</th>
+                </tr>
+                </thead>
+                <tbody class="fw-semibold text-gray-600">
+
+                <tr th:each="list:${list}" th:data-id="${list.UNO}" onclick="redirectToPost(this)">
+
+                  <td th:text="${list.GNO}"></td>
+
+                  <td data-bs-toggle="tooltip" data-bs-placement="bottom"  th:title="${list.SUBJECTFULL}"><a th:href="@{'/board/readBoard'(id=${list.UNO})}" th:text="${list.SUBJECT}"></a>
+
+                  </td>
+                  <td th:text="${list.ID}"></td>
+
+                  <td th:text="${list.IN_DATE}"></td>
+
+                  <td th:text="${list.HIT}" class="text-end"></td>
+
+                </tr>
+
+
+                </tbody>
+              </table>
+              <!--end::Table-->
             </div>
-            <!--end::Card toolbar-->
+
+            <!--end::Card body-->
           </div>
-          <!--end::Card header-->
-          <!--begin::Card body-->
-          <div class="card-body pt-0">
-            <!--begin::Table-->
-            <table class="table align-middle table-striped table-row-dashed fs-6 gy-5" id="kt_ecommerce_report_customer_orders_table">
-              <thead>
-
-              <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
-                <th class="min-w-50px">NO</th>
-                <th class="min-w-125px">제목</th>
-                <th class="min-w-80px">작성자</th>
-                <th class="min-w-80px">작성일</th>
-                <th class="text-end min-w-75px">조회수</th>
-              </tr>
-              </thead>
-              <tbody class="fw-semibold text-gray-600">
-
-              <tr th:each="list:${list}" th:data-id="${list.UNO}" onclick="redirectToPost(this)">
-
-                <td th:text="${list.GNO}"></td>
-
-                <td data-bs-toggle="tooltip" data-bs-placement="bottom"  th:title="${list.SUBJECTFULL}"><a th:href="@{'/board/readBoard'(id=${list.UNO})}" th:text="${list.SUBJECT}"></a>
-
-                </td>
-                <td th:text="${list.ID}"></td>
-
-                <td th:text="${list.IN_DATE}"></td>
-
-                <td th:text="${list.HIT}" class="text-end"></td>
-
-              </tr>
-
-
-              </tbody>
-            </table>
-            <!--end::Table-->
-          </div>
-
-          <!--end::Card body-->
+          <!--end::Products-->
         </div>
-        <!--end::Products-->
+        <!--end::Content container-->
       </div>
-      <!--end::Content container-->
-    </div>
-    <script>
-      function redirectToPost(element) {
-        var postId = element.getAttribute('data-id');
-        window.location.href = `/board/readBoard?id=${postId}`; // URL을 쿼리 파라미터로 사용
-      }
-    </script>
-    <!--end::Content-->
-    <script src="/assets/plugins/global/plugins.bundle.js"></script>
-    <script src="/assets/js/board/scripts.bundle.js"></script>
-    <script src="/assets/js/custom/apps/ecommerce/reports/customer-orders/customer-orders.js"></script>
-  </div>
+      <script>
+        function redirectToPost(element) {
+          var postId = element.getAttribute('data-id');
+          window.location.href = `/board/readBoard?id=${postId}`; // URL을 쿼리 파라미터로 사용
+        }
+      </script>
+      <!--end::Content-->
+      <script src="/assets/plugins/global/plugins.bundle.js"></script>
+      <script src="/assets/js/board/scripts.bundle.js"></script>
+      <script src="/assets/js/custom/apps/ecommerce/reports/customer-orders/customer-orders.js"></script>
+
     <!--end::Content wrapper-->
 
   <!--end:::Main-->
 
-
+  </div>
 </div>
 <!--begin::Custom Javascript(used for this page only)-->
 <!--end::Custom Javascript-->
