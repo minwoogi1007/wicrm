@@ -1,14 +1,14 @@
 
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{/main}">
+      layout:decorate="~{main}">
 <!--begin::Main-->
+
 <div layout:fragment="content">
 
 
         <!-- Load Summernote CSS -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.css">
 
     <!-- Global Stylesheets Bundle -->
 
@@ -64,48 +64,26 @@
                     <div class="card-body p-lg-10">
                         <!--begin::Latest posts-->
                         <div class="mb-15">
-
-                            <!--begin::Title-->
-                            <div class="d-flex justify-content-between align-items-center text-gray-900 mb-7">
-                                <label class="col-lg-1 col-form-label required fw-semibold fs-2">제목</label>
-                                <input type="text" id="title" name="title" class="form-control form-control-lg form-control-solid"   />
-
-                            </div>
-                            <form class="form" action="#" method="post">
-                                <!--begin::Input group-->
-                                <div class="fv-row">
-                                    <!--begin::Dropzone-->
-                                    <div class="dropzone" id="kt_dropzonejs_example_1">
-                                        <!--begin::Message-->
-                                        <div class="dz-message needsclick">
-                                            <i class="ki-duotone ki-file-up fs-3x text-primary"><span class="path1"></span><span class="path2"></span></i>
-
-                                            <!--begin::Info-->
-                                            <div class="ms-4">
-                                                <h3 class="fs-5 fw-bold text-gray-900 mb-1">Drop files here or click to upload.</h3>
-                                                <span class="fs-7 fw-semibold text-gray-500">Upload up to 10 files</span>
-                                            </div>
-                                            <!--end::Info-->
+                            <form id="boardForm" enctype="multipart/form-data" method="post">
+                                <div class="d-flex justify-content-between align-items-center text-gray-900 mb-7">
+                                    <label class="col-lg-1 col-form-label required fw-semibold fs-2">제목</label>
+                                    <input type="text" id="title" name="title" class="form-control form-control-lg form-control-solid" />
+                                </div>
+                                <div class="separator separator-dashed mb-9"></div>
+                                <div class="mb-15">
+                                    <div class="d-flex justify-content-between align-items-center text-gray-900 mb-7">
+                                        <div class="container">
+                                            <textarea name="summernote" id="summernote"></textarea>
                                         </div>
                                     </div>
-                                    <!--end::Dropzone-->
                                 </div>
-                                <!--end::Input group-->
+                                <div class="mb-15">
+                                    <input type="file" name="file" />
+                                </div>
+                                <div class="mb-15">
+                                    <button type="button" id="saveButton" class="btn btn-primary">저장</button>
+                                </div>
                             </form>
-                            <!--end::Form-->
-                            <div class="separator separator-dashed mb-9"></div>
-                            <div class="mb-15">
-                                <!--begin::Title-->
-                                <div class="d-flex justify-content-between align-items-center text-gray-900 mb-7">
-                                    <div class="container">
-                                        <textarea name="summernote" id="summernote"></textarea>
-                                    </div>
-                                </div>
-                                <!--end::Title-->
-                            </div>
-                            <!--end::Feature post-->
-                            <!--begin::Posts-->
-
                             <!--end::Posts-->
                         </div>
 
@@ -123,74 +101,90 @@
     <!--begin::Footer-->
 
     <!--end::Footer-->
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
-    <!-- Load Summernote JS -->
-    <script type="text/JavaScript" src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.js"></script>
-    <script type="text/JavaScript" src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/lang/summernote-ko-KR.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+        <!-- Load Summernote JS -->
+        <script type="text/JavaScript" src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.js"></script>
+        <script type="text/JavaScript" src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/lang/summernote-ko-KR.js"></script>
 
 
         <script>
+            $(document).ready(function() {
+                var token = $("meta[name='_csrf']").attr("content");
+                var header = $("meta[name='_csrf_header']").attr("content");
 
-
-
-        $(document).ready(function() {
-            Dropzone.autoDiscover = false;
-            // Initialize Dropzone
-            var myDropzone = new Dropzone("#kt_dropzonejs_example_1", {
-
-                url: "/api/upload", // Set the url for your upload script location
-                paramName: "file", // The name that will be used to transfer the file
-                maxFiles: 10,
-                maxFilesize: 10, // MB
-                addRemoveLinks: true,
-                autoProcessQueue: false, // Prevent Dropzone from auto uploading
-                accept: function(file, done) {
-                    done();
-                }
-            });
-
-            // Initialize Summernote
-            $('#summernote').summernote({
-                height: 550, // 에디터 높이
-                minHeight: null, // 최소 높이
-                maxHeight: null, // 최대 높이
-                focus: true, // 에디터 로딩후 포커스를 맞출지 여부
-                lang: "ko-KR", // 한글 설정
-                placeholder: "게시글 작성", // placeholder 설정
-                fontNames: ["맑은 고딕", "궁서", "굴림체", "굴림", "돋움체", "바탕체", "Arial", "Arial Black", "Comic Sans MS", "Courier New"],
-                fontNamesIgnoreCheck: ["맑은 고딕"], // 기본 폰트 설정
-                fontSizes: ["8", "9", "10", "11", "12", "14", "16", "18", "20", "22", "24", "28", "30", "36", "50", "72"]
-            });
-
-            // Handle form submission
-            $('#saveButton').click(function() {
-                var formData = new FormData($('#boardForm')[0]);
-                var content = $('#summernote').val();
-                formData.append('content', content);
-
-                myDropzone.processQueue(); // Upload files
-
-                // Send form data after files are uploaded
-                myDropzone.on("queuecomplete", function() {
+                $('#summernote').summernote({
+                    height: 550,
+                    minHeight: null,
+                    maxHeight: null,
+                    focus: true,
+                    lang: "ko-KR",
+                    placeholder: "게시글 작성",
+                    fontNames: ["맑은 고딕", "궁서", "굴림체", "굴림", "돋움체", "바탕체", "Arial", "Arial Black", "Comic Sans MS", "Courier New"],
+                    fontNamesIgnoreCheck: ["맑은 고딕"],
+                    fontSizes: ["8", "9", "10", "11", "12", "14", "16", "18", "20", "22", "24", "28", "30", "36", "50", "72"],
+                    callbacks: {
+                        onImageUpload: function(files) {
+                            for (var i = 0; i < files.length; i++) {
+                                uploadImage(files[i]);
+                            }
+                        }
+                    }
+                });
+                function uploadImage(file) {
+                    var data = new FormData();
+                    data.append("file", file);
                     $.ajax({
-                        url: "/api/savePost",
+                        url: "/board/uploadImage",
+                        type: "POST",
+                        data: data,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader(header, token);
+                        },
+                        success: function(url) {
+                            $('#summernote').summernote('insertImage', url, function ($image) {
+                                $image.attr('src', url);
+                                $image.attr('data-filename', file.name);
+                            });
+                        },
+                        error: function(data) {
+                            console.error("Error uploading image:", data);
+                        }
+                    });
+                }
+
+                $('#saveButton').click(function() {
+                    var formData = new FormData($('#boardForm')[0]);
+                    var content = $('#summernote').val();
+                    formData.append('content', content);
+
+                    var token = $("meta[name='_csrf']").attr("content");
+                    var header = $("meta[name='_csrf_header']").attr("content");
+                    $.ajax({
+                        url: "/board/create/saveBoard",
                         type: "POST",
                         data: formData,
                         processData: false,
                         contentType: false,
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader(header, token);
+                        },
                         success: function(response) {
                             alert("저장되었습니다.");
                             // Redirect or update UI as needed
+                            window.history.back(); // 이전 페이지로 이동
                         },
                         error: function(error) {
+                            alert("저장 실패.");
                             console.error("Error saving post:", error);
+                            window.history.back(); // 이전 페이지로 이동
                         }
                     });
                 });
             });
-        });
     </script>
 
 </div>

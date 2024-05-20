@@ -1,6 +1,7 @@
 package com.wio.crm.mapper;
 
 import com.wio.crm.model.Board;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -12,8 +13,10 @@ public interface BoardMapper {
     List<Board> findAllPosts();
     List<Board> noticeBoardList();
 
-    void insertPost(Board board);
     Board selectPostById(String id,String custCode);
+
+    void insertPost(Board board);
+
 
 
 }

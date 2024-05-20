@@ -45,9 +45,9 @@ public class BoardServiceImpl implements BoardService {
         String custCode = getCurrentCustcode(); // 고객 코드 조회
         return boardMapper.selectPostById(id,custCode);
     }
-
     @Override
-    public void insertPost(Board board) { // 글쓰기 기능 구현
-        boardMapper.insertPost(board); // 가정: BoardMapper에 insertPost 메소드가 정의되어 있음
+    public void insertPost(Board board) {
+
+        boardMapper.insertPost(board);
     }
 }

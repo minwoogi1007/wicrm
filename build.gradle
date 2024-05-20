@@ -38,3 +38,6 @@ compileJava {
 test {
 	useJUnitPlatform()
 }
+bootJar {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}

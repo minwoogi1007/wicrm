@@ -5,24 +5,27 @@ import com.wio.crm.model.Board;
 import com.wio.crm.model.Tcnt01Emp;
 import com.wio.crm.model.Temp01;
 import com.wio.crm.service.BoardService;
-import com.wio.crm.mapper.BoardMapper;
+import org.springframework.core.env.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +41,8 @@ public class BoardController {
         this.boardService = boardService;
     }
 
+    @Autowired
+    private Environment env;
     @GetMapping("/error")
     public String error() {
         return "error"; // Thymeleaf 템플릿 이름
@@ -88,13 +93,85 @@ public class BoardController {
     }
 
     // 글쓰기 처리
-    @PostMapping("/board/create")
-    public String createPost(Board board, @RequestParam("image") MultipartFile image) {
-        // 이미지 처리 로직은 생략. Board 객체에 이미지 정보를 설정하는 부분 필요
-        boardService.insertPost(board);
-        return "redirect:/Board"; // 글 목록 페이지로 리디렉션
-    }
+    @PostMapping("/board/create/saveBoard")
+    public ResponseEntity<String> saveBoard(@RequestParam(value = "file", required = false) MultipartFile file, @RequestParam Map<String, String> params) {
+        try {
+            String fileName = null;
+            if (file != null && !file.isEmpty()) {
+                String uploadDir = env.getProperty("file.upload-dir");
+                Path uploadPath = Paths.get(uploadDir);
 
+                if (!Files.exists(uploadPath)) {
+                    Files.createDirectories(uploadPath);
+                }
+
+                fileName = StringUtils.cleanPath(file.getOriginalFilename());
+                Path filePath = uploadPath.resolve(fileName);
+                Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+            }
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            String id ="";
+            String custCode="";
+            String empName="";
+            // 현재 로그인한 사용자의 CustomUserDetails 얻기
+            if (authentication.getPrincipal() instanceof CustomUserDetails) {
+                CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+                // 사용자 정의 정보 사용
+                //내부직원
+                Temp01 tempUser = userDetails.getTempUserInfo();
+                //외부직원
+                Tcnt01Emp tcntUser = userDetails.getTcntUserInfo();
+
+                //일단 업체 담당자만 등록
+                id = tcntUser.getUserId();
+                custCode  = tcntUser.getCustCode();
+                empName=tcntUser.getEmp_name();
+
+            }
+
+            // Save other details to database
+
+            // Save post data
+            Board board = new Board();
+            board.setSUBJECT(params.get("title"));
+            board.setCONTENT(params.get("content"));
+            board.setATT_FILE(fileName);
+            board.setCAT_GROUP(custCode);
+            board.setID(id);
+            board.setEMPNM(empName);
+            boardService.insertPost(board);
+
+            return ResponseEntity.ok("Saved successfully");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while saving the file");
+        }
+
+    }
+    @PostMapping("/board/uploadImage")
+    public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
+        try {
+            String uploadDir = env.getProperty("file.upload-dir");
+            Path uploadPath = Paths.get(uploadDir);
+
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+            Path filePath = uploadPath.resolve(fileName);
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            String fileUrl = "/uploads/" + fileName; // 업로드된 파일의 URL
+
+            return ResponseEntity.ok(fileUrl);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while uploading the image");
+        }
+    }
     // 글 읽기
     @GetMapping("/board/readBoard")
     public String readPost(@RequestParam("id") String id, Model model) {
@@ -105,8 +182,4 @@ public class BoardController {
         return "board/readBoard";// Thymeleaf 템플릿 이름
     }
 
-    @GetMapping("/createBoard")
-    public String createBoard() {
-        return "board/createBoard";
-    }
 }

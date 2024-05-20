@@ -64,21 +64,21 @@
 	<div class="app-page flex-column flex-column-fluid" id="kt_app_page">
 		<!--begin::Header-->
 		<!--HEAD.HTML-->
-		<th:block th:replace="~{/fragments/head :: head}"></th:block>
+		<th:block th:replace="~{fragments/head :: head}"></th:block>
 		<!--end::Header-->
 		<!--begin::Wrapper-->
 		<div class="app-wrapper flex-column flex-row-fluid" id="kt_app_wrapper">
 			<!--begin::Sidebar-->
 			<!--sidebar.HTML-->
 
-			<th:block th:replace="~{/fragments/sidebar :: sidebar}"></th:block>
+			<th:block th:replace="~{fragments/sidebar :: sidebar}"></th:block>
 			<!--end::Sidebar-->
 			<!--begin::Main-->
 			<div class="app-main flex-column flex-row-fluid" id="kt_app_main">
 				<th:block  layout:fragment="content"></th:block>
 			</div>
 			<div id="kt_app_footer" class="app-footer">
-				<th:block th:replace="~{/fragments/footer:: footer}"></th:block>
+				<th:block th:replace="~{fragments/footer:: footer}"></th:block>
 			</div>
 		</div>
 

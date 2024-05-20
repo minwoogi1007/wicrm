@@ -1,10 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{/main}">
+      layout:decorate="~{main}">
 <!--begin::Main-->
-<meta name="_csrf" th:content="${_csrf.token}"/>
-<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 <div layout:fragment="content">
     <!--begin::Content wrapper-->
   <div class="d-flex flex-column flex-column-fluid">
@@ -96,7 +94,9 @@
                   <td th:text="${list.GNO}"></td>
 
                   <td data-bs-toggle="tooltip" data-bs-placement="bottom"  th:title="${list.SUBJECTFULL}"><a th:href="@{'/board/readBoard'(id=${list.UNO})}" th:text="${list.SUBJECT}"></a>
-
+                    <span th:if="${list.ATT_FILE != null}">
+                                                <i class="ki-duotone ki-paper-clip fs-6 text-gray-800"></i>
+                                            </span>
                   </td>
                   <td th:text="${list.ID}"></td>
 

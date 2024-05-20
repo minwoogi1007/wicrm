@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{/main}">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{main}">
 
 <div layout:fragment="content">
     <!--begin::Content wrapper-->
     <div class="d-flex flex-column flex-column-fluid">
         <!--begin::Toolbar-->
-        <th:block th:replace="~{/fragments/pageHeader :: pageHeader}"></th:block>
+        <th:block th:replace="~{fragments/pageHeader :: pageHeader}"></th:block>
         <!--end::Toolbar-->
         <!--begin::Content-->
         <div id="kt_app_content" class="app-content flex-column-fluid">
