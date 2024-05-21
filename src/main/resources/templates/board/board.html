@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{main}">
@@ -13,7 +13,7 @@
         <!--begin::Page title-->
         <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
           <!--begin::Title-->
-          <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">상담유형</h1>
+          <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">게시판</h1>
           <!--end::Title-->
           <!--begin::Breadcrumb-->
           <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
@@ -68,7 +68,7 @@
               </div>
               <!--end::Card title-->
               <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
-                <a href="/board/create" class="btn btn-primary">글쓰기</a>
+                <a href="/board/create" class="btn btn-sm  btn-primary">글쓰기</a>
               </div>
               <!--end::Card toolbar-->
             </div>
@@ -84,12 +84,13 @@
                   <th class="min-w-125px">제목</th>
                   <th class="min-w-80px">작성자</th>
                   <th class="min-w-80px">작성일</th>
-                  <th class="text-end min-w-75px">조회수</th>
+                  <th class="min-w-70px">댓글</th>
+                  <th class="min-w-70px">조회수</th>
                 </tr>
                 </thead>
                 <tbody class="fw-semibold text-gray-600">
 
-                <tr th:each="list:${list}" th:data-id="${list.UNO}" onclick="redirectToPost(this)">
+                <tr th:each="list : ${list}" th:data-id="${list.UNO}"  onclick="redirectToPost(this)">
 
                   <td th:text="${list.GNO}"></td>
 
@@ -101,8 +102,9 @@
                   <td th:text="${list.ID}"></td>
 
                   <td th:text="${list.IN_DATE}"></td>
+                  <td th:text="${list.RE_COUNT}"></td>
 
-                  <td th:text="${list.HIT}" class="text-end"></td>
+                  <td th:text="${list.HIT}" ></td>
 
                 </tr>
 
@@ -121,7 +123,7 @@
       <script>
         function redirectToPost(element) {
           var postId = element.getAttribute('data-id');
-          window.location.href = `/board/readBoard?id=${postId}`; // URL을 쿼리 파라미터로 사용
+          window.location.href = `/board/readBoard?id=${postId}`;
         }
       </script>
       <!--end::Content-->

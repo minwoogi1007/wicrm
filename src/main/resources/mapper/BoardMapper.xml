@@ -57,6 +57,25 @@
 
     </select>
 
+    <select id="selectComment" resultType="com.wio.crm.model.Board">
+        SELECT
+            gno,
+            uno,
+            REPLY_DEPTH,
+            CAT_GROUP,
+            SUBJECT,
+            EMPNM,
+            IN_DATE,
+            ID,
+            CONTENT,
+            ATT_FILE
+        FROM BOARD_CALL
+        WHERE CAT_GROUP = #{custCode}
+          AND gno=(select gno from board_call where uno= #{id} and CAT_GROUP = #{custCode})
+          AND SUBJECT IS NULL
+        ORDER BY IN_DATE
+
+    </select>
     <insert id="insertPost">
         INSERT INTO BOARD_CALL (
             UNO, GNO, REPLY_DEPTH, CAT_GROUP, ID, SUBJECT, CONTENT, HIT, IN_DATE, ATT_FILE, EMPNM, NOCODE
@@ -80,5 +99,8 @@
                      '1'
                  )
     </insert>
-
+    <insert id="insertComment" parameterType="com.wio.crm.model.Board">
+        INSERT INTO comments (gno, uno, category, content, id, in_date)
+        VALUES (#{gno}, #{uno}, #{category}, #{content}, #{id}, NOW())
+    </insert>
 </mapper>

@@ -2,112 +2,175 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{main}">
-<!--begin::Main-->
-<!-- Include Summernote CSS -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-bs4.css" rel="stylesheet">
-
+<head>
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+</head>
+<body>
 <div layout:fragment="content">
-    <!--begin::Content wrapper-->
+    <!-- 컨텐츠 래퍼 시작 -->
     <div class="d-flex flex-column flex-column-fluid">
-        <!--begin::Toolbar-->
+        <!-- 툴바 시작 -->
         <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
-            <!--begin::Toolbar container-->
+            <!-- 툴바 컨테이너 시작 -->
             <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
-                <!--begin::Page title-->
+                <!-- 페이지 제목 시작 -->
                 <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
-                    <!--begin::Title-->
-                    <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">공지사항</h1>
-                    <!--end::Title-->
-                    <!--begin::Breadcrumb-->
+                    <!-- 제목 시작 -->
+                    <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">게시판</h1>
+                    <!-- 제목 끝 -->
+                    <!-- Breadcrumb 시작 -->
                     <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
-                        <!--begin::Item-->
+                        <!-- 항목 시작 -->
                         <li class="breadcrumb-item text-muted">
                             <a href="/main" class="text-muted text-hover-primary">Home</a>
                         </li>
-                        <!--end::Item-->
-                        <!--begin::Item-->
+                        <!-- 항목 끝 -->
+                        <!-- 항목 시작 -->
                         <li class="breadcrumb-item">
                             <span class="bullet bg-gray-500 w-5px h-2px"></span>
                         </li>
-                        <!--end::Item-->
-                        <!--begin::Item-->
+                        <!-- 항목 끝 -->
+                        <!-- 항목 시작 -->
                         <li class="breadcrumb-item text-muted">게시판</li>
-                        <!--end::Item-->
-
+                        <!-- 항목 끝 -->
                     </ul>
-                    <!--end::Breadcrumb-->
+                    <!-- Breadcrumb 끝 -->
                 </div>
-                <!--end::Page title-->
-                <!--begin::Actions-->
-
-                <!--end::Actions-->
+                <!-- 페이지 제목 끝 -->
+                <!-- Actions 시작 -->
+                <!-- Actions 끝 -->
             </div>
-            <!--end::Toolbar container-->
+            <!-- 툴바 컨테이너 끝 -->
         </div>
-        <!--end::Toolbar-->
-        <!--begin::Content-->
+        <!-- 툴바 끝 -->
+        <!-- 컨텐츠 시작 -->
         <div id="kt_app_content" class="app-content flex-column-fluid">
-            <!--begin::Content container-->
+            <!-- 컨텐츠 컨테이너 시작 -->
             <div id="kt_app_content_container" class="app-container container-xxl">
-                <!--begin::Products-->
+                <!-- 제품 시작 -->
                 <div class="card card-flush">
-                    <!--begin::Card body-->
-                        <!--begin::Table-->
-
-                            <!--begin::Body-->
+                    <!-- 카드 본문 시작 -->
                     <div class="card-body p-lg-10">
-                        <!--begin::Latest posts-->
+                        <!-- 최신 포스트 시작 -->
                         <div class="mb-15">
-                            <!--begin::Title-->
+                            <!-- 제목 시작 -->
                             <div class="d-flex justify-content-between align-items-center text-gray-900 mb-7">
                                 <h3 th:text="${post.SUBJECT}"></h3>
                                 <span class="fs-6 fw-bold text-gray-500" th:text="${post.EMPNM} + ' / ' + ${post.IN_DATE}"></span>
                             </div>
-                            <!--end::Title-->
-                            <!--begin::Separator-->
+                            <!-- 제목 끝 -->
+                            <!-- 구분선 시작 -->
                             <div class="separator separator-dashed mb-9"></div>
-                            <!--end::Separator-->
-                            <!--begin::Feature post-->
+                            <!-- 구분선 끝 -->
+                            <!-- 주요 포스트 시작 -->
                             <div class="row mb-10 mb-lg-18">
                                 <a th:href="@{/download/{filename}(filename=${post.ATT_FILE})}" download th:text="${post.ATT_FILE}"></a>
                             </div>
                             <div class="row mb-10 mb-lg-18">
-                                <!--begin::Col-->
+                                <!-- 컬럼 시작 -->
                                 <div th:utext="${post.CONTENT}"></div>
-                                <!--end::Col-->
+                                <!-- 컬럼 끝 -->
                             </div>
                             <div class="separator separator-dashed mb-9"></div>
+                            <div class="d-flex flex-column mb-5 fv-row">
+                                <div class="d-flex">
+                                    <input type="hidden" id="gno" name="gno" th:value="${post.GNO}" />
+                                    <input type="hidden" id="uno" name="uno" th:value="${post.UNO}" />
+                                    <input type="hidden" id="category" name="category" th:value="${post.CAT_GROUP}" />
+                                    <div class="form-floating flex-grow-1 me-2" id="commentsContainer">
+                                        <textarea class="form-control" placeholder="댓글을 입력하세요" name="newComment" id="floatingTextarea2" style="height: 40px;"></textarea>
+                                        <label for="floatingTextarea2">Comments</label>
+                                    </div>
+                                    <button type="button" id="addCommentButton" class="btn btn-sm btn-primary align-self-end">등록</button>
+                                </div>
+                            </div>
 
-                            <!--end::Feature post-->
-                            <!--begin::Posts-->
-
-                            <!--end::Posts-->
+                            <div th:if="${#lists.isEmpty(list)}">
+                                <p> 댓글 없음 </p>
+                            </div>
+                            <div th:unless="${#lists.isEmpty(list)}">
+                                <table id="commentsTable">
+                                    <tr th:each="list, iterStat : ${list}">
+                                        <td class="comment-item mb-2 p-2" th:text="${list.IN_DATE}"></td>
+                                        <td class="comment-item mb-2 p-2" th:text="${list.ID}"></td>
+                                        <td class="comment-item mb-2 p-2" th:utext="${list.CONTENT}"></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="separator separator-dashed mb-9"></div>
+                            <!-- 주요 포스트 끝 -->
                         </div>
-                        <!--end::Latest posts-->
-                        <!--begin::Section-->
-
-                        <!--end::latest instagram-->
+                        <div class="mb-15">
+                            <button type="button" id="listBack" class="btn btn-sm btn-primary">목록</button>
+                        </div>
+                        <!-- 최신 포스트 끝 -->
                     </div>
-                            <!--end::Body-->
-
-                        <!--end::Table-->
-
-                    <!--end::Card body-->
+                    <!-- 카드 본문 끝 -->
                 </div>
-                <!--end::Products-->
+                <!-- 제품 끝 -->
             </div>
-            <!--end::Content container-->
+            <!-- 컨텐츠 컨테이너 끝 -->
         </div>
-        <!--end::Content-->
+        <!-- 컨텐츠 끝 -->
         <script src="/assets/plugins/global/plugins.bundle.js"></script>
         <script src="/assets/js/board/scripts.bundle.js"></script>
         <script src="/assets/js/custom/apps/ecommerce/reports/customer-orders/customer-orders.js"></script>
+        <script>
+            $(document).ready(function() {
+                $('#listBack').click(function() {
+                    history.back();
+                });
+
+                var csrfToken = $('meta[name="_csrf"]').attr('content');
+                var csrfHeader = $('meta[name="_csrf_header"]').attr('content');
+
+                $('#addCommentButton').click(function() {
+                    var commentText = $('#floatingTextarea2').val().trim();
+                    var gno = $('#gno').val();
+                    var uno = $('#uno').val();
+                    var category = $('#category').val();
+
+                    if (commentText === "") {
+                        alert("댓글을 입력하세요.");
+                        return;
+                    }
+
+                    var formData = {
+                        GNO: gno,
+                        UNO: uno,
+                        CAT_GROUP: category,
+                        CONTENT: commentText
+                    };
+
+                    $.ajax({
+                        url: '/board/readBoard/comments',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(formData),
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader(csrfHeader, csrfToken); // CSRF 토큰 설정
+                        },
+                        success: function(response) {
+                            var newComment = `<tr>
+                        <td class="comment-item mb-2 p-2">${response.IN_DATE}</td>
+                        <td class="comment-item mb-2 p-2">${response.ID}</td>
+                        <td class="comment-item mb-2 p-2">${response.CONTENT}</td>
+                    </tr>`;
+                            $('#commentsTable').append(newComment);
+                            $('#floatingTextarea2').val("");
+                        },
+                        error: function(error) {
+                            console.error("Error adding comment:", error.responseText);
+                            alert("댓글 추가 실패.");
+                        }
+                    });
+                });
+            });
+        </script>
+
     </div>
-    <!--end::Content wrapper-->
-
-    <!--end:::Main-->
-
-
+    <!-- 컨텐츠 래퍼 끝 -->
 </div>
-<!--begin::Custom Javascript(used for this page only)-->
-<!--end::Custom Javascript-->
+</body>
+</html>

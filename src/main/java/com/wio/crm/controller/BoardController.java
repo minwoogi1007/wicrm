@@ -16,9 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -26,7 +24,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -50,7 +47,7 @@ public class BoardController {
 
     @GetMapping("/board")
     public String board(Model model, @RequestParam(name = "category", required = false) String category) {
-        List<Board> posts = new ArrayList<>();
+        List<Board> posts;
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -94,21 +91,23 @@ public class BoardController {
 
     // 글쓰기 처리
     @PostMapping("/board/create/saveBoard")
-    public ResponseEntity<String> saveBoard(@RequestParam(value = "file", required = false) MultipartFile file, @RequestParam Map<String, String> params) {
+    public ResponseEntity<String> saveBoard(@RequestParam(value = "files", required = false) MultipartFile[] files, @RequestParam Map<String, String> params) {
         try {
-            String fileName = null;
-            if (file != null && !file.isEmpty()) {
-                String uploadDir = env.getProperty("file.upload-dir");
-                Path uploadPath = Paths.get(uploadDir);
 
-                if (!Files.exists(uploadPath)) {
-                    Files.createDirectories(uploadPath);
+            String uploadDir = env.getProperty("file.upload-dir");
+            Path uploadPath = Paths.get(uploadDir);
+            StringBuilder fileNames = new StringBuilder();
+
+            for (MultipartFile file : files) {
+                if (!file.isEmpty()) {
+                    String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+                    Path filePath = uploadPath.resolve(fileName);
+                    Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+                    fileNames.append(fileName).append(";");
                 }
-
-                fileName = StringUtils.cleanPath(file.getOriginalFilename());
-                Path filePath = uploadPath.resolve(fileName);
-                Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
             }
+
+
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
             String id ="";
@@ -137,7 +136,7 @@ public class BoardController {
             Board board = new Board();
             board.setSUBJECT(params.get("title"));
             board.setCONTENT(params.get("content"));
-            board.setATT_FILE(fileName);
+            board.setATT_FILE(fileNames.toString());
             board.setCAT_GROUP(custCode);
             board.setID(id);
             board.setEMPNM(empName);
@@ -175,11 +174,23 @@ public class BoardController {
     // 글 읽기
     @GetMapping("/board/readBoard")
     public String readPost(@RequestParam("id") String id, Model model) {
-        System.out.println(id);
 
         Board post = boardService.selectPostById(id);
+        List<Board> comment = boardService.selectComment(id);
+
         model.addAttribute("post", post);
+
+        model.addAttribute("list", comment);
         return "board/readBoard";// Thymeleaf 템플릿 이름
+    }
+    @PostMapping("/board/readBoard/comments")
+
+    public ResponseEntity<Board> saveComment(@RequestBody Board board) {
+        // 댓글 저장 로직을 여기에 추가
+
+        System.out.println("board============"+board.getCAT_GROUP());
+        Board savedComment = boardService.saveComment(board);
+        return ResponseEntity.ok(savedComment);
     }
 
 }
