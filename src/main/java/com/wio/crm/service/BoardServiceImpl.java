@@ -27,6 +27,17 @@ public class BoardServiceImpl implements BoardService {
         // Using a ternary operator to simplify code
         return userDetails.getTcntUserInfo() != null ? userDetails.getTcntUserInfo().getCustCode() : "";
     }
+    private String getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
+            return ""; // Early return for null or incorrect type
+        }
+
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+        // Using a ternary operator to simplify code
+        return userDetails.getTcntUserInfo() != null ? userDetails.getTcntUserInfo().getUserId() : "";
+    }
     @Autowired
     public BoardServiceImpl(BoardMapper boardMapper) {
         this.boardMapper = boardMapper;
@@ -65,15 +76,20 @@ public class BoardServiceImpl implements BoardService {
     public Board saveComment(Board board) {
         // 댓글의 UNO, GNO, REPLY_DEPTH 값을 설정하는 로직
 
-        System.out.println("r_uno 이전===================="+board.getCAT_GROUP());
+
         int r_uno = boardMapper.getNextUno(board.getCAT_GROUP());
-        System.out.println("r_uno==="+r_uno);
+
         board.setUNO(Integer.toString(r_uno));
 
-        int c_reply = boardMapper.getReplyCount(board.getCAT_GROUP(), board.getGNO(), board.getREPLY_DEPTH());
 
-        System.out.println("c_reply==="+c_reply);
+        int c_reply = boardMapper.getReplyCount(board.getCAT_GROUP(), board.getGNO(), board.getREPLY_DEPTH());
+        board.setID(getCurrentUserId());
+
         String r_reply = getReplyDepth(c_reply);
+
+
+
+
         board.setREPLY_DEPTH(board.getREPLY_DEPTH() + r_reply);
 
         // 현재 날짜와 시간을 설정

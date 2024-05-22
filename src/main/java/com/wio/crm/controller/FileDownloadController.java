@@ -2,6 +2,8 @@ package com.wio.crm.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -18,25 +20,23 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 @RestController
 public class FileDownloadController {
-
+    @Autowired
+    private Environment env;
     @GetMapping("/download/{filename:.+}")
     @ResponseBody
     public ResponseEntity<Resource> downloadFile(@PathVariable String filename) {
         try {
-            String decodedFilename = URLDecoder.decode(filename, StandardCharsets.UTF_8.toString());
-            Path fileStorageLocation = Paths.get("/down").toAbsolutePath().normalize();
-            Path filePath = fileStorageLocation.resolve(decodedFilename).normalize();
+            String uploadDir = env.getProperty("file.upload-dir");
+            Path filePath = Paths.get(uploadDir).resolve(filename).normalize();
             Resource resource = new UrlResource(filePath.toUri());
-            if (resource.exists()) {
-                String encodedFilename = UriUtils.encodePathSegment(resource.getFilename(), StandardCharsets.UTF_8.name());
-                String contentDisposition = "attachment; filename=\"" + encodedFilename + "\"; filename*=UTF-8''" + encodedFilename;
-                return ResponseEntity.ok()
-                        .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
-                        .body(resource);
-            } else {
-                System.out.println("File not found: " + filePath);
+
+            if (!resource.exists()) {
                 return ResponseEntity.notFound().build();
             }
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                    .body(resource);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }

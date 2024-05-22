@@ -9,6 +9,9 @@ import org.springframework.core.env.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -24,6 +27,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -183,13 +188,39 @@ public class BoardController {
         model.addAttribute("list", comment);
         return "board/readBoard";// Thymeleaf 템플릿 이름
     }
+
+
     @PostMapping("/board/readBoard/comments")
+    @ResponseBody
+    public ResponseEntity<Board> saveComment(
+            @RequestParam("GNO") String gno,
+            @RequestParam("UNO") String uno,
+            @RequestParam("CAT_GROUP") String catGroup,
+            @RequestParam("CONTENT") String content,
+            @RequestParam("REPLY_DEPTH") String replyDepth) {
 
-    public ResponseEntity<Board> saveComment(@RequestBody Board board) {
-        // 댓글 저장 로직을 여기에 추가
+        // 각 파라미터가 잘 넘어오는지 확인
+        System.out.println("GNO============" + gno);
+        System.out.println("UNO============" + uno);
+        System.out.println("CAT_GROUP============" + catGroup);
+        System.out.println("CONTENT============" + content);
+        System.out.println("REPLY_DEPTH============" + replyDepth);
+// 현재 날짜와 시간을 특정 형식으로 설정
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String formattedDate = dateFormat.format(new Date());
+        // Board 객체 생성 및 설정
+        Board board = new Board();
+        board.setGNO(gno);
+        board.setUNO(uno);
+        board.setCAT_GROUP(catGroup);
+        board.setCONTENT(content);
+        board.setREPLY_DEPTH(replyDepth);
+        board.setIN_DATE(formattedDate);
 
-        System.out.println("board============"+board.getCAT_GROUP());
+        // 댓글 저장 로직
         Board savedComment = boardService.saveComment(board);
+        board.setID(savedComment.getID());
+
         return ResponseEntity.ok(savedComment);
     }
 

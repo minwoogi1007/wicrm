@@ -76,8 +76,10 @@
                             <div class="d-flex flex-column mb-5 fv-row">
                                 <div class="d-flex">
                                     <input type="hidden" id="gno" name="gno" th:value="${post.GNO}" />
+                                    <input type="hidden" id="id" name="gno" th:value="${post.ID}" />
                                     <input type="hidden" id="uno" name="uno" th:value="${post.UNO}" />
                                     <input type="hidden" id="category" name="category" th:value="${post.CAT_GROUP}" />
+                                    <input type="hidden" id="replyDepth" name="category" th:value="${post.REPLY_DEPTH}" />
                                     <div class="form-floating flex-grow-1 me-2" id="commentsContainer">
                                         <textarea class="form-control" placeholder="댓글을 입력하세요" name="newComment" id="floatingTextarea2" style="height: 40px;"></textarea>
                                         <label for="floatingTextarea2">Comments</label>
@@ -100,10 +102,11 @@
                             </div>
                             <div class="separator separator-dashed mb-9"></div>
                             <!-- 주요 포스트 끝 -->
+                            <div class="mb-15">
+                                <button type="button" id="listBack" class="btn btn-sm btn-primary">목록</button>
+                            </div>
                         </div>
-                        <div class="mb-15">
-                            <button type="button" id="listBack" class="btn btn-sm btn-primary">목록</button>
-                        </div>
+
                         <!-- 최신 포스트 끝 -->
                     </div>
                     <!-- 카드 본문 끝 -->
@@ -130,35 +133,43 @@
                     var gno = $('#gno').val();
                     var uno = $('#uno').val();
                     var category = $('#category').val();
-
+                    var replyDepth = $('#replyDepth').val();
                     if (commentText === "") {
                         alert("댓글을 입력하세요.");
                         return;
                     }
 
+                    if (!confirm("등록 하시겠습니까?")) {
+                        return;
+                    }
+
+
                     var formData = {
                         GNO: gno,
                         UNO: uno,
                         CAT_GROUP: category,
-                        CONTENT: commentText
+                        CONTENT: commentText,
+                        REPLY_DEPTH :replyDepth
                     };
 
                     $.ajax({
                         url: '/board/readBoard/comments',
                         type: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify(formData),
+                        contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                        data: formData,
                         beforeSend: function(xhr) {
                             xhr.setRequestHeader(csrfHeader, csrfToken); // CSRF 토큰 설정
                         },
                         success: function(response) {
+                            console.log(response);
                             var newComment = `<tr>
-                        <td class="comment-item mb-2 p-2">${response.IN_DATE}</td>
-                        <td class="comment-item mb-2 p-2">${response.ID}</td>
-                        <td class="comment-item mb-2 p-2">${response.CONTENT}</td>
+                        <td class="comment-item mb-2 p-2">${response.in_date}</td>
+                        <td class="comment-item mb-2 p-2">${response.id}</td>
+                        <td class="comment-item mb-2 p-2">${response.content}</td>
                     </tr>`;
                             $('#commentsTable').append(newComment);
                             $('#floatingTextarea2').val("");
+                            alert("댓글이 등록되었습니다.");
                         },
                         error: function(error) {
                             console.error("Error adding comment:", error.responseText);
@@ -168,6 +179,7 @@
                 });
             });
         </script>
+
 
     </div>
     <!-- 컨텐츠 래퍼 끝 -->

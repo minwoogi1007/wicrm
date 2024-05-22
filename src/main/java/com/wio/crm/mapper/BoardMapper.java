@@ -22,10 +22,10 @@ public interface BoardMapper {
 
     void insertPost(Board board);
 
-    @Select("SELECT NVL(MAX(UNO), 0) + 1 FROM BOARD_CALL WHERE CAT_GROUP = #{catGroup}")
-    int  getNextUno(String catGroup);
 
-    @Select("SELECT COUNT(REPLY_DEPTH) FROM BOARD_CALL WHERE CAT_GROUP = #{catGroup} AND GNO = #{gno} AND REPLY_DEPTH LIKE #{replyDepth} || '%'")
+    int  getNextUno(@Param("catGroup") String catGroup);
+
+
     int getReplyCount(@Param("catGroup") String catGroup, @Param("gno") String gno, @Param("replyDepth") String replyDepth);
 
 }

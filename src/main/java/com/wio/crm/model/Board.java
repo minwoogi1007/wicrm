@@ -1,6 +1,8 @@
 package com.wio.crm.model;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Board {
     private String UNO;
     private String GNO;
@@ -111,6 +113,7 @@ public class Board {
         this.HIT = HIT;
     }
 
+    @JsonProperty("in_date")
     public String getIN_DATE() {
         return IN_DATE;
     }

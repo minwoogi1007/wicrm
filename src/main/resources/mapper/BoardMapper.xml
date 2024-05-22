@@ -65,7 +65,7 @@
             CAT_GROUP,
             SUBJECT,
             EMPNM,
-            IN_DATE,
+            TO_DATE(IN_DATE,'YYYY-MM-DD HH24:MI:SS')  IN_DATE,
             ID,
             CONTENT,
             ATT_FILE
@@ -100,7 +100,17 @@
                  )
     </insert>
     <insert id="insertComment" parameterType="com.wio.crm.model.Board">
-        INSERT INTO comments (gno, uno, category, content, id, in_date)
-        VALUES (#{gno}, #{uno}, #{category}, #{content}, #{id}, NOW())
+        INSERT INTO BOARD_CALL (GNO, UNO,REPLY_DEPTH, CAT_GROUP, CONTENT, HIT, ID, IN_DATE)
+        VALUES (#{GNO}, #{UNO}, #{REPLY_DEPTH},#{CAT_GROUP}, #{CONTENT}, 0,#{ID}, #{IN_DATE})
     </insert>
+    <select id="getNextUno" resultType="int">
+        SELECT NVL(MAX(UNO), 0) + 1
+        FROM BOARD_CALL
+        WHERE CAT_GROUP = #{catGroup}
+    </select>
+    <select id="getReplyCount" resultType="int">
+        SELECT COUNT(REPLY_DEPTH) FROM BOARD_CALL WHERE CAT_GROUP = #{catGroup} AND GNO = #{gno} AND REPLY_DEPTH LIKE #{replyDepth} || '%'
+    </select>
+
+
 </mapper>

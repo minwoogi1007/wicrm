@@ -40,6 +40,26 @@ public class CustomSuccessHandler extends SavedRequestAwareAuthenticationSuccess
         // 로그인 이력 기록
         loginHistoryService.recordLoginHistory(authentication.getName());
 
+
+        // 사용자 정보 조회 및 세션에 저장
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        String userId = "";
+        String userName = "";
+
+        if (userDetails.getTcntUserInfo() != null) {
+            userId = userDetails.getTcntUserInfo().getUserId();
+            userName = userDetails.getTcntUserInfo().getEmp_name();
+        } else {
+            userId = userDetails.getTempUserInfo().getUserId();
+            userName = userDetails.getTempUserInfo().getEmp_Name();
+        }
+
+        System.out.println("loginUserId============================================================"+userId);
+        System.out.println("userName============================================================"+userName);
+        session.setAttribute("loginUserId", userId);
+        session.setAttribute("loginUserName", userName);
+        System.out.println("sessionloginUserId============================================================"+session.getAttribute("loginUserId"));
+        System.out.println("sessionuserName============================================================"+session.getAttribute("loginUserName"));
         // 마지막에 한 번만 호출하여 리다이렉트 처리
         super.onAuthenticationSuccess(request, response, authentication);
     }

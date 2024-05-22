@@ -72,6 +72,7 @@ $(document).ready(function() {
                         const point = response[key];
 
                         $('#DPOINTSUM').text(point.dpointsum);
+
                         $('#DPOINTUSEDAY').text(point.dpointuseday);
                         $('#DPOINTUSEWEEK').text(point.dpointuseweek);
                         $('#DPOINTCHARGE').text(point.dpointcharge);

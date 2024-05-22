@@ -78,7 +78,7 @@
                                     </div>
                                 </div>
                                 <div class="mb-2">
-                                    <input type="file" name="files" multiple />
+                                    <input type="file" id="fileInput" name="files" multiple />
                                 </div>
                                 <div class="mb-2">
                                     <button type="button" id="saveButton" class="btn btn-sm  btn-primary">저장</button> <a href="javascript:void(0);" class="btn btn-sm btn-secondary" id="cancelButton">취소</a>
@@ -165,7 +165,7 @@
                 $('#saveButton').click(function() {
                     var title = $('#title').val().trim();
                     var content = $('#summernote').val().trim();
-
+                    var files = document.getElementById('fileInput').files;
 
                     if (title === "") {
                         alert("제목을 입력하세요.");
@@ -176,7 +176,13 @@
                         alert("내용을 입력하세요.");
                         return false;
                     }
-
+                    // 파일명 길이 검사
+                    for (var i = 0; i < files.length; i++) {
+                        if (files[i].name.length > 100) {
+                            alert("파일명은 최대 100자까지 가능합니다: " + files[i].name);
+                            return false;
+                        }
+                    }
                     var formData = new FormData($('#boardForm')[0]);
 
                     formData.append('content', content);
