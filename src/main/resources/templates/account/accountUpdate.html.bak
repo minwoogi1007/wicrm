@@ -116,7 +116,7 @@
                         xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken); // Ensure this header is being set
                     },
                     success: function(response) {
-                        //console.log('Update Success:', response);  // 로그 추가
+                        console.log('Update Success:', response);  // 로그 추가
                         alert('계정 정보가 성공적으로 업데이트되었습니다.');
                         window.location.href = '/account'; // 사용자를 /account/update 경로로 리다이렉트합니다.
 

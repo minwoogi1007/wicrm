@@ -30,16 +30,6 @@ public class CustomSuccessHandler extends SavedRequestAwareAuthenticationSuccess
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws ServletException, IOException {
-        // 사용자 권한에 따른 메뉴 리스트 조회 및 세션 저장 로직
-        List<Menu> menuList = menuService.getCompanyUserMenus(authentication.getName());
-
-        // 조회된 메뉴 리스트를 세션에 저장
-        HttpSession session = request.getSession();
-        session.setAttribute("USER_MENUS", menuList);
-
-        // 로그인 이력 기록
-        loginHistoryService.recordLoginHistory(authentication.getName());
-
 
         // 사용자 정보 조회 및 세션에 저장
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
@@ -53,6 +43,18 @@ public class CustomSuccessHandler extends SavedRequestAwareAuthenticationSuccess
             userId = userDetails.getTempUserInfo().getUserId();
             userName = userDetails.getTempUserInfo().getEmp_Name();
         }
+        // 사용자 권한에 따른 메뉴 리스트 조회 및 세션 저장 로직
+        List<Menu> menuList = menuService.getCompanyUserMenus(authentication.getName());
+
+        // 조회된 메뉴 리스트를 세션에 저장
+        HttpSession session = request.getSession();
+        session.setAttribute("USER_MENUS", menuList);
+
+        // 로그인 이력 기록
+        loginHistoryService.recordLoginHistory(authentication.getName());
+
+
+
 
         System.out.println("loginUserId============================================================"+userId);
         System.out.println("userName============================================================"+userName);

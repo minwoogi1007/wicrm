@@ -134,7 +134,7 @@
                     document.addEventListener('DOMContentLoaded', function() {
                         // 현재 페이지의 URL 경로와 쿼리 스트링을 포함하여 가져옵니다.
                         const currentPath = window.location.pathname + window.location.search;
-                        //console.log('Current Path:', currentPath);
+                        console.log('Current Path:', currentPath);
 
                         // 모든 메뉴 링크를 순회하며 현재 URL이 메뉴 링크의 href 속성에 포함되는지 확인합니다.
                         const menuLinks = document.querySelectorAll('.menu-item a');

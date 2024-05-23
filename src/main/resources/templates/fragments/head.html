@@ -64,10 +64,10 @@
                                 <!--end::Avatar-->
                                 <!--begin::Username-->
                                 <div class="d-flex flex-column">
-                                    <div class="fw-bold d-flex align-items-center fs-5">
-                                        <div id="loginUserId" class="fw-bold d-flex align-items-center fs-5"></div>
+                                    <div th:text="${session.loginUserId}"class="fw-bold d-flex align-items-center fs-5">
 
-                                    </div><a href="#" id="loginUserName" class="fw-semibold text-muted text-hover-primary fs-7"></a>
+                                    </div>
+                                    <a href="#" class="fw-semibold text-muted text-hover-primary fs-7" id="loginUserNameSpan" th:text="${session.loginUserName}"></a>
                                 </div>
                                 <!--end::Username-->
                             </div>
@@ -81,26 +81,11 @@
                         <!--end::Menu item-->
                         <!--begin::Menu item-->
                         <div class="menu-item px-5">
-                            <a href="authentication/layouts/corporate/sign-in.html" class="menu-link px-5">Sign Out</a>
+                            <a href="/login" class="menu-link px-5">Sign Out</a>
                         </div>
                         <!--end::Menu item-->
                     </div>
-                    <script>
-                        // JavaScript to populate the user information in the header
-                        document.addEventListener('DOMContentLoaded', function() {
-                            var loginUserId = /*[[${session.loginUserId}]]*/ 'guest'; // Default value for demonstration
-                            var loginUserName = /*[[${session.loginUserName}]]*/ 'Guest';
 
-                            sessionStorage.setItem('loginUserId', loginUserId);
-                            sessionStorage.setItem('loginUserName', loginUserName);
-
-                            console.log(loginUserId);
-                            console.log(loginUserName);
-
-                            document.getElementById('loginUserId').textContent = loginUserId;
-                            document.getElementById('loginUserName').textContent = loginUserName;
-                        });
-                    </script>
                     <!--end::User account menu-->
                 </div>
                 <!--end::User menu-->

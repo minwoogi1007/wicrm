@@ -434,7 +434,7 @@
                             type: 'GET',
                             data: formData,
                             success: function(response) {
-                                //console.log(response);
+                                console.log(response);
                                 var tbody = $('#kt_project_users_table tbody');
                                 tbody.empty();
                                 response.data.forEach(function(data) {
@@ -580,7 +580,7 @@
                         var custCode = $('#kt_modal_new_address').find('#hcustCode').val();
                         var newComment = $('textarea[name="newComment"]').val();
 
-                        //console.log(callCode + ' ' + personCode + ' ' + projectCode + ' ' + custCode + ' ' + newComment);
+                        console.log(callCode + ' ' + personCode + ' ' + projectCode + ' ' + custCode + ' ' + newComment);
 
                         var formData = {
                             callCode: callCode,

@@ -165,7 +165,7 @@
                             xhr.setRequestHeader(csrfHeader, csrfToken); // CSRF 토큰 설정
                         },
                         success: function(response) {
-                            //console.log(response);
+                            console.log(response);
                             var newComment = `<tr>
                         <td class="comment-item mb-2 p-2">${response.in_date}</td>
                         <td class="comment-item mb-2 p-2">${response.id}</td>

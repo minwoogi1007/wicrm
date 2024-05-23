@@ -185,6 +185,13 @@ public class BoardController {
 
         model.addAttribute("post", post);
 
+        if (post.getATT_FILE() != null && !post.getATT_FILE().trim().isEmpty()) {
+            String[] files = post.getATT_FILE().trim().split(";");
+            model.addAttribute("files", files);
+        } else {
+            model.addAttribute("files", new String[0]);
+        }
+
         model.addAttribute("list", comment);
         return "board/readBoard";// Thymeleaf 템플릿 이름
     }

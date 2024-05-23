@@ -88,7 +88,7 @@
                      #{SUBJECT},
                      #{CONTENT},
                      0,
-                     SYSDATE,
+                     to_char(SYSDATE,'yyyy-MM-dd HH:mm:ss'),
                     <if test="ATT_FILE != null">
                         #{ATT_FILE}
                     </if>
@@ -100,8 +100,8 @@
                  )
     </insert>
     <insert id="insertComment" parameterType="com.wio.crm.model.Board">
-        INSERT INTO BOARD_CALL (GNO, UNO,REPLY_DEPTH, CAT_GROUP, CONTENT, HIT, ID, IN_DATE)
-        VALUES (#{GNO}, #{UNO}, #{REPLY_DEPTH},#{CAT_GROUP}, #{CONTENT}, 0,#{ID}, #{IN_DATE})
+        INSERT INTO N_TIPDW (ID,PW,GUBN,INSERT_TIME,CONFIRM_YN,CONFIRM_TIME,CONFIRM_EMP,USERID,USERNAME,REPASS)VALUES
+            ('GWELL9',)
     </insert>
     <select id="getNextUno" resultType="int">
         SELECT NVL(MAX(UNO), 0) + 1
@@ -110,6 +110,8 @@
     </select>
     <select id="getReplyCount" resultType="int">
         SELECT COUNT(REPLY_DEPTH) FROM BOARD_CALL WHERE CAT_GROUP = #{catGroup} AND GNO = #{gno} AND REPLY_DEPTH LIKE #{replyDepth} || '%'
+
+
     </select>
 
 
