@@ -26,14 +26,15 @@ public class SecurityConfig {
                         .ignoringRequestMatchers(
                                 new AntPathRequestMatcher("/logout"),  // "/logout"에 대한 CSRF 검증을 비활성화
                                 new AntPathRequestMatcher("/api/**"),  // "/api/**" 경로에 대해 CSRF 보호를 비활성화
-                                new AntPathRequestMatcher("/download/**") // "/download/**" 경로에 대해 CSRF 보호를 비활성화
+                                new AntPathRequestMatcher("/download/**"), // "/download/**" 경로에 대해 CSRF 보호를 비활성화
+                                new AntPathRequestMatcher("/upload") // 추가된 업로드 경로
                         ).csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/consultations","/board/create/saveBoard").hasAuthority("ROLE_USER")
                         .requestMatchers("/empl").hasAuthority("ROLE_EMPLOYEE")
                         .requestMatchers("/encrypt-passwords","/encrypt-password", "/encryption","/check-userid-availability","/apply-userid").permitAll()
-                        .requestMatchers("/download/**").permitAll()
+                        .requestMatchers("/download/**", "/upload").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginPage("/login")
