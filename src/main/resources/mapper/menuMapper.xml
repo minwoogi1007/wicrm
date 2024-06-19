@@ -29,6 +29,11 @@
                                         AND MU.USER_ID = EP.POSITION
                                         AND MU.AUTHORITY = 'Y'
                                         AND EP.USERID =#{username}
+        <choose>
+            <when test="authority != 1">
+                AND MU.ADMIN IS NULL
+            </when>
+        </choose>
                                       UNION ALL SELECT  HM.MENU_CD AS HMENU_CD
                                                      ,   MM.MENU_CD AS MMENU_CD
                                                      ,   DM.MENU_CD AS DMENU_CD
@@ -43,6 +48,11 @@
                                         AND MU.USER_ID = EP.CUST_CODE
                                         AND MU.AUTHORITY = 'Y'
                                         AND EP.ID =#{username}
+        <choose>
+            <when test="authority != 1">
+                AND MU.ADMIN IS NULL
+            </when>
+        </choose>
                  )
                  SELECT * FROM (
                                    SELECT A.MENU_CD

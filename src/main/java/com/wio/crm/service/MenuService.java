@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class MenuService {
@@ -14,7 +15,7 @@ public class MenuService {
     private MenuMapper menuMapper;
 
 
-    public List<Menu> getCompanyUserMenus(String role) {
-        return menuMapper.findMenusByRole(role);
+    public List<Map<String, Object>> getCompanyUserMenus(String role, String authority) {
+        return menuMapper.findMenusByRole(role,authority);
     }
 }

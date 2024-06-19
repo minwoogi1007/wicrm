@@ -308,208 +308,210 @@
                 </div>
                 <!--end::Row-->
                 <!--begin::Row-->
-                <div th:if="${dataForA}">
-                    <div class="row g-5 g-xl-10">
-                        <!--begin::Col-->
-                        <div class="col-xxl-4 mb-5 mb-xl-10">
-                            <div class="card card-flush h-xl-100">
-                                <!--begin::Heading-->
-                                <div class="card-header rounded bgi-no-repeat bgi-size-cover bgi-position-y-top bgi-position-x-center align-items-start h-250px" style="background-image:url('/assets/media/svg/shapes/top-green.png')" data-bs-theme="light">
-                                    <!--begin::Title-->
-                                    <h3 class="card-title align-items-start flex-column text-white pt-15">
-                                        <span class="fw-bold fs-2 mb-1">마일리지 현황</span>
+                <div th:if="${session.loginUserAuthority == '1'}">
+                    <div th:if="${dataForA}">
+                        <div class="row g-5 g-xl-10">
+                            <!--begin::Col-->
+                            <div class="col-xxl-4 mb-5 mb-xl-10">
+                                <div class="card card-flush h-xl-100">
+                                    <!--begin::Heading-->
+                                    <div class="card-header rounded bgi-no-repeat bgi-size-cover bgi-position-y-top bgi-position-x-center align-items-start h-250px" style="background-image:url('/assets/media/svg/shapes/top-green.png')" data-bs-theme="light">
+                                        <!--begin::Title-->
+                                        <h3 class="card-title align-items-start flex-column text-white pt-15">
+                                            <span class="fw-bold fs-2 mb-1">마일리지 현황</span>
 
-                                    </h3>
-                                    <!--end::Title-->
-                                    <!--begin::Toolbar-->
+                                        </h3>
+                                        <!--end::Title-->
+                                        <!--begin::Toolbar-->
 
-                                    <!--end::Toolbar-->
-                                </div>
-                                <!--end::Heading-->
-                                <!--begin::Body-->
-                                <div class="card-body mt-n20">
-                                    <!--begin::Stats-->
-                                    <div class="mt-n20 position-relative">
-                                        <!--begin::Row-->
-                                        <div class="row g-3 g-lg-6">
-                                            <!--begin::Col-->
-                                            <div class="col-6">
-                                                <!--begin::Items-->
-                                                <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5">
-                                                    <!--begin::Symbol-->
-                                                    <div class="symbol symbol-30px me-5 mb-8">
-                                                        <span class="symbol-label">
-                                                            <div id="todayDate"></div>
-                                                        </span>
-                                                    </div>
-                                                    <!--end::Symbol-->
-                                                    <!--begin::Stats-->
-                                                    <div class="m-0">
-                                                        <!--begin::Number-->
-                                                        <span id="DPOINTUSEDAY" class="text-gray-700 fw-bolder d-block fs-2 lh-1 ls-n1 mb-1"></span>
-                                                        <!--end::Number-->
-                                                        <!--begin::Desc-->
-                                                        <span class="text-gray-500 fw-semibold fs-8">오늘</span>
-                                                        <!--end::Desc-->
-                                                    </div>
-                                                    <!--end::Stats-->
-                                                </div>
-                                                <!--end::Items-->
-                                            </div>
-                                            <!--end::Col-->
-                                            <!--begin::Col-->
-                                            <div class="col-6">
-                                                <!--begin::Items-->
-                                                <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5">
-                                                    <!--begin::Symbol-->
-                                                    <div class="symbol symbol-30px me-5 mb-8">
-                                                        <span class="symbol-label">
-                                                            <div id="thisWeek"></div>
-                                                        </span>
-                                                    </div>
-                                                    <!--end::Symbol-->
-                                                    <!--begin::Stats-->
-                                                    <div class="m-0">
-                                                        <!--begin::Number-->
-                                                        <span id="DPOINTUSEWEEK" class="text-gray-700 fw-bolder d-block fs-2 lh-1 ls-n1 mb-1"></span>
-                                                        <!--end::Number-->
-                                                        <!--begin::Desc-->
-                                                        <span class="text-gray-500 fw-semibold fs-8">이번주</span>
-                                                        <!--end::Desc-->
-                                                    </div>
-                                                    <!--end::Stats-->
-                                                </div>
-                                                <!--end::Items-->
-                                            </div>
-                                            <!--end::Col-->
-                                            <!--begin::Col-->
-                                            <div class="col-6">
-                                                <!--begin::Items-->
-                                                <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5">
-                                                    <!--begin::Symbol-->
-                                                    <div class="symbol symbol-30px me-5 mb-8">
-                                                        <span class="symbol-label">
-                                                            <div id="currentMonth"></div>
-                                                        </span>
-                                                    </div>
-                                                    <!--end::Symbol-->
-                                                    <!--begin::Stats-->
-                                                    <div class="m-0">
-                                                        <!--begin::Number-->
-                                                        <span id="DPOINTCHARGE" class="text-gray-700 fw-bolder d-block fs-2 lh-1 ls-n1 mb-1"></span>
-                                                        <!--end::Number-->
-                                                        <!--begin::Desc-->
-                                                        <span class="text-gray-500 fw-semibold fs-8">충전</span>
-                                                        <!--end::Desc-->
-                                                    </div>
-                                                    <!--end::Stats-->
-                                                </div>
-                                                <!--end::Items-->
-                                            </div>
-                                            <!--end::Col-->
-                                            <!--begin::Col-->
-                                            <div class="col-6">
-                                                <!--begin::Items-->
-                                                <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5">
-                                                    <!--begin::Symbol-->
-                                                    <div class="symbol symbol-30px me-5 mb-8">
-                                                        <span class="symbol-label">
-                                                            잔여
-                                                        </span>
-                                                    </div>
-                                                    <script>
-                                                        document.addEventListener('DOMContentLoaded', function() {
-                                                            const monthNames = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
-                                                            // 현재 날짜 정보
-                                                            const currentDate = new Date();
-                                                            const currentMonth = monthNames[currentDate.getMonth()];
-                                                            const todayDate = currentDate.getDate() + '일';
-                                                            const now = new Date();
-                                                            const startOfYear = new Date(now.getFullYear(), 0, 1); // 올해의 시작
-                                                            const pastDaysOfYear = (now - startOfYear) / (24 * 60 * 60 * 1000); // 올해 지난 날짜 수
-                                                            const weekNumber = Math.ceil((pastDaysOfYear + startOfYear.getDay() + 1) / 7); // 올해의 몇 번째 주 계산
-
-                                                            // "이번주는 올해의 몇 번째 주" 설정
-                                                            document.getElementById('thisWeek').innerText = `${weekNumber}주`;
-                                                            // "이번 달" 설정
-                                                            document.getElementById('currentMonth').innerText = currentMonth;
-
-                                                            // "오늘" 설정
-                                                            document.getElementById('todayDate').innerText = todayDate;
-
-                                                            // "이번주" 범위 계산
-                                                            const startOfWeek = new Date(currentDate.setDate(currentDate.getDate() - currentDate.getDay() + 1));
-                                                            const endOfWeek = new Date(startOfWeek.getTime() + 6 * 24 * 60 * 60 * 1000);
-
-
-                                                        });
-                                                    </script>
-                                                    <!--end::Symbol-->
-                                                    <!--begin::Stats-->
-                                                    <div class="m-0">
-                                                        <!--begin::Number-->
-                                                        <span id="DPOINTSUM" class="text-gray-700 fw-bolder d-block fs-2 lh-1 ls-n1 mb-1"></span>
-                                                        <!--end::Number-->
-                                                        <!--begin::Desc-->
-                                                        <span class="text-gray-500 fw-semibold fs-8">마일리지</span>
-                                                        <!--end::Desc-->
-                                                    </div>
-                                                    <!--end::Stats-->
-                                                </div>
-                                                <!--end::Items-->
-                                            </div>
-                                            <!--end::Col-->
-                                        </div>
-                                        <!--end::Row-->
+                                        <!--end::Toolbar-->
                                     </div>
-                                    <!--end::Stats-->
-                                </div>
-                                <!--end::Body-->
-                            </div>
-                        </div>
-                        <!--오늘 처리 건수-->
-                        <div class="col-xxl-8 mb-5 mb-xl-10">
-                            <!--begin::Chart widget 36-->
-                            <div class="card card-flush overflow-hidden h-md-100">
-                                <!--begin::Header-->
-                                <div class="card-header py-5">
-                                    <!--begin::Title-->
-                                    <h3 class="card-title align-items-start flex-column">
-                                        <span class="card-label fw-bold text-gray-900">마일리지</span>
-                                        <span class="text-gray-500 mt-1 fw-semibold fs-6">일별 사용 마일리지</span>
-                                    </h3>
-                                    <!--end::Title-->
-                                    <!--begin::Toolbar-->
+                                    <!--end::Heading-->
+                                    <!--begin::Body-->
+                                    <div class="card-body mt-n20">
+                                        <!--begin::Stats-->
+                                        <div class="mt-n20 position-relative">
+                                            <!--begin::Row-->
+                                            <div class="row g-3 g-lg-6">
+                                                <!--begin::Col-->
+                                                <div class="col-6">
+                                                    <!--begin::Items-->
+                                                    <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5">
+                                                        <!--begin::Symbol-->
+                                                        <div class="symbol symbol-30px me-5 mb-8">
+                                                            <span class="symbol-label">
+                                                                <div id="todayDate"></div>
+                                                            </span>
+                                                        </div>
+                                                        <!--end::Symbol-->
+                                                        <!--begin::Stats-->
+                                                        <div class="m-0">
+                                                            <!--begin::Number-->
+                                                            <span id="DPOINTUSEDAY" class="text-gray-700 fw-bolder d-block fs-2 lh-1 ls-n1 mb-1"></span>
+                                                            <!--end::Number-->
+                                                            <!--begin::Desc-->
+                                                            <span class="text-gray-500 fw-semibold fs-8">오늘</span>
+                                                            <!--end::Desc-->
+                                                        </div>
+                                                        <!--end::Stats-->
+                                                    </div>
+                                                    <!--end::Items-->
+                                                </div>
+                                                <!--end::Col-->
+                                                <!--begin::Col-->
+                                                <div class="col-6">
+                                                    <!--begin::Items-->
+                                                    <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5">
+                                                        <!--begin::Symbol-->
+                                                        <div class="symbol symbol-30px me-5 mb-8">
+                                                            <span class="symbol-label">
+                                                                <div id="thisWeek"></div>
+                                                            </span>
+                                                        </div>
+                                                        <!--end::Symbol-->
+                                                        <!--begin::Stats-->
+                                                        <div class="m-0">
+                                                            <!--begin::Number-->
+                                                            <span id="DPOINTUSEWEEK" class="text-gray-700 fw-bolder d-block fs-2 lh-1 ls-n1 mb-1"></span>
+                                                            <!--end::Number-->
+                                                            <!--begin::Desc-->
+                                                            <span class="text-gray-500 fw-semibold fs-8">이번주</span>
+                                                            <!--end::Desc-->
+                                                        </div>
+                                                        <!--end::Stats-->
+                                                    </div>
+                                                    <!--end::Items-->
+                                                </div>
+                                                <!--end::Col-->
+                                                <!--begin::Col-->
+                                                <div class="col-6">
+                                                    <!--begin::Items-->
+                                                    <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5">
+                                                        <!--begin::Symbol-->
+                                                        <div class="symbol symbol-30px me-5 mb-8">
+                                                            <span class="symbol-label">
+                                                                <div id="currentMonth"></div>
+                                                            </span>
+                                                        </div>
+                                                        <!--end::Symbol-->
+                                                        <!--begin::Stats-->
+                                                        <div class="m-0">
+                                                            <!--begin::Number-->
+                                                            <span id="DPOINTCHARGE" class="text-gray-700 fw-bolder d-block fs-2 lh-1 ls-n1 mb-1"></span>
+                                                            <!--end::Number-->
+                                                            <!--begin::Desc-->
+                                                            <span class="text-gray-500 fw-semibold fs-8">충전</span>
+                                                            <!--end::Desc-->
+                                                        </div>
+                                                        <!--end::Stats-->
+                                                    </div>
+                                                    <!--end::Items-->
+                                                </div>
+                                                <!--end::Col-->
+                                                <!--begin::Col-->
+                                                <div class="col-6">
+                                                    <!--begin::Items-->
+                                                    <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5">
+                                                        <!--begin::Symbol-->
+                                                        <div class="symbol symbol-30px me-5 mb-8">
+                                                            <span class="symbol-label">
+                                                                잔여
+                                                            </span>
+                                                        </div>
+                                                        <script>
+                                                            document.addEventListener('DOMContentLoaded', function() {
+                                                                const monthNames = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
+                                                                // 현재 날짜 정보
+                                                                const currentDate = new Date();
+                                                                const currentMonth = monthNames[currentDate.getMonth()];
+                                                                const todayDate = currentDate.getDate() + '일';
+                                                                const now = new Date();
+                                                                const startOfYear = new Date(now.getFullYear(), 0, 1); // 올해의 시작
+                                                                const pastDaysOfYear = (now - startOfYear) / (24 * 60 * 60 * 1000); // 올해 지난 날짜 수
+                                                                const weekNumber = Math.ceil((pastDaysOfYear + startOfYear.getDay() + 1) / 7); // 올해의 몇 번째 주 계산
 
-                                    <!--end::Toolbar-->
+                                                                // "이번주는 올해의 몇 번째 주" 설정
+                                                                document.getElementById('thisWeek').innerText = `${weekNumber}주`;
+                                                                // "이번 달" 설정
+                                                                document.getElementById('currentMonth').innerText = currentMonth;
+
+                                                                // "오늘" 설정
+                                                                document.getElementById('todayDate').innerText = todayDate;
+
+                                                                // "이번주" 범위 계산
+                                                                const startOfWeek = new Date(currentDate.setDate(currentDate.getDate() - currentDate.getDay() + 1));
+                                                                const endOfWeek = new Date(startOfWeek.getTime() + 6 * 24 * 60 * 60 * 1000);
+
+
+                                                            });
+                                                        </script>
+                                                        <!--end::Symbol-->
+                                                        <!--begin::Stats-->
+                                                        <div class="m-0">
+                                                            <!--begin::Number-->
+                                                            <span id="DPOINTSUM" class="text-gray-700 fw-bolder d-block fs-2 lh-1 ls-n1 mb-1"></span>
+                                                            <!--end::Number-->
+                                                            <!--begin::Desc-->
+                                                            <span class="text-gray-500 fw-semibold fs-8">마일리지</span>
+                                                            <!--end::Desc-->
+                                                        </div>
+                                                        <!--end::Stats-->
+                                                    </div>
+                                                    <!--end::Items-->
+                                                </div>
+                                                <!--end::Col-->
+                                            </div>
+                                            <!--end::Row-->
+                                        </div>
+                                        <!--end::Stats-->
+                                    </div>
+                                    <!--end::Body-->
                                 </div>
-                                <!--end::Header-->
-                                <!--begin::Card body-->
-                                <div class="card-body d-flex justify-content-between flex-column pb-1 px-0">
-                                    <!--begin::Statistics-->
-                                    <div class="px-9 mb-5">
+                            </div>
+                            <!--오늘 처리 건수-->
+                            <div class="col-xxl-8 mb-5 mb-xl-10">
+                                <!--begin::Chart widget 36-->
+                                <div class="card card-flush overflow-hidden h-md-100">
+                                    <!--begin::Header-->
+                                    <div class="card-header py-5">
+                                        <!--begin::Title-->
+                                        <h3 class="card-title align-items-start flex-column">
+                                            <span class="card-label fw-bold text-gray-900">마일리지</span>
+                                            <span class="text-gray-500 mt-1 fw-semibold fs-6">일별 사용 마일리지</span>
+                                        </h3>
+                                        <!--end::Title-->
+                                        <!--begin::Toolbar-->
+
+                                        <!--end::Toolbar-->
+                                    </div>
+                                    <!--end::Header-->
+                                    <!--begin::Card body-->
+                                    <div class="card-body d-flex justify-content-between flex-column pb-1 px-0">
                                         <!--begin::Statistics-->
-                                        <div class="d-flex mb-2">
-                                            <span id="DPOINTUSE" class="fs-4 fw-semibold text-gray-500 me-1"></span>
-                                            <span class="fs-2hx fw-bold text-gray-800 me-2 lh-1 ls-n2"></span>
+                                        <div class="px-9 mb-5">
+                                            <!--begin::Statistics-->
+                                            <div class="d-flex mb-2">
+                                                <span id="DPOINTUSE" class="fs-4 fw-semibold text-gray-500 me-1"></span>
+                                                <span class="fs-2hx fw-bold text-gray-800 me-2 lh-1 ls-n2"></span>
+                                            </div>
+                                            <!--end::Statistics-->
+                                            <!--begin::Description-->
+                                            <span class="fs-6 fw-semibold text-gray-500"> </span>
+                                            <!--end::Description-->
                                         </div>
                                         <!--end::Statistics-->
-                                        <!--begin::Description-->
-                                        <span class="fs-6 fw-semibold text-gray-500"> </span>
-                                        <!--end::Description-->
+                                        <!--begin::Chart-->
+                                        <div id="kt_charts_widget_3" class="min-h-auto ps-4 pe-6" style="height: 300px"></div>
+                                        <!--end::Chart-->
                                     </div>
-                                    <!--end::Statistics-->
-                                    <!--begin::Chart-->
-                                    <div id="kt_charts_widget_3" class="min-h-auto ps-4 pe-6" style="height: 300px"></div>
-                                    <!--end::Chart-->
+                                    <!--end::Card body-->
                                 </div>
-                                <!--end::Card body-->
+                                <!--end::Chart widget 36-->
                             </div>
-                            <!--end::Chart widget 36-->
+                            <!--end::Col-->
+                            <!--begin::Col-->
+                            <!--end::Col-->
                         </div>
-                        <!--end::Col-->
-                        <!--begin::Col-->
-                        <!--end::Col-->
                     </div>
                 </div>
                 <!--end::Row-->
@@ -520,7 +522,7 @@
                         <div class="col-xxl-4 mb-5 mb-xl-10">
                             <div class="card card-flush h-xl-100">
                                 <!--begin::Heading-->
-                                <div class="card-header rounded bgi-no-repeat bgi-size-cover bgi-position-y-top bgi-position-x-center align-items-start h-250px" style="background-image:url('/assets/media/svg/shapes/top-green.png')" data-bs-theme="light">
+                                <div class="card-header rounded  bgi-no-repeat bgi-size-cover bgi-position-y-top bgi-position-x-center align-items-start h-250px" style="background-image:url('/assets/media/svg/shapes/top-green.png')" data-bs-theme="light">
                                     <!--begin::Title-->
                                     <h3 class="card-title align-items-start flex-column text-white pt-15">
                                         <span class="fw-bold fs-2x mb-3">콜 현황</span>

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class CustomSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
@@ -35,16 +36,27 @@ public class CustomSuccessHandler extends SavedRequestAwareAuthenticationSuccess
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         String userId = "";
         String userName = "";
-
+        String authority = "";
         if (userDetails.getTcntUserInfo() != null) {
             userId = userDetails.getTcntUserInfo().getUserId();
             userName = userDetails.getTcntUserInfo().getEmp_name();
+            authority = userDetails.getTcntUserInfo().getAuthority();
         } else {
             userId = userDetails.getTempUserInfo().getUserId();
             userName = userDetails.getTempUserInfo().getEmp_Name();
+            authority = userDetails.getTempUserInfo().getPosition();
         }
+
+        System.out.println("authority========"+authority);
         // 사용자 권한에 따른 메뉴 리스트 조회 및 세션 저장 로직
-        List<Menu> menuList = menuService.getCompanyUserMenus(authentication.getName());
+        List<Map<String, Object>> menuList;
+        try {
+            menuList = menuService.getCompanyUserMenus(authentication.getName(), authority);
+            System.out.println("Fetched menu list: " + menuList);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ServletException("Failed to fetch user menus", e);
+        }
 
         // 조회된 메뉴 리스트를 세션에 저장
         HttpSession session = request.getSession();
@@ -58,6 +70,7 @@ public class CustomSuccessHandler extends SavedRequestAwareAuthenticationSuccess
 
         System.out.println("loginUserId============================================================"+userId);
         System.out.println("userName============================================================"+userName);
+        session.setAttribute("loginUserAuthority", authority);
         session.setAttribute("loginUserId", userId);
         session.setAttribute("loginUserName", userName);
         System.out.println("sessionloginUserId============================================================"+session.getAttribute("loginUserId"));

@@ -63,9 +63,14 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     // 사용자의 승인 상태 확인
     private void verifyUserConfirmationStatus(Tipdw user) {
+        System.out.println("user.getConfirmYn() : " + user.getConfirmYn());
         if ("N".equals(user.getConfirmYn())) {
             throw new UserNotConfirmedException("아직 승인되지 않은 사용자입니다: " + user.getUserid());
         }
+        /* 2024.06.18 주석처리  개발후에 업데이트
+        else if("C".equals(user.getConfirmYn())){
+            throw new UserNotConfirmedException("승인 불가된 사용자 입니다.: " + user.getUserid());
+        }*/
     }
 
     // 내부 직원 처리
@@ -87,6 +92,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (tcntUser == null) {
             throw new AccountExpiredException("현재 활성 상태가 아닌 사용자입니다: " + userid);
         }
+
 
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
