@@ -23,7 +23,8 @@
             A.ADMIN ,
             B.HOMEPAGE as  homePage,
             A.HAS_EMAIL as  hasEmail,
-            A.HAS_PHONE as hasPhone
+            A.HAS_PHONE as hasPhone,
+            a.AUTHORITY as authority
         FROM N_TCNT01_EMP A, TCNT01 B
         WHERE A.CUST_CODE = B.CUST_CODE
           AND USERID= #{custCode}

@@ -162,17 +162,17 @@
 
                                     </div>
                                     <!--end::Input group-->
-                                    <!--begin::Input group
+                                    <!--begin::Input group-->
                                     <div class="row mb-0">
 
                                         <label class="col-lg-4 fw-semibold fs-5 text-muted">관리자</label>
 
                                         <div class="col-lg-8">
-                                            <span class="fw-semibold fs-6 text-gray-800"></span>
+                                            <span class="fw-semibold fs-6 text-gray-800"th:if="${accountInfo.authority == '1'}" th:text="'YES'"></span>
+                                            <span class="fw-semibold fs-6 text-gray-800"th:if="${accountInfo.authority != '1'}" th:text="'NO'"></span>
                                         </div>
 
-                                    </div>-->
-
+                                    </div>
                                 </div>
 
 
