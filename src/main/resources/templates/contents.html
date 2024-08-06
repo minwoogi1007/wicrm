@@ -3,6 +3,7 @@
 
 <div layout:fragment="content">
     <!--begin::Content wrapper-->
+    <div th:replace="~{fragments/modal :: welcomeModal}"></div>
     <div class="d-flex flex-column flex-column-fluid">
         <!--begin::Toolbar-->
         <th:block th:replace="~{fragments/pageHeader :: pageHeader}"></th:block>
@@ -1087,6 +1088,10 @@
                                 });
                             }
                         });
+
+
+
+
                     </script>
                     <!--end::Row-->
                     <!--begin::Row-->

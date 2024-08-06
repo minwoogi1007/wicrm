@@ -40,12 +40,14 @@ public class ConController {
         List<AdminCode> constat = adminCodeService.getAdminCodesByGubn("4003");
         List<AdminCode> conbuy = adminCodeService.getAdminCodesByGubn("5000");
         List<AdminCode> contype = adminCodeService.getAdminCodesByGubn("4002");
-
+        List<AdminCode> custStat = adminCodeService.getAdminCodesByGubn("9500");
 
 
         model.addAttribute("constat", constat);
         model.addAttribute("contype", contype);
         model.addAttribute("conbuy", conbuy);
+        model.addAttribute("custStat", custStat);
+
 // Print adminCodes to console for debugging
 
         // Convert to JSON for better readability
@@ -62,12 +64,17 @@ public class ConController {
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String mall,
+            @RequestParam(required = false) String custStat,
             @RequestParam(required = false) String filter,
             @RequestParam(required = false) String keyword) {
 
+        //System.out.println("custStat: " + custStat);
 
-        List<Consultation> consultations = conService.getConsultations(page, pageSize, startDate, endDate, status, type, mall, keyword,filter);
-        int total = conService.countTotal(startDate, endDate, status, type, mall, keyword,filter);
+        List<Consultation> consultations = conService.getConsultations(page, pageSize, startDate, endDate, status, type, mall,custStat, keyword,filter);
+        //System.out.println("consultations: " + consultations);
+
+        int total = conService.countTotal(startDate, endDate, status, type, mall,custStat, keyword,filter);
+        //System.out.println("total: " + total);
 
         Map<String, Object> response = new HashMap<>();
         response.put("data", consultations);
@@ -102,13 +109,14 @@ public class ConController {
                               @RequestParam(required = false) String status,
                               @RequestParam(required = false) String type,
                               @RequestParam(required = false) String mall,
+                              @RequestParam(required = false) String custStat,
                               @RequestParam(required = false) String filter,
                               @RequestParam(required = false) String keyword,
                               HttpServletResponse response) throws IOException {
 
 
         // 데이터를 조회하고 엑셀 파일 생성
-        List<Consultation> consultations = conService.getConsultationsForExcel(startDate, endDate, status, type, mall, filter, keyword);
+        List<Consultation> consultations = conService.getConsultationsForExcel(startDate, endDate, status, type, mall,custStat, filter, keyword);
 
         // Workbook 생성
         Workbook workbook = new XSSFWorkbook();

@@ -49,6 +49,7 @@
         NEW_CS_TYPE as newCsType,
         NEW_CS_SUB_TYPE as newCsSubType,
         BUY_TYPE as buyType,
+        COMPLETION_CODE as completionCode,
        (SELECT COUNT(*)
         FROM TBND01_MEMO
         WHERE CUST_CODE =main_query.CUST_CODE
@@ -74,9 +75,13 @@
                 <if test="params.mall != null and params.mall != ''">
                     AND BUY_GUBN = #{params.mall}
                 </if>
+                <if test="params.custStat != null and params.custStat != ''">
+                    AND COMPLETION_CODE = #{params.custStat}
+                </if>
                 <if test="params.status != null and params.status != ''
                         or params.type != null and params.type != ''
-                        or params.mall != null and params.mall != ''">
+                        or params.mall != null and params.mall != ''
+                        or params.custStat != null and params.custStat != ''">
                     AND TO_CHAR(IN_DATE, 'YYYYMMDD') BETWEEN #{params.startDate} AND #{params.endDate}
                 </if>
                     UNION ALL
@@ -94,6 +99,9 @@
                 </if>
                 <if test="params.mall != null and params.mall != ''">
                     AND BUY_GUBN = #{params.mall}
+                </if>
+                <if test="params.custStat != null and params.custStat != ''">
+                    AND COMPLETION_CODE = #{params.custStat}
                 </if>
                     AND TO_CHAR(IN_DATE, 'YYYYMMDD') BETWEEN #{params.startDate} AND #{params.endDate}
                  ) TBND01
@@ -141,9 +149,13 @@
         <if test="params.mall != null and params.mall != ''">
             AND BUY_GUBN = #{params.mall}
         </if>
+        <if test="params.custStat != null and params.custStat != ''">
+            AND COMPLETION_CODE = #{params.custStat}
+        </if>
         <if test="params.status != null and params.status != ''
                 or params.type != null and params.type != ''
-                or params.mall != null and params.mall != ''">
+                or params.mall != null and params.mall != ''
+                or params.custStat != null and params.custStat != ''">
             AND TO_CHAR(IN_DATE, 'YYYYMMDD') BETWEEN #{params.startDate} AND #{params.endDate}
         </if>
         <if test="params.keyword != null and params.keyword != ''">
@@ -197,6 +209,7 @@
         NEW_CS_TYPE as newCsType,
         NEW_CS_SUB_TYPE as newCsSubType,
         BUY_TYPE as buyType,
+        COMPLETION_CODE as completionCode,
         (SELECT COUNT(*)
         FROM TBND01_MEMO
         WHERE CUST_CODE =main_query.CUST_CODE
@@ -222,9 +235,13 @@
         <if test="params.mall != null and params.mall != ''">
             AND BUY_GUBN = #{params.mall}
         </if>
+        <if test="params.custStat != null and params.custStat != ''">
+            AND COMPLETION_CODE = #{params.custStat}
+        </if>
         <if test="params.status != null and params.status != ''
                         or params.type != null and params.type != ''
-                        or params.mall != null and params.mall != ''">
+                        or params.mall != null and params.mall != ''
+                        or params.custStat != null and params.custStat != ''">
             AND TO_CHAR(IN_DATE, 'YYYYMMDD') BETWEEN #{params.startDate} AND #{params.endDate}
         </if>
         UNION ALL
@@ -242,6 +259,9 @@
         </if>
         <if test="params.mall != null and params.mall != ''">
             AND BUY_GUBN = #{params.mall}
+        </if>
+        <if test="params.custStat != null and params.custStat != ''">
+            AND COMPLETION_CODE = #{params.custStat}
         </if>
         AND TO_CHAR(IN_DATE, 'YYYYMMDD') BETWEEN #{params.startDate} AND #{params.endDate}
         ) TBND01
@@ -278,6 +298,7 @@
                NVL(A.CS_BANK,'') as csBank,
                NVL(A.CS_NAME,'') as csName,
                NVL(A.CS_CASH,'') as csCash,
+               A.COMPLETION_CODE  as completionCode,
                A.PRC_NOTE as prcNote
         FROM TBND01 A
         WHERE A.CUST_CODE = #{params.custCode}

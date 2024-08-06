@@ -21,7 +21,7 @@ public class EncryptionController {
     @GetMapping("/encryption")
     public String encryptionPage() {
         logger.info("controller = encryptionPage start");
-        return "encrypt.html.BAK"; // HTML 템플릿 파일 이름
+        return "encrypt.html"; // HTML 템플릿 파일 이름
     }
 
     @PostMapping("/encrypt-password")

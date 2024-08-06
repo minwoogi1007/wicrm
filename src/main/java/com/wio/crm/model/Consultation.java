@@ -47,6 +47,16 @@ public class Consultation {
     private String countRe;
     private String projectName;
 
+    private String completionCode;
+
+    public String getCompletionCode() {
+        return completionCode;
+    }
+
+    public void setCompletionCode(String completionCode) {
+        this.completionCode = completionCode;
+    }
+
     private Consultation consultation;
     private List<Comment> comments;
 

@@ -18,13 +18,17 @@
     <!--begin::Actions-->
     <!--퀵메뉴 등록 -->
     <div class="d-flex align-items-center gap-2 gap-lg-3">
-      <!--begin::Filter menu-->
-
-      <!--end::Filter menu-->
-      <!--begin::Secondary button-->
-      <!--end::Secondary button-->
-      <!--begin::Primary button-->
-      <!--end::Primary button-->
+      <div class="d-flex">
+        <select name="campaign-type" data-control="select2" data-hide-search="true" class="form-select form-select-sm bg-body border-body w-175px">
+          <option value="today" selected="selected">오늘</option>
+          <option value="week">일주일</option>
+          <option value="month">이번달</option>
+          <option value="last-month">전달</option>
+        </select>
+        <a href="#" id="downloadButton" class="btn btn-icon btn-sm btn-success flex-shrink-0 ms-4">
+          <i class="ki-duotone ki-plus fs-2"></i>
+        </a>
+      </div>
     </div>
     <!--end::Actions-->
   </div>

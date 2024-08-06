@@ -11,8 +11,38 @@ let callSum=0;
 let comSum =0;
 let missSum = 0;
 let yesterComSum = 0;
+document.addEventListener('DOMContentLoaded', function () {
+    function setCookie(name, value, days) {
+        console.log('setCookie');
+        const date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        const expires = "expires=" + date.toUTCString();
+        document.cookie = name + "=" + value + ";" + expires + ";path=/";
+    }
 
+    function getCookie(name) {
+        const value = "; " + document.cookie;
+        const parts = value.split("; " + name + "=");
+        if (parts.length === 2) return parts.pop().split(";").shift();
+    }
 
+    const modal = new bootstrap.Modal(document.getElementById('welcomeModal'));
+
+    if (!getCookie('hideWelcomeModal')) {
+        modal.show();
+    }
+
+    document.getElementById('dontShowAgainCheckbox').addEventListener('change', function () {
+        console.log('dontShowAgainCheckbox');
+        if (this.checked) {
+            console.log('checked');
+            setCookie('hideWelcomeModal', 'true', 7);
+        } else {
+            console.log('else');
+            setCookie('hideWelcomeModal', '', -1); // Clear the cookie
+        }
+    });
+});
 $(document).ready(function() {
     let isFirstCall = true;
     fetchData();
@@ -55,6 +85,7 @@ $(document).ready(function() {
     let pointMax;
     let pointMin;
     let formattedPointList=[];
+
     function fetchPoint(){
         $.ajax({
             url: "/api/dashboard-point-data", // 서버 엔드포인트

@@ -149,6 +149,13 @@
                                                     </label>
                                                 </div>
                                             </div>
+                                            <div class="col-lg-3">
+                                                <label class="fs-6 form-label fw-bold text-gray-900">담당자 처리</label>
+                                                <select id="custStat" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Status" data-hide-search="true">
+                                                    <option value="all" th:selected="true" th:text="'전체'"></option>
+                                                    <option th:each="custStat : ${custStat}" th:value="${custStat.admCode}" th:text="${custStat.admSname}"></option>
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -269,6 +276,7 @@
                                                 <td class="fw-semibold bg-light-primary text-primary">입금액</td>
                                                 <td id="csCash"></td>
                                             </tr>
+
                                             <input type="hidden" id="hcallCode">
                                             <input type="hidden" id="hpersonCode">
                                             <input type="hidden" id="hprojectCode">
@@ -300,11 +308,21 @@
                                     <div class="d-flex flex-column mb-5 fv-row">
                                         <div class="d-flex">
                                             <div class="form-floating flex-grow-1 me-2" id="commentsContainer">
-                                                <textarea class="form-control" placeholder="댓글을 입력하세요" name="newComment" id="floatingTextarea2" style="height: 40px;"></textarea>
+                                                <textarea class="form-control" placeholder="댓글을 입력하세요" name="newComment" id="floatingTextarea2" style="height: 78px;"></textarea>
                                                 <label for="floatingTextarea2">Comments</label>
                                             </div>
-                                            <button type="button" id="addCommentButton" class="btn btn-sm btn-primary align-self-end">등록</button>
+                                            <div class="flex-shrink-0">
+                                                <select id="completionCodeSelect" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Status" data-hide-search="true" >
+                                                    <option value="1">CS 접수</option>
+                                                    <option value="2">처리중</option>
+                                                    <option value="3">처리완료</option>
+                                                </select>
+                                                    <button type="button" id="addCommentButton" class="btn btn-sm btn-primary">등록</button>
+
+                                            </div>
+
                                         </div>
+
                                     </div>
 
                                     <!-- 상담 히스토리 섹션 -->
@@ -398,6 +416,7 @@
                         var status = $('#status').val();
                         var type = $('#type').val();
                         var mall = $('#mall').val();
+                        var custStat = $('#custStat').val();
                         var keyword = $('#searchKeyword').val();
 
                         var filter = $('input[name="filter"]:checked').val();
@@ -405,6 +424,7 @@
                         status = (status === "all") ? null : status;
                         type = (type === "all") ? null : type;
                         mall = (mall === "all") ? null : mall;
+                        custStat = (custStat === "all") ? null : custStat;
 
                         var formData = {
                             startDate: hiddenStartDate,
@@ -412,6 +432,7 @@
                             status: status,
                             type: type,
                             mall: mall,
+                            custStat: custStat,
                             filter: filter,
                             keyword: keyword,
                             page: page,
@@ -445,14 +466,28 @@
                                     var emgGubnBadge = data.emgGubn == '1' ?
                                         '<span class="badge badge-light-danger fw-bold px-4 py-3">긴급</span>' :
                                         '<span class="badge badge-light-success fw-bold px-4 py-3">일반</span>';
-
+                                    var completionCode;
+                                    switch(data.completionCode) {
+                                        case '1':
+                                            completionCode = '<span class="badge badge-light-danger fw-bold px-4 py-3">CS 접수</span>';
+                                            break;
+                                        case '2':
+                                            completionCode = '<span class="badge badge-light-warning fw-bold px-4 py-3">처리중</span>';
+                                            break;
+                                        case '3':
+                                            completionCode = '<span class="badge badge-light-success fw-bold px-4 py-3">처리완료</span>';
+                                            break;
+                                        default:
+                                            completionCode = '<span class="badge badge-light-secondary fw-bold px-4 py-3"></span>';
+                                            break;
+                                    }
                                     tbody.append(
                                         '<tr class="fs-6" style="border-bottom: 1px solid #ddd;">' +
                                         '<td colspan="7">' +
                                         '<div class="d-flex flex-column">' +
                                         // 상단 데이터
                                         '<div class="d-flex justify-content-between" style="text-align: left;">' +
-                                        '<div style="width: 14%; text-align: left;">' + emgGubnBadge + '</div>' +
+                                        '<div style="width: 14%; text-align: left;">' + emgGubnBadge + completionCode+'</div>' +
                                         '<div style="width: 14%; text-align: left;">' + data.inDate + '</div>' +
                                         '<div style="width: 14%; text-align: left;">' + data.inTime + '</div>' +
                                         '<div style="width: 14%; text-align: left;">' + data.empNo + '</div>' +
@@ -521,10 +556,24 @@
                                     return value == null ? '' : value;
                                 }// Generate badge for emgGubn
                                 var emgGubnBadge = data.emgGubn == '1' ?'<span class="badge badge-light-danger fw-bold px-4 py-3">긴급</span>' : '<span class="badge badge-light-success fw-bold px-4 py-3">일반</span>';
-
+                                var completionCode;
+                                switch(data.completionCode) {
+                                    case '1':
+                                        completionCode = '<span class="badge badge-light-danger fw-bold px-4 py-3">CS 접수</span>';
+                                        break;
+                                    case '2':
+                                        completionCode = '<span class="badge badge-light-warning fw-bold px-4 py-3">처리중</span>';
+                                        break;
+                                    case '3':
+                                        completionCode = '<span class="badge badge-light-success fw-bold px-4 py-3">처리완료</span>';
+                                        break;
+                                    default:
+                                        completionCode = '<span class="badge badge-light-secondary fw-bold px-4 py-3"></span>';
+                                        break;
+                                }
                                 // Set modal header with badge
                                 $('#kt_modal_new_address_header').html(
-                                    '<h2>상담 내역 상세 ' + emgGubnBadge + '</h2>' +
+                                    '<h2>상담 내역 상세 ' + emgGubnBadge + completionCode+'</h2>' +
                                     '<div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">' +
                                     '<i class="ki-duotone ki-cross fs-1">' +
                                     '<span class="path1"></span>' +
@@ -542,6 +591,9 @@
                                 $('#kt_modal_new_address').find('#csBank').text(safeValue(data.csBank));
                                 $('#kt_modal_new_address').find('#csDate').text( safeValue(data.csDate));
                                 $('#kt_modal_new_address').find('#csCash').text(safeValue(data.csCash));
+                                // Set the select value for completionCode
+                                $('#kt_modal_new_address').find('#completionCodeSelect').val(data.completionCode);
+
                                 $('#kt_modal_new_address').find('textarea[name="csNote"]').val(safeValue(data.csNote));
                                 $('#kt_modal_new_address').find('textarea[name="prcNote"]').val(safeValue(data.prcNote));
 

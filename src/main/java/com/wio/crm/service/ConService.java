@@ -43,17 +43,17 @@ public class ConService {
         return userDetails.getTcntUserInfo() != null ? userDetails.getTcntUserInfo().getCustCode() : "";
     }
 
-    public List<Consultation> getConsultations(int page, int pageSize, String startDate, String endDate, String status, String type, String mall , String  keyword,String filter) {
+    public List<Consultation> getConsultations(int page, int pageSize, String startDate, String endDate, String status, String type, String mall ,String custStat, String  keyword,String filter) {
         int offset = (page - 1) * pageSize+ 1;
         int limit = page * pageSize;
         Map<String, Object> params = new HashMap<>();
-        System.out.println("getCurrentCustcode()===" + getCurrentCustcode());
         params.put("custCode", getCurrentCustcode());
         params.put("startDate", startDate);
         params.put("endDate", endDate);
         params.put("status", status);
         params.put("type", type);
         params.put("mall", mall);
+        params.put("custStat", custStat);
         params.put("keyword", keyword);
         params.put("filter", filter);
         params.put("offset", offset);
@@ -63,7 +63,7 @@ public class ConService {
         return consMapper.selectList("selectList", params);
     }
 
-    public int countTotal(String startDate, String endDate, String status, String type, String mall, String  keyword,String filter) {
+    public int countTotal(String startDate, String endDate, String status, String type, String mall,String custStat, String  keyword,String filter) {
         Map<String, Object> params = new HashMap<>();
         params.put("custCode", getCurrentCustcode());
         params.put("startDate", startDate);
@@ -73,10 +73,10 @@ public class ConService {
         params.put("filter", filter);
         params.put("type", type);
         params.put("mall", mall);
-
+        params.put("custStat", custStat);
         return consMapper.countTotal(params);
     }
-    public List<Consultation> getConsultationsForExcel(String startDate, String endDate, String status, String type, String mall, String filter, String keyword) {
+    public List<Consultation> getConsultationsForExcel(String startDate, String endDate, String status, String type, String mall,String custStat, String filter, String keyword) {
         Map<String, Object> params = new HashMap<>();
         params.put("custCode", getCurrentCustcode());
         params.put("startDate", startDate);
@@ -84,7 +84,9 @@ public class ConService {
         params.put("status", status);
         params.put("type", type);
         params.put("mall", mall);
+        params.put("custStat", custStat);
         params.put("filter", filter);
+
         params.put("keyword", keyword);
 
         return consMapper.selectAllForExcel(params);
