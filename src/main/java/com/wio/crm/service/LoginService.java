@@ -23,12 +23,12 @@ public class LoginService {
         userMapper.insertUser(userInfo);
 
         // gubn에 따른 처리 로직
-        if (userInfo.getGubn().equals("0")) {
+        if (userInfo.getGubn().equals("1")) {
             // 업체 직원인 경우
 
             // n_tcnt01_emp_temp 임시 테이블에 등록
             userMapper.insertTcnt01Emp(userInfo);
-        } else if (userInfo.getGubn().equals("1")) {
+        } else if (userInfo.getGubn().equals("0")) {
             // 직원인 경우
 
             // n_temp01 테이블에 추가 등록

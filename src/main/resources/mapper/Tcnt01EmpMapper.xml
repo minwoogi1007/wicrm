@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wio.crm.mapper.Tcnt01EmpMapper">
+    <insert id="insertTcnt01Emp" parameterType="com.wio.crm.model.Tcnt01Emp">
+        INSERT INTO N_TCNT01_EMP (
+        USER_ID,
+        EMP_NAME,
+        CUST_CODE
+        <!-- Add other fields as necessary -->
+        ) VALUES (
+        #{userId},
+        #{empName},
+        #{custCode}
+        <!-- Add other fields as necessary -->
+        )
+    </insert>
+</mapper>

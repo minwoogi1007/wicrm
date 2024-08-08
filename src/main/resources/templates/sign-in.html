@@ -140,15 +140,15 @@
 
 							<div class="col-md-6">
 
-								<a href="#" class="btn btn-flex btn-outline btn-text-gray-700 btn-active-color-primary bg-state-light flex-center text-nowrap w-100" data-bs-toggle="modal" data-bs-target="#kt_modal_new_target" data-gubn="1">
+								<a href="#" class="btn btn-flex btn-outline btn-text-gray-700 btn-active-color-primary bg-state-light flex-center text-nowrap w-100" data-bs-toggle="modal" data-bs-target="#kt_modal_new_target" data-gubn="0">
 
-									<img alt="Logo" src="/assets/media/svg/brand-logos/icons7.png" class="h-15px me-3"d  />직원 신청</a>
+									<img alt="Logo" src="/assets/media/svg/brand-logos/icons7.png" class="h-15px me-3"  />직원 신청</a>
 
 							</div>
 
 							<div class="col-md-6">
 
-								<a href="#" class="btn btn-flex btn-outline btn-text-gray-700 btn-active-color-primary bg-state-light flex-center text-nowrap w-100" data-bs-toggle="modal" data-bs-target="#kt_modal_new_target" data-gubn="0">
+								<a href="#" class="btn btn-flex btn-outline btn-text-gray-700 btn-active-color-primary bg-state-light flex-center text-nowrap w-100" data-bs-toggle="modal" data-bs-target="#kt_modal_new_target" data-gubn="1">
 
 									<img alt="Logo" src="/assets/media/svg/brand-logos/icons8.png" class="h-15px me-3" />업체 직원 신청</a>
 
@@ -309,7 +309,7 @@
 			$('[data-bs-toggle="modal"]').on('click', function() {
 				gubn = $(this).attr('data-gubn');
 				// gubn 값에 따라 업체명 입력 필드의 표시 여부를 결정합니다.
-				if(gubn === "0") {
+				if(gubn === "1") {
 					$('#companyNameRow').show();
 				} else {
 					$('#companyNameRow').hide();
@@ -346,7 +346,7 @@
 			var password = document.querySelector('[name="pass1"]').value;
 			var passwordConfirm = document.querySelector('[name="pass2"]').value;
 
-			var companyName = (gubn === "0") ? document.querySelector('[name="companyName"]').value : "";
+			var companyName = (gubn === "1") ? document.querySelector('[name="companyName"]').value : "";
 			console.log("gubn==="+gubn);
 			console.log("companyName==="+companyName);
 			// 필수 입력 값 확인

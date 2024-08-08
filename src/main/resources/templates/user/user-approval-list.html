@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{main}">
+<!--begin::Main-->
+<div layout:fragment="content">
+  <script src="/assets/plugins/global/plugins.bundle.js"></script>
+  <div class="d-flex flex-column flex-column-fluid">
+    <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+      <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+        <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+          <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">아이디 신청</h1>
+        </div>
+      </div>
+    </div>
+
+    <div id="kt_app_content" class="app-content flex-column-fluid">
+      <div id="kt_app_content_container" class="app-container container-xxl">
+        <div class="card">
+          <div class="card-header border-0 pt-6">
+            <div class="card-title">
+              <div class="d-flex align-items-center position-relative my-1">
+                <i class="ki-duotone ki-magnifier fs-3 position-absolute ms-5">
+                  <span class="path1"></span>
+                  <span class="path2"></span>
+                </i>
+                <input type="text" data-kt-ecommerce-order-filter="search" class="form-control form-control-solid w-250px ps-12" placeholder="조회" />
+              </div>
+            </div>
+          </div>
+          <div class="card-body py-4">
+            <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_ecommerce_report_customer_orders_table">
+              <thead>
+              <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
+                <th class="min-w-125px">신청자</th>
+                <th class="min-w-125px">업체명</th>
+                <th class="min-w-125px">Status</th>
+                <th class="min-w-125px">신청일</th>
+                <th class="text-end min-w-100px">Actions</th>
+              </tr>
+              </thead>
+              <tbody class="text-gray-600 fw-semibold">
+
+              <tr th:each="user : ${userApprovals}">
+                <td class="d-flex align-items-center">
+                  <div class="d-flex flex-column">
+                    <a href="#" class="text-gray-800 text-hover-primary mb-1" th:text="${user.username}"></a>
+                    <span th:text="${user.userid}"></span>
+                  </div>
+                </td>
+                <td th:text="${user.custName}"></td>
+                <td>
+                  <div class="badge badge-light-warning">Pending</div>
+                </td>
+                <td th:text="${#temporals.format(user.insertTime, 'yyyy-MM-dd HH:mm')}"></td>
+                <td class="text-end">
+                  <a href="#" class="btn btn-light btn-active-light-primary btn-sm" data-bs-toggle="modal" data-bs-target="#kt_modal_user_approval" th:data-user-id="${user.userid}">View</a>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- User Approval Modal -->
+  <div class="modal fade" id="kt_modal_user_approval" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered mw-650px">
+      <div class="modal-content">
+        <div class="modal-header" id="kt_modal_user_approval_header">
+          <h2 class="fw-bold">User Approval Details</h2>
+          <div class="btn btn-icon btn-sm btn-active-icon-primary" data-kt-users-modal-action="close">
+            <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+          </div>
+        </div>
+        <div class="modal-body scroll-y mx-5 mx-xl-15 my-7">
+          <form id="kt_modal_user_approval_form" class="form" action="#">
+            <div class="d-flex flex-column scroll-y me-n7 pe-7" id="kt_modal_user_approval_scroll" data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_user_approval_header" data-kt-scroll-wrappers="#kt_modal_user_approval_scroll" data-kt-scroll-offset="300px">
+              <input type="hidden" name="user_id" />
+              <div class="fv-row mb-7">
+                <label class="required fw-semibold fs-6 mb-2">Full Name</label>
+                <input type="text" name="user_name" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Full name" readonly />
+              </div>
+
+              <div class="fv-row mb-7">
+                <label class="required fw-semibold fs-6 mb-2">Company</label>
+                <input type="text" name="user_company" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Company name" readonly />
+              </div>
+
+              <div class="fv-row mb-7">
+                <label class="required fw-semibold fs-6 mb-2">Applied Date</label>
+                <input type="text" name="applied_date" class="form-control form-control-solid mb-3 mb-lg-0" readonly />
+              </div>
+
+            </div>
+            <div class="text-center pt-15">
+              <button type="reset" class="btn btn-light me-3" data-kt-users-modal-action="cancel">Discard</button>
+              <button type="submit" class="btn btn-primary" data-kt-users-modal-action="submit">
+                <span class="indicator-label">Approve</span>
+                <span class="indicator-progress">Please wait...
+                                <span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      $('#kt_modal_user_approval').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var userId = button.data('user-id');
+        var modal = $(this);
+
+        $.ajax({
+          url: '/user-approval/detail/' + userId,
+          type: 'GET',
+          success: function(response) {
+            modal.find('[name="user_id"]').val(response.userid);
+            modal.find('[name="user_name"]').val(response.username);
+            modal.find('[name="user_company"]').val(response.custName);
+            modal.find('[name="applied_date"]').val(new Date(response.insertTime).toLocaleString());
+          },
+          error: function(xhr, status, error) {
+            console.error("Error fetching user details:", error);
+          }
+        });
+      });
+
+      $('[data-kt-users-modal-action="submit"]').on('click', function(e) {
+        e.preventDefault();
+
+        var form = $('#kt_modal_user_approval_form');
+        var userId = form.find('[name="user_id"]').val();
+        var companyCode = form.find('[name="company_code"]').val();
+
+        $.ajax({
+          url: '/user-approval/approve',
+          type: 'POST',
+          data: {
+            id: userId,
+            companyCode: companyCode
+          },
+          success: function(response) {
+            $('#kt_modal_user_approval').modal('hide');
+            location.reload(); // Refresh the page to show updated list
+          },
+          error: function(xhr, status, error) {
+            console.error("Error approving user:", error);
+          }
+        });
+      });
+    });
+  </script>
+  <script src="/assets/plugins/global/plugins.bundle.js"></script>
+  <script src="/assets/js/board/scripts.bundle.js"></script>
+  <script src="/assets/js/custom/apps/ecommerce/reports/customer-orders/customer-orders.js"></script>
+</div>

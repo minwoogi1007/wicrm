@@ -16,7 +16,7 @@ public interface UserMapper {
             "            USERID,\n" +
             "            PW,\n" +
             "            USE_YN,\n" +
-            "            IN_DATE) VALUES (#{companyName},(SELECT 'T'|| LPAD( nvl(max(substr(EMPNO,2,9)),0)+1 ,9,0)  FROM tcnt01_emp_temp),#{userName},#{userId},#{userId}, #{password},'N',sysdate)")
+            "            IN_DATE) VALUES (#{companyName},(SELECT 'T'|| LPAD( nvl(max(substr(EMPNO,2,9)),0)+1 ,9,0)  FROM n_tcnt01_emp_temp),#{userName},#{userId},#{userId}, #{password},'N',sysdate)")
     void insertTcnt01Emp (UserInfo userInfo);
 
     @Insert("INSERT INTO N_TEMP01  (\n" +
@@ -27,6 +27,6 @@ public interface UserMapper {
             "            USERID,\n" +
             "            PW,\n" +
             "            CALL_NO,\n" +
-            "            IN_DATE)  VALUES ( (SELECT 'T'|| LPAD( nvl(max(substr(EMPNO,2,9)),0)+1 ,9,0)  FROM temp01), '11',#{userName},#{userId},#{userId}, #{password},'0000',sysdate)")
+            "            IN_DATE)  VALUES ( (SELECT 'T'|| LPAD( nvl(max(substr(EMPNO,2,9)),0)+1 ,9,0)  FROM n_temp01), '11',#{userName},#{userId},#{userId}, #{password},'0000',sysdate)")
     void insertTemp01 (UserInfo userInfo);
 }

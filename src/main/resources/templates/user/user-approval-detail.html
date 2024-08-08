@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{main}">
+<!--begin::Main-->
+<div layout:fragment="content">
+  <script src="/assets/plugins/global/plugins.bundle.js"></script>
+  <div class="d-flex flex-column flex-column-fluid">
+    <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+      <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+        <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+          <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">User Approval Detail</h1>
+        </div>
+      </div>
+    </div>
+
+    <div id="kt_app_content" class="app-content flex-column-fluid">
+      <div id="kt_app_content_container" class="app-container container-xxl">
+        <div class="card mb-5 mb-xl-10">
+          <div class="card-body pt-9 pb-0">
+            <div class="d-flex flex-wrap flex-sm-nowrap mb-3">
+              <div class="flex-grow-1">
+                <div class="d-flex justify-content-between align-items-start flex-wrap mb-2">
+                  <div class="d-flex flex-column">
+                    <div class="d-flex align-items-center mb-2">
+                      <a href="#" class="text-gray-900 text-hover-primary fs-2 fw-bold me-1" th:text="${userApproval.username}"></a>
+                    </div>
+                    <div class="d-flex flex-wrap fw-semibold fs-6 mb-4 pe-2">
+                      <a href="#" class="d-flex align-items-center text-gray-400 text-hover-primary me-5 mb-2">
+                        <i class="ki-duotone ki-profile-circle fs-4 me-1">
+                          <span class="path1"></span>
+                          <span class="path2"></span>
+                          <span class="path3"></span>
+                        </i>
+                        <span th:text="${userApproval.position}"></span>
+                      </a>
+                      <a href="#" class="d-flex align-items-center text-gray-400 text-hover-primary me-5 mb-2">
+                        <i class="ki-duotone ki-geolocation fs-4 me-1">
+                          <span class="path1"></span>
+                          <span class="path2"></span>
+                        </i>
+                        <span th:text="${userApproval.companyName}"></span>
+                      </a>
+                      <a href="#" class="d-flex align-items-center text-gray-400 text-hover-primary mb-2">
+                        <i class="ki-duotone ki-sms fs-4 me-1">
+                          <span class="path1"></span>
+                          <span class="path2"></span>
+                        </i>
+                        <span th:text="${userApproval.email}"></span>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex overflow-auto h-55px">
+              <ul class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bold flex-nowrap">
+                <li class="nav-item">
+                  <a class="nav-link text-active-primary me-6 active" href="#">Overview</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mb-5 mb-xl-10" id="kt_profile_details_view">
+          <div class="card-header cursor-pointer">
+            <div class="card-title m-0">
+              <h3 class="fw-bold m-0">Profile Details</h3>
+            </div>
+          </div>
+
+          <div class="card-body p-9">
+            <div class="row mb-7">
+              <label class="col-lg-4 fw-semibold text-muted">Full Name</label>
+              <div class="col-lg-8">
+                <span class="fw-bold fs-6 text-gray-800" th:text="${userApproval.username}"></span>
+              </div>
+            </div>
+            <div class="row mb-7">
+              <label class="col-lg-4 fw-semibold text-muted">Company</label>
+              <div class="col-lg-8 fv-row">
+                <span class="fw-semibold text-gray-800 fs-6" th:text="${userApproval.companyName}"></span>
+              </div>
+            </div>
+            <div class="row mb-7">
+              <label class="col-lg-4 fw-semibold text-muted">Contact Phone</label>
+              <div class="col-lg-8 d-flex align-items-center">
+                <span class="fw-bold fs-6 text-gray-800 me-2" th:text="${userApproval.phone}"></span>
+              </div>
+            </div>
+            <div class="row mb-7">
+              <label class="col-lg-4 fw-semibold text-muted">Company Site</label>
+              <div class="col-lg-8">
+                <a href="#" class="fw-semibold fs-6 text-gray-800 text-hover-primary" th:text="${userApproval.website}"></a>
+              </div>
+            </div>
+            <div class="row mb-7">
+              <label class="col-lg-4 fw-semibold text-muted">Applied Date</label>
+              <div class="col-lg-8">
+                <span class="fw-bold fs-6 text-gray-800" th:text="${#temporals.format(userApproval.insertTime, 'yyyy-MM-dd HH:mm')}"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <form th:action="@{/approve-user}" method="post">
+              <input type="hidden" name="id" th:value="${userApproval.id}" />
+              <div class="row mb-6">
+                <label class="col-lg-4 col-form-label fw-semibold fs-6">Company Code</label>
+                <div class="col-lg-8 fv-row">
+                  <input type="text" name="companyCode" class="form-control form-control-lg form-control-solid" placeholder="Enter company code" required />
+                </div>
+              </div>
+              <div class="card-footer d-flex justify-content-end py-6 px-9">
+                <button type="submit" class="btn btn-primary">Approve User</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="/assets/plugins/global/plugins.bundle.js"></script>
+  <script src="/assets/js/board/scripts.bundle.js"></script>
+  <script src="/assets/js/custom/apps/ecommerce/reports/customer-orders/customer-orders.js"></script>
+</div>
