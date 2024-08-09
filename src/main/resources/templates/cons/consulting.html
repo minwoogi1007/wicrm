@@ -467,19 +467,23 @@
                                         '<span class="badge badge-light-danger fw-bold px-4 py-3">긴급</span>' :
                                         '<span class="badge badge-light-success fw-bold px-4 py-3">일반</span>';
                                     var completionCode;
-                                    switch(data.completionCode) {
-                                        case '1':
-                                            completionCode = '<span class="badge badge-light-danger fw-bold px-4 py-3">CS 접수</span>';
-                                            break;
-                                        case '2':
-                                            completionCode = '<span class="badge badge-light-warning fw-bold px-4 py-3">처리중</span>';
-                                            break;
-                                        case '3':
-                                            completionCode = '<span class="badge badge-light-success fw-bold px-4 py-3">처리완료</span>';
-                                            break;
-                                        default:
-                                            completionCode = '<span class="badge badge-light-secondary fw-bold px-4 py-3"></span>';
-                                            break;
+                                    if (data.completionCode === null || data.completionCode === undefined) {
+                                        completionCode = '';
+                                    } else {
+                                        switch(data.completionCode) {
+                                            case '1':
+                                                completionCode = '<span class="badge badge-light-danger fw-bold px-4 py-3">CS 접수</span>';
+                                                break;
+                                            case '2':
+                                                completionCode = '<span class="badge badge-light-warning fw-bold px-4 py-3">처리중</span>';
+                                                break;
+                                            case '3':
+                                                completionCode = '<span class="badge badge-light-success fw-bold px-4 py-3">처리완료</span>';
+                                                break;
+                                            default:
+                                                completionCode = '<span class="badge badge-light-secondary fw-bold px-4 py-3"></span>';
+                                                break;
+                                        }
                                     }
                                     tbody.append(
                                         '<tr class="fs-6" style="border-bottom: 1px solid #ddd;">' +

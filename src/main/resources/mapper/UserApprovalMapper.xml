@@ -4,21 +4,24 @@
 
     <select id="findByConfirmYn" resultType="com.wio.crm.model.UserApproval">
         SELECT
-            b.CUST_NAME as custName,
-            b.EMP_NAME as username,
-            a.userid,
-            a.id,
-            a.insert_time as insertTime,
-            a.confirm_yn as confirmYn,
-            b.EMAIL as email
+        b.CUST_NAME as custName,
+        b.EMP_NAME as username,
+        a.userid,
+        a.id,
+        a.insert_time as insertTime,
+        a.confirm_yn as confirmYn,
+        b.EMAIL as email
         FROM
-            N_TIPDW A, N_TCNT01_EMP_TEMP B
+        N_TIPDW A, N_TCNT01_EMP_TEMP B
         WHERE
-            A.GUBN = '1'
-          AND A.CONFIRM_YN = 'N'
-          AND A.USERID = B.USERID
+        A.GUBN = '1'
+        and a.userid=b.userid
+        <if test="status != null and status != 'ALL'">
+            AND A.CONFIRM_YN = #{status}
+        </if>
+
         ORDER BY
-            A.INSERT_TIME DESC
+        A.INSERT_TIME DESC
     </select>
 
     <select id="findById" resultType="com.wio.crm.model.UserApproval">
@@ -36,10 +39,20 @@
           AND A.USERID = B.USERID
     </select>
 
-    <update id="updateUserApproval" parameterType="com.wio.crm.model.UserApproval">
-        UPDATE N_TIPDW
-        SET CONFIRM_YN = #{confirmYn},
-            CONFIRM_TIME = #{confirmTime}
-        WHERE ID = #{id}
-    </update>
+    <insert id="insertEmpData" parameterType="map">
+        INSERT INTO N_TCNT01_EMP
+            (CUST_CODE, EMPNO, EMP_NAME, ID, PW, USE_YN, IN_DATE, IN_EMPNO, USERID)
+        VALUES
+            (#{companyCode, jdbcType=VARCHAR},
+             #{EMPNO, jdbcType=VARCHAR},
+             #{EMP_NAME, jdbcType=VARCHAR},
+             #{ID, jdbcType=VARCHAR},
+             #{PW, jdbcType=VARCHAR},
+             '1',
+             sysdate,
+             #{IN_EMPNO, jdbcType=VARCHAR},
+             #{USERID, jdbcType=VARCHAR})
+    </insert>
+
+
 </mapper>

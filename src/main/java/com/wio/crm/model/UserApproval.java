@@ -34,6 +34,16 @@ public class UserApproval {
     private String custName;
     private String addr2;
 
+    private String custCode;
+
+    public String getCustCode() {
+        return custCode;
+    }
+
+    public void setCustCode(String custCode) {
+        this.custCode = custCode;
+    }
+
     // Getters and Setters
     public String getId() {
         return id;
