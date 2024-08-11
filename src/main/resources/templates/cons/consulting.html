@@ -4,6 +4,93 @@
       layout:decorate="~{main}">
 
 <div layout:fragment="content">
+    <style>
+        /* 테이블 셀 내부 여백을 추가하여 가독성 개선 */
+        table td, table th {
+            padding: 12px 8px;
+        }
+
+        /* 구분 셀에 컬러 배지 추가 */
+        .badge {
+            font-size: 0.875rem;
+            padding: 0.4em 0.7em;
+            border-radius: 0.25rem;
+        }
+
+        .badge-light-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-light-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .badge-light-warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        /* 카드 스타일 추가 */
+        .card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* 강조된 텍스트 색상 */
+        .text-gray-800 {
+            color: #343a40;
+        }
+
+        .text-info {
+            color: #17a2b8;
+        }
+
+        /* 테이블 헤더 디자인 */
+        thead th {
+            background-color: #f1f3f4;
+            color: #495057;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        /* 테이블 행 간격 추가 */
+        tbody tr {
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        /* 카드 내부 요소 간의 간격 */
+        .d-flex.justify-content-between {
+            margin-bottom: 0.5rem;
+        }
+
+        /* 버튼 스타일 개선 */
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: #fff;
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+            border-radius: 0.2rem;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+    </style>
     <script src="/assets/plugins/global/plugins.bundle.js"></script>
     <div class="app-main flex-column flex-row-fluid" id="kt_app_main">
         <!--begin::Content wrapper-->
@@ -312,11 +399,9 @@
                                                 <label for="floatingTextarea2">Comments</label>
                                             </div>
                                             <div class="flex-shrink-0">
-                                                <select id="completionCodeSelect" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Status" data-hide-search="true" >
-                                                    <option value="1">CS 접수</option>
-                                                    <option value="2">처리중</option>
-                                                    <option value="3">처리완료</option>
-                                                </select>
+                                                <div class="d-flex flex-column mb-5 fv-row">
+                                                    <!-- 셀렉트 박스가 여기에 동적으로 추가됩니다 -->
+                                                </div>
                                                     <button type="button" id="addCommentButton" class="btn btn-sm btn-primary">등록</button>
 
                                             </div>
@@ -464,24 +549,24 @@
                                     var prcNoteFormatted = data.prcNote ? data.prcNote.replace(/\n/g, '<br>') : '';
 
                                     var emgGubnBadge = data.emgGubn == '1' ?
-                                        '<span class="badge badge-light-danger fw-bold px-4 py-3">긴급</span>' :
-                                        '<span class="badge badge-light-success fw-bold px-4 py-3">일반</span>';
+                                        '<span class="badge badge-light-danger">긴급</span>' :
+                                        '<span class="badge badge-light-success">일반</span>';
                                     var completionCode;
                                     if (data.completionCode === null || data.completionCode === undefined) {
                                         completionCode = '';
                                     } else {
                                         switch(data.completionCode) {
                                             case '1':
-                                                completionCode = '<span class="badge badge-light-danger fw-bold px-4 py-3">CS 접수</span>';
+                                                completionCode = '<span class="badge badge-light-warning">CS 접수</span>';
                                                 break;
                                             case '2':
-                                                completionCode = '<span class="badge badge-light-warning fw-bold px-4 py-3">처리중</span>';
+                                                completionCode = '<span class="badge badge-light-warning">처리중</span>';
                                                 break;
                                             case '3':
-                                                completionCode = '<span class="badge badge-light-success fw-bold px-4 py-3">처리완료</span>';
+                                                completionCode = '<span class="badge badge-light-success">처리완료</span>';
                                                 break;
                                             default:
-                                                completionCode = '<span class="badge badge-light-secondary fw-bold px-4 py-3"></span>';
+                                                completionCode = '<span class="badge badge-light-secondary"></span>';
                                                 break;
                                         }
                                     }
@@ -491,7 +576,7 @@
                                         '<div class="d-flex flex-column">' +
                                         // 상단 데이터
                                         '<div class="d-flex justify-content-between" style="text-align: left;">' +
-                                        '<div style="width: 14%; text-align: left;">' + emgGubnBadge + completionCode+'</div>' +
+                                        '<div style="width: 14%; text-align: left;">' + emgGubnBadge +' '+ completionCode+'</div>' +
                                         '<div style="width: 14%; text-align: left;">' + data.inDate + '</div>' +
                                         '<div style="width: 14%; text-align: left;">' + data.inTime + '</div>' +
                                         '<div style="width: 14%; text-align: left;">' + data.empNo + '</div>' +
@@ -506,7 +591,7 @@
                                         '<div class="d-flex flex-column" style="width: 28%; text-align: left;">' +
                                         '<div class="mb-1 text-gray-800 text-hover-primary">' + csNoteFormatted + '</div>' +
                                         '</div>' +
-                                        '<div style="width: 28%; text-align: center;" colspan="2">' +
+                                        '<div style="width: 28%; text-align: left;" colspan="2">' +
                                         '<div class="fw-semibold fs-6 text-gray-500">' + prcNoteFormatted + '</div>' +
                                         '</div>' +
                                         '<div style="width: 14%; text-align: center;">' + data.countRe + '</div>' +
@@ -563,10 +648,10 @@
                                 var completionCode;
                                 switch(data.completionCode) {
                                     case '1':
-                                        completionCode = '<span class="badge badge-light-danger fw-bold px-4 py-3">CS 접수</span>';
+                                        completionCode = '<span class="badge badge-light-warning fw-bold px-4 py-3">CS 접수</span>';
                                         break;
                                     case '2':
-                                        completionCode = '<span class="badge badge-light-warning fw-bold px-4 py-3">처리중</span>';
+                                        completionCode = '<span class="badge badge-light-secondary fw-bold px-4 py-3">처리중</span>';
                                         break;
                                     case '3':
                                         completionCode = '<span class="badge badge-light-success fw-bold px-4 py-3">처리완료</span>';
@@ -577,7 +662,7 @@
                                 }
                                 // Set modal header with badge
                                 $('#kt_modal_new_address_header').html(
-                                    '<h2>상담 내역 상세 ' + emgGubnBadge + completionCode+'</h2>' +
+                                    '<h2>상담 내역 상세 ' + emgGubnBadge +' '+ completionCode+'</h2>' +
                                     '<div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">' +
                                     '<i class="ki-duotone ki-cross fs-1">' +
                                     '<span class="path1"></span>' +
@@ -596,7 +681,7 @@
                                 $('#kt_modal_new_address').find('#csDate').text( safeValue(data.csDate));
                                 $('#kt_modal_new_address').find('#csCash').text(safeValue(data.csCash));
                                 // Set the select value for completionCode
-                                $('#kt_modal_new_address').find('#completionCodeSelect').val(data.completionCode);
+
 
                                 $('#kt_modal_new_address').find('textarea[name="csNote"]').val(safeValue(data.csNote));
                                 $('#kt_modal_new_address').find('textarea[name="prcNote"]').val(safeValue(data.prcNote));
@@ -622,6 +707,42 @@
                                     var historyRow  =`<tr><td>${historyItem.inDate} / ${historyItem.inTime}</td><td>${safeValue(historyItem.csNote)}</td><td>${safeValue(historyItem.prcNote)}</td></tr>`;
                                     historyTableBody.append(historyRow);
                                 });
+
+                                // COMPLETION_CODE에 따라 셀렉트 박스 표시 여부 결정
+                                console.log("Completion Code:", response.completionCode);
+
+                                // COMPLETION_CODE에 따라 셀렉트 박스 생성 또는 제거
+                                var completionCodeContainer = $('.d-flex.flex-column.mb-5.fv-row').eq(2);
+                                completionCodeContainer.empty(); // 기존 내용 제거
+
+                                if (response.completionCode !== null && response.completionCode !== undefined && response.completionCode !== '') {
+                                    var select = $('<select>', {
+                                        id: 'completionCodeSelect',
+                                        class: 'form-select form-select-solid',
+                                        'data-control': 'select2',
+                                        'data-placeholder': 'Select Status',
+                                        'data-hide-search': 'true'
+                                    });
+
+                                    var options = [
+                                        {value: '1', text: 'CS 접수'},
+                                        {value: '2', text: '처리중'},
+                                        {value: '3', text: '처리완료'}
+                                    ];
+
+                                    options.forEach(function(option) {
+                                        select.append($('<option>', {
+                                            value: option.value,
+                                            text: option.text
+                                        }));
+                                    });
+
+                                    select.val(response.completionCode);
+                                    completionCodeContainer.append(select);
+
+                                    // Select2 초기화 (필요한 경우)
+                                    select.select2();
+                                }
                             },
                             error: function(error) {
                                 console.log('Error fetching data:', error);

@@ -94,6 +94,8 @@ public class ConController {
         response.put("data", consultation);
         response.put("total", comments);
         response.put("history", history);
+        // COMPLETION_CODE 값을 별도로 포함
+        response.put("completionCode", consultation.getCompletionCode());
         return ResponseEntity.ok(response);
     }
 
