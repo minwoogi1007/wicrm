@@ -142,7 +142,9 @@
         TBND01.PERSON_CODE = TBND01_CUST.PERSON_CODE AND
         TBND01.CALL_CODE = TBND01_CUST.CALL_CODE
         WHERE TBND01.CUST_CODE = #{params.custCode}
-          AND TBND01.PRC_GUBN NOT IN ('3','4')
+        <![CDATA[
+        AND TBND01.PRC_GUBN <> '4'
+                ]]>
         ) main_query
         WHERE
         (main_query.EMG_GUBN = '1' OR TO_CHAR(main_query.IN_DATE, 'YYYYMMDD') BETWEEN #{params.startDate} AND #{params.endDate})
@@ -202,7 +204,9 @@
         TBND01.PERSON_CODE = TBND01_CUST.PERSON_CODE AND
         TBND01.CALL_CODE = TBND01_CUST.CALL_CODE
         WHERE TBND01.CUST_CODE = #{params.custCode}
-        AND TBND01.PRC_GUBN NOT IN ('3','4')
+        <![CDATA[
+        AND TBND01.PRC_GUBN <> '4'
+                ]]>
         ) main_query
         WHERE
         (main_query.EMG_GUBN = '1' OR TO_CHAR(main_query.IN_DATE, 'YYYYMMDD') BETWEEN #{params.startDate} AND #{params.endDate})
@@ -287,7 +291,9 @@
         FROM TBND01
         WHERE CUST_CODE = #{params.custCode}
         AND EMG_GUBN = '1'
-        AND PRC_GUBN NOT IN ('3','4')
+        <![CDATA[
+        AND TBND01.PRC_GUBN <> '4'
+                ]]>
         <if test="params.status != null and params.status != ''">
             AND PRC_GUBN = #{params.status}
         </if>

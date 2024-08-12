@@ -23,7 +23,7 @@ public interface UserApprovalMapper {
     Map<String, Object> getEmpTempData(@Param("userId") String userId);
 
     // Generate new EMPNO
-    @Select("SELECT 'T'|| LPAD( nvl(max(substr(EMPNO,2,9)),0)+1 ,9,0) FROM N_TCNT01_EMP")
+    @Select("SELECT 'E'|| LPAD( nvl(max(substr(EMPNO,2,9)),0)+1 ,9,0) FROM N_TCNT01_EMP")
     String generateNewEmpNo();
 
     // Insert data into N_TCNT01_EMP
