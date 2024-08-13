@@ -3,6 +3,7 @@ package com.wio.crm.service;
 import com.wio.crm.config.CustomUserDetails;
 import com.wio.crm.mapper.ConsMapper;
 import com.wio.crm.model.Comment;
+import com.wio.crm.model.CompletionCode;
 import com.wio.crm.model.Consultation;
 import com.wio.crm.model.History;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -133,6 +134,8 @@ public class ConService {
         consMapper.insertComment(comment);
     }
 
-
+    public void updateCompletionCode(CompletionCode request) {
+        consMapper.updateCompletionCode(request);
+    }
 }
 

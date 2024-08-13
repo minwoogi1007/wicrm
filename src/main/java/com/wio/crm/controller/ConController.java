@@ -2,6 +2,7 @@ package com.wio.crm.controller;
 
 import com.wio.crm.Entity.AdminCode;
 import com.wio.crm.model.Comment;
+import com.wio.crm.model.CompletionCode;
 import com.wio.crm.model.Consultation;
 import com.wio.crm.model.History;
 import com.wio.crm.service.AdminCodeService;
@@ -10,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -104,7 +106,15 @@ public class ConController {
         conService.addComment(request);
         return ResponseEntity.ok().build();
     }
-
+    @PostMapping("/api/consultations/updateCompletionCode")
+    public ResponseEntity<String> updateCompletionCode(@RequestBody CompletionCode request) {
+        try {
+            conService.updateCompletionCode(request);
+            return ResponseEntity.ok("Completion code updated successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating completion code: " + e.getMessage());
+        }
+    }
     @GetMapping("/api/consultations/excel")
     public void downloadExcel(@RequestParam String startDate,
                               @RequestParam String endDate,

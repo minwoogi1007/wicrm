@@ -207,11 +207,6 @@ public class BoardController {
             @RequestParam("REPLY_DEPTH") String replyDepth) {
 
         // 각 파라미터가 잘 넘어오는지 확인
-        System.out.println("GNO============" + gno);
-        System.out.println("UNO============" + uno);
-        System.out.println("CAT_GROUP============" + catGroup);
-        System.out.println("CONTENT============" + content);
-        System.out.println("REPLY_DEPTH============" + replyDepth);
 // 현재 날짜와 시간을 특정 형식으로 설정
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String formattedDate = dateFormat.format(new Date());
@@ -229,6 +224,14 @@ public class BoardController {
         board.setID(savedComment.getID());
 
         return ResponseEntity.ok(savedComment);
+    }
+
+    @GetMapping("/board/edit")
+    public String editPost(@RequestParam("id") String id, Model model) {
+        Board post = boardService.selectPostById(id);
+
+        model.addAttribute("post", post);
+        return "board/editBoard";
     }
 
 }

@@ -1,6 +1,7 @@
 package com.wio.crm.mapper;
 
 import com.wio.crm.model.Comment;
+import com.wio.crm.model.CompletionCode;
 import com.wio.crm.model.Consultation;
 import com.wio.crm.model.History;
 import org.apache.ibatis.annotations.Mapper;
@@ -30,6 +31,8 @@ public interface ConsMapper {
     List<History> getHistory(@Param("params") Map<String, Object> params);
 
     void insertComment(@Param("comment") Comment comment);
+
+    void updateCompletionCode(@Param("completionCode") CompletionCode completionCode);
 
 
 }

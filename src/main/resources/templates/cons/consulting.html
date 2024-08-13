@@ -368,6 +368,7 @@
                                             <input type="hidden" id="hpersonCode">
                                             <input type="hidden" id="hprojectCode">
                                             <input type="hidden" id="hcustCode">
+                                            <input type="hidden" id="originalCompletionCode" name="originalCompletionCode" value="">
                                             </tbody>
                                         </table>
                                     </div>
@@ -691,7 +692,8 @@
                                 $('#kt_modal_new_address').find('#hpersonCode').val(data.personCode);
                                 $('#kt_modal_new_address').find('#hprojectCode').val(data.projectCode);
                                 $('#kt_modal_new_address').find('#hcustCode').val(data.custCode);
-
+                                $('#kt_modal_new_address').find('#completionCode').val(data.custCode);
+                                $('#kt_modal_new_address').find('#originalCompletionCode').val(response.completionCode);
                                 // Fill comments list
                                 var commentsList = $('#kt_modal_new_address').find('#commentsList');
                                 commentsList.empty();
@@ -739,6 +741,8 @@
                                     });
 
                                     select.val(response.completionCode);
+                                    // 원래의 completionCode 값을 hidden input에 저장
+                                    $('#originalCompletionCode').val(response.completionCode);
                                     completionCodeContainer.append(select);
 
                                     // Select2 초기화 (필요한 경우)
@@ -780,6 +784,15 @@
                         var custCode = $('#kt_modal_new_address').find('#hcustCode').val();
                         var newComment = $('textarea[name="newComment"]').val();
 
+                        var completionCode = $('#kt_modal_new_address').find('#completionCodeSelect').val();
+                        var originalCompletionCode = $('#kt_modal_new_address').find('#originalCompletionCode').val();
+
+                        var newComment = $('#kt_modal_new_address').find('textarea[name="newComment"]').val().trim();
+                        if (newComment === '') {
+                            alert('댓글을 입력하세요.');
+                            return;
+                        }
+
                         //console.log(callCode + ' ' + personCode + ' ' + projectCode + ' ' + custCode + ' ' + newComment);
 
                         var formData = {
@@ -787,44 +800,44 @@
                             personCode: personCode,
                             projectCode: projectCode,
                             custCode: custCode,
-                            conText: newComment
+                            conText: newComment,
+                            completionCode: completionCode
                         };
 
                         $.ajax({
+
                             url: '/api/consultations/addComment',
                             type: 'POST',
                             contentType: 'application/json', // Set Content-Type to application/json
                             data: JSON.stringify(formData), // Convert formData to JSON string
                             success: function(response) {
+                                console.log('completionCode:', completionCode);
+                                console.log('originalCompletionCode:', originalCompletionCode);
+
                                 // Refresh comments list
-                                $.ajax({
-                                    url: '/api/consultations/details',
-                                    type: 'GET',
-                                    data: {
-                                        callCode: callCode,
-                                        personCode: personCode,
-                                        projectCode: projectCode,
-                                        custCode: custCode
-                                    },
-                                    success: function(response) {
-                                        var comments = response.total;
+                                if (completionCode !== originalCompletionCode) {
+                                    $.ajax({
+                                        url: '/api/consultations/updateCompletionCode',
+                                        type: 'POST',
+                                        contentType: 'application/json',
+                                        data: JSON.stringify({
+                                            callCode: callCode,
+                                            personCode: personCode,
+                                            projectCode: projectCode,
+                                            custCode: custCode,
+                                            completionCode: completionCode
+                                        }),
+                                        success: function(updateResponse) {
+                                            console.log('TBND01_CUST updated successfully');
+                                            $('#kt_modal_new_address').find('#originalCompletionCode').val(completionCode);
+                                        },
+                                        error: function(updateError) {
+                                            console.log('Error updating TBND01_CUST:', updateError);
+                                        }
+                                    });
+                                }
 
-                                        // Fill comments list
-                                        var commentsList = $('#kt_modal_new_address').find('#commentsList');
-                                        commentsList.empty();
-                                        comments.forEach(function(comment) {
-                                            var commentItem = '<div class="comment-item mb-2 p-2" style="background-color: #f0f0f0;"><p><strong>' +
-                                                comment.inDate + ' ' + comment.userId + '</strong>: ' + comment.conText + '</p></div>';
-                                            commentsList.append(commentItem);
-                                        });
-
-                                        // Clear new comment textarea
-                                        $('textarea[name="newComment"]').val('');
-                                    },
-                                    error: function(error) {
-                                        console.log('Error refreshing comments:', error);
-                                    }
-                                });
+                                refreshComments(callCode, personCode, projectCode, custCode);
                             },
                             error: function(error) {
                                 console.log('Error adding comment:', error);
@@ -859,8 +872,41 @@
                         });
                         window.location.href = '/api/consultations/excel?' +formData;
                     });
+
+                    // 모달 닫힘 이벤트 리스너 추가
+                    $('#kt_modal_new_address').on('hidden.bs.modal', function () {
+                        var currentPage = $('#currentPage').val() || 1; // 현재 페이지 번호 가져오기
+                        loadPage(currentPage); // 현재 페이지 번호로 loadPage 호출
+                    });
                 });
 
+
+                function refreshComments(callCode, personCode, projectCode, custCode) {
+                    $.ajax({
+                        url: '/api/consultations/details',
+                        type: 'GET',
+                        data: {
+                            callCode: callCode,
+                            personCode: personCode,
+                            projectCode: projectCode,
+                            custCode: custCode
+                        },
+                        success: function(response) {
+                            var comments = response.total;
+                            var commentsList = $('#kt_modal_new_address').find('#commentsList');
+                            commentsList.empty();
+                            comments.forEach(function(comment) {
+                                var commentItem = '<div class="comment-item mb-2 p-2" style="background-color: #f0f0f0;"><p><strong>' +comment.inDate +'  ' +comment.userId + '</strong>: ' + comment.conText + '</p></div>';
+
+                                commentsList.append(commentItem);
+                            });
+                            $('textarea[name="newComment"]').val('');
+                        },
+                        error: function(error) {
+                            console.log('Error refreshing comments:', error);
+                        }
+                    });
+                }
             </script>
 
         </div>

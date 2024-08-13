@@ -100,8 +100,9 @@
                  )
     </insert>
     <insert id="insertComment" parameterType="com.wio.crm.model.Board">
-        INSERT INTO N_TIPDW (ID,PW,GUBN,INSERT_TIME,CONFIRM_YN,CONFIRM_TIME,CONFIRM_EMP,USERID,USERNAME,REPASS)VALUES
-            ('GWELL9',)
+       INSERT INTO BOARD_CALL (GNO, UNO,REPLY_DEPTH, CAT_GROUP, CONTENT, HIT, ID, IN_DATE)
+        VALUES (#{GNO}, #{UNO}, #{REPLY_DEPTH},#{CAT_GROUP}, #{CONTENT}, 0,#{ID}, #{IN_DATE})
+
     </insert>
     <select id="getNextUno" resultType="int">
         SELECT NVL(MAX(UNO), 0) + 1

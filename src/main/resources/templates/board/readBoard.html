@@ -106,9 +106,15 @@
                             </div>
                             <div class="separator separator-dashed mb-9"></div>
                             <!-- 주요 포스트 끝 -->
-                            <div class="mb-15">
-                                <button type="button" id="listBack" class="btn btn-sm btn-primary">목록</button>
+                            <div class="mb-15 d-flex justify-content-start align-items-center">
+                                <button type="button" id="listBack" class="btn btn-sm btn-primary me-2">목록</button>
+                                <div th:if="${session.loginUserId == post.ID}">
+                                    <a th:href="@{/board/edit(id=${post.UNO})}" class="btn btn-sm btn-success">수정</a>
+                                </div>
                             </div>
+                            <!-- 로그인 사용자와 글쓴이가 같을 경우 수정 버튼 표시 -->
+
+
                         </div>
 
                         <!-- 최신 포스트 끝 -->
@@ -174,6 +180,7 @@
                             $('#commentsTable').append(newComment);
                             $('#floatingTextarea2').val("");
                             alert("댓글이 등록되었습니다.");
+                            location.reload();
                         },
                         error: function(error) {
                             console.error("Error adding comment:", error.responseText);
