@@ -199,6 +199,7 @@
         TBND01.BUY_GUBN,
         TBND01.CS_NOTE,
         TBND01.PRC_NOTE,
+        TBND01.RECALL_CUST,
         TBND01_CUST.COMPLETION_CODE
         FROM TBND01
         LEFT JOIN TBND01_CUST ON
@@ -207,149 +208,206 @@
         TBND01.PERSON_CODE = TBND01_CUST.PERSON_CODE AND
         TBND01.CALL_CODE = TBND01_CUST.CALL_CODE
         WHERE TBND01.CUST_CODE = #{params.custCode}
-        <![CDATA[
-        AND TBND01.PRC_GUBN <> '4'
-                ]]>
-        ) main_query
-        WHERE
-        (main_query.EMG_GUBN = '1' OR TO_CHAR(main_query.IN_DATE, 'YYYYMMDD') BETWEEN #{params.startDate} AND #{params.endDate})
+        AND (
+        TBND01.EMG_GUBN = '1'
+        OR (
+        TO_CHAR(TBND01.IN_DATE, 'YYYYMMDD') BETWEEN #{params.startDate} AND #{params.endDate}
         <if test="params.status != null and params.status != ''">
-            AND main_query.PRC_GUBN = #{params.status}
+            AND TBND01.PRC_GUBN = #{params.status}
         </if>
         <if test="params.type != null and params.type != ''">
-            AND main_query.CS_TYPE = #{params.type}
+            AND TBND01.CS_TYPE = #{params.type}
         </if>
         <if test="params.mall != null and params.mall != ''">
-            AND main_query.BUY_GUBN = #{params.mall}
+            AND TBND01.BUY_GUBN = #{params.mall}
         </if>
         <if test="params.custStat != null and params.custStat != ''">
-            AND main_query.COMPLETION_CODE = #{params.custStat}
+            AND TBND01_CUST.COMPLETION_CODE = #{params.custStat}
         </if>
         <if test="params.keyword != null and params.keyword != ''">
-            AND (main_query.CS_NOTE LIKE '%' || #{params.keyword} || '%'
-            OR main_query.PRC_NOTE LIKE '%' || #{params.keyword} || '%')
+            AND (TBND01.CS_NOTE LIKE '%' || #{params.keyword} || '%'
+            OR TBND01.PRC_NOTE LIKE '%' || #{params.keyword} || '%')
         </if>
-        <if test="params.filter != null and params.filter == 'emergency'">
-            AND main_query.EMG_GUBN = '1'
+        )
+        )
+        <if test="params.filter != null">
+            <choose>
+                <when test="params.filter == 'emergency'">
+                    AND TBND01.EMG_GUBN = '1'
+                </when>
+                <when test="params.filter == 'claim'">
+                    AND TBND01.RECALL_CUST = '1'
+                </when>
+                <when test="params.filter == 'normal'">
+                    AND TBND01.EMG_GUBN != '1' AND TBND01.RECALL_CUST != '1'
+                </when>
+            </choose>
         </if>
-        <if test="params.filter != null and params.filter == 'claim'">
-            AND main_query.CS_TYPE = '29'
-        </if>
-        <if test="params.filter != null and params.filter == 'normal'">
-            AND main_query.EMG_GUBN = '0'
-        </if>
+        ) subquery
     </select>
     <select id="selectAllForExcel" resultType="com.wio.crm.model.Consultation">
-        SELECT CUST_CODE as custCode,
-        PROJECT_CODE as projectCode,
-        (SELECT PROJECT_NAME FROM TPRJ01 WHERE PROJECT_CODE=main_query.PROJECT_CODE AND CUST_CODE = #{params.custCode}) as projectName,
-        PERSON_CODE as personCode,
-        CALL_CODE as callCode,
-        NVL((SELECT PERSON_NAME FROM TPER01 WHERE PERSON_CODE = main_query.PERSON_CODE AND CUST_CODE = #{params.custCode}), ' ') as empNo,
-        (SELECT TEL_NO FROM TPER01 WHERE PERSON_CODE=main_query.PERSON_CODE AND CUST_CODE = #{params.custCode} ) as custTell,
-        INCALL_NO as incallNo,
-        OUTCALL_NO as outcallNo,
-        RING_TIME as ringTime,
-        RING_ID as ringId,
-        CHANNEL_TIME as channelTime,
-        CHANNEL_ID as channelId,
-        OUT_TIME as outTime,
-        OUT_ID as outId,
-        (SELECT ADM_SNAME FROM TSYS01 WHERE ADM_GUBN='4002'AND  ADM_CODE=main_query.CS_TYPE) as csType,
-        CS_NOTE as csNote,
-        CS_DATE as csDate,
-        CS_BANK as csBank,
-        CS_NAME as csName,
-        CS_CASH as csCash,
-        (SELECT ADM_SNAME FROM TSYS01 WHERE ADM_GUBN='4003'AND  ADM_CODE=main_query.PRC_GUBN) as prcGubn,
-        PRC_NOTE as prcNote,
-        EMG_GUBN as emgGubn,
-        RECALL_EMP as recallEmp,
-        RECALL_CUST as recallCust,
-        SAUP_GUBN as saupGubn,
-        DEL_GUBN as delGubn,
-        TO_CHAR(IN_DATE,'YYYYMMDD') as inDate,
-        TO_CHAR(IN_DATE, 'HH24:MI:SS')as inTime,
-        IN_EMPNO as inEmpno,
-        UP_DATE as up_Date,
-        UP_EMPNO as upEmpno,
-        (SELECT ADM_SNAME FROM TSYS01 WHERE ADM_GUBN='5000'AND  ADM_CODE=main_query.BUY_GUBN)  as buyGubn,
-        NEW_CS_TYPE as newCsType,
-        NEW_CS_SUB_TYPE as newCsSubType,
-        BUY_TYPE as buyType,
-        COMPLETION_CODE as completionCode,
-        (SELECT COUNT(*)
-        FROM TBND01_MEMO
-        WHERE CUST_CODE =main_query.CUST_CODE
-        AND PROJECT_CODE=main_query.PROJECT_CODE
-        AND PERSON_CODE=main_query.PERSON_CODE
-        AND CALL_CODE =main_query.CALL_CODE) COUNTRE,
-        rnum
-        FROM (
-        SELECT TBND01.*, ROW_NUMBER() OVER (
-        ORDER BY CASE WHEN EMG_GUBN = '1' THEN 0 ELSE 1 END, IN_DATE DESC
-        ) AS rnum
-        FROM (
-        SELECT TBND01.*
+        WITH filtered_consultations AS (
+        SELECT
+        TBND01.CUST_CODE,
+        TBND01.PROJECT_CODE,
+        TBND01.PERSON_CODE,
+        TBND01.CALL_CODE,
+        TBND01.EMPNO,
+        TBND01.INCALL_NO,
+        TBND01.OUTCALL_NO,
+        TBND01.RING_TIME,
+        TBND01.RING_ID,
+        TBND01.CHANNEL_TIME,
+        TBND01.CHANNEL_ID,
+        TBND01.OUT_TIME,
+        TBND01.OUT_ID,
+        TBND01.CS_TYPE,
+        TBND01.CS_NOTE,
+        TBND01.CS_DATE,
+        TBND01.CS_BANK,
+        TBND01.CS_NAME,
+        TBND01.CS_CASH,
+        TBND01.PRC_GUBN,
+        TBND01.PRC_NOTE,
+        TBND01.EMG_GUBN,
+        TBND01.RECALL_EMP,
+        TBND01.RECALL_CUST,
+        TBND01.SAUP_GUBN,
+        TBND01.DEL_GUBN,
+        TBND01.IN_DATE,
+        TBND01.IN_EMPNO,
+        TBND01.UP_DATE,
+        TBND01.UP_EMPNO,
+        TBND01.BUY_GUBN,
+        TBND01.NEW_CS_TYPE,
+        TBND01.NEW_CS_SUB_TYPE,
+        TBND01.BUY_TYPE,
+        TBND01_CUST.COMPLETION_CODE,
+        CASE WHEN TBND01.EMG_GUBN = '1' THEN 1 ELSE 2 END AS priority
         FROM TBND01
-        WHERE CUST_CODE = #{params.custCode}
-        AND EMG_GUBN = '1'
-        <![CDATA[
-        AND TBND01.PRC_GUBN <> '4'
-                ]]>
+        LEFT JOIN TBND01_CUST ON
+        TBND01.CUST_CODE = TBND01_CUST.CUST_CODE AND
+        TBND01.PROJECT_CODE = TBND01_CUST.PROJECT_CODE AND
+        TBND01.PERSON_CODE = TBND01_CUST.PERSON_CODE AND
+        TBND01.CALL_CODE = TBND01_CUST.CALL_CODE
+        WHERE TBND01.CUST_CODE = #{params.custCode}
+        AND (
+        TBND01.EMG_GUBN = '1'
+        OR (
+        TO_CHAR(TBND01.IN_DATE, 'YYYYMMDD') BETWEEN #{params.startDate} AND #{params.endDate}
         <if test="params.status != null and params.status != ''">
-            AND PRC_GUBN = #{params.status}
+            AND TBND01.PRC_GUBN = #{params.status}
         </if>
         <if test="params.type != null and params.type != ''">
-            AND CS_TYPE = #{params.type}
+            AND TBND01.CS_TYPE = #{params.type}
         </if>
         <if test="params.mall != null and params.mall != ''">
-            AND BUY_GUBN = #{params.mall}
+            AND TBND01.BUY_GUBN = #{params.mall}
         </if>
         <if test="params.custStat != null and params.custStat != ''">
-            AND COMPLETION_CODE = #{params.custStat}
+            AND TBND01_CUST.COMPLETION_CODE = #{params.custStat}
         </if>
-        <if test="params.status != null and params.status != ''
-                        or params.type != null and params.type != ''
-                        or params.mall != null and params.mall != ''
-                        or params.custStat != null and params.custStat != ''">
-            AND TO_CHAR(IN_DATE, 'YYYYMMDD') BETWEEN #{params.startDate} AND #{params.endDate}
-        </if>
-        UNION ALL
-        SELECT TBND01.*
-        FROM TBND01
-        WHERE CUST_CODE = #{params.custCode}
-        <![CDATA[
-                    AND EMG_GUBN <> '1'
-                ]]>
-        <if test="params.status != null and params.status != ''">
-            AND PRC_GUBN = #{params.status}
-        </if>
-        <if test="params.type != null and params.type != ''">
-            AND CS_TYPE = #{params.type}
-        </if>
-        <if test="params.mall != null and params.mall != ''">
-            AND BUY_GUBN = #{params.mall}
-        </if>
-        <if test="params.custStat != null and params.custStat != ''">
-            AND COMPLETION_CODE = #{params.custStat}
-        </if>
-        AND TO_CHAR(IN_DATE, 'YYYYMMDD') BETWEEN #{params.startDate} AND #{params.endDate}
-        ) TBND01
-        where 1=1
         <if test="params.keyword != null and params.keyword != ''">
-            AND (CS_NOTE LIKE '%' || #{params.keyword} || '%' OR PRC_NOTE LIKE '%' || #{params.keyword} || '%')
-        </if>-- 하위 쿼리에 별칭 추가
-        <if test="params.filter != null and params.filter == 'emergency'">
-            AND EMG_GUBN = '1'
+            AND (TBND01.CS_NOTE LIKE '%' || #{params.keyword} || '%'
+            OR TBND01.PRC_NOTE LIKE '%' || #{params.keyword} || '%')
         </if>
-        <if test="params.filter != null and params.filter == 'claim'">
-            AND CS_TYPE = '29'
+        )
+        )
+        <if test="params.filter != null">
+            <choose>
+                <when test="params.filter == 'emergency'">
+                    AND TBND01.EMG_GUBN = '1'
+                </when>
+                <when test="params.filter == 'claim'">
+                    AND TBND01.RECALL_CUST = '1'
+                </when>
+                <when test="params.filter == 'normal'">
+                    AND TBND01.EMG_GUBN != '1' AND TBND01.RECALL_CUST != '1'
+                </when>
+            </choose>
         </if>
-        <if test="params.filter != null and params.filter == 'normal'">
-            AND EMG_GUBN = '0'
-        </if>
-        ) main_query
+        )
+        SELECT
+        fc.CUST_CODE as custCode,
+        fc.PROJECT_CODE as projectCode,
+        (
+        SELECT PROJECT_NAME
+        FROM TPRJ01
+        WHERE PROJECT_CODE = fc.PROJECT_CODE
+        AND CUST_CODE = #{params.custCode}
+        ) as projectName,
+        fc.PERSON_CODE as personCode,
+        fc.CALL_CODE as callCode,
+        NVL(
+        (
+        SELECT PERSON_NAME
+        FROM TPER01
+        WHERE PERSON_CODE = fc.PERSON_CODE
+        AND CUST_CODE = #{params.custCode}
+        ), ' '
+        ) as empNo,
+        (
+        SELECT TEL_NO
+        FROM TPER01
+        WHERE PERSON_CODE = fc.PERSON_CODE
+        AND CUST_CODE = #{params.custCode}
+        ) as custTell,
+        fc.INCALL_NO as incallNo,
+        fc.OUTCALL_NO as outcallNo,
+        fc.RING_TIME as ringTime,
+        fc.RING_ID as ringId,
+        fc.CHANNEL_TIME as channelTime,
+        fc.CHANNEL_ID as channelId,
+        fc.OUT_TIME as outTime,
+        fc.OUT_ID as outId,
+        (
+        SELECT ADM_SNAME
+        FROM TSYS01
+        WHERE ADM_GUBN = '4002'
+        AND ADM_CODE = fc.CS_TYPE
+        ) as csType,
+        fc.CS_NOTE as csNote,
+        fc.CS_DATE as csDate,
+        fc.CS_BANK as csBank,
+        fc.CS_NAME as csName,
+        fc.CS_CASH as csCash,
+        (
+        SELECT ADM_SNAME
+        FROM TSYS01
+        WHERE ADM_GUBN = '4003'
+        AND ADM_CODE = fc.PRC_GUBN
+        ) as prcGubn,
+        fc.PRC_NOTE as prcNote,
+        fc.EMG_GUBN as emgGubn,
+        fc.RECALL_EMP as recallEmp,
+        fc.RECALL_CUST as recallCust,
+        fc.SAUP_GUBN as saupGubn,
+        fc.DEL_GUBN as delGubn,
+        TO_CHAR(fc.IN_DATE, 'YYYYMMDD') as inDate,
+        TO_CHAR(fc.IN_DATE, 'HH24:MI:SS') as inTime,
+        fc.IN_EMPNO as inEmpno,
+        fc.UP_DATE as up_Date,
+        fc.UP_EMPNO as upEmpno,
+        (
+        SELECT ADM_SNAME
+        FROM TSYS01
+        WHERE ADM_GUBN = '5000'
+        AND ADM_CODE = fc.BUY_GUBN
+        ) as buyGubn,
+        fc.NEW_CS_TYPE as newCsType,
+        fc.NEW_CS_SUB_TYPE as newCsSubType,
+        fc.BUY_TYPE as buyType,
+        fc.COMPLETION_CODE as completionCode,
+        (
+        SELECT COUNT(*)
+        FROM TBND01_MEMO
+        WHERE CUST_CODE = fc.CUST_CODE
+        AND PROJECT_CODE = fc.PROJECT_CODE
+        AND PERSON_CODE = fc.PERSON_CODE
+        AND CALL_CODE = fc.CALL_CODE
+        ) as COUNTRE
+        FROM filtered_consultations fc
+        ORDER BY fc.priority, fc.IN_DATE DESC
     </select>
     <select id="selectConsultationDetails" resultType="com.wio.crm.model.Consultation">
         SELECT

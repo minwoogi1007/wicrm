@@ -231,7 +231,7 @@ public class BoardController {
         Board post = boardService.selectPostById(id);
 
         model.addAttribute("post", post);
-        return "board/editBoard";
+        return "board/createBoard";
     }
 
 }

@@ -58,7 +58,20 @@
 	</style>
 	<meta name="_csrf" th:content="${_csrf.token}"/>
 	<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
-
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		if (/*[[${session.user == null}]]*/ true) {
+			window.location.href = '/login';
+		}
+		/*]]>*/
+		$.ajaxSetup({
+			complete: function(xhr, status) {
+				if (xhr.responseJSON && xhr.responseJSON.sessionExpired) {
+					window.location.href = '/login';
+				}
+			}
+		});
+	</script>
 </head>
 <!--end::Head-->
 <!--begin::Body-->
