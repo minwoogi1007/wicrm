@@ -24,6 +24,17 @@
 			window.top.location.replace(window.self.location.href);
 		}
 	</script>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		var loginUserId = /*[[${session.loginUserId}]]*/ null;
+		if (!loginUserId) {
+			window.location.href = '/login';
+		}
+
+		/*]]>*/
+
+	</script>
 	<!--end::Global Stylesheets Bundle-->
 	<script>// Frame-busting to prevent site from being loaded within a frame without permission (click-jacking) if (window.top != window.self) { window.top.location.replace(window.self.location.href); }</script>
 	<!-- Add these scripts in your HTML head or before the closing body tag -->
@@ -58,20 +69,7 @@
 	</style>
 	<meta name="_csrf" th:content="${_csrf.token}"/>
 	<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
-	<script th:inline="javascript">
-		/*<![CDATA[*/
-		if (/*[[${session.user == null}]]*/ true) {
-			window.location.href = '/login';
-		}
-		/*]]>*/
-		$.ajaxSetup({
-			complete: function(xhr, status) {
-				if (xhr.responseJSON && xhr.responseJSON.sessionExpired) {
-					window.location.href = '/login';
-				}
-			}
-		});
-	</script>
+
 </head>
 <!--end::Head-->
 <!--begin::Body-->
@@ -166,6 +164,13 @@
 
 <!--end::Custom Javascript-->
 <script>
+	$.ajaxSetup({
+		complete: function(xhr, textStatus) {
+			if (xhr.status === 401) {
+				window.location.href = '/login';
+			}
+		}
+	});
 	document.addEventListener('DOMContentLoaded', function() {
 		document.getElementById('downloadButton').addEventListener('click', function() {
 			var content = document.getElementById('contentToDownload');

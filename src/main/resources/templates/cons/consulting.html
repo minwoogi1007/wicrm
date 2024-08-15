@@ -90,6 +90,24 @@
             background-color: #0056b3;
             border-color: #0056b3;
         }
+        .modal-large {
+            max-width: 90%;
+            width: 90%;
+        }
+        .modal-large .modal-content {
+            height: 90vh;
+            overflow-y: auto;
+        }
+        #commentsContainer {
+            width: 90%;
+        }
+        #commentsContainer textarea {
+            width: 100%;
+        }
+        .flex-shrink-0 {
+            width: 10%;
+        }
+
     </style>
     <script src="/assets/plugins/global/plugins.bundle.js"></script>
     <div class="app-main flex-column flex-row-fluid" id="kt_app_main">
@@ -322,7 +340,7 @@
                 </div>
             </div>
             <div class="modal fade" id="kt_modal_new_address" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered mw-900px">
+                <div class="modal-dialog modal-large" role="document">
                     <div class="modal-content">
                         <form class="form" action="#" id="kt_modal_new_address_form">
                             <div class="modal-header" id="kt_modal_new_address_header">
@@ -395,12 +413,12 @@
                                     </div>
                                     <div class="d-flex flex-column mb-5 fv-row">
                                         <div class="d-flex">
-                                            <div class="form-floating flex-grow-1 me-2" id="commentsContainer">
+                                            <div class="form-floating flex-grow-1 me-2" id="commentsContainer" style="width: 85%;">
                                                 <textarea class="form-control" placeholder="댓글을 입력하세요" name="newComment" id="floatingTextarea2" style="height: 78px;"></textarea>
                                                 <label for="floatingTextarea2">Comments</label>
                                             </div>
                                             <div class="flex-shrink-0">
-                                                <div class="d-flex flex-column mb-5 fv-row">
+                                                <div class="d-flex flex-column mb-5 fv-row"  >
                                                     <!-- 셀렉트 박스가 여기에 동적으로 추가됩니다 -->
                                                 </div>
                                                     <button type="button" id="addCommentButton" class="btn btn-sm btn-primary">등록</button>

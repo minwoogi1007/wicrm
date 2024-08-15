@@ -48,6 +48,7 @@ public class SecurityConfig {
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID", "XSRF-TOKEN")
                         .permitAll());
+
         return http.build();
     }
 

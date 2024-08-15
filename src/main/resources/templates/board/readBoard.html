@@ -58,7 +58,9 @@
                         <div class="mb-15">
                             <!-- 제목 시작 -->
                             <div class="d-flex justify-content-between align-items-center text-gray-900 mb-7">
-                                <h3 th:text="${post.SUBJECT}"></h3>
+                                <h3 id="post-title-display" th:text="${post.SUBJECT}"></h3>
+                                <input type="text" id="post-title-input" name="title" class="form-control form-control-lg form-control-solid" style="display: none;" th:value="${post.SUBJECT}">
+
                                 <span class="fs-6 fw-bold text-gray-500" th:text="${post.EMPNM} + ' / ' + ${post.IN_DATE}"></span>
                             </div>
                             <!-- 제목 끝 -->
@@ -67,10 +69,21 @@
                             <!-- 구분선 끝 -->
                             <!-- 주요 포스트 시작 -->
                             <div class="row mb-10 mb-lg-18">
-                                <div th:if="${files.length > 0}">
-                                    <div th:each="file : ${files}">
-                                        <a th:href="@{/download/{filename}(filename=${file})}" download th:text="${file}"></a>
+                                <div id="file-list">
+                                    <div th:if="${not #lists.isEmpty(files)}">
+                                        <div th:each="file : ${files}" class="file-item mb-2">
+                                            <span class="file-name">
+                                                <a th:href="@{/download/{filename}(filename=${file})}" download th:text="${file}"></a>
+                                            </span>
+                                            <button class="btn btn-sm btn-danger delete-file" style="display: none;">삭제</button>
+                                        </div>
                                     </div>
+                                    <div th:if="${#lists.isEmpty(files)}">
+                                        <p>첨부된 파일이 없습니다.</p>
+                                    </div>
+                                </div>
+                                <div id="file-upload" style="display: none;">
+                                    <input type="file" id="new-file" multiple>
                                 </div>
                             </div>
                             <div class="row mb-10 mb-lg-18">
@@ -149,10 +162,12 @@
 
                 $('#editButton').click(function() {
                     isEditing = true;
+                    $('#post-title-display').hide();
+                    $('#post-title-input').show().focus();
                     $('#content-display').hide();
                     $('#editor-container').show();
                     $('#summernote').summernote({
-                        height: 550,
+                        height: 400,
                         minHeight: null,
                         maxHeight: null,
                         focus: true,
@@ -171,11 +186,14 @@
                     });
                     $('#editButton').hide();
                     $('#saveButton, #cancelButton').show();
+
                 });
 
                 // 저장 버튼 클릭 이벤트
                 $('#saveButton').click(function() {
                     var content = $('#summernote').summernote('code');
+                    var title = $('#post-title-input').val();
+                    var uno = $('#uno').val();
                     // AJAX를 사용하여 서버로 수정된 내용 전송
                     // 성공 시 아래 코드 실행
                     $('#content-display').html(content).show();
@@ -189,6 +207,8 @@
                 // 취소 버튼 클릭 이벤트
                 $('#cancelButton').click(function() {
                     isEditing = false;
+                    $('#post-title-display').show();
+                    $('#post-title-input').hide();
                     $('#content-display').show();
                     $('#editor-container').hide();
                     $('#summernote').summernote('destroy');
@@ -282,8 +302,8 @@
             });
             function resetEditButtons() {
                 $('#editButtons').html(`
-            <button id="editButton" class="btn btn-sm btn-primary" onclick="toggleEdit()">수정</button>
-        `);
+                    <button id="editButton" class="btn btn-sm btn-primary" onclick="toggleEdit()">수정</button>
+                `);
             }
         </script>
 
