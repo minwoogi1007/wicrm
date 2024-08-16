@@ -99,6 +99,20 @@
                      '1'
                  )
     </insert>
+
+    <update id="updatePost" parameterType="com.wio.crm.model.Board">
+        UPDATE BOARD_CALL
+        SET SUBJECT = #{SUBJECT},
+        CONTENT = #{CONTENT},
+            ATT_FILE = #{ATT_FILE},
+        EMPNM = #{EMPNM},
+        IN_DATE = to_char(SYSDATE,'yyyy-MM-dd HH:mm:ss')
+        WHERE UNO = #{UNO}
+        AND CAT_GROUP = #{CAT_GROUP}
+        AND ID = #{ID}
+    </update>
+
+
     <insert id="insertComment" parameterType="com.wio.crm.model.Board">
        INSERT INTO BOARD_CALL (GNO, UNO,REPLY_DEPTH, CAT_GROUP, CONTENT, HIT, ID, IN_DATE)
         VALUES (#{GNO}, #{UNO}, #{REPLY_DEPTH},#{CAT_GROUP}, #{CONTENT}, 0,#{ID}, #{IN_DATE})

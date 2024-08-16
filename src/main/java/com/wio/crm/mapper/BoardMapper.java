@@ -28,4 +28,6 @@ public interface BoardMapper {
 
     int getReplyCount(@Param("catGroup") String catGroup, @Param("gno") String gno, @Param("replyDepth") String replyDepth);
 
+    void updatePost(Board board); // 새로 추가된 메서드
+
 }

@@ -327,6 +327,7 @@
 
                                         </table>
                                         <ul class="pagination" id="pagination">
+                                            <input type="hidden" id="currentPage" name="currentPage" >
                                         </ul>
 
 
@@ -471,7 +472,7 @@
                         var pageCount = Math.ceil(total / pageSize);
                         var pagination = $('#pagination');
                         pagination.empty();
-
+                        $('#currentPage').val(currentPage);
                         // Previous button
                         if (currentPage > 1) {
                             pagination.append(`<li class="page-item"><a href="#" class="page-link" onclick="loadPage(${currentPage - 1})"><i class="previous"></i></a></li>`);
@@ -848,6 +849,9 @@
                                         success: function(updateResponse) {
                                             console.log('TBND01_CUST updated successfully');
                                             $('#kt_modal_new_address').find('#originalCompletionCode').val(completionCode);
+                                            var currentPage = $('#currentPage').val() || 1; // 현재 페이지 번호 가져오기
+                                            loadPage(currentPage); // 현재 페이지 번호로 loadPage 호출
+                                            alert('등록완료');
                                         },
                                         error: function(updateError) {
                                             console.log('Error updating TBND01_CUST:', updateError);
@@ -891,11 +895,10 @@
                         window.location.href = '/api/consultations/excel?' +formData;
                     });
 
-                    // 모달 닫힘 이벤트 리스너 추가
+                    /* 모달 닫힘 이벤트 리스너 추가
                     $('#kt_modal_new_address').on('hidden.bs.modal', function () {
-                        var currentPage = $('#currentPage').val() || 1; // 현재 페이지 번호 가져오기
-                        loadPage(currentPage); // 현재 페이지 번호로 loadPage 호출
-                    });
+
+                    });*/
                 });
 
 

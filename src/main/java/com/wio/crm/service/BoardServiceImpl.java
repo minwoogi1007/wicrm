@@ -98,6 +98,21 @@ public class BoardServiceImpl implements BoardService {
         return board;
     }
 
+    @Override
+    public void updatePost(Board board) {
+        String custCode = getCurrentCustcode(); // 고객 코드 조회
+        String userId = getCurrentUserId(); // 현재 사용자 ID 조회
+
+        board.setCAT_GROUP(custCode);
+        board.setID(userId);
+
+        // 기존 게시글 정보 조회
+
+
+        boardMapper.updatePost(board);
+    }
+
+
     private String getReplyDepth(int c_reply) {
         switch (c_reply) {
             case 1: return "A";

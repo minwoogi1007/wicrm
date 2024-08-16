@@ -2,10 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{main}">
-<head>
-    <meta name="_csrf" th:content="${_csrf.token}" />
-    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
-</head>
+
 <body>
 <div layout:fragment="content">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.css">
@@ -75,7 +72,8 @@
                                             <span class="file-name">
                                                 <a th:href="@{/download/{filename}(filename=${file})}" download th:text="${file}"></a>
                                             </span>
-                                            <button class="btn btn-sm btn-danger delete-file" style="display: none;">삭제</button>
+                                            <i class="bi bi-x-circle text-danger delete-file" th:attr="data-filename=${file}" style="display: none; cursor: pointer;"></i>
+
                                         </div>
                                     </div>
                                     <div th:if="${#lists.isEmpty(files)}">
@@ -83,7 +81,7 @@
                                     </div>
                                 </div>
                                 <div id="file-upload" style="display: none;">
-                                    <input type="file" id="new-file" multiple>
+                                    <input type="file"  name="files"  multiple>
                                 </div>
                             </div>
                             <div class="row mb-10 mb-lg-18">
@@ -103,25 +101,32 @@
                                     <input type="hidden" id="uno" name="uno" th:value="${post.UNO}" />
                                     <input type="hidden" id="category" name="category" th:value="${post.CAT_GROUP}" />
                                     <input type="hidden" id="replyDepth" name="category" th:value="${post.REPLY_DEPTH}" />
-                                    <div class="form-floating flex-grow-1 me-2" id="commentsContainer">
-                                        <textarea class="form-control" placeholder="댓글을 입력하세요" name="newComment" id="floatingTextarea2" style="height: 40px;"></textarea>
-                                        <label for="floatingTextarea2">Comments</label>
+
+                                    <div id="commentInputSection" class="d-flex flex-column mb-5 fv-row" style="width: 100%;">
+                                        <div class="d-flex">
+                                            <div class="form-floating flex-grow-1 me-2" id="commentsContainer" >
+                                                <textarea class="form-control" placeholder="댓글을 입력하세요" name="newComment" id="floatingTextarea2" style="height: 40px;"></textarea>
+                                                <label for="floatingTextarea2">Comments</label>
+                                            </div>
+                                            <button type="button" id="addCommentButton" class="btn btn-sm btn-primary align-self-end">등록</button>
+                                        </div>
                                     </div>
-                                    <button type="button" id="addCommentButton" class="btn btn-sm btn-primary align-self-end">등록</button>
+
                                 </div>
                             </div>
-
-                            <div th:if="${#lists.isEmpty(list)}">
-                                <p> 댓글 없음 </p>
-                            </div>
-                            <div th:unless="${#lists.isEmpty(list)}">
-                                <table id="commentsTable">
-                                    <tr th:each="list, iterStat : ${list}">
-                                        <td class="comment-item mb-2 p-2" th:text="${list.IN_DATE}"></td>
-                                        <td class="comment-item mb-2 p-2" th:text="${list.ID}"></td>
-                                        <td class="comment-item mb-2 p-2" th:utext="${list.CONTENT}"></td>
-                                    </tr>
-                                </table>
+                            <div id="commentListSection">
+                                <div th:if="${#lists.isEmpty(list)}">
+                                    <p> 댓글 없음 </p>
+                                </div>
+                                <div th:unless="${#lists.isEmpty(list)}">
+                                    <table id="commentsTable">
+                                        <tr th:each="list, iterStat : ${list}">
+                                            <td class="comment-item mb-2 p-2" th:text="${list.IN_DATE}"></td>
+                                            <td class="comment-item mb-2 p-2" th:text="${list.ID}"></td>
+                                            <td class="comment-item mb-2 p-2" th:utext="${list.CONTENT}"></td>
+                                        </tr>
+                                    </table>
+                                </div>
                             </div>
                             <div class="separator separator-dashed mb-9"></div>
                             <!-- 주요 포스트 끝 -->
@@ -155,13 +160,38 @@
         <!-- Load Summernote JS -->
         <script type="text/JavaScript" src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.js"></script>
         <script type="text/JavaScript" src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/lang/summernote-ko-KR.js"></script>
-        <script>
+        <script th:inline="javascript">
             $(document).ready(function() {
                 var isEditing = false;
                 var originalContent = /*[[${post.CONTENT}]]*/ '';
+                var csrfToken = $("meta[name='_csrf']").attr("content");
+                var csrfHeader = $("meta[name='_csrf_header']").attr("content");
+                var deletedFiles = [];
+                var commentInputSection = document.getElementById('commentInputSection');
+                var commentListSection = document.getElementById('commentListSection');
+
+                function hideElement(element) {
+                    element.style.setProperty('display', 'none', 'important');
+                }
+
+                function logElementVisibility(element, name) {
+                    var style = window.getComputedStyle(element);
+                    console.log(name + ' display:', style.display);
+                    console.log(name + ' visibility:', style.visibility);
+                    console.log(name + ' offsetHeight:', element.offsetHeight);
+                }
+                // AJAX 요청에 대한 전역 설정
+                $.ajaxSetup({
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader(csrfHeader, csrfToken);
+                        console.log("Sending request with CSRF token:", csrfToken);
+
+                    }
+                });
 
                 $('#editButton').click(function() {
                     isEditing = true;
+                    deletedFiles = []; // 편집 모드 시작 시 deletedFiles 초기화
                     $('#post-title-display').hide();
                     $('#post-title-input').show().focus();
                     $('#content-display').hide();
@@ -186,34 +216,80 @@
                     });
                     $('#editButton').hide();
                     $('#saveButton, #cancelButton').show();
+                    $('#file-upload').show();
+                    $('.delete-file').show();
+
+                    // 댓글 섹션 숨기기
+                    hideElement(commentInputSection);
+                    hideElement(commentListSection);
+
+                    console.log('Attempted to hide commentInputSection and commentListSection');
+                    logElementVisibility(commentInputSection, 'commentInputSection');
+                    logElementVisibility(commentListSection, 'commentListSection');
 
                 });
-
+                $('.delete-file').click(function() {
+                    var filename = $(this).data('filename');
+                    deletedFiles.push(filename);
+                    $(this).parent('.file-item').remove();
+                });
                 // 저장 버튼 클릭 이벤트
                 $('#saveButton').click(function() {
-                    var content = $('#summernote').summernote('code');
+                    console.log('saveButton');
+                    var content = $('#summernote').val().trim();
                     var title = $('#post-title-input').val();
+                    var gno = $('#gno').val();
+                    var id = $('#id').val();
                     var uno = $('#uno').val();
-                    // AJAX를 사용하여 서버로 수정된 내용 전송
-                    // 성공 시 아래 코드 실행
-                    $('#content-display').html(content).show();
-                    $('#editor-container').hide();
-                    $('#summernote').summernote('destroy');
-                    $('#editButton').show();
-                    $('#saveButton, #cancelButton').hide();
-                    isEditing = false;
+                    var catGroup = $('#category').val();
+
+
+                    var formData = new FormData();
+                    formData.append('GNO', gno);
+                    formData.append('ID', id);
+                    formData.append('UNO', uno);
+                    formData.append('CAT_GROUP', catGroup);
+                    formData.append('SUBJECT', title);
+                    formData.append('CONTENT', content);
+                    formData.append('deletedFiles', JSON.stringify(deletedFiles));
+                    // Append files
+
+                    var fileInput = $('input[name="files"]')[0];
+                    if (fileInput && fileInput.files) {
+                        var totalSize = 0;
+                        for (var i = 0; i < fileInput.files.length; i++) {
+                            formData.append('files', fileInput.files[i]);
+                        }
+                        // 파일 크기 제한 (예: 10MB)
+                        if (totalSize > 10 * 1024 * 1024) {
+                            alert('파일 크기가 너무 큽니다. 총 10MB 이하로 업로드해주세요.');
+                            return;
+                        }
+                    }
+                    $.ajax({
+
+                        url: '/board/update',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+
+                        success: function(response) {
+                            alert('게시글이 성공적으로 수정되었습니다.');
+                            // 서버에서 받은 URL로 리다이렉트
+                            window.location.href = response;
+                        },
+                        error: function(xhr, status, error) {
+                            alert('게시글 수정 중 오류가 발생했습니다: ' + error);
+                        }
+                    });
                 });
 
                 // 취소 버튼 클릭 이벤트
                 $('#cancelButton').click(function() {
                     isEditing = false;
-                    $('#post-title-display').show();
-                    $('#post-title-input').hide();
-                    $('#content-display').show();
-                    $('#editor-container').hide();
-                    $('#summernote').summernote('destroy');
-                    $('#editButton').show();
-                    $('#saveButton, #cancelButton').hide();
+                    deletedFiles = []; // 취소 시 deletedFiles 초기화
+                    location.reload();
                 });
 
                 // 이미지 업로드 함수
@@ -227,6 +303,9 @@
                         cache: false,
                         contentType: false,
                         processData: false,
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader(csrfHeader, csrfToken);
+                        },
                         success: function(url) {
                             $('#summernote').summernote('insertImage', url, function ($image) {
                                 $image.attr('src', url);
@@ -235,6 +314,7 @@
                         },
                         error: function(data) {
                             console.error("Error uploading image:", data);
+                            alert("이미지 업로드에 실패했습니다.");
                         }
                     });
                 }
@@ -244,8 +324,6 @@
                     history.back();
                 });
 
-                var csrfToken = $('meta[name="_csrf"]').attr('content');
-                var csrfHeader = $('meta[name="_csrf_header"]').attr('content');
 
                 $('#addCommentButton').click(function() {
                     var commentText = $('#floatingTextarea2').val().trim();
@@ -300,11 +378,7 @@
 
 
             });
-            function resetEditButtons() {
-                $('#editButtons').html(`
-                    <button id="editButton" class="btn btn-sm btn-primary" onclick="toggleEdit()">수정</button>
-                `);
-            }
+
         </script>
 
 

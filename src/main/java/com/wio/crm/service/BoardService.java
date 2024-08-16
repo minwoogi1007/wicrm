@@ -23,4 +23,6 @@ public interface BoardService {
     List<Board> selectComment(String id);
     void insertPost(Board board); // 글쓰기 기능 추가
     Board saveComment(Board board);
+
+    void updatePost(Board board); // 새로 추가된 메서드
 }

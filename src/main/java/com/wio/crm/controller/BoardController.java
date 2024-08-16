@@ -1,5 +1,7 @@
 package com.wio.crm.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wio.crm.config.CustomUserDetails;
 import com.wio.crm.model.Board;
 import com.wio.crm.model.Tcnt01Emp;
@@ -28,9 +30,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @Controller
@@ -226,12 +226,70 @@ public class BoardController {
         return ResponseEntity.ok(savedComment);
     }
 
-    @GetMapping("/board/edit")
-    public String editPost(@RequestParam("id") String id, Model model) {
-        Board post = boardService.selectPostById(id);
+    @PostMapping("/board/update")
+    public ResponseEntity<String> updateBoard(@RequestParam(value = "files", required = false) MultipartFile[] files,
+                                              @RequestParam Map<String, String> params,
+                                              @RequestParam("deletedFiles") String deletedFilesJson,
+                                              Authentication authentication) {
+        try {
+            // 1. 데이터 무결성 확인 및 보안 검증
+            Board existingPost = boardService.selectPostById(params.get("UNO"));
+            if (existingPost == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Post not found");
+            }
+            // 2. 권한 검증
+            if (!existingPost.getID().equals(authentication.getName())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You don't have permission to update this post");
+            }
 
-        model.addAttribute("post", post);
-        return "board/createBoard";
+            String uploadDir = env.getProperty("file.upload-dir");
+            Path uploadPath = Paths.get(uploadDir);
+
+            System.out.println("deletedFilesJson========"+deletedFilesJson);
+            // 삭제된 파일 처리
+            List<String> deletedFiles = new ObjectMapper().readValue(deletedFilesJson, new TypeReference<List<String>>() {});
+            List<String> remainingFiles = new ArrayList<>();
+
+            if (existingPost.getATT_FILE() != null && !existingPost.getATT_FILE().isEmpty()) {
+
+                remainingFiles = new ArrayList<>(Arrays.asList(existingPost.getATT_FILE().split(";")));
+                System.out.println("remainingFiles========"+remainingFiles);
+                remainingFiles.removeAll(deletedFiles);
+                System.out.println("remainingFiles========"+remainingFiles);
+            }
+
+            for (String deletedFile : deletedFiles) {
+                Path filePath = uploadPath.resolve(deletedFile);
+                Files.deleteIfExists(filePath);
+            }
+
+            StringBuilder fileNames = new StringBuilder(String.join(";", remainingFiles));
+
+            if (files != null) {
+                for (MultipartFile file : files) {
+                    if (file != null && !file.isEmpty()) {
+                        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+                        Path filePath = uploadPath.resolve(fileName);
+                        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+                        if (fileNames.length() > 0 && !fileNames.toString().endsWith(";")) {
+                            fileNames.append(";");
+                        }
+                        fileNames.append(fileName);
+                    }
+                }
+            }
+
+            existingPost.setATT_FILE(fileNames.toString());
+            existingPost.setSUBJECT(params.get("SUBJECT"));
+            existingPost.setCONTENT(params.get("CONTENT"));
+            // 5. 게시글 업데이트
+            boardService.updatePost(existingPost);
+
+            return ResponseEntity.ok("/board/readBoard?id=" + existingPost.getUNO());
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while updating the post");
+        }
     }
 
 }
