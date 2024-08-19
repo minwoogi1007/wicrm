@@ -146,9 +146,21 @@
                                 activateLink(link);
                             }
 
-                            // 게시판 관련 페이지에서도 활성화되는 추가 조건
-                            if (currentPath.includes('/board') && linkPath.includes('/board')) {
-                                activateLink(link);
+                            // 게시판 특별 처리
+                            else if (currentPath.includes('/board') && linkPath.includes('/board')) {
+                                var currentCategory = new URLSearchParams(window.location.search).get('category');
+                                var linkCategory = new URLSearchParams(new URL(linkPath, window.location.origin).search).get('category');
+
+                                // 글쓰기 페이지인 경우
+                                if (currentPath.includes('/board/create') ||currentPath.includes('/board/readBoard')) {
+                                    if (currentCategory === linkCategory) {
+                                        activateLink(link);
+                                    }
+                                }
+                                // 일반 게시판 페이지인 경우
+                                else if (currentCategory === linkCategory) {
+                                    activateLink(link);
+                                }
                             }
                         });
 

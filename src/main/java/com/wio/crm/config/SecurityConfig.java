@@ -33,7 +33,8 @@ public class SecurityConfig {
                         ).csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/consultations","/board/**").hasAuthority("ROLE_USER")
+                        // 이 줄을 제거했습니다: .requestMatchers("/api/consultations","/board/**").hasAuthority("ROLE_USER")
+
                         .requestMatchers("/empl").hasAuthority("ROLE_EMPLOYEE")
                         .requestMatchers("/encrypt-passwords","/encrypt-password", "/encryption","/check-userid-availability","/apply-userid").permitAll()
                         .requestMatchers("/download/**", "/upload","/board/uploadImage").permitAll()

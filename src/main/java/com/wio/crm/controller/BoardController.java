@@ -50,17 +50,32 @@ public class BoardController {
         return "error"; // Thymeleaf 템플릿 이름
     }
 
+    private boolean isAuthorizedUser(Authentication authentication) {
+        return authentication != null &&
+                authentication.getName().equals("MINWOOGI");
+    }
     @GetMapping("/board")
-    public String board(Model model, @RequestParam(name = "category", required = false) String category) {
+    public String board(Model model, @RequestParam(name = "category", required = false) String category, Authentication authentication) {
         List<Board> posts;
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null) {
             logger.info("접근불가");
             return "redirect:/sign-in";
         }
 
+        boolean canCreatePost =  isAuthorizedUser(authentication);
+
+        // 'G' 카테고리인 경우 권한 체크 없이 진행
+        if ("G".equals(category)) {
+            System.out.println("G.equals(category)========");
+            posts = boardService.findPostsByCategory(category);
+            model.addAttribute("list", posts);
+            model.addAttribute("category", category);  // 추가된 부분
+            model.addAttribute("canCreatePost", canCreatePost);
+
+            return "board/board";
+        }
 
         // 현재 로그인한 사용자의 CustomUserDetails 얻기
         if (authentication.getPrincipal() instanceof CustomUserDetails) {
@@ -72,26 +87,31 @@ public class BoardController {
             //외부직원
             Tcnt01Emp tcntUser = userDetails.getTcntUserInfo();
 
-            if(tcntUser!= null){
-                if(tcntUser.getCustCode().equals(category)){
-                    posts = boardService.findPostsByCategory(category);
-                }else{
-                    return "redirect:/error";
+            System.out.println("tempUser========"+tempUser);
+            System.out.println("tcntUser========"+tcntUser);
 
+            if(tempUser!=null){     //내부직원
+                canCreatePost = false;
+            }else{                  //외부직원
+                if(tcntUser.getCustCode().equals(category)){
+                    canCreatePost = true;
                 }
-            }else{
-                posts = boardService.findPostsByCategory(category);
             }
+            posts = boardService.findPostsByCategory(category);
+
 
             model.addAttribute("list", posts);
+            model.addAttribute("category", category);  // 추가된 부분
+            model.addAttribute("canCreatePost", canCreatePost);
         }
         return "board/board";
     }
 
     // 글쓰기 폼 페이지로 이동
     @GetMapping("/board/create")
-    public String createForm() {
-        return "board/createBoard"; // Thymeleaf 템플릿 이름
+    public String createForm(@RequestParam(name = "category", required = false) String category, Model model, Authentication authentication) {
+        model.addAttribute("category", category);
+        return "board/createBoard";
     }
 
     // 글쓰기 처리
@@ -178,10 +198,25 @@ public class BoardController {
     }
     // 글 읽기
     @GetMapping("/board/readBoard")
-    public String readPost(@RequestParam("id") String id, Model model) {
+    public String readPost(@RequestParam("id") String id,
+                           @RequestParam(name = "category", required = false) String category,
+                           Model model) {
+        Board post;
 
-        Board post = boardService.selectPostById(id);
-        List<Board> comment = boardService.selectComment(id);
+        if ("G".equals(category)) {
+            // 공지사항인 경우
+            post = boardService.selectPostByIdWithoutCustCode(id);
+        } else {
+            // 일반 게시글인 경우
+            post = boardService.selectPostById(id);
+        }
+
+        List<Board> comment;
+        if ("G".equals(category)) {
+            comment = boardService.selectCommentWithoutCustCode(id);
+        } else {
+            comment = boardService.selectComment(id);
+        }
 
         model.addAttribute("post", post);
 

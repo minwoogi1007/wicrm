@@ -15,6 +15,7 @@
             --ROW_NUMBER() OVER (ORDER BY a.GNO DESC) AS rownum,
             a.UNO,
             a.GNO,
+            a.cat_group,
             a.SUBJECT AS SUBJECTFULL,
             CASE
                 WHEN LENGTH(a.SUBJECT) > 20 THEN SUBSTR(a.SUBJECT, 1, 19) || '...'

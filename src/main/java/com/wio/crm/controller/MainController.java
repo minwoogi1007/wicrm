@@ -1,5 +1,7 @@
 package com.wio.crm.controller;
 
+import com.wio.crm.model.Board;
+import com.wio.crm.service.BoardService;
 import com.wio.crm.service.DashboardService;
 import com.wio.crm.service.MenuService;
 import jakarta.servlet.http.HttpSession;
@@ -23,6 +25,10 @@ public class MainController {
 
     @Autowired
     private DashboardService dashboardService;
+
+    @Autowired
+    private BoardService boardService;
+
 
     @GetMapping("/main")
     public String mainPage(Model model, HttpSession session) {
@@ -50,6 +56,10 @@ public class MainController {
         model.addAttribute("isEmployee", isEmployee);
 
         model.addAttribute("content", "contents"); // Initial content
+
+        Board latestNotice = boardService.getLatestNotice();
+        model.addAttribute("latestNotice", latestNotice);
+
         return "contents";
     }
 

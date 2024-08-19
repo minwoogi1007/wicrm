@@ -25,4 +25,9 @@ public interface BoardService {
     Board saveComment(Board board);
 
     void updatePost(Board board); // 새로 추가된 메서드
+
+    Board getLatestNotice();//메인 공지 모달창
+
+    Board selectPostByIdWithoutCustCode(String id);
+    List<Board> selectCommentWithoutCustCode(String id);
 }

@@ -16,6 +16,19 @@ public class BoardServiceImpl implements BoardService {
     @Autowired
     private final BoardMapper boardMapper;
 
+    @Override
+    public Board getLatestNotice() {
+        return boardMapper.getLatestNotice();
+    }
+    @Override
+    public Board selectPostByIdWithoutCustCode(String id) {
+        return boardMapper.selectPostByIdWithoutCustCode(id);
+    }
+
+    @Override
+    public List<Board> selectCommentWithoutCustCode(String id) {
+        return boardMapper.selectCommentWithoutCustCode(id);
+    }
     private String getCurrentCustcode() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {

@@ -30,4 +30,41 @@ public interface BoardMapper {
 
     void updatePost(Board board); // 새로 추가된 메서드
 
+    @Select("SELECT * FROM BOARD_CALL WHERE CAT_GROUP = 'G' AND UNO = (SELECT MAX(UNO) FROM BOARD_CALL WHERE CAT_GROUP = 'G')")
+    Board getLatestNotice();
+
+    @Select("SELECT\n" +
+            "            gno,\n" +
+            "            uno,\n" +
+            "            REPLY_DEPTH,\n" +
+            "            CAT_GROUP,\n" +
+            "            SUBJECT,\n" +
+            "            EMPNM,\n" +
+            "            IN_DATE,\n" +
+            "            ID,\n" +
+            "            CONTENT,\n" +
+            "            ATT_FILE\n" +
+            "        FROM BOARD_CALL\n" +
+            "        WHERE CAT_GROUP = 'G'\n" +
+            "          AND uno=#{id}")
+    Board selectPostByIdWithoutCustCode(String id);
+
+    @Select("SELECT\n" +
+            "            gno,\n" +
+            "            uno,\n" +
+            "            REPLY_DEPTH,\n" +
+            "            CAT_GROUP,\n" +
+            "            SUBJECT,\n" +
+            "            EMPNM,\n" +
+            "            TO_DATE(IN_DATE,'YYYY-MM-DD HH24:MI:SS')  IN_DATE,\n" +
+            "            ID,\n" +
+            "            CONTENT,\n" +
+            "            ATT_FILE\n" +
+            "        FROM BOARD_CALL\n" +
+            "        WHERE CAT_GROUP = 'G'\n" +
+            "          AND gno=(select gno from board_call where uno= #{id} and CAT_GROUP ='G')\n" +
+            "          AND SUBJECT IS NULL\n" +
+            "        ORDER BY IN_DATE")
+    List<Board> selectCommentWithoutCustCode(String id);
+
 }
