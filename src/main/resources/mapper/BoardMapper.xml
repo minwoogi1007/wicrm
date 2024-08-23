@@ -52,7 +52,7 @@
             CONTENT,
             ATT_FILE
         FROM BOARD_CALL
-        WHERE CAT_GROUP = #{custCode}
+        WHERE CAT_GROUP = #{category}
           AND uno=#{id}
 
 
@@ -71,8 +71,8 @@
             CONTENT,
             ATT_FILE
         FROM BOARD_CALL
-        WHERE CAT_GROUP = #{custCode}
-          AND gno=(select gno from board_call where uno= #{id} and CAT_GROUP = #{custCode})
+        WHERE CAT_GROUP = #{category}
+          AND gno=(select gno from board_call where uno= #{id} and CAT_GROUP = #{category})
           AND SUBJECT IS NULL
         ORDER BY IN_DATE
 

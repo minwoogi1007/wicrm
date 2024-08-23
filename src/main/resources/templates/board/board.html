@@ -94,11 +94,15 @@
                 </thead>
                 <tbody class="fw-semibold text-gray-600">
 
-                <tr th:each="list : ${list}" th:data-id="${list.UNO}"  onclick="redirectToPost(this)">
+                <tr th:each="list : ${list}" th:data-id="${list.UNO}" th:data-category="${category}" onclick="redirectToPost(this)">
 
                   <td th:text="${list.GNO}"></td>
 
-                  <td data-bs-toggle="tooltip" data-bs-placement="bottom"  th:title="${list.SUBJECTFULL}"><a th:href="@{'/board/readBoard?id=' + ${list.UNO} + '&category=' + ${category}}" th:text="${list.SUBJECT}"></a>
+                  <td data-bs-toggle="tooltip" data-bs-placement="bottom"  th:title="${list.SUBJECTFULL}">
+                    <a th:href="@{/board/readBoard(id=${list.UNO}, category=${category})}"
+                       th:text="${list.SUBJECT}"
+                       th:attr="data-debug=${category}"></a>
+
                     <span th:if="${list.ATT_FILE != null}">
                                                 <i class="ki-duotone ki-paper-clip fs-6 text-gray-800"></i>
                                             </span>
@@ -127,12 +131,11 @@
       <script>
         function redirectToPost(element) {
           var postId = element.getAttribute('data-id');
-          window.location.href = `/board/readBoard?id=${postId}`;
+          var category = element.getAttribute('data-category'); // 카테고리 추가
+          window.location.href = `/board/readBoard?id=${postId}&category=${category}`; // 카테고리 파라미터 추가
         }
       </script>
       <!--end::Content-->
-      <script src="/assets/plugins/global/plugins.bundle.js"></script>
-      <script src="/assets/js/board/scripts.bundle.js"></script>
       <script src="/assets/js/custom/apps/ecommerce/reports/customer-orders/customer-orders.js"></script>
 
     <!--end::Content wrapper-->

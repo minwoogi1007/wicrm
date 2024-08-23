@@ -7,6 +7,7 @@ import com.wio.crm.model.Board;
 import com.wio.crm.model.Tcnt01Emp;
 import com.wio.crm.model.Temp01;
 import com.wio.crm.service.BoardService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.env.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,14 +56,10 @@ public class BoardController {
                 authentication.getName().equals("MINWOOGI");
     }
     @GetMapping("/board")
-    public String board(Model model, @RequestParam(name = "category", required = false) String category, Authentication authentication) {
+    public String board(Model model, @RequestParam("category") String category, Authentication authentication) {
         List<Board> posts;
 
-
-        if (authentication == null) {
-            logger.info("접근불가");
-            return "redirect:/sign-in";
-        }
+        System.out.println("Board method called with category: " + category);
 
         boolean canCreatePost =  isAuthorizedUser(authentication);
 
@@ -102,6 +99,7 @@ public class BoardController {
 
             model.addAttribute("list", posts);
             model.addAttribute("category", category);  // 추가된 부분
+            System.out.println("Board method - Category: " + category);
             model.addAttribute("canCreatePost", canCreatePost);
         }
         return "board/board";
@@ -199,23 +197,30 @@ public class BoardController {
     // 글 읽기
     @GetMapping("/board/readBoard")
     public String readPost(@RequestParam("id") String id,
-                           @RequestParam(name = "category", required = false) String category,
+                           @RequestParam("category") String category,
+                           HttpServletRequest request,
                            Model model) {
         Board post;
 
+        System.out.println("Full request URL: " + request.getRequestURL() + "?" + request.getQueryString());
+        System.out.println("id: " + id);
+        System.out.println("category: " + category);
+        System.out.println("All request parameters:");
+        request.getParameterMap().forEach((key, value) ->
+                System.out.println(key + ": " + String.join(", ", value)));
         if ("G".equals(category)) {
             // 공지사항인 경우
             post = boardService.selectPostByIdWithoutCustCode(id);
         } else {
             // 일반 게시글인 경우
-            post = boardService.selectPostById(id);
+            post = boardService.selectPostById(id,category);
         }
 
         List<Board> comment;
         if ("G".equals(category)) {
             comment = boardService.selectCommentWithoutCustCode(id);
         } else {
-            comment = boardService.selectComment(id);
+            comment = boardService.selectComment(id,category);
         }
 
         model.addAttribute("post", post);
@@ -268,7 +273,7 @@ public class BoardController {
                                               Authentication authentication) {
         try {
             // 1. 데이터 무결성 확인 및 보안 검증
-            Board existingPost = boardService.selectPostById(params.get("UNO"));
+            Board existingPost = boardService.selectPostById(params.get("UNO"),params.get("CAT_GROUP"));
             if (existingPost == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Post not found");
             }

@@ -67,16 +67,15 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public Board selectPostById(String id) { // 반환 타입 추가
-        String custCode = getCurrentCustcode(); // 고객 코드 조회
-        return boardMapper.selectPostById(id,custCode);
+    public Board selectPostById(String id,String category) { // 반환 타입 추가
+
+        return boardMapper.selectPostById(id,category);
     }
 
     @Override
-    public List<Board> selectComment(String id) {
-        String custCode = getCurrentCustcode(); // 고객 코드 조회
+    public List<Board> selectComment(String id,String category) {
 
-        return boardMapper.selectComment(custCode,id);
+        return boardMapper.selectComment(category,id);
     }
 
     @Override
