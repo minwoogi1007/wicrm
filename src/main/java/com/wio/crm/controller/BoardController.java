@@ -325,7 +325,7 @@ public class BoardController {
             // 5. 게시글 업데이트
             boardService.updatePost(existingPost);
 
-            return ResponseEntity.ok("/board/readBoard?id=" + existingPost.getUNO());
+            return ResponseEntity.ok("/board/readBoard?id=" + existingPost.getUNO()+"&category=" + existingPost.getCAT_GROUP());
         } catch (IOException ex) {
             ex.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while updating the post");
