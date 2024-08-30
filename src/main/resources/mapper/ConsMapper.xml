@@ -483,19 +483,66 @@
           AND B.PROJECT_CODE = #{params.projectCode}
           AND B.PERSON_CODE = #{params.personCode}
           AND B.CALL_CODE = #{params.callCode}
-        ORDER BY B.SERL_NO
+        ORDER BY TO_CHAR(B.IN_DATE,'YYYYMMDD HH24:MI:SS')
     </select>
     <select id="getHistory" resultType="com.wio.crm.model.History">
-        SELECT CS_NOTE as csNote,
-               (SELECT ADM_SNAME FROM TSYS01 WHERE ADM_GUBN='4003'AND  ADM_CODE=A.PRC_GUBN) as prcGubn,
-               PRC_NOTE as prcNote,
-               TO_CHAR(A.IN_DATE,'YYYYMMDD') as inDate,
-               TO_CHAR(A.IN_DATE, 'HH24:MI:SS')as inTime
-        FROM TBND01 A
-        WHERE CUST_CODE = #{params.custCode}
-          AND PROJECT_CODE = #{params.projectCode}
-          AND PERSON_CODE = #{params.personCode}
-        ORDER BY IN_DATE DESC
+
+WITH ConsultationData AS (
+    SELECT
+        '1' AS GUBN,
+        CUST_CODE,
+        PROJECT_CODE,
+        PERSON_CODE,
+        CALL_CODE,
+        CS_NOTE AS CSNOTE,
+        (
+            SELECT ADM_SNAME
+            FROM TSYS01
+            WHERE ADM_GUBN = '4003' AND ADM_CODE = TBND01.PRC_GUBN
+        ) AS PRCGUBN,
+        PRC_NOTE AS PRCNOTE,
+        TO_CHAR(IN_DATE, 'YYYYMMDD') AS INDATE,
+        TO_CHAR(IN_DATE, 'HH24:MI:SS') AS INTIME,
+        ROW_NUMBER() OVER (ORDER BY IN_DATE DESC) AS RN
+    FROM TBND01
+    WHERE CUST_CODE =#{params.custCode}
+    AND PROJECT_CODE = #{params.projectCode}
+    AND PERSON_CODE = #{params.personCode}
+      <![CDATA[
+      AND CALL_CODE<>#{params.callCode}
+      AND PRC_GUBN<>'4'
+    ]]>
+)
+        SELECT * FROM (
+                          SELECT
+                              CD.GUBN,
+                              CD.CSNOTE,
+                              CD.PRCGUBN,
+                              CD.PRCNOTE,
+                              CD.INDATE,
+                              CD.INTIME,
+                              CD.RN,
+                              CD.CALL_CODE
+                          FROM ConsultationData CD
+
+                          UNION ALL
+
+                          SELECT
+                              '2' AS GUBN,
+                              M.CONTEXT AS CSNOTE,
+                              NULL AS PRCGUBN,
+                              NULL AS PRCNOTE,
+                              TO_CHAR(M.IN_DATE, 'YYYYMMDD') AS INDATE,
+                              TO_CHAR(M.IN_DATE, 'HH24:MI:SS') AS INTIME,
+                              CD.RN,
+                              M.CALL_CODE
+                          FROM TBND01_MEMO M
+                                   JOIN ConsultationData CD ON M.CUST_CODE = CD.CUST_CODE
+                              AND M.PROJECT_CODE = CD.PROJECT_CODE
+                              AND M.PERSON_CODE = CD.PERSON_CODE
+                              AND M.CALL_CODE = CD.CALL_CODE
+                      )
+        ORDER BY RN, GUBN, INDATE, INTIME
     </select>
     <insert id="insertComment">
         INSERT INTO TBND01_MEMO(

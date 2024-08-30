@@ -112,11 +112,13 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public void updatePost(Board board) {
-        String custCode = getCurrentCustcode(); // 고객 코드 조회
         String userId = getCurrentUserId(); // 현재 사용자 ID 조회
+        if("G".equals(board.getCAT_GROUP())){
+            board.setID("MINWOOGI");
+        }else{
+            board.setID(userId);
+        }
 
-        board.setCAT_GROUP(custCode);
-        board.setID(userId);
 
         // 기존 게시글 정보 조회
 

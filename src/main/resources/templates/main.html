@@ -61,7 +61,14 @@
 		.backgroundBlink {
 			animation: backgroundBlinker 1s linear infinite;
 			color: white; /* 텍스트 색상을 하얀색으로 설정 (선택사항) */
-		}
+		}.date-time-column {
+			 width: 120px;  /* 원하는 너비로 조정하세요 */
+			 min-width: 80px;
+			 max-width: 120px;
+			 white-space: nowrap;
+			 overflow: hidden;
+			 text-overflow: ellipsis;
+		 }
 
 	</style>
 	<meta name="_csrf" th:content="${_csrf.token}"/>

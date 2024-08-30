@@ -273,7 +273,10 @@ public class BoardController {
                                               Authentication authentication) {
         try {
             // 1. 데이터 무결성 확인 및 보안 검증
+
             Board existingPost = boardService.selectPostById(params.get("UNO"),params.get("CAT_GROUP"));
+
+
             if (existingPost == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Post not found");
             }
@@ -285,7 +288,6 @@ public class BoardController {
             String uploadDir = env.getProperty("file.upload-dir");
             Path uploadPath = Paths.get(uploadDir);
 
-            System.out.println("deletedFilesJson========"+deletedFilesJson);
             // 삭제된 파일 처리
             List<String> deletedFiles = new ObjectMapper().readValue(deletedFilesJson, new TypeReference<List<String>>() {});
             List<String> remainingFiles = new ArrayList<>();
@@ -293,9 +295,7 @@ public class BoardController {
             if (existingPost.getATT_FILE() != null && !existingPost.getATT_FILE().isEmpty()) {
 
                 remainingFiles = new ArrayList<>(Arrays.asList(existingPost.getATT_FILE().split(";")));
-                System.out.println("remainingFiles========"+remainingFiles);
                 remainingFiles.removeAll(deletedFiles);
-                System.out.println("remainingFiles========"+remainingFiles);
             }
 
             for (String deletedFile : deletedFiles) {
@@ -322,8 +322,10 @@ public class BoardController {
             existingPost.setATT_FILE(fileNames.toString());
             existingPost.setSUBJECT(params.get("SUBJECT"));
             existingPost.setCONTENT(params.get("CONTENT"));
+            existingPost.setCAT_GROUP(params.get("CAT_GROUP"));
             // 5. 게시글 업데이트
             boardService.updatePost(existingPost);
+
 
             return ResponseEntity.ok("/board/readBoard?id=" + existingPost.getUNO()+"&category=" + existingPost.getCAT_GROUP());
         } catch (IOException ex) {

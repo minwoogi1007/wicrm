@@ -102,7 +102,8 @@
                                     <input type="hidden" id="category" name="category" th:value="${post.CAT_GROUP}" />
                                     <input type="hidden" id="replyDepth" name="category" th:value="${post.REPLY_DEPTH}" />
 
-                                    <div id="commentInputSection" class="d-flex flex-column mb-5 fv-row" style="width: 100%;">
+
+                                    <div  th:if="${post.CAT_GROUP != 'G'}" id="commentInputSection" class="d-flex flex-column mb-5 fv-row" style="width: 100%;">
                                         <div class="d-flex">
                                             <div class="form-floating flex-grow-1 me-2" id="commentsContainer" >
                                                 <textarea class="form-control" placeholder="댓글을 입력하세요" name="newComment" id="floatingTextarea2" style="height: 40px;"></textarea>
@@ -112,9 +113,10 @@
                                         </div>
                                     </div>
 
+
                                 </div>
                             </div>
-                            <div id="commentListSection">
+                            <div  th:if="${post.CAT_GROUP != 'G'}" id="commentListSection">
                                 <div th:if="${#lists.isEmpty(list)}">
                                     <p> 댓글 없음 </p>
                                 </div>
@@ -128,7 +130,7 @@
                                     </table>
                                 </div>
                             </div>
-                            <div class="separator separator-dashed mb-9"></div>
+                            <div  th:if="${post.CAT_GROUP != 'G'}" class="separator separator-dashed mb-9"></div>
                             <!-- 주요 포스트 끝 -->
                             <div class="mb-15 d-flex justify-content-start align-items-center">
                                 <button type="button" id="listBack" class="btn btn-sm btn-primary me-2">목록</button>
@@ -249,6 +251,7 @@
                     formData.append('ID', id);
                     formData.append('UNO', uno);
                     formData.append('CAT_GROUP', catGroup);
+                    console.log('CAT_GROUP:', catGroup);
                     formData.append('SUBJECT', title);
                     formData.append('CONTENT', content);
                     formData.append('deletedFiles', JSON.stringify(deletedFiles));

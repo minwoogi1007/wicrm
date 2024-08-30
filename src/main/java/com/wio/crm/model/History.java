@@ -7,6 +7,16 @@ public class History {
     private String inDate;
     private String inTime;
 
+    private String gubn;
+
+    public String getGubn() {
+        return gubn;
+    }
+
+    public void setGubn(String gubn) {
+        this.gubn = gubn;
+    }
+
     public String getInDate() {
         return inDate;
     }

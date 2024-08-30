@@ -662,9 +662,16 @@
                                 var comments = response.total;
                                 var history = response.history;
 
+                                function formatText(text) {
+                                    return text.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>');
+                                }
+
                                 function safeValue(value) {
-                                    return value == null ? '' : value;
-                                }// Generate badge for emgGubn
+                                    return value != null ? formatText(value) : '';
+                                }
+
+
+                                // Generate badge for emgGubn
                                 var emgGubnBadge = data.emgGubn == '1' ?'<span class="badge badge-light-danger fw-bold px-4 py-3">긴급</span>' : '<span class="badge badge-light-success fw-bold px-4 py-3">일반</span>';
                                 var completionCode;
                                 switch(data.completionCode) {
@@ -717,7 +724,7 @@
                                 var commentsList = $('#kt_modal_new_address').find('#commentsList');
                                 commentsList.empty();
                                 response.total.forEach(function(comment) {
-                                    var commentItem = '<div class="comment-item mb-2 p-2" style="background-color: #f0f0f0;"><p><strong>' +comment.inDate +'  ' +comment.userId + '</strong>: ' + comment.conText + '</p></div>';
+                                    var commentItem = '<div class="comment-item mb-2 p-2" style="background-color: #f0f0f0;"><p><strong>' +comment.inDate +'  ' +comment.userId + '</strong>: ' + safeValue(comment.conText) + '</p></div>';
 
                                     commentsList.append(commentItem);
                                 });
@@ -726,7 +733,16 @@
                                 var historyTableBody = $('#historyTable tbody');
                                 historyTableBody.empty();
                                 history.forEach(function(historyItem) {
-                                    var historyRow  =`<tr><td>${historyItem.inDate} / ${historyItem.inTime}</td><td>${safeValue(historyItem.csNote)}</td><td>${safeValue(historyItem.prcNote)}</td></tr>`;
+                                    var historyRow  ='';
+                                    console.log(historyItem);
+                                    if(historyItem.gubn==='1'){
+                                        historyRow  =`<tr><td  class="date-time-column">${historyItem.inDate} / ${historyItem.inTime}</td><td>${safeValue(historyItem.csNote)}</td><td>${safeValue(historyItem.prcNote)}</td></tr>`;
+                                    }else{
+                                        historyRow =`<tr><td></td><td colspan="2">ㄴ ${safeValue(historyItem.csNote)}  ${historyItem.inDate}${historyItem.inTime}</td></tr>`;
+                                    }
+
+
+
                                     historyTableBody.append(historyRow);
                                 });
 
