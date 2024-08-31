@@ -66,6 +66,9 @@
             AND (TBND01.CS_NOTE LIKE '%' || #{params.keyword} || '%'
             OR TBND01.PRC_NOTE LIKE '%' || #{params.keyword} || '%')
         </if>
+        <![CDATA[
+            AND TBND01.PRC_GUBN<>'4'
+            ]]>
         )
         )
         <if test="params.filter != null">
@@ -228,6 +231,9 @@
             AND (TBND01.CS_NOTE LIKE '%' || #{params.keyword} || '%'
             OR TBND01.PRC_NOTE LIKE '%' || #{params.keyword} || '%')
         </if>
+        <![CDATA[
+            AND TBND01.PRC_GUBN<>'4'
+            ]]>
         )
         )
         <if test="params.filter != null">
@@ -311,6 +317,9 @@
             AND (TBND01.CS_NOTE LIKE '%' || #{params.keyword} || '%'
             OR TBND01.PRC_NOTE LIKE '%' || #{params.keyword} || '%')
         </if>
+        <![CDATA[
+            AND TBND01.PRC_GUBN<>'4'
+            ]]>
         )
         )
         <if test="params.filter != null">

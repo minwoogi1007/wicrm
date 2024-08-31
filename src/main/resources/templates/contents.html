@@ -97,7 +97,7 @@
                                         <!--end::Number-->
                                         <span id="count-yesterdayCom-card-data-3" class="text-gray-500 fw-bold fs-6"></span>
 
-                                        <button type="button" class="btn btn-icon btn-sm h-auto btn-color-gray-500 btn-active-color-primary justify-content-end">
+                                        <button type="button" id="completedConsBtn"  class="btn btn-icon btn-sm h-auto btn-color-gray-500 btn-active-color-primary justify-content-end">
                                             <i class="ki-duotone ki-exit-right-corner fs-2">
                                                 <span class="path1"></span>
                                                 <span class="path2"></span>
@@ -163,6 +163,26 @@
                                     <!--end::Statistics-->
                                 </div>
                                 <!--end::Item-->
+                                <script>
+                                    $(document).ready(function() {
+                                        $("#completedConsBtn").on("click", function() {
+                                            // 오늘 날짜를 YYYYMMDD 형식으로 가져오기
+                                            var today = new Date();
+                                            var dateString = today.getFullYear() +
+                                                String(today.getMonth() + 1).padStart(2, '0') +
+                                                String(today.getDate()-1).padStart(2, '0');
+
+                                            // 상담조회 페이지로 이동
+                                            window.location.href = "/cons?" +
+                                                "startDate=" + dateString +
+                                                "&endDate=" + dateString +
+                                                "&status=2"  +// 처리완료 상태;
+                                             "filter='normal'"
+                                        });
+                                    });
+
+                                </script>
+
                             </div>
                             <!--end::Body-->
                         </div>
@@ -1087,6 +1107,9 @@
                                     }
                                 });
                             }
+
+
+
                         });
 
 

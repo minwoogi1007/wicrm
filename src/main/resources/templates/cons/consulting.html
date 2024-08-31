@@ -107,6 +107,31 @@
         .flex-shrink-0 {
             width: 10%;
         }
+        .history-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+        .history-table td {
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+        }
+        .history-table .date-time-column {
+            width: 150px;
+            text-align: center;
+            background-color: #f8f9fa;
+        }
+        .history-table .content-column {
+            background-color: #ffffff;
+        }
+        .history-table .sub-row td {
+            border-top: none;
+            padding-top: 0;
+            padding-left: 20px;
+            font-style: italic;
+            color: #6c757d;
+        }
 
     </style>
     <script src="/assets/plugins/global/plugins.bundle.js"></script>
@@ -435,14 +460,8 @@
                                     <div class="d-flex flex-column mb-5 fv-row">
                                         <label class="fs-6 fw-semibold mb-2">고객 상담 히스토리</label>
                                         <div class="table-responsive">
-                                            <table id="historyTable" class="table table-striped table-bordered">
-                                                <thead>
-                                                <tr>
-                                                    <th>날짜</th>
-                                                    <th>상담내용</th>
-                                                    <th>처리내용</th>
-                                                </tr>
-                                                </thead>
+                                            <table id="historyTable" class="history-table">
+
                                                 <tbody>
                                                 <!-- 히스토리 항목이 여기 추가됩니다 -->
                                                 </tbody>
@@ -665,12 +684,24 @@
                                 function formatText(text) {
                                     return text.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>');
                                 }
-
+                                function decodeHtml(html) {
+                                    var txt = document.createElement("textarea");
+                                    txt.innerHTML = html;
+                                    return txt.value;
+                                }
                                 function safeValue(value) {
-                                    return value != null ? formatText(value) : '';
+                                    if (!value) return '';
+                                    // HTML 엔티티 디코딩
+                                    var decodedValue = decodeHtml(value);
+                                    // 이미 <br> 태그가 있는 경우 그대로 유지, 없는 경우 줄바꿈을 <br>로 변환
+                                    return decodedValue.replace(/(?!\<br\>)\n/g, '<br>');
                                 }
 
-
+                                function safeValueText(value) {
+                                    if (!value) return '';
+                                    var decodedValue = decodeHtml(value);
+                                    return decodedValue.replace(/<br\s*\/?>/gi, '\n');
+                                }
                                 // Generate badge for emgGubn
                                 var emgGubnBadge = data.emgGubn == '1' ?'<span class="badge badge-light-danger fw-bold px-4 py-3">긴급</span>' : '<span class="badge badge-light-success fw-bold px-4 py-3">일반</span>';
                                 var completionCode;
@@ -711,8 +742,8 @@
                                 // Set the select value for completionCode
 
 
-                                $('#kt_modal_new_address').find('textarea[name="csNote"]').val(safeValue(data.csNote));
-                                $('#kt_modal_new_address').find('textarea[name="prcNote"]').val(safeValue(data.prcNote));
+                                $('#kt_modal_new_address').find('textarea[name="csNote"]').val(safeValueText(data.csNote));
+                                $('#kt_modal_new_address').find('textarea[name="prcNote"]').val(safeValueText(data.prcNote));
 
                                 $('#kt_modal_new_address').find('#hcallCode').val(data.callCode);
                                 $('#kt_modal_new_address').find('#hpersonCode').val(data.personCode);
@@ -734,13 +765,31 @@
                                 historyTableBody.empty();
                                 history.forEach(function(historyItem) {
                                     var historyRow  ='';
-                                    console.log(historyItem);
-                                    if(historyItem.gubn==='1'){
-                                        historyRow  =`<tr><td  class="date-time-column">${historyItem.inDate} / ${historyItem.inTime}</td><td>${safeValue(historyItem.csNote)}</td><td>${safeValue(historyItem.prcNote)}</td></tr>`;
-                                    }else{
-                                        historyRow =`<tr><td></td><td colspan="2">ㄴ ${safeValue(historyItem.csNote)}  ${historyItem.inDate}${historyItem.inTime}</td></tr>`;
+                                    if(historyItem.gubn === '1'){
+                                        historyRow = `
+                                             <tr>
+                                            <td class="date-time-column">${historyItem.inDate}<br>${historyItem.inTime}</td>
+                                            <td class="content-column">
+                                                <strong>상담내용:</strong><br>
+                                                ${safeValue(historyItem.csNote)}
+                                                ${historyItem.prcNote ? `
+                                                    <br><br>
+                                                    <strong>처리내용:</strong><br>
+                                                    ${safeValue(historyItem.prcNote)}
+                                                ` : ''}
+                                            </td>
+                                        </tr>`;
+                                    } else {
+                                        historyRow = `
+                                            <tr class="sub-row">
+                                                <td></td>
+                                                <td class="content-column">
+                                                    ㄴ ${safeValue(historyItem.csNote)}
+                                                    <br>
+                                                    <small>${historyItem.inDate} ${historyItem.inTime}</small>
+                                                </td>
+                                            </tr>`;
                                     }
-
 
 
                                     historyTableBody.append(historyRow);
