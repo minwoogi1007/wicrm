@@ -30,8 +30,11 @@ public interface DashboardMapper {
     List<DashboardData> getMonthlySum(String custCode);
 
     DashboardData getPoint(String custCode);
+
+    DashboardData getCount(String custCode);
+
     List<DashboardData> getPointList(String custCode);
 
-
+    List<DashboardData> getCountSum(String custCode);
 
 }

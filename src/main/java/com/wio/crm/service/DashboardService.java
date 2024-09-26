@@ -270,4 +270,41 @@ public class DashboardService {
 
         return data;
     }
+    public Map<String, Object> getDashBoardCount(String username) {
+
+        Map<String, Object> data = new HashMap<>();
+        // 데이터베이스 조회
+        String custCode=getCurrentUserCustCode();
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+        DashboardData point = null;
+        List<DashboardData> pointList = null;
+        // 사용자 유형에 따른 처리
+        // 거래처 사용자인 경우
+        if (userDetails.getTcntUserInfo() != null) {
+            String gubn = userDetails.getTcntUserInfo().getCust_grade(); // 안전하게 gubn 값을 가져옵니다.
+            System.out.println("카운트 ======gubn===="+gubn);
+            if ("A".equals(gubn)) {
+                // A 유형 사용자를 위한 로직
+
+            } else if ("B".equals(gubn)) {
+                point = dashboardMapper.getCount(custCode);
+                pointList = dashboardMapper.getCountSum(custCode);
+            }
+        } else if (userDetails.getTempUserInfo() != null) {
+            // 내부 직원 사용자인 경우
+            // 내부 직원 사용자에 대한 처리 로직 추가
+            point = dashboardMapper.getCount(custCode);
+            pointList = dashboardMapper.getCountSum(custCode);
+        } else {
+            // 알 수 없는 사용자 유형 또는 누락된 정보 처리
+            // 오류 처리 로직 추가 또는 기본 데이터 설정
+        }
+
+        data.put("point", point);
+        data.put("pointList", pointList);
+        return data;
+    }
 }

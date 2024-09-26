@@ -98,4 +98,11 @@ public class DashboardController {
         Map<String, Object> data = dashboardService.getDashBoardPoint(username);
         return ResponseEntity.ok(data);
     }
+    @GetMapping("/api/dashboard-count-data")
+    public ResponseEntity<Map<String, Object>> getDashBoardCount(Principal principal) {
+
+        String username = principal.getName();
+        Map<String, Object> data = dashboardService.getDashBoardCount(username);
+        return ResponseEntity.ok(data);
+    }
 }

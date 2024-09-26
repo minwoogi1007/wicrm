@@ -703,6 +703,23 @@
     GROUP BY m.month_start
     ORDER BY m.month_start
     </select>
+
+    <select id="getCount" resultType="com.wio.crm.model.DashboardData">
+        SELECT
+            CUST_CODE,
+            SUM(CASE WHEN TRUNC(IN_DATE) = TRUNC(SYSDATE) THEN 1 ELSE 0 END) AS DAILY_PRCSUM,
+            SUM(CASE WHEN TRUNC(IN_DATE) BETWEEN TRUNC(SYSDATE, 'IW') AND TRUNC(SYSDATE) THEN 1 ELSE 0 END) AS WEEK,
+            SUM(CASE WHEN TRUNC(IN_DATE) BETWEEN TRUNC(SYSDATE, 'MM') AND TRUNC(SYSDATE) THEN 1 ELSE 0 END) AS MONTHLY_PRCSUM,
+            SUM(CASE WHEN TRUNC(IN_DATE) BETWEEN TRUNC(SYSDATE, 'YYYY') AND TRUNC(SYSDATE) THEN 1 ELSE 0 END) AS YEARLY_PRCSUM
+        FROM
+            TBND01
+        WHERE
+            PRC_GUBN = '2'
+          AND CUST_CODE =  #{custCode}
+        GROUP BY
+            CUST_CODE
+    </select>
+
     <select id="getPoint" resultType="com.wio.crm.model.DashboardData">
         WITH DateInfo AS (
             SELECT
@@ -798,6 +815,19 @@
         TO_CHAR(A.IN_DATE, 'YYYY-MM-DD')
         ORDER BY
         POINT_DATE
+    </select>
+
+    <select id="getCountSum" resultType="com.wio.crm.model.DashboardData">
+        SELECT TO_CHAR(IN_DATE, 'YYYY-MM-DD') AS POINT_DATE, COUNT(*) AS SUM_POINT
+        FROM TBND01
+        WHERE PRC_GUBN = '2'
+      <![CDATA[
+        AND IN_DATE >= TRUNC(SYSDATE, 'MM')
+        AND IN_DATE < TRUNC(SYSDATE) + 1
+      ]]>
+        AND CUST_CODE = #{custCode}
+        GROUP BY TO_CHAR(IN_DATE, 'YYYY-MM-DD')
+        order by TO_CHAR(IN_DATE, 'YYYY-MM-DD')
     </select>
 
 

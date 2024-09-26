@@ -68,6 +68,7 @@
                                 <div class="d-flex justify-content-between align-items-center text-gray-900 mb-7">
                                     <label class="col-lg-1 col-form-label required fw-semibold fs-6">제목</label>
                                     <input type="text" id="title" name="title" class="form-control form-control-lg form-control-solid" />
+                                    <input type="hidden" id="category" name="category" th:value="${category}" />
                                 </div>
                                 <div class="separator separator-dashed mb-9"></div>
                                 <div class="mb-2">
@@ -166,6 +167,7 @@
                     var title = $('#title').val().trim();
                     var content = $('#summernote').val().trim();
                     var files = document.getElementById('fileInput').files;
+                    var category = $('#category').val().trim();
 
                     if (title === "") {
                         alert("제목을 입력하세요.");

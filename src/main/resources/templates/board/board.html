@@ -84,12 +84,14 @@
                 <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
                   <th class="min-w-50px">NO</th>
                   <th class="min-w-125px">제목</th>
+                  <div th:if="${category != 'G'}">
+                    <th class="min-w-80px">작성자</th>
 
-                  <th class="min-w-80px">작성자</th>
+                    <th class="min-w-80px">작성일</th>
+                    <th class="min-w-70px">댓글</th>
+                    <th class="min-w-70px">조회수</th>
+                  </div>
 
-                  <th class="min-w-80px">작성일</th>
-                  <th class="min-w-70px">댓글</th>
-                  <th class="min-w-70px">조회수</th>
                 </tr>
                 </thead>
                 <tbody class="fw-semibold text-gray-600">
@@ -107,13 +109,14 @@
                                                 <i class="ki-duotone ki-paper-clip fs-6 text-gray-800"></i>
                                             </span>
                   </td>
-                  <td th:text="${list.ID}"></td>
+                  <div th:if="${category != 'G'}">
+                    <td th:text="${list.ID}"></td>
 
-                  <td th:text="${list.IN_DATE}"></td>
-                  <td th:text="${list.RE_COUNT}"></td>
+                    <td th:text="${list.IN_DATE}"></td>
+                    <td th:text="${list.RE_COUNT}"></td>
 
-                  <td th:text="${list.HIT}" ></td>
-
+                    <td th:text="${list.HIT}" ></td>
+                  </div>
                 </tr>
 
 

@@ -3,7 +3,7 @@
 
 <div layout:fragment="content">
     <!--begin::Content wrapper-->
-    <div th:replace="~{fragments/modal :: welcomeModal}"></div>
+    <!--<div th:replace="~{fragments/modal :: welcomeModal}"></div>-->
     <div class="d-flex flex-column flex-column-fluid">
         <!--begin::Toolbar-->
         <th:block th:replace="~{fragments/pageHeader :: pageHeader}"></th:block>
@@ -538,6 +538,11 @@
                 <!--end::Row-->
                 <!--begin::Row-->
                 <div th:if="${dataForB}">
+                    <script th:inline="javascript">
+                        /*<![CDATA[*/
+                        var isDataForB = /*[[${dataForB != null}]]*/ false;
+                        /*]]>*/
+                    </script>
                     <div class="row g-5 g-xl-10">
                         <!--begin::Col-->
                         <div class="col-xxl-4 mb-5 mb-xl-10">
@@ -578,7 +583,7 @@
                                                     <!--begin::Stats-->
                                                     <div class="m-0">
                                                         <!--begin::Number-->
-                                                        <span class="text-gray-700 fw-bolder d-block fs-2qx lh-1 ls-n1 mb-1">37</span>
+                                                        <span id="DCOUNTDAY"  class="text-gray-700 fw-bolder d-block fs-2qx lh-1 ls-n1 mb-1">37</span>
                                                         <!--end::Number-->
                                                         <!--begin::Desc-->
                                                         <span class="text-gray-500 fw-semibold fs-6">일간</span>
@@ -606,7 +611,7 @@
                                                     <!--begin::Stats-->
                                                     <div class="m-0">
                                                         <!--begin::Number-->
-                                                        <span class="text-gray-700 fw-bolder d-block fs-2qx lh-1 ls-n1 mb-1">6</span>
+                                                        <span id="DCOUNTWEEK" class="text-gray-700 fw-bolder d-block fs-2qx lh-1 ls-n1 mb-1">6</span>
                                                         <!--end::Number-->
                                                         <!--begin::Desc-->
                                                         <span class="text-gray-500 fw-semibold fs-6">주간</span>
@@ -635,7 +640,7 @@
                                                     <!--begin::Stats-->
                                                     <div class="m-0">
                                                         <!--begin::Number-->
-                                                        <span class="text-gray-700 fw-bolder d-block fs-2qx lh-1 ls-n1 mb-1">4,7</span>
+                                                        <span id="DCOUNTMONTH" class="text-gray-700 fw-bolder d-block fs-2qx lh-1 ls-n1 mb-1">4,7</span>
                                                         <!--end::Number-->
                                                         <!--begin::Desc-->
                                                         <span class="text-gray-500 fw-semibold fs-6">월간</span>
@@ -664,7 +669,7 @@
                                                     <!--begin::Stats-->
                                                     <div class="m-0">
                                                         <!--begin::Number-->
-                                                        <span class="text-gray-700 fw-bolder d-block fs-2qx lh-1 ls-n1 mb-1">822</span>
+                                                        <span  id="DCOUNTYEAR" class="text-gray-700 fw-bolder d-block fs-2qx lh-1 ls-n1 mb-1">822</span>
                                                         <!--end::Number-->
                                                         <!--begin::Desc-->
                                                         <span class="text-gray-500 fw-semibold fs-6">년간</span>
@@ -720,17 +725,17 @@
                                     <div class="px-9 mb-5">
                                         <!--begin::Statistics-->
                                         <div class="d-flex mb-2">
-                                            <span class="fs-4 fw-semibold text-gray-500 me-1">$</span>
-                                            <span class="fs-2hx fw-bold text-gray-800 me-2 lh-1 ls-n2">14,094</span>
+                                            <span class="fs-4 fw-semibold text-gray-500 me-1"></span>
+                                            <span id="DCOUNT" class="fs-2hx fw-bold text-gray-800 me-2 lh-1 ls-n2"></span>
                                         </div>
                                         <!--end::Statistics-->
-                                        <!--begin::Description-->
-                                        <span class="fs-6 fw-semibold text-gray-500"> $48,346 차감</span>
+                                        <!--begin::Description
+                                        <span class="fs-6 fw-semibold text-gray-500"> $48,346 차감</span>-->
                                         <!--end::Description-->
                                     </div>
                                     <!--end::Statistics-->
                                     <!--begin::Chart-->
-                                    <div id="kt_charts_widget_3_1" class="min-h-auto ps-4 pe-6" style="height: 300px"></div>
+                                    <div id="kt_charts_widget_31" class="min-h-auto ps-4 pe-6" style="height: 300px"></div>
                                     <!--end::Chart-->
                                 </div>
                                 <!--end::Card body-->

@@ -11,6 +11,7 @@ let callSum=0;
 let comSum =0;
 let missSum = 0;
 let yesterComSum = 0;
+
 document.addEventListener('DOMContentLoaded', function () {
     function setCookie(name, value, days) {
         console.log('setCookie');
@@ -53,6 +54,12 @@ $(document).ready(function() {
     fetchWeeklyData();
     fetchYearData();
     fetchPoint();
+
+    //도급 사용시
+    // isDataForB가 정의되어 있고 true일 때만 fetchCount 실행
+    if (typeof isDataForB !== 'undefined' && isDataForB) {
+        fetchCount();
+    }
     // ID를 사용하여 버튼 선택
     const customCount = document.getElementById('customCount');
     const timeCount = document.getElementById('timeCount');
@@ -138,6 +145,59 @@ $(document).ready(function() {
         });
 
     }
+    function fetchCount(){
+        //도급 업체만 나오게
+        $.ajax({
+            url: "/api/dashboard-count-data", // 서버 엔드포인트
+            type: "GET",
+            success: function(response) {
+                //console.log(response);
+                // response는 각 카드 데이터를 포함하는 객체
+                pointMList =[];
+                pointDay=[];
+                Object.keys(response).forEach(function(key) {
+                    // 예: key = 'card-data-1'
+
+
+                    if(key=="point"){
+                        const point = response[key];
+                        console.log(point);
+                        $('#DCOUNTDAY').text(point.daily_PRCSUM);
+
+                        $('#DCOUNTWEEK').text(point.week);
+                        $('#DCOUNTMONTH').text(point.monthly_PRCSUM);
+                        $('#DCOUNTYEAR').text(point.yearly_PRCSUM);
+                        $('#DCOUNT').text( point.monthly_PRCSUM+" 건");
+                    }else if(key=="pointList"){
+                        const pointMileList= response[key];
+                        pointDay.push("");
+                        pointMList.push(0);
+                        pointMileList.forEach((item, index) => {
+                            pointMList.push(item.sum_POINT);
+                            pointDay.push(item.point_DATE);
+                        });
+                        pointDay.push("");
+                        pointMList.push(0);
+                        pointMax = Math.max(...pointMList);
+                        pointMin =Math.min(...pointMList);
+                    }
+
+
+                });
+
+                formattedPointList = pointMList.map(function(number) {
+                    return number.toLocaleString();
+                });
+
+                KTChartsWidget31.init();
+            },
+            error: function(xhr, status, error) {
+                console.error("Data load failed:", error);
+            }
+        });
+
+    }
+
     function fetchMonthData(){
         $.ajax({
             url: "/api/dashboard-month-data", // 서버 엔드포인트
@@ -1637,7 +1697,160 @@ $(document).ready(function() {
             }
         }
     }();
-
+    var KTChartsWidget31 = function() {
+        var e = {
+                self: null,
+                rendered: !1
+            },
+            t = function(e) {
+                var t = document.getElementById("kt_charts_widget_31");
+                if (t) {
+                    var a = parseInt(KTUtil.css(t, "height")),
+                        l = KTUtil.getCssVariableValue("--bs-gray-500"),
+                        r = KTUtil.getCssVariableValue("--bs-border-dashed-color"),
+                        o = KTUtil.getCssVariableValue("--bs-success"),
+                        i = {
+                            series: [{
+                                name: "처리건수",
+                                data: pointMList
+                            }],
+                            chart: {
+                                fontFamily: "inherit",
+                                type: "area",
+                                height: a,
+                                toolbar: {
+                                    show: !1
+                                }
+                            },
+                            plotOptions: {},
+                            legend: {
+                                show: !1
+                            },
+                            dataLabels: {
+                                enabled: !1
+                            },
+                            fill: {
+                                type: "gradient",
+                                gradient: {
+                                    shadeIntensity: 1,
+                                    opacityFrom: .4,
+                                    opacityTo: 0,
+                                    stops: [0, 80, 100]
+                                }
+                            },
+                            stroke: {
+                                curve: "smooth",
+                                show: !0,
+                                width: 3,
+                                colors: [o]
+                            },
+                            xaxis: {
+                                categories: pointDay,
+                                axisBorder: {
+                                    show: !1
+                                },
+                                axisTicks: {
+                                    show: !1
+                                },
+                                tickAmount: 6,
+                                labels: {
+                                    rotate: 0,
+                                    rotateAlways: !0,
+                                    style: {
+                                        colors: l,
+                                        fontSize: "12px"
+                                    }
+                                },
+                                crosshairs: {
+                                    position: "front",
+                                    stroke: {
+                                        color: o,
+                                        width: 1,
+                                        dashArray: 3
+                                    }
+                                },
+                                tooltip: {
+                                    enabled: !0,
+                                    formatter: void 0,
+                                    offsetY: 0,
+                                    style: {
+                                        fontSize: "12px"
+                                    }
+                                }
+                            },
+                            yaxis: {
+                                tickAmount: 4,
+                                max: pointMax,
+                                min: pointMin,
+                                labels: {
+                                    style: {
+                                        colors: l,
+                                        fontSize: "12px"
+                                    },
+                                    formatter: function(e) {
+                                        return e
+                                    }
+                                }
+                            },
+                            states: {
+                                normal: {
+                                    filter: {
+                                        type: "none",
+                                        value: 0
+                                    }
+                                },
+                                hover: {
+                                    filter: {
+                                        type: "none",
+                                        value: 0
+                                    }
+                                },
+                                active: {
+                                    allowMultipleDataPointsSelection: !1,
+                                    filter: {
+                                        type: "none",
+                                        value: 0
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                style: {
+                                    fontSize: "12px"
+                                },
+                                y: {
+                                    formatter: function(e) {
+                                        return e
+                                    }
+                                }
+                            },
+                            colors: [KTUtil.getCssVariableValue("--bs-success")],
+                            grid: {
+                                borderColor: r,
+                                strokeDashArray: 4,
+                                yaxis: {
+                                    lines: {
+                                        show: !0
+                                    }
+                                }
+                            },
+                            markers: {
+                                strokeColor: o,
+                                strokeWidth: 3
+                            }
+                        };
+                    e.self = new ApexCharts(t, i), setTimeout((function() {
+                        e.self.render(), e.rendered = !0
+                    }), 200)
+                }
+            };
+        return {
+            init: function() {
+                t(e), KTThemeMode.on("kt.thememode.change", (function() {
+                    e.rendered && e.self.destroy(), t(e)
+                }))
+            }
+        }
+    }();
 
     var KTChartsWidget3_1 = function() {
         var e = {
