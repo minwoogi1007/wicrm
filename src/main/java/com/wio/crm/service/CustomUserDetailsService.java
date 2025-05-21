@@ -63,7 +63,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     // 사용자의 승인 상태 확인
     private void verifyUserConfirmationStatus(Tipdw user) {
-        System.out.println("user.getConfirmYn() : " + user.getConfirmYn());
+        //System.out.println("user.getConfirmYn() : " + user.getConfirmYn());
         if ("N".equals(user.getConfirmYn())) {
             throw new UserNotConfirmedException("아직 승인되지 않은 사용자입니다: " + user.getUserid());
         }
@@ -88,21 +88,42 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     // 외부 직원 처리
     private UserDetails handleExternalEmployee(String userid, Tipdw user) {
+        logger.info("거래처 직원 정보 조회: {}", userid);
+        
+        // 거래처 직원 정보 조회 - 표준 findByUserId 사용
         Tcnt01Emp tcntUser = tcnt01EmpMapper.findByUserId(userid);
         if (tcntUser == null) {
+            logger.error("거래처 직원 정보 조회 실패: {}", userid);
             throw new AccountExpiredException("현재 활성 상태가 아닌 사용자입니다: " + userid);
         }
-
-
+        
+        // 거래처 직원 정보 로그
+        logger.info("거래처 직원 정보: userId={}, custCode={}, cust_grade={}, emp_name={}, authority={}", 
+            tcntUser.getUserId(), tcntUser.getCustCode(), tcntUser.getCust_grade(), tcntUser.getEmp_name(), tcntUser.getAuthority());
+        
+        // 권한 설정
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+        
+        // 관리자 권한 추가 (authority=1인 경우)
+        if ("1".equals(tcntUser.getAuthority())) {
+            logger.info("관리자 권한 추가: {}", userid);
+            authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        }
 
         return buildCustomUserDetails(user, null, tcntUser, authorities);
     }
 
     // CustomUserDetails 객체 구성
     private CustomUserDetails buildCustomUserDetails(Tipdw user, Temp01 tempUser, Tcnt01Emp tcntUser, List<SimpleGrantedAuthority> authorities) {
-        String custCode = tcntUser != null ? tcntUser.getCust_grade() : null;
+        String custCode = tcntUser != null ? tcntUser.getCustCode() : null;
+        
+        if (tcntUser != null) {
+            logger.debug("tcntUser 정보: custCode={}, cust_grade={}, emp_name={}", 
+                tcntUser.getCustCode(), tcntUser.getCust_grade(), tcntUser.getEmp_name());
+            //System.out.println("tcntUser 정보: custCode=" + tcntUser.getCustCode() + ", cust_grade=" + tcntUser.getCust_grade() + ", emp_name=" + tcntUser.getEmp_name());
+        }
+        
         return new CustomUserDetails(user.getUserid(), user.getPw(), authorities, custCode, tempUser, tcntUser);
     }
 }

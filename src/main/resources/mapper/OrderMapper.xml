@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wio.crm.mapper.OrderMapper">
+    <insert id="insertOrder" parameterType="com.wio.crm.model.Order">
+        INSERT INTO orders (
+            order_id, sequence, order_time, order_date, sa_order_number, rmk3,
+            rmk1, shopping_order, recipient_name, order_mall, contact1,
+            contact2, zip_code, address, quantity, product_code,
+            product_option, sale_price, payment_amount, gift, shipping_type,
+            delivery_memo, release_number, d_memo, rmk2, shopping_mall_name,
+            product_code2, order_name
+        ) VALUES (
+                     #{orderId, jdbcType=NUMERIC}, #{sequence, jdbcType=VARCHAR}, #{orderTime, jdbcType=VARCHAR}, #{orderDate, jdbcType=VARCHAR}, #{saOrderNumber, jdbcType=VARCHAR},
+                     #{rmk3, jdbcType=VARCHAR}, #{rmk1, jdbcType=VARCHAR}, #{shoppingOrder, jdbcType=VARCHAR}, #{recipientName, jdbcType=VARCHAR}, #{orderMall, jdbcType=VARCHAR},
+                     #{contact1, jdbcType=VARCHAR}, #{contact2, jdbcType=VARCHAR}, #{zipCode, jdbcType=VARCHAR}, #{address, jdbcType=VARCHAR}, #{quantity, jdbcType=VARCHAR},
+                     #{productCode, jdbcType=VARCHAR}, #{productOption, jdbcType=VARCHAR}, #{salePrice, jdbcType=VARCHAR}, #{paymentAmount, jdbcType=VARCHAR}, #{gift, jdbcType=VARCHAR},
+                     #{shippingType, jdbcType=VARCHAR}, #{deliveryMemo, jdbcType=VARCHAR}, #{releaseNumber, jdbcType=VARCHAR}, #{dMemo, jdbcType=VARCHAR}, #{rmk2, jdbcType=VARCHAR},
+                     #{shoppingMallName, jdbcType=VARCHAR}, #{productCode2, jdbcType=VARCHAR}, #{orderName, jdbcType=VARCHAR}
+                 )
+    </insert>
+    <select id="getNextOrderId" resultType="long">
+        SELECT order_id_seq.NEXTVAL FROM dual
+    </select>
+
+    <!-- Get all Orders -->
+    <select id="getAllOrders" resultType="com.wio.crm.model.Order">
+        SELECT * FROM orders
+    </select>
+
+    <!-- Find Orders with Missing Invoices -->
+    <select id="findMissingInvoices" resultType="com.wio.crm.model.Order">
+        SELECT * FROM orders WHERE NOT EXISTS (
+            SELECT 1 FROM invoices
+            WHERE invoices.recipient_name = orders.recipient_name
+              AND invoices.recipient_phone = orders.contact1
+              AND invoices.recipient_address = orders.address
+              AND invoices.product_name = CONCAT(orders.product_code, '-', orders.option, '-', orders.quantity, '.')
+        )
+    </select>
+</mapper>

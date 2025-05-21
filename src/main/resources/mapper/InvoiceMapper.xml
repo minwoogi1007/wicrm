@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wio.crm.mapper.InvoiceMapper">
+
+    <insert id="insertInvoice" parameterType="com.wio.crm.model.Invoice">
+        INSERT INTO invoices (
+            region, tracking_number, recipient_name, recipient_phone, recipient_manager,
+            recipient_mobile, recipient_postal_code, recipient_address, quantity,
+            product_name, freight_type, payment_condition, release_number,
+            special_note, memo1, memo2, memo3, memo4
+        ) VALUES (
+                     #{region, jdbcType=VARCHAR}, #{trackingNumber, jdbcType=VARCHAR}, #{recipientName, jdbcType=VARCHAR}, #{recipientPhone, jdbcType=VARCHAR},
+                     #{recipientManager, jdbcType=VARCHAR}, #{recipientMobile, jdbcType=VARCHAR}, #{recipientPostalCode, jdbcType=VARCHAR}, #{recipientAddress, jdbcType=VARCHAR},
+                     #{quantity, jdbcType=INTEGER}, #{productName, jdbcType=VARCHAR}, #{freightType, jdbcType=VARCHAR}, #{paymentCondition, jdbcType=VARCHAR},
+                     #{releaseNumber, jdbcType=VARCHAR}, #{specialNote, jdbcType=VARCHAR}, #{memo1, jdbcType=VARCHAR}, #{memo2, jdbcType=VARCHAR},
+                     #{memo3, jdbcType=VARCHAR}, #{memo4, jdbcType=VARCHAR}
+                 )
+    </insert>
+
+    <select id="getNextInvoiceId" resultType="long">
+        SELECT invoice_id_seq.NEXTVAL FROM dual
+    </select>
+
+
+</mapper>

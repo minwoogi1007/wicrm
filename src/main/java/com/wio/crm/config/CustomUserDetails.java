@@ -37,4 +37,14 @@ public class CustomUserDetails extends User {
     public void setTcntUserInfo(Tcnt01Emp tcntUserInfo) {
         this.tcntUserInfo = tcntUserInfo;
     }
+    
+    @Override
+    public String toString() {
+        return "CustomUserDetails{" +
+                "username=" + getUsername() +
+                ", custCode='" + custCode + '\'' +
+                ", tempUserInfo=" + (tempUserInfo != null ? tempUserInfo.toString() : "null") +
+                ", tcntUserInfo=" + (tcntUserInfo != null ? tcntUserInfo.toString() : "null") +
+                '}';
+    }
 }

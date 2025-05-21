@@ -28,6 +28,6 @@ public interface BoardService {
 
     Board getLatestNotice();//메인 공지 모달창
 
-    Board selectPostByIdWithoutCustCode(String id);
+   // Board selectPostByIdWithoutCustCode(String id);
     List<Board> selectCommentWithoutCustCode(String id);
 }

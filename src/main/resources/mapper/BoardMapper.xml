@@ -1,7 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.wio.crm.mapper.BoardMapper">
-    <select id="findPostsByCategory" resultType="com.wio.crm.model.Board">
+    <!-- Board 결과 매핑 정의 -->
+    <resultMap id="BoardResultMap" type="com.wio.crm.model.Board">
+        <id property="UNO" column="UNO"/>
+        <result property="GNO" column="GNO"/>
+        <result property="CAT_GROUP" column="CAT_GROUP"/>
+        <result property="SUBJECT" column="SUBJECT"/>
+        <result property="SUBJECTFULL" column="SUBJECTFULL"/>
+        <result property="ID" column="ID"/>
+        <result property="IN_DATE" column="IN_DATE"/>
+        <result property="REPLY_DEPTH" column="REPLY_DEPTH"/>
+        <result property="ATT_FILE" column="ATT_FILE"/>
+        <result property="HIT" column="HIT"/>
+        <result property="EMPNM" column="EMPNM"/>
+        <result property="RE_COUNT" column="RE_COUNT"/>
+        <result property="NOCODE" column="NOCODE"/>
+    </resultMap>
+
+    <select id="findPostsByCategory" resultMap="BoardResultMap">
         WITH ReplyCounts AS (
             SELECT
                 GNO,
@@ -12,71 +29,105 @@
             GROUP BY GNO, cat_group
         )
         SELECT
-            --ROW_NUMBER() OVER (ORDER BY a.GNO DESC) AS rownum,
-            a.UNO,
-            a.GNO,
-            a.cat_group,
+            a.UNO as UNO,
+            a.GNO as GNO,
+            a.cat_group as CAT_GROUP,
             a.SUBJECT AS SUBJECTFULL,
             CASE
                 WHEN LENGTH(a.SUBJECT) > 20 THEN SUBSTR(a.SUBJECT, 1, 19) || '...'
                 ELSE a.SUBJECT
             END AS SUBJECT,
-            a.ID,
-            SUBSTR(a.IN_DATE,0,10) AS IN_DATE,
-            a.REPLY_DEPTH,
+            a.ID as ID,
+            TO_CHAR(TO_DATE(a.IN_DATE, 'YYYY-MM-DD HH24:MI:SS'), 'YYYY-MM-DD') as IN_DATE,
+            a.REPLY_DEPTH as REPLY_DEPTH,
             a.att_file as ATT_FILE,
-            a.hit,
-            a.EMPNM,
-            rc.re_count,
-            CASE WHEN a.nocode = '1' THEN 'notice' ELSE '' END AS nocode
+            NVL(a.hit, 0) as HIT,
+            a.EMPNM as EMPNM,
+            NVL(rc.re_count, 0) as RE_COUNT,
+            CASE WHEN a.nocode = '1' THEN 'notice' ELSE '' END AS NOCODE
         FROM BOARD_CALL a
                  LEFT JOIN ReplyCounts rc ON a.GNO = rc.GNO AND a.cat_group = rc.cat_group
         WHERE a.CAT_GROUP = #{category}
           AND a.REPLY_DEPTH = 'A'
           AND a.DELCODE IS NULL
           AND a.SUBJECT IS NOT NULL
-          and substr(a.in_date,0,10) > '2024-01-01'
+          AND TO_DATE(a.IN_DATE, 'YYYY-MM-DD HH24:MI:SS') >= ADD_MONTHS(SYSDATE, -6)
         ORDER BY a.GNO DESC, a.REPLY_DEPTH
-
     </select>
-    <select id="selectPostById" resultType="com.wio.crm.model.Board">
+    <select id="selectPostById" resultMap="BoardResultMap">
         SELECT
-            gno,
-            uno,
-            REPLY_DEPTH,
-            CAT_GROUP,
-            SUBJECT,
-            EMPNM,
-            IN_DATE,
-            ID,
-            CONTENT,
-            ATT_FILE
+            gno as GNO,
+            uno as UNO,
+            REPLY_DEPTH as REPLY_DEPTH,
+            CAT_GROUP as CAT_GROUP,
+            SUBJECT as SUBJECT,
+            EMPNM as EMPNM,
+            IN_DATE as IN_DATE,
+            ID as ID,
+            CONTENT as CONTENT,
+            ATT_FILE as ATT_FILE
         FROM BOARD_CALL
         WHERE CAT_GROUP = #{category}
           AND uno=#{id}
-
-
     </select>
 
-    <select id="selectComment" resultType="com.wio.crm.model.Board">
+    <select id="selectComment" resultMap="BoardResultMap">
         SELECT
-            gno,
-            uno,
-            REPLY_DEPTH,
-            CAT_GROUP,
-            SUBJECT,
-            EMPNM,
-            TO_DATE(IN_DATE,'YYYY-MM-DD HH24:MI:SS')  IN_DATE,
-            ID,
-            CONTENT,
-            ATT_FILE
+            gno as GNO,
+            uno as UNO,
+            REPLY_DEPTH as REPLY_DEPTH,
+            CAT_GROUP as CAT_GROUP,
+            SUBJECT as SUBJECT,
+            EMPNM as EMPNM,
+            TO_CHAR(TO_DATE(IN_DATE,'YYYY-MM-DD HH24:MI:SS'), 'YYYY-MM-DD') as IN_DATE,
+            ID as ID,
+            CONTENT as CONTENT,
+            ATT_FILE as ATT_FILE
         FROM BOARD_CALL
         WHERE CAT_GROUP = #{category}
           AND gno=(select gno from board_call where uno= #{id} and CAT_GROUP = #{category})
           AND SUBJECT IS NULL
         ORDER BY IN_DATE
-
     </select>
+    
+    <!-- 공지사항 게시글 조회 -->
+    <select id="selectPostByIdWithoutCustCode" resultMap="BoardResultMap">
+        SELECT
+            gno as GNO,
+            uno as UNO,
+            REPLY_DEPTH as REPLY_DEPTH,
+            CAT_GROUP as CAT_GROUP,
+            SUBJECT as SUBJECT,
+            EMPNM as EMPNM,
+            TO_CHAR(TO_DATE(IN_DATE, 'YYYY-MM-DD HH24:MI:SS'), 'YYYY-MM-DD') as IN_DATE,
+            ID as ID,
+            CONTENT as CONTENT,
+            ATT_FILE as ATT_FILE
+        FROM BOARD_CALL
+        WHERE CAT_GROUP = 'G'
+          AND uno=#{id}
+    </select>
+    
+    <!-- 공지사항 댓글 조회 -->
+    <select id="selectCommentWithoutCustCode" resultMap="BoardResultMap">
+        SELECT
+            gno as GNO,
+            uno as UNO,
+            REPLY_DEPTH as REPLY_DEPTH,
+            CAT_GROUP as CAT_GROUP,
+            SUBJECT as SUBJECT,
+            EMPNM as EMPNM,
+            TO_CHAR(TO_DATE(IN_DATE, 'YYYY-MM-DD HH24:MI:SS'), 'YYYY-MM-DD') as IN_DATE,
+            ID as ID,
+            CONTENT as CONTENT,
+            ATT_FILE as ATT_FILE
+        FROM BOARD_CALL
+        WHERE CAT_GROUP = 'G'
+          AND gno=(select gno from board_call where uno=#{id} and CAT_GROUP = 'G')
+          AND SUBJECT IS NULL
+        ORDER BY IN_DATE
+    </select>
+
     <insert id="insertPost">
         INSERT INTO BOARD_CALL (
             UNO, GNO, REPLY_DEPTH, CAT_GROUP, ID, SUBJECT, CONTENT, HIT, IN_DATE, ATT_FILE, EMPNM, NOCODE
@@ -115,9 +166,8 @@
 
 
     <insert id="insertComment" parameterType="com.wio.crm.model.Board">
-       INSERT INTO BOARD_CALL (GNO, UNO,REPLY_DEPTH, CAT_GROUP, CONTENT, HIT, ID, IN_DATE)
-        VALUES (#{GNO}, #{UNO}, #{REPLY_DEPTH},#{CAT_GROUP}, #{CONTENT}, 0,#{ID}, #{IN_DATE})
-
+       INSERT INTO BOARD_CALL (GNO, UNO, REPLY_DEPTH, CAT_GROUP, CONTENT, HIT, ID, IN_DATE)
+        VALUES (#{GNO}, #{UNO}, #{REPLY_DEPTH}, #{CAT_GROUP}, #{CONTENT}, 0, #{ID}, #{IN_DATE})
     </insert>
     <select id="getNextUno" resultType="int">
         SELECT NVL(MAX(UNO), 0) + 1
@@ -126,9 +176,104 @@
     </select>
     <select id="getReplyCount" resultType="int">
         SELECT COUNT(REPLY_DEPTH) FROM BOARD_CALL WHERE CAT_GROUP = #{catGroup} AND GNO = #{gno} AND REPLY_DEPTH LIKE #{replyDepth} || '%'
-
-
     </select>
 
+    <!-- 모든 게시글 조회 -->
+    <select id="findAllPosts" resultMap="BoardResultMap">
+        WITH ReplyCounts AS (
+            SELECT
+                GNO,
+                cat_group,
+                COUNT(*) AS re_count
+            FROM BOARD_CALL
+            WHERE SUBJECT IS NULL AND DELCODE IS NULL
+            GROUP BY GNO, cat_group
+        )
+        SELECT
+            a.UNO as UNO,
+            a.GNO as GNO,
+            a.cat_group as CAT_GROUP,
+            a.SUBJECT AS SUBJECTFULL,
+            CASE
+                WHEN LENGTH(a.SUBJECT) > 20 THEN SUBSTR(a.SUBJECT, 1, 19) || '...'
+                ELSE a.SUBJECT
+            END AS SUBJECT,
+            a.ID as ID,
+            TO_CHAR(TO_DATE(a.IN_DATE, 'YYYY-MM-DD HH24:MI:SS'), 'YYYY-MM-DD') as IN_DATE,
+            a.REPLY_DEPTH as REPLY_DEPTH,
+            a.att_file as ATT_FILE,
+            NVL(a.hit, 0) as HIT,
+            a.EMPNM as EMPNM,
+            NVL(rc.re_count, 0) as RE_COUNT,
+            CASE WHEN a.nocode = '1' THEN 'notice' ELSE '' END AS NOCODE
+        FROM BOARD_CALL a
+        LEFT JOIN ReplyCounts rc ON a.GNO = rc.GNO AND a.cat_group = rc.cat_group
+        WHERE a.REPLY_DEPTH = 'A'
+        AND a.DELCODE IS NULL
+        AND a.SUBJECT IS NOT NULL
+        AND TO_DATE(a.IN_DATE, 'YYYY-MM-DD HH24:MI:SS') >= ADD_MONTHS(SYSDATE, -6)
+        ORDER BY a.GNO DESC, a.REPLY_DEPTH
+    </select>
+
+    <!-- 공지사항 목록 조회 -->
+    <select id="noticeBoardList" resultMap="BoardResultMap">
+        WITH ReplyCounts AS (
+            SELECT
+                GNO,
+                cat_group,
+                COUNT(*) AS re_count
+            FROM BOARD_CALL
+            WHERE SUBJECT IS NULL AND DELCODE IS NULL
+            GROUP BY GNO, cat_group
+        )
+        SELECT
+            a.UNO as UNO,
+            a.GNO as GNO,
+            a.cat_group as CAT_GROUP,
+            a.SUBJECT AS SUBJECTFULL,
+            CASE
+                WHEN LENGTH(a.SUBJECT) > 20 THEN SUBSTR(a.SUBJECT, 1, 19) || '...'
+                ELSE a.SUBJECT
+            END AS SUBJECT,
+            a.ID as ID,
+            TO_CHAR(TO_DATE(a.IN_DATE, 'YYYY-MM-DD HH24:MI:SS'), 'YYYY-MM-DD') as IN_DATE,
+            a.REPLY_DEPTH as REPLY_DEPTH,
+            a.att_file as ATT_FILE,
+            NVL(a.hit, 0) as HIT,
+            a.EMPNM as EMPNM,
+            NVL(rc.re_count, 0) as RE_COUNT,
+            CASE WHEN a.nocode = '1' THEN 'notice' ELSE '' END AS NOCODE
+        FROM BOARD_CALL a
+        LEFT JOIN ReplyCounts rc ON a.GNO = rc.GNO AND a.cat_group = rc.cat_group
+        WHERE a.CAT_GROUP = 'G'
+        AND a.REPLY_DEPTH = 'A'
+        AND a.DELCODE IS NULL
+        AND a.SUBJECT IS NOT NULL
+        AND a.NOCODE = '1'
+        ORDER BY a.GNO DESC, a.REPLY_DEPTH
+    </select>
+
+    <!-- 최신 공지사항 조회 -->
+    <select id="getLatestNotice" resultMap="BoardResultMap">
+        SELECT
+            gno as GNO,
+            uno as UNO,
+            REPLY_DEPTH as REPLY_DEPTH,
+            CAT_GROUP as CAT_GROUP,
+            SUBJECT as SUBJECT,
+            EMPNM as EMPNM,
+            TO_CHAR(TO_DATE(IN_DATE, 'YYYY-MM-DD HH24:MI:SS'), 'YYYY-MM-DD') as IN_DATE,
+            ID as ID,
+            CONTENT as CONTENT,
+            ATT_FILE as ATT_FILE
+        FROM BOARD_CALL
+        WHERE CAT_GROUP = 'G'
+        AND REPLY_DEPTH = 'A'
+        AND SUBJECT IS NOT NULL
+        AND DELCODE IS NULL
+        AND NOCODE = '1'
+        AND ROWNUM = 1
+        ORDER BY UNO DESC
+    </select>
 
 </mapper>

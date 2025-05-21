@@ -38,7 +38,7 @@ public class MileageService {
     public Map<String, Object> getRemainingMileage() {
         Map<String, Object> data = new HashMap<>();
         String custCode = getCurrentUserCustCode();
-        System.out.println("custCode-===" + custCode);
+        //System.out.println("custCode-===" + custCode);
 
         Mileage remainingMileage = mileageMapper.getRemainingMileage(custCode);
         List<Transaction> mileageCharge = mileageMapper.getAllTransactions(custCode);

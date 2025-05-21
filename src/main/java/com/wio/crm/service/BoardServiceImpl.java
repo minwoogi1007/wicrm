@@ -13,21 +13,22 @@ import java.util.List;
 
 @Service
 public class BoardServiceImpl implements BoardService {
-    @Autowired
     private final BoardMapper boardMapper;
+
+    @Autowired
+    public BoardServiceImpl(BoardMapper boardMapper) {
+        this.boardMapper = boardMapper;
+    }
 
     @Override
     public Board getLatestNotice() {
         return boardMapper.getLatestNotice();
     }
-    @Override
-    public Board selectPostByIdWithoutCustCode(String id) {
-        return boardMapper.selectPostByIdWithoutCustCode(id);
-    }
+
 
     @Override
     public List<Board> selectCommentWithoutCustCode(String id) {
-        return boardMapper.selectCommentWithoutCustCode(id);
+        return boardMapper.selectCommentWithoutCustCode(Integer.parseInt(id));
     }
     private String getCurrentCustcode() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -51,10 +52,6 @@ public class BoardServiceImpl implements BoardService {
         // Using a ternary operator to simplify code
         return userDetails.getTcntUserInfo() != null ? userDetails.getTcntUserInfo().getUserId() : "";
     }
-    @Autowired
-    public BoardServiceImpl(BoardMapper boardMapper) {
-        this.boardMapper = boardMapper;
-    }
 
     @Override
     public List<Board> findPostsByCategory(String category) {
@@ -75,7 +72,7 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public List<Board> selectComment(String id,String category) {
 
-        return boardMapper.selectComment(category,id);
+        return boardMapper.selectComment(category, Integer.valueOf(id));
     }
 
     @Override
@@ -88,11 +85,29 @@ public class BoardServiceImpl implements BoardService {
     public Board saveComment(Board board) {
         // 댓글의 UNO, GNO, REPLY_DEPTH 값을 설정하는 로직
 
+        // CAT_GROUP이 null인 경우 처리
+        if (board.getCAT_GROUP() == null || board.getCAT_GROUP().trim().isEmpty()) {
+            System.err.println("Warning: CAT_GROUP is null or empty. Setting user's CUST_CODE.");
+            
+            // 현재 로그인한 사용자의 CUST_CODE 가져오기
+            String custCode = getCurrentCustcode();
+            if (custCode != null && !custCode.isEmpty()) {
+                board.setCAT_GROUP(custCode);
+                //System.out.println("CAT_GROUP set from user's CUST_CODE: " + custCode);
+            } else {
+                // 로그인한 사용자의 CUST_CODE를 가져올 수 없는 경우 예외 발생
+                throw new IllegalStateException("Cannot set CAT_GROUP: User's CUST_CODE is not available");
+            }
+        }
 
         int r_uno = boardMapper.getNextUno(board.getCAT_GROUP());
 
         board.setUNO(Integer.toString(r_uno));
 
+        // REPLY_DEPTH가 null인 경우 기본값 'A' 설정
+        if (board.getREPLY_DEPTH() == null || board.getREPLY_DEPTH().trim().isEmpty()) {
+            board.setREPLY_DEPTH("A");
+        }
 
         int c_reply = boardMapper.getReplyCount(board.getCAT_GROUP(), board.getGNO(), board.getREPLY_DEPTH());
         board.setID(getCurrentUserId());

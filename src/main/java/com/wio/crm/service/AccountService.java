@@ -78,7 +78,7 @@ public class AccountService {
         String userId = getCurrentUserId();
 
         Account account = accountMapper.findUserByUsername(userId);
-        System.out.println("user==========="+account.getPassword());
+        //System.out.println("user==========="+account.getPassword());
 
         return passwordEncoder.matches(currentPassword, account.getPassword());
     }

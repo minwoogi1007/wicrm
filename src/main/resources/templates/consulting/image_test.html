@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+
+<div layout:fragment="content">
+    <style>
+        .debug-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+        }
+        .debug-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        .debug-content {
+            font-family: monospace;
+            white-space: pre-wrap;
+            background-color: #fff;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .image-test {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .image-container {
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            width: 250px;
+            margin-bottom: 15px;
+        }
+        .image-preview {
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            background-color: #f5f5f5;
+        }
+        .image-preview img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        .url-info {
+            background-color: #f5f5f5;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+        .url-part {
+            background-color: #e9f5ff;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+    </style>
+
+    <div class="app-main flex-column flex-row-fluid" id="kt_app_main">
+        <div class="d-flex flex-column flex-column-fluid">
+            <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+                <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                    <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                        <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">이미지 경로 테스트</h1>
+                        <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                            <li class="breadcrumb-item text-muted">
+                                <a href="/main" class="text-muted text-hover-primary">Home</a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                            </li>
+                            <li class="breadcrumb-item text-muted">상담 관리</li>
+                            <li class="breadcrumb-item">
+                                <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                            </li>
+                            <li class="breadcrumb-item text-muted">이미지 테스트</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="kt_app_content" class="app-content flex-column-fluid">
+                <div id="kt_app_content_container" class="app-container container-xxl">
+                    <!-- 문의 정보 카드 -->
+                    <div class="card mb-5" th:if="${inquiry != null}">
+                        <div class="card-header">
+                            <h3 class="card-title fw-bold">문의 정보</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>문의 ID:</strong> <span th:text="${inquiry.inquiryId}">1</span></p>
+                                    <p><strong>고객명:</strong> <span th:text="${inquiry.customerName}">홍길동</span></p>
+                                    <p><strong>상태:</strong> <span th:text="${inquiry.status}">상태</span></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>등록일:</strong> <span th:text="${#temporals.format(inquiry.createdDate, 'yyyy-MM-dd HH:mm')}">2025-04-21</span></p>
+                                    <p><strong>유형:</strong> <span th:text="${inquiry.inquiryType}">유형</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- URL 정보 카드 -->
+                    <div class="card mb-5">
+                        <div class="card-header">
+                            <h3 class="card-title fw-bold">이미지 URL 구성 정보</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="url-info">
+                                <p><strong>서버 기본 URL:</strong> <span class="url-part" th:text="${serverUrl}">http://175.119.224.45:8080/uploads/</span></p>
+                                <p><strong>파일 경로 예시 (DB 값):</strong> <span class="url-part">images/파일명.jpg</span></p>
+                                <p><strong>전체 URL 예시:</strong> <span class="url-part">http://175.119.224.45:8080/uploads/images/파일명.jpg</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 이미지 테스트 카드 -->
+                    <div class="card mb-5">
+                        <div class="card-header">
+                            <h3 class="card-title fw-bold">첨부파일 테스트</h3>
+                        </div>
+                        <div class="card-body">
+                            <div th:if="${attachments != null && !attachments.isEmpty()}">
+                                <div th:each="attachment, status : ${attachments}" class="mb-5 pb-5 border-bottom">
+                                    <h4 th:text="${'첨부파일 #' + (status.index + 1)}">첨부파일 #1</h4>
+                                    
+                                    <!-- 파일 정보 -->
+                                    <div class="debug-card mb-4">
+                                        <div class="debug-title">DB에 저장된 정보</div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <p><strong>ID:</strong> <span th:text="${attachment['attachment_id']}">ID</span></p>
+                                                <p><strong>파일명:</strong> <span th:text="${attachment['file_name']}">파일명</span></p>
+                                                <p><strong>파일경로:</strong> <span th:text="${attachment['file_path']}" class="url-part">경로</span></p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p><strong>파일유형:</strong> <span th:text="${attachment['file_type']}">유형</span></p>
+                                                <p><strong>파일크기:</strong> <span th:text="${attachment['file_size'] != null ? #numbers.formatDecimal(attachment['file_size'] / 1024, 0, 1) + ' KB' : '-'}">크기</span></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- URL 구성 정보 -->
+                                    <div class="debug-card mb-4">
+                                        <div class="debug-title">URL 구성</div>
+                                        <p><strong>기본 URL:</strong> <span class="url-part" th:text="${serverUrl}">http://175.119.224.45:8080/uploads/</span></p>
+                                        <p><strong>파일 경로:</strong> <span class="url-part" th:text="${attachment['file_path']}">경로</span></p>
+                                        <p><strong>전체 URL:</strong> <span class="url-part" th:text="${serverUrl + attachment['file_path']}">전체 URL</span></p>
+                                        
+                                        <!-- HTML 태그 샘플 -->
+                                        <div class="debug-content" th:text="${'<img src=\"' + serverUrl + attachment['file_path'] + '\" alt=\"' + attachment['file_name'] + '\">'}">&lt;img src="..."&gt;</div>
+                                    </div>
+                                    
+                                    <!-- 이미지 표시 테스트 -->
+                                    <div class="debug-card" th:if="${attachment['file_type'] != null && attachment['file_type'].startsWith('image/')}">
+                                        <div class="debug-title">이미지 로드 테스트</div>
+                                        
+                                        <div class="row">
+                                            <!-- 방법 1: 직접 URL -->
+                                            <div class="col-md-4">
+                                                <div class="image-container">
+                                                    <h5>방법 1: 직접 URL</h5>
+                                                    <div class="image-preview">
+                                                        <img th:src="${serverUrl + attachment['file_path']}" 
+                                                             th:alt="${attachment['file_name']}"
+                                                             onerror="console.error('방법1 실패:', this.src); this.onerror=null; this.src='https://via.placeholder.com/150';"
+                                                             onload="console.log('방법1 성공:', this.src);">
+                                                    </div>
+                                                    <code th:text="${serverUrl + attachment['file_path']}">URL</code>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- 방법 2: 리터럴 대체 -->
+                                            <div class="col-md-4">
+                                                <div class="image-container">
+                                                    <h5>방법 2: 리터럴 대체</h5>
+                                                    <div class="image-preview">
+                                                        <img th:src="@{|${serverUrl}${attachment['file_path']}|}" 
+                                                             th:alt="${attachment['file_name']}"
+                                                             onerror="console.error('방법2 실패:', this.src); this.onerror=null; this.src='https://via.placeholder.com/150';"
+                                                             onload="console.log('방법2 성공:', this.src);">
+                                                    </div>
+                                                    <code>@{|${serverUrl}${attachment['file_path']}|}</code>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- 방법 3: 문자열 결합 -->
+                                            <div class="col-md-4">
+                                                <div class="image-container">
+                                                    <h5>방법 3: 문자열 결합</h5>
+                                                    <div class="image-preview">
+                                                        <img th:src="'http://175.119.224.45:8080/uploads/' + ${attachment['file_path']}" 
+                                                             th:alt="${attachment['file_name']}"
+                                                             onerror="console.error('방법3 실패:', this.src); this.onerror=null; this.src='https://via.placeholder.com/150';"
+                                                             onload="console.log('방법3 성공:', this.src);">
+                                                    </div>
+                                                    <code>'http://175.119.224.45:8080/uploads/' + ${attachment['file_path']}</code>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-4">
+                                            <a th:href="${serverUrl + attachment['file_path']}" 
+                                               class="btn btn-sm btn-primary"
+                                               download
+                                               target="_blank">
+                                                <i class="ki-duotone ki-cloud-download fs-2">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                </i>
+                                                파일 다운로드
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div th:if="${attachments == null || attachments.isEmpty()}" class="alert alert-info">
+                                <i class="ki-duotone ki-information-5 fs-2x me-4">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                    <span class="path3"></span>
+                                </i>
+                                첨부된 파일이 없습니다. 첨부파일이 있는 문의를 선택해주세요.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 페이지 로드 시 실행
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("이미지 URL 테스트 페이지가 로드되었습니다.");
+            
+            // 첨부파일 정보 로깅
+            var attachments = [];
+            try {
+                // Thymeleaf 인라인 스크립트로 첨부파일 정보 가져오기
+                /*<![CDATA[*/
+                attachments = /*[[${attachments}]]*/ [];
+                /*]]>*/
+            } catch (e) {
+                console.error("첨부파일 데이터 변환 오류:", e);
+            }
+            
+            if (attachments && attachments.length > 0) {
+                console.log(`첨부파일 ${attachments.length}개 발견`);
+                
+                attachments.forEach(function(attachment, index) {
+                    console.log(`\n===== 첨부파일 #${index+1} =====`);
+                    
+                    // 모든 속성 출력
+                    for (var key in attachment) {
+                        console.log(`${key}: ${attachment[key]}`);
+                    }
+                    
+                    // 이미지일 경우 전체 URL 출력
+                    if (attachment.file_type && attachment.file_type.startsWith('image/')) {
+                        var serverUrl = "http://175.119.224.45:8080/uploads/";
+                        var filePath = attachment.file_path;
+                        var fullUrl = serverUrl + filePath;
+                        
+                        console.log("\n▶ 이미지 URL 정보:");
+                        console.log("서버 URL:", serverUrl);
+                        console.log("파일 경로:", filePath);
+                        console.log("전체 URL:", fullUrl);
+                        console.log("HTML 태그:", `<img src="${fullUrl}" alt="${attachment.file_name || '첨부파일'}">`);
+                    }
+                });
+            } else {
+                console.log("첨부파일이 없습니다.");
+            }
+            
+            // 페이지의 모든 이미지 요소 찾기
+            var imageElements = document.querySelectorAll('img');
+            console.log(`\n페이지에 총 ${imageElements.length}개의 이미지 요소가 있습니다.`);
+            
+            // 각 이미지의 src 출력
+            imageElements.forEach(function(img, index) {
+                console.log(`이미지 #${index+1} - src: ${img.src}`);
+            });
+        });
+    </script>
+</div>
+
+</html>

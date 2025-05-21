@@ -7,68 +7,175 @@
     <style>
         /* 테이블 셀 내부 여백을 추가하여 가독성 개선 */
         table td, table th {
-            padding: 12px 8px;
+            padding: 16px 12px;
+            vertical-align: middle;
+        }
+        
+        /* 컨테이너 스타일 추가 */
+        .app-container {
+            padding: 1.5rem !important;
+        }
+        
+        /* 테이블 행 간격 및 호버 효과 개선 */
+        tbody tr:hover {
+            background-color: #f8f9fa;
+            transition: background-color 0.3s;
         }
 
-        /* 구분 셀에 컬러 배지 추가 */
+        /* 구분 셀에 컬러 배지 추가 - 개선된 스타일 */
         .badge {
-            font-size: 0.875rem;
-            padding: 0.4em 0.7em;
+            font-size: 0.8rem;
+            padding: 0.5em 0.8em;
             border-radius: 0.25rem;
+            font-weight: 500;
+            display: inline-block;
+            white-space: nowrap;
+            text-align: center;
+            margin-right: 5px;
         }
 
         .badge-light-danger {
-            background-color: #f8d7da;
-            color: #721c24;
+            background-color: rgba(241, 65, 108, 0.15);
+            color: #f1416c;
+            border: 1px solid rgba(241, 65, 108, 0.3);
         }
 
         .badge-light-success {
-            background-color: #d4edda;
-            color: #155724;
+            background-color: rgba(80, 205, 137, 0.15);
+            color: #50cd89;
+            border: 1px solid rgba(80, 205, 137, 0.3);
         }
 
         .badge-light-warning {
-            background-color: #fff3cd;
-            color: #856404;
+            background-color: rgba(255, 168, 0, 0.15);
+            color: #ffa800;
+            border: 1px solid rgba(255, 168, 0, 0.3);
+        }
+        
+        .badge-light-secondary {
+            background-color: rgba(181, 181, 195, 0.15);
+            color: #7e8299;
+            border: 1px solid rgba(181, 181, 195, 0.3);
         }
 
-        /* 카드 스타일 추가 */
+        /* 카드 스타일 개선 */
         .card {
-            border: 1px solid #e0e0e0;
+            border: 1px solid #eff2f5;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.04);
             margin-bottom: 1.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
         }
 
         .card-body {
-            padding: 1.5rem;
+            padding: 1.7rem;
+        }
+        
+        /* 정보 내용 카드 스타일 */
+        .info-card {
+            border-left: 4px solid #009ef7;
+            background-color: #f1faff;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
         }
 
-        /* 강조된 텍스트 색상 */
+        /* 강조된 텍스트 색상 및 스타일 */
         .text-gray-800 {
-            color: #343a40;
+            color: #3f4254;
+            font-weight: 500;
         }
 
         .text-info {
-            color: #17a2b8;
+            color: #009ef7;
+        }
+        
+        .text-content {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #5e6278;
+            max-height: none;
+            padding-right: 5px;
+            word-break: break-all;
+        }
+        
+        /* 스크롤바 스타일 */
+        .text-content::-webkit-scrollbar {
+            width: 5px;
+        }
+        
+        .text-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .text-content::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+        
+        .text-content::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+        
+        .text-content-title {
+            font-weight: 600;
+            color: #3f4254;
+            margin-bottom: 0.3rem;
+            font-size: 0.9rem;
         }
 
-        /* 테이블 헤더 디자인 */
+        /* 테이블 헤더 디자인 개선 */
         thead th {
-            background-color: #f1f3f4;
-            color: #495057;
-            font-weight: bold;
+            background-color: #f5f8fa;
+            color: #3f4254;
+            font-weight: 600;
             text-transform: uppercase;
-            border-bottom: 2px solid #dee2e6;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #e4e6ef;
+            padding: 1rem 1rem;
         }
 
-        /* 테이블 행 간격 추가 */
+        /* 테이블 행 간격 및 구분선 개선 */
         tbody tr {
-            border-bottom: 1px solid #e9ecef;
+            border-bottom: 1px solid #eff2f5;
+            transition: background-color 0.3s;
         }
 
         tbody tr:last-child {
             border-bottom: none;
+        }
+        
+        /* 컨텐츠 구분을 위한 카드 래퍼 */
+        .content-wrapper {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.03);
+            border-left: 3px solid #e4e6ef;
+            transition: border-left-color 0.3s;
+        }
+        
+        /* 컨텐츠 유형별 커스텀 스타일 */
+        tr:hover .content-wrapper {
+            border-left-color: #009ef7;
+        }
+        
+        /* 테이블 로우 호버 시 배경색 변경 */
+        #kt_project_users_table tbody tr:hover {
+            background-color: #f1faff;
+        }
+        
+        /* 컨텐츠 래퍼 안에 있는 텍스트 내용에 기본 여백 제거 */
+        .content-wrapper .text-content {
+            margin: 0;
+            padding: 0.5rem 0;
         }
 
         /* 카드 내부 요소 간의 간격 */
@@ -97,40 +204,80 @@
         .modal-large .modal-content {
             height: 90vh;
             overflow-y: auto;
+            border-radius: 10px;
+            border: none;
+        }
+        .modal-large .modal-header {
+            border-bottom: 1px solid #eff2f5;
+            padding: 1.5rem 1.75rem;
+        }
+        .modal-large .modal-body {
+            padding: 1.75rem;
         }
         #commentsContainer {
             width: 90%;
         }
         #commentsContainer textarea {
             width: 100%;
+            border-radius: 8px;
+            border: 1px solid #e4e6ef;
+            padding: 1rem;
+            transition: border-color 0.3s;
+        }
+        #commentsContainer textarea:focus {
+            border-color: #009ef7;
+            box-shadow: 0 0 0 0.2rem rgba(0, 158, 247, 0.15);
         }
         .flex-shrink-0 {
             width: 10%;
         }
+        #addCommentButton {
+            height: 40px;
+            margin-top: 20px;
+            font-weight: 500;
+            min-width: 80px;
+        }
         .history-table {
             width: 100%;
             border-collapse: separate;
-            border-spacing: 0 10px;
+            border-spacing: 0 12px;
         }
         .history-table td {
-            padding: 10px;
-            border: 1px solid #e0e0e0;
-            border-radius: 5px;
+            padding: 12px 16px;
+            border: 1px solid #eff2f5;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+        }
+        .history-table tr:hover td {
+            background-color: #f9f9f9;
         }
         .history-table .date-time-column {
             width: 150px;
             text-align: center;
-            background-color: #f8f9fa;
+            background-color: #f5f8fa;
+            font-weight: 500;
+            color: #3f4254;
+            border-left: 3px solid #009ef7;
         }
         .history-table .content-column {
             background-color: #ffffff;
+            line-height: 1.6;
+        }
+        .history-table .content-column strong {
+            color: #3f4254;
+            display: inline-block;
+            margin-bottom: 4px;
         }
         .history-table .sub-row td {
             border-top: none;
             padding-top: 0;
-            padding-left: 20px;
+            padding-left: 24px;
             font-style: italic;
-            color: #6c757d;
+            color: #7e8299;
+            border-left: 3px solid #b5b5c3;
+        }
+        .history-table .sub-row:hover td {
+            background-color: #f9f9f9;
         }
 
     </style>
@@ -182,7 +329,7 @@
             <!--begin::Content-->
             <div id="kt_app_content" class="app-content flex-column-fluid">
                 <!--begin::Content container-->
-                <div id="kt_app_content_container" class="app-container container-xxl">
+                <div id="kt_app_content_container" class="app-container container-fluid px-2">
                     <!--begin::Form-->
 
                     <!--begin::Card-->
@@ -326,24 +473,17 @@
                                             <span class="spinner-border text-primary" role="status"></span>
                                             <span class="text-gray-800 fs-6 fw-semibold mt-5">Loading...</span>
                                         </div>
-                                        <table id="kt_project_users_table" class="table table-striped  table-bordered gy-5 gs-7 border rounded w-100">
-                                            <thead class="fs-9 text-gray-500 text-uppercase bg-light-info text-info">
-                                            <tr class="fw-bold fs-6 text-gray-800 px-7">
-                                                <th class="min-w-80px " >구분</th>
-                                                <th class="min-w-80px">일자</th>
-                                                <th class="min-w-80px">시간</th>
-                                                <th class="min-w-80px">고객명</th>
-                                                <th class="min-w-80px">전화번호</th>
-                                                <th class="min-w-80px text-center">상담유형</th>
-                                                <th class="min-w-80px text-center">구매몰</th>
-                                            </tr>
-                                            <tr class="fw-bold fs-6 text-gray-800 px-7">
-                                                <th class="min-w-80px" >사이트</th>
-                                                <th class="min-w-80px">처리상태</th>
-                                                <th class="min-w-80px text-center" >상담내용</th>
-                                                <th class="min-w-80px text-center" colspan="2">처리내용</th>
-                                                <th class="min-w-80px text-center">댓글</th>
-                                                <th class="min-w-80px text-center">상세</th>
+                                        <table id="kt_project_users_table" class="table table-striped table-bordered gy-5 gs-7 border rounded w-100">
+                                            <thead>
+                                            <tr class="fw-bold fs-6 text-gray-800">
+                                                <th style="width: 6%">구분/처리상태</th>
+                                                <th style="width: 6%">일자/시간</th>
+                                                <th style="width: 12%">고객정보</th>
+                                                <th style="width: 8%">사이트/구매몰</th>
+                                                <th style="width: 30%">상담유형/상담내용</th>
+                                                <th style="width: 30%">처리내용</th>
+                                                <th style="width: 4%">댓글</th>
+                                                <th style="width: 4%">관리</th>
                                             </tr>
                                             </thead>
                                             <tbody class="fs-6">
@@ -380,94 +520,129 @@
                             </div>
                             <div class="modal-body py-10 px-lg-17">
                                 <div class="scroll-y me-n7 pe-7" id="kt_modal_new_address_scroll" data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_new_address_header" data-kt-scroll-wrappers="#kt_modal_new_address_scroll" data-kt-scroll-offset="300px">
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered">
-                                            <tbody>
-                                            <tr>
-                                                <td class="fw-semibold bg-light-primary text-primary">상담일</td>
-                                                <td id="inDate"></td>
-                                                <td class="fw-semibold bg-light-primary text-primary">고객명</td>
-                                                <td id="empNo"></td>
-                                                <td class="fw-semibold bg-light-primary text-primary">전화번호</td>
-                                                <td id="custTell"></td>
-                                            </tr>
-                                            <tr>
-                                                <td class="fw-semibold bg-light-primary text-primary">상담유형</td>
-                                                <td id="csType"></td>
-                                                <td class="fw-semibold bg-light-primary text-primary">처리유형</td>
-                                                <td id="prcGubn"></td>
-                                                <td class="fw-semibold bg-light-primary text-primary">구매몰</td>
-                                                <td id="buyGubn"></td>
-                                            </tr>
-                                            <tr>
-                                                <td class="fw-semibold bg-light-primary text-primary">입금일</td>
-                                                <td id="csDate"></td>
-                                                <td class="fw-semibold bg-light-primary text-primary">입금은행</td>
-                                                <td id="csBank"></td>
-                                                <td class="fw-semibold bg-light-primary text-primary">입금액</td>
-                                                <td id="csCash"></td>
-                                            </tr>
+                                    <!-- 고객 정보 컨텐츠 카드 -->
+                                    <div class="card card-flush mb-6">
+                                        <div class="card-header">
+                                            <h3 class="card-title fw-semibold text-gray-800">고객 정보</h3>
+                                        </div>
+                                        <div class="card-body pt-0">
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered table-hover">
+                                                    <tbody>
+                                                    <tr>
+                                                        <td class="fw-semibold bg-light-primary text-primary" style="width: 16.66%">상담일</td>
+                                                        <td id="inDate" style="width: 16.66%"></td>
+                                                        <td class="fw-semibold bg-light-primary text-primary" style="width: 16.66%">고객명</td>
+                                                        <td id="empNo" style="width: 16.66%"></td>
+                                                        <td class="fw-semibold bg-light-primary text-primary" style="width: 16.66%">전화번호</td>
+                                                        <td id="custTell" style="width: 16.66%"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="fw-semibold bg-light-primary text-primary">상담유형</td>
+                                                        <td id="csType"></td>
+                                                        <td class="fw-semibold bg-light-primary text-primary">처리유형</td>
+                                                        <td id="prcGubn"></td>
+                                                        <td class="fw-semibold bg-light-primary text-primary">구매몰</td>
+                                                        <td id="buyGubn"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="fw-semibold bg-light-primary text-primary">입금일</td>
+                                                        <td id="csDate"></td>
+                                                        <td class="fw-semibold bg-light-primary text-primary">입금은행</td>
+                                                        <td id="csBank"></td>
+                                                        <td class="fw-semibold bg-light-primary text-primary">입금액</td>
+                                                        <td id="csCash"></td>
+                                                    </tr>
 
-                                            <input type="hidden" id="hcallCode">
-                                            <input type="hidden" id="hpersonCode">
-                                            <input type="hidden" id="hprojectCode">
-                                            <input type="hidden" id="hcustCode">
-                                            <input type="hidden" id="originalCompletionCode" name="originalCompletionCode" value="">
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div class="row mb-5">
-                                        <div class="col-md-6 fv-row">
-                                            <label class="bg-light-primary text-primary" >상담내용</label>
-                                            <textarea class="form-control form-control-solid mb-2" name="csNote" rows="10" readonly></textarea>
-                                        </div>
-                                        <div class="col-md-6 fv-row">
-                                            <label class="bg-light-primary text-primary ">처리내용</label>
-                                            <textarea class="form-control form-control-solid mb-2" name="prcNote" rows="10" readonly></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex flex-column mb-5 fv-row">
-                                        <label class="fs-6 fw-semibold mb-2">댓글 리스트</label>
-                                        <div class="table-responsive">
-                                            <table id="commentsListTable" class="table table-striped table-bordered">
-
-                                                <tbody id="commentsList">
-                                                <!-- 댓글 항목이 여기 추가됩니다 -->
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex flex-column mb-5 fv-row">
-                                        <div class="d-flex">
-                                            <div class="form-floating flex-grow-1 me-2" id="commentsContainer" style="width: 85%;">
-                                                <textarea class="form-control" placeholder="댓글을 입력하세요" name="newComment" id="floatingTextarea2" style="height: 78px;"></textarea>
-                                                <label for="floatingTextarea2">Comments</label>
+                                                    <input type="hidden" id="hcallCode">
+                                                    <input type="hidden" id="hpersonCode">
+                                                    <input type="hidden" id="hprojectCode">
+                                                    <input type="hidden" id="hcustCode">
+                                                    <input type="hidden" id="originalCompletionCode" name="originalCompletionCode" value="">
+                                                    </tbody>
+                                                </table>
                                             </div>
-                                            <div class="flex-shrink-0">
-                                                <div class="d-flex flex-column mb-5 fv-row"  >
-                                                    <!-- 셀렉트 박스가 여기에 동적으로 추가됩니다 -->
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 상담/처리 내용 카드 -->
+                                    <div class="row mb-6">
+                                        <div class="col-md-6">
+                                            <div class="card card-flush h-100">
+                                                <div class="card-header">
+                                                    <h3 class="card-title fw-semibold text-gray-800">상담내용</h3>
                                                 </div>
-                                                    <button type="button" id="addCommentButton" class="btn btn-sm btn-primary">등록</button>
-
+                                                <div class="card-body pt-0">
+                                                    <div class="content-wrapper" style="height: 250px; overflow-y: auto;">
+                                                        <textarea class="form-control form-control-solid border-0 bg-transparent p-0" name="csNote" rows="10" readonly style="height: 100%; resize: none;"></textarea>
+                                                    </div>
+                                                </div>
                                             </div>
-
                                         </div>
-
-
+                                        <div class="col-md-6">
+                                            <div class="card card-flush h-100">
+                                                <div class="card-header">
+                                                    <h3 class="card-title fw-semibold text-gray-800">처리내용</h3>
+                                                </div>
+                                                <div class="card-body pt-0">
+                                                    <div class="content-wrapper" style="height: 250px; overflow-y: auto;">
+                                                        <textarea class="form-control form-control-solid border-0 bg-transparent p-0" name="prcNote" rows="10" readonly style="height: 100%; resize: none;"></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 댓글 섹션 카드 -->
+                                    <div class="card card-flush mb-6">
+                                        <div class="card-header">
+                                            <h3 class="card-title fw-semibold text-gray-800">댓글 리스트</h3>
+                                        </div>
+                                        <div class="card-body pt-0">
+                                            <div class="comment-list mt-3 mb-5">
+                                                <div id="commentsList" class="py-2">
+                                                    <!-- 댓글 항목이 여기 추가됩니다 -->
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- 댓글 입력 문 -->
+                                            <div class="d-flex mt-3">
+                                                <div class="form-floating flex-grow-1 me-3" id="commentsContainer">
+                                                    <textarea class="form-control" placeholder="댓글을 입력하세요" name="newComment" id="floatingTextarea2" style="height: 78px;"></textarea>
+                                                    <label for="floatingTextarea2">댓글 작성</label>
+                                                </div>
+                                                <div class="flex-shrink-0 d-flex flex-column">
+                                                    <div class="d-flex flex-column mb-2 comment-status-select">
+                                                        <!-- 셀렉트 박스가 여기에 동적으로 추가됩니다 -->
+                                                    </div>
+                                                    <button type="button" id="addCommentButton" class="btn btn-primary px-4">
+                                                        <i class="ki-duotone ki-check-circle fs-7 me-1"></i>
+                                                        등록
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
 
-                                    <!-- 상담 히스토리 섹션 -->
-                                    <div class="d-flex flex-column mb-5 fv-row">
-                                        <label class="fs-6 fw-semibold mb-2">고객 상담 히스토리</label>
-                                        <div class="table-responsive">
-                                            <table id="historyTable" class="history-table">
-
-                                                <tbody>
-                                                <!-- 히스토리 항목이 여기 추가됩니다 -->
-                                                </tbody>
-                                            </table>
+                                    <!-- 상담 히스토리 카드 -->
+                                    <div class="card card-flush mb-6">
+                                        <div class="card-header">
+                                            <div class="card-title">
+                                                <h3 class="fw-semibold text-gray-800">고객 상담 히스토리</h3>
+                                            </div>
+                                            <div class="card-toolbar">
+                                                <span class="badge badge-light-primary">총 히스토리 <span id="historyCount">0</span>건</span>
+                                            </div>
                                         </div>
-                                </div>
+                                        <div class="card-body pt-0">
+                                            <div class="table-responsive">
+                                                <table id="historyTable" class="history-table w-100">
+                                                    <tbody>
+                                                    <!-- 히스토리 항목이 여기 추가됩니다 -->
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
                             </div>
                             </div>
                         </form>
@@ -611,33 +786,68 @@
                                         }
                                     }
                                     tbody.append(
-                                        '<tr class="fs-6" style="border-bottom: 1px solid #ddd;">' +
-                                        '<td colspan="7">' +
-                                        '<div class="d-flex flex-column">' +
-                                        // 상단 데이터
-                                        '<div class="d-flex justify-content-between" style="text-align: left;">' +
-                                        '<div style="width: 14%; text-align: left;">' + emgGubnBadge +' '+ completionCode+'</div>' +
-                                        '<div style="width: 14%; text-align: left;">' + data.inDate + '</div>' +
-                                        '<div style="width: 14%; text-align: left;">' + data.inTime + '</div>' +
-                                        '<div style="width: 14%; text-align: left;">' + data.empNo + '</div>' +
-                                        '<div style="width: 14%; text-align: left;">' + data.custTell + '</div>' +
-                                        '<div style="width: 14%; text-align: center;">' + data.csType + '</div>' +
-                                        '<div style="width: 14%; text-align: center;">' + data.buyGubn + '</div>' +
-                                        '</div>' +
-                                        // 하단 데이터
-                                        '<div class="d-flex justify-content-between mt-2" style="text-align: left;">' +
-                                        '<div style="width: 14%; text-align: left;">' + data.projectName + '</div>' +
-                                        '<div style="width: 14%; text-align: left;">' + data.prcGubn + '</div>' +
-                                        '<div class="d-flex flex-column" style="width: 28%; text-align: left;">' +
-                                        '<div class="mb-1 text-gray-800 text-hover-primary">' + csNoteFormatted + '</div>' +
-                                        '</div>' +
-                                        '<div style="width: 28%; text-align: left;" colspan="2">' +
-                                        '<div class="fw-semibold fs-6 text-gray-500">' + prcNoteFormatted + '</div>' +
-                                        '</div>' +
-                                        '<div style="width: 14%; text-align: center;">' + data.countRe + '</div>' +
-                                        '<div  style="width: 14%; text-align: center;"><a href="#" class="btn btn-primary btn-sm view-button" data-call-code="' + data.callCode + '" data-person-code="' + data.personCode + '" data-project-code="' + data.projectCode + '" data-cust-code="' + data.custCode + '" data-bs-toggle="modal" data-bs-target="#kt_modal_new_address">View</a></div>' +
-                                        '</div>' +
-                                        '</div>' +
+                                        '<tr class="fs-6">' +
+                                        // 구분/처리상태
+                                        '<td class="align-middle">' +
+                                        '  <div class="d-flex flex-column">' +
+                                        '    <div class="mb-1">' + emgGubnBadge + '</div>' +
+                                        '    <div>' + completionCode + '</div>' +
+                                        '  </div>' +
+                                        '</td>' +
+                                        // 일자/시간
+                                        '<td class="align-middle">' +
+                                        '  <div class="d-flex flex-column">' +
+                                        '    <span class="fw-semibold text-gray-800">' + data.inDate + '</span>' +
+                                        '    <span class="text-muted">' + data.inTime + '</span>' +
+                                        '  </div>' +
+                                        '</td>' +
+                                        // 고객정보
+                                        '<td class="align-middle">' +
+                                        '  <div class="d-flex flex-column">' +
+                                        '    <span class="fw-semibold text-gray-800">' + data.empNo + '</span>' +
+                                        '    <span class="text-muted">' + data.custTell + '</span>' +
+                                        '  </div>' +
+                                        '</td>' +
+                                        // 사이트/구매몰
+                                        '<td class="align-middle">' +
+                                        '  <div class="d-flex flex-column">' +
+                                        '    <span class="text-gray-800">' + data.projectName + '</span>' +
+                                        '    <span class="badge badge-light-primary mt-1">' + data.buyGubn + '</span>' +
+                                        '  </div>' +
+                                        '</td>' +
+                                        // 상담유형/상담내용
+                                        '<td class="align-middle">' +
+                                        '  <div class="d-flex flex-column">' +
+                                        '    <div class="mb-1">' +
+                                        '      <span class="badge badge-light-info">' + data.csType + '</span>' +
+                                        '      <span class="ms-1">' + data.prcGubn + '</span>' +
+                                        '    </div>' +
+                                        '    <div class="content-wrapper" style="height: auto; max-height: 150px; overflow-y: auto; word-break: break-all;">' +
+                                        '      <div class="text-content-title">상담내용</div>' +
+                                        '      <div class="text-content">' + csNoteFormatted + '</div>' +
+                                        '    </div>' +
+                                        '  </div>' +
+                                        '</td>' +
+                                        // 처리내용
+                                        '<td class="align-middle">' +
+                                        '  <div class="content-wrapper" style="height: auto; max-height: 150px; overflow-y: auto; word-break: break-all;">' +
+                                        '    <div class="text-content-title">처리내용</div>' +
+                                        '    <div class="text-content">' + prcNoteFormatted + '</div>' +
+                                        '  </div>' +
+                                        '</td>' +
+                                        // 댓글
+                                        '<td class="align-middle text-center">' +
+                                        '  <span class="badge badge-circle badge-light-' + (data.countRe > 0 ? 'primary' : 'secondary') + ' fw-bold">' + data.countRe + '</span>' +
+                                        '</td>' +
+                                        // 관리
+                                        '<td class="align-middle text-center">' +
+                                        '  <a href="#" class="btn btn-sm btn-primary btn-icon view-button" data-call-code="' + data.callCode + '" data-person-code="' + data.personCode + '" data-project-code="' + data.projectCode + '" data-cust-code="' + data.custCode + '" data-bs-target="#kt_modal_new_address" data-bs-toggle="modal">' +
+                                        '    <i class="ki-duotone ki-eye">' +
+                                        '      <span class="path1"></span>' +
+                                        '      <span class="path2"></span>' +
+                                        '      <span class="path3"></span>' +
+                                        '    </i>' +
+                                        '  </a>' +
                                         '</td>' +
                                         '</tr>'
                                     );
@@ -755,7 +965,13 @@
                                 var commentsList = $('#kt_modal_new_address').find('#commentsList');
                                 commentsList.empty();
                                 response.total.forEach(function(comment) {
-                                    var commentItem = '<div class="comment-item mb-2 p-2" style="background-color: #f0f0f0;"><p><strong>' +comment.inDate +'  ' +comment.userId + '</strong>: ' + safeValue(comment.conText) + '</p></div>';
+                                    var commentItem = '<div class="comment-item p-3 mb-3" style="background-color: #f8f9fa; border-radius: 8px; border-left: 3px solid #009ef7;">' +
+                                                 '<div class="d-flex justify-content-between align-items-center mb-2">' +
+                                                 '<span class="fw-semibold text-gray-800">' + comment.userId + '</span>' +
+                                                 '<span class="text-muted fs-7">' + comment.inDate + '</span>' +
+                                                 '</div>' +
+                                                 '<div class="text-gray-700">' + safeValue(comment.conText) + '</div>' +
+                                                 '</div>';
 
                                     commentsList.append(commentItem);
                                 });
@@ -764,7 +980,9 @@
                                 var historyTableBody = $('#historyTable tbody');
                                 historyTableBody.empty();
                                 history.forEach(function(historyItem) {
-                                    var historyRow  ='';
+                                    var historyRow = '';
+                                    // 히스토리 개수 업데이트
+                                    $('#historyCount').text(history.length);
                                     if(historyItem.gubn === '1'){
                                         historyRow = `
                                              <tr>
@@ -799,7 +1017,7 @@
                                 console.log("Completion Code:", response.completionCode);
 
                                 // COMPLETION_CODE에 따라 셀렉트 박스 생성 또는 제거
-                                var completionCodeContainer = $('.d-flex.flex-column.mb-5.fv-row').eq(2);
+                                var completionCodeContainer = $('.comment-status-select');
                                 completionCodeContainer.empty(); // 기존 내용 제거
 
                                 if (response.completionCode !== null && response.completionCode !== undefined && response.completionCode !== '') {
@@ -912,10 +1130,11 @@
                                             completionCode: completionCode
                                         }),
                                         success: function(updateResponse) {
-                                            console.log('TBND01_CUST updated successfully');
-                                            $('#kt_modal_new_address').find('#originalCompletionCode').val(completionCode);
-                                            var currentPage = $('#currentPage').val() || 1; // 현재 페이지 번호 가져오기
-                                            loadPage(currentPage); // 현재 페이지 번호로 loadPage 호출
+                                        console.log('TBND01_CUST updated successfully');
+                                        $('#kt_modal_new_address').find('#originalCompletionCode').val(completionCode);
+                                        var currentPage = $('#currentPage').val() || 1; // 현재 페이지 번호 가져오기
+                                        loadPage(currentPage); // 현재 페이지 번호로 loadPage 호출
+                                        refreshComments(callCode, personCode, projectCode, custCode);
                                             alert('등록완료');
                                         },
                                         error: function(updateError) {
@@ -982,7 +1201,13 @@
                             var commentsList = $('#kt_modal_new_address').find('#commentsList');
                             commentsList.empty();
                             comments.forEach(function(comment) {
-                                var commentItem = '<div class="comment-item mb-2 p-2" style="background-color: #f0f0f0;"><p><strong>' +comment.inDate +'  ' +comment.userId + '</strong>: ' + comment.conText + '</p></div>';
+                                var commentItem = '<div class="comment-item p-3 mb-3" style="background-color: #f8f9fa; border-radius: 8px; border-left: 3px solid #009ef7;">' +
+                                                 '<div class="d-flex justify-content-between align-items-center mb-2">' +
+                                                 '<span class="fw-semibold text-gray-800">' + comment.userId + '</span>' +
+                                                 '<span class="text-muted fs-7">' + comment.inDate + '</span>' +
+                                                 '</div>' +
+                                                 '<div class="text-gray-700">' + comment.conText + '</div>' +
+                                                 '</div>';
 
                                 commentsList.append(commentItem);
                             });

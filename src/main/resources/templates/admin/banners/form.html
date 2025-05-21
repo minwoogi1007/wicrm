@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{main}">
+<body>
+<div layout:fragment="content">
+    <div class="d-flex flex-column flex-column-fluid">
+        <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+            <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                    <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0" th:text="${banner.id} ? '배너 수정' : '배너 추가'"></h1>
+                </div>
+            </div>
+        </div>
+        <div id="kt_app_content" class="app-content flex-column-fluid">
+            <div id="kt_app_content_container" class="app-container container-xxl">
+                <div class="card card-flush">
+                    <div class="card-body p-lg-10">
+                        <form th:action="@{/admin/banners/save}" method="post" enctype="multipart/form-data">
+                            <input type="hidden" name="id" th:value="${banner.id}">
+                            
+                            <div class="mb-5">
+                                <label for="name" class="form-label required">배너 이름</label>
+                                <input type="text" id="name" name="name" class="form-control" th:value="${banner.name}" required>
+                            </div>
+                            
+                            <div class="mb-5">
+                                <label for="imageFile" class="form-label required">배너 이미지</label>
+                                <input type="file" id="imageFile" name="imageFile" class="form-control" accept="image/*" th:required="${banner.id == null}">
+                                <div th:if="${banner.imageUrl}" class="mt-2">
+                                    <img th:src="${banner.imageUrl}" width="200" height="auto" alt="현재 이미지">
+                                    <small class="text-muted d-block">새 이미지를 업로드하지 않으면 현재 이미지가 유지됩니다.</small>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-5">
+                                <label for="linkUrl" class="form-label required">링크 URL</label>
+                                <input type="text" id="linkUrl" name="linkUrl" class="form-control" th:value="${banner.linkUrl}" required>
+                            </div>
+                            
+                            <div class="mb-5">
+                                <label for="position" class="form-label required">위치</label>
+                                <select id="position" name="position" class="form-select" required>
+                                    <option value="sidebar" th:selected="${banner.position == 'sidebar'}">사이드바</option>
+                                    <option value="header" th:selected="${banner.position == 'header'}">헤더</option>
+                                    <option value="footer" th:selected="${banner.position == 'footer'}">푸터</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-5">
+                                <label for="displayOrder" class="form-label">표시 순서</label>
+                                <input type="number" id="displayOrder" name="displayOrder" class="form-control" th:value="${banner.displayOrder}">
+                                <small class="text-muted">낮은 숫자가 먼저 표시됩니다.</small>
+                            </div>
+                            
+                            <div class="mb-5">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="active" name="active" th:checked="${banner.active}">
+                                    <label class="form-check-label" for="active">활성화</label>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-5">
+                                <div class="col-md-6">
+                                    <label for="startDate" class="form-label">시작일</label>
+                                    <input type="date" id="startDate" name="startDate" class="form-control" 
+                                           th:value="${banner.startDate} ? ${#dates.format(banner.startDate, 'yyyy-MM-dd')} : ''">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="endDate" class="form-label">종료일</label>
+                                    <input type="date" id="endDate" name="endDate" class="form-control" 
+                                           th:value="${banner.endDate} ? ${#dates.format(banner.endDate, 'yyyy-MM-dd')} : ''">
+                                </div>
+                                <div class="col-12 mt-2">
+                                    <small class="text-muted">날짜를 지정하지 않으면 무기한으로 설정됩니다.</small>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-end">
+                                <a th:href="@{/admin/banners}" class="btn btn-light me-2">취소</a>
+                                <button type="submit" class="btn btn-primary">저장</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

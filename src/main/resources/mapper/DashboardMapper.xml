@@ -1,13 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.wio.crm.mapper.DashboardMapper">
-    <select id="findDataForCard1" resultType="com.wio.crm.model.DashboardData">
+    <resultMap id="dashboardDataMap" type="com.wio.crm.model.DashboardData">
+        <result property="todayMiss" column="todayMiss"/>
+        <result property="todayCom" column="todayCom"/>
+        <result property="todayEme" column="todayEme"/>
+        <result property="count_sum" column="count_sum"/>
+        <result property="cs_type" column="CS_TYPE"/>
+        <result property="processing_rate" column="PROCESSING_RATE"/>
+    </resultMap>
+
+    <resultMap id="pointListDataMap" type="com.wio.crm.model.DashboardData">
+        <result property="cs_type" column="CS_TYPE"/>
+        <result property="dailyPoint" column="dailyPoint"/>
+        <result property="dailyPointN" column="dailyPointN"/>
+    </resultMap>
+
+    <resultMap id="dashStatCountDataMap" type="com.wio.crm.model.DashboardData">
+        <result property="cs_type" column="CS_TYPE"/>
+        <result property="dailyPoint" column="dailyPoint"/>
+        <result property="dailyPointN" column="dailyPointN"/>
+        <result property="totalCount" column="TotalCount"/>
+    </resultMap>
+
+    <resultMap id="CallCountResultMap" type="com.wio.crm.model.DashboardData">
+        <result property="prc_Date" column="PRC_DATE" jdbcType="VARCHAR" />
+        <result property="gubn" column="GUBN" jdbcType="VARCHAR" />
+        <result property="hour_09" column="HOUR_09" jdbcType="INTEGER" />
+        <result property="hour_10" column="HOUR_10" jdbcType="INTEGER" />
+        <result property="hour_11" column="HOUR_11" jdbcType="INTEGER" />
+        <result property="hour_12" column="HOUR_12" jdbcType="INTEGER" />
+        <result property="hour_13" column="HOUR_13" jdbcType="INTEGER" />
+        <result property="hour_14" column="HOUR_14" jdbcType="INTEGER" />
+        <result property="hour_15" column="HOUR_15" jdbcType="INTEGER" />
+        <result property="hour_16" column="HOUR_16" jdbcType="INTEGER" />
+        <result property="hour_17" column="HOUR_17" jdbcType="INTEGER" />
+        <result property="hour_18" column="HOUR_18" jdbcType="INTEGER" />
+        <result property="hour_19" column="HOUR_19" jdbcType="INTEGER" />
+        <result property="callSum" column="CALLSUM" jdbcType="INTEGER" />
+        <result property="CALLSUM" column="CALLSUM" jdbcType="INTEGER" />
+    </resultMap>
+
+    <resultMap id="mileageResultMap" type="com.wio.crm.model.DashboardData">
+        <result property="SUM_POINT" column="SUM_POINT"/>
+        <result property="POINT_DATE" column="POINT_DATE"/>
+    </resultMap>
+
+    <select id="findDataForCard1" resultMap="dashboardDataMap">
         select
-        nvl(todayMiss,0)todayMiss,
-        nvl(todayCom,0)count_Com,
-        nvl(todayEme,0) todayEme,
-        nvl(todayMiss+todayCom,0)count_sum,
-        NVL(ROUND((todayCom / NULLIF(todayMiss + todayCom, 0)) * 100, 2), 0) AS processing_rate
+        nvl(todayMiss,0) as todayMiss,
+        nvl(todayCom,0) as todayCom,
+        nvl(todayEme,0) as todayEme,
+        nvl(todayMiss+todayCom,0) as count_sum,
+        NVL(ROUND((todayCom / NULLIF(todayMiss + todayCom, 0)) * 100, 2), 0) AS PROCESSING_RATE
         from
         (
         select
@@ -23,11 +68,11 @@
         WHERE A.CALL_DATE = B.CALLDATE
         AND substr(calldate,0,10) =TO_CHAR(SYSDATE,'YYYY-MM-DD')
      <![CDATA[
-          AND A.CLID = B.CLID
-        AND RESULT <>'ANSWER'
-        --and b.context <> 'outbound'
-        and a.cust_code is not null
-      ]]>
+      AND A.CLID = B.CLID
+    AND RESULT <>'ANSWER'
+    --and b.context <> 'outbound'
+    and a.cust_code is not null
+  ]]>
         <if test="custCode != null and !custCode.isEmpty()">
             AND a.CUST_CODE = #{custCode}
         </if>
@@ -52,8 +97,208 @@
         )todayEme
         from dual
         )
+    </select>
 
-</select>
+    <select id="findYesterdayDataForCard1" resultMap="dashboardDataMap">
+        select
+        nvl(todayMiss,0) as todayMiss,
+        nvl(todayCom,0) as todayCom,
+        nvl(todayEme,0) as todayEme,
+        nvl(todayMiss+todayCom,0) as count_sum,
+        NVL(ROUND((todayCom / NULLIF(todayMiss + todayCom, 0)) * 100, 2), 0) AS PROCESSING_RATE
+        from
+        (
+        select
+
+        (
+        SELECT count(*)
+        FROM
+        (SELECT MAX(CALLDATE)CALL_DATE ,CLID,CUST_CODE,PROJECT_CODE
+        FROM CALL_LOG_D
+        WHERE substr(calldate,0,10)= TO_CHAR(SYSDATE-1,'YYYY-MM-DD')
+        and cust_code is not null
+        GROUP BY SUBSTR(calldate,0,10) , CLID,CUST_CODE,PROJECT_CODE) A,CALL_LOG_D B
+        WHERE A.CALL_DATE = B.CALLDATE
+        AND substr(calldate,0,10) =TO_CHAR(SYSDATE-1,'YYYY-MM-DD')
+     <![CDATA[
+      AND A.CLID = B.CLID
+    AND RESULT <>'ANSWER'
+    --and b.context <> 'outbound'
+    and a.cust_code is not null
+  ]]>
+        <if test="custCode != null and !custCode.isEmpty()">
+            AND a.CUST_CODE = #{custCode}
+        </if>
+        )  todayMiss,
+        (
+        SELECT count(A.CUST_CODE)
+        FROM TBND01 A
+        WHERE 1=1
+        AND PRC_GUBN = '2'
+        AND TO_CHAR(IN_DATE, 'YYYYMMDD') = TO_CHAR(SYSDATE-1,'YYYYMMDD')
+        <if test="custCode != null and !custCode.isEmpty()">
+            AND CUST_CODE = #{custCode}
+        </if>
+        )todayCom,
+        (
+        SELECT count(A.CUST_CODE)
+        FROM TBND01 A
+        WHERE 1=1
+        AND A.PRC_GUBN = '2'
+        AND EMG_GUBN = '1'
+        AND TO_CHAR(IN_DATE, 'YYYYMMDD') = to_char(sysdate-1,'YYYYMMDD')
+        )todayEme
+        from dual
+        )
+    </select>
+
+    <select id="findWeeklyDataForCard1" resultMap="dashboardDataMap">
+        select
+        nvl(todayMiss,0) as todayMiss,
+        nvl(todayCom,0) as todayCom,
+        nvl(todayEme,0) as todayEme,
+        nvl(todayMiss+todayCom,0) as count_sum,
+        NVL(ROUND((todayCom / NULLIF(todayMiss + todayCom, 0)) * 100, 2), 0) AS PROCESSING_RATE
+        from
+        (
+        select
+
+        (
+        SELECT count(*)
+        FROM
+        (SELECT MAX(CALLDATE)CALL_DATE ,CLID,CUST_CODE,PROJECT_CODE
+        FROM CALL_LOG_D
+        WHERE substr(calldate,0,10) BETWEEN TO_CHAR(SYSDATE-7,'YYYY-MM-DD') AND TO_CHAR(SYSDATE,'YYYY-MM-DD')
+        and cust_code is not null
+        GROUP BY SUBSTR(calldate,0,10) , CLID,CUST_CODE,PROJECT_CODE) A,CALL_LOG_D B
+        WHERE A.CALL_DATE = B.CALLDATE
+        AND substr(calldate,0,10) BETWEEN TO_CHAR(SYSDATE-7,'YYYY-MM-DD') AND TO_CHAR(SYSDATE,'YYYY-MM-DD')
+     <![CDATA[
+      AND A.CLID = B.CLID
+    AND RESULT <>'ANSWER'
+    --and b.context <> 'outbound'
+    and a.cust_code is not null
+  ]]>
+        <if test="custCode != null and !custCode.isEmpty()">
+            AND a.CUST_CODE = #{custCode}
+        </if>
+        )  todayMiss,
+        (
+        SELECT count(A.CUST_CODE)
+        FROM TBND01 A
+        WHERE 1=1
+        AND PRC_GUBN = '2'
+        AND TO_CHAR(IN_DATE, 'YYYYMMDD') BETWEEN TO_CHAR(SYSDATE-7,'YYYYMMDD') AND TO_CHAR(SYSDATE,'YYYYMMDD')
+        <if test="custCode != null and !custCode.isEmpty()">
+            AND CUST_CODE = #{custCode}
+        </if>
+        )todayCom,
+        (
+        SELECT count(A.CUST_CODE)
+        FROM TBND01 A
+        WHERE 1=1
+        AND A.PRC_GUBN = '2'
+        AND EMG_GUBN = '1'
+        AND TO_CHAR(IN_DATE, 'YYYYMMDD') BETWEEN TO_CHAR(SYSDATE-7,'YYYYMMDD') AND TO_CHAR(SYSDATE,'YYYYMMDD')
+        )todayEme
+        from dual
+        )
+    </select>
+
+    <select id="findMonthlyDataForCard1" resultMap="dashboardDataMap">
+        select
+        nvl(todayMiss,0) as todayMiss,
+        nvl(todayCom,0) as todayCom,
+        nvl(todayEme,0) as todayEme,
+        nvl(todayMiss+todayCom,0) as count_sum,
+        NVL(ROUND((todayCom / NULLIF(todayMiss + todayCom, 0)) * 100, 2), 0) AS PROCESSING_RATE
+        from
+        (
+        select
+
+        (
+        SELECT count(*)
+        FROM
+        (SELECT MAX(CALLDATE)CALL_DATE ,CLID,CUST_CODE,PROJECT_CODE
+        FROM CALL_LOG_D
+        WHERE TO_CHAR(TO_DATE(substr(calldate,0,10), 'YYYY-MM-DD'), 'YYYYMM') = TO_CHAR(SYSDATE, 'YYYYMM')
+        and cust_code is not null
+        GROUP BY SUBSTR(calldate,0,10) , CLID,CUST_CODE,PROJECT_CODE) A,CALL_LOG_D B
+        WHERE A.CALL_DATE = B.CALLDATE
+        AND TO_CHAR(TO_DATE(substr(calldate,0,10), 'YYYY-MM-DD'), 'YYYYMM') = TO_CHAR(SYSDATE, 'YYYYMM')
+     <![CDATA[
+      AND A.CLID = B.CLID
+    AND RESULT <>'ANSWER'
+    --and b.context <> 'outbound'
+    and a.cust_code is not null
+  ]]>
+        <if test="custCode != null and !custCode.isEmpty()">
+            AND a.CUST_CODE = #{custCode}
+        </if>
+        )  todayMiss,
+        (
+        SELECT count(A.CUST_CODE)
+        FROM TBND01 A
+        WHERE 1=1
+        AND PRC_GUBN = '2'
+        AND TO_CHAR(IN_DATE, 'YYYYMM') = TO_CHAR(SYSDATE, 'YYYYMM')
+        <if test="custCode != null and !custCode.isEmpty()">
+            AND CUST_CODE = #{custCode}
+        </if>
+        )todayCom,
+        (
+        SELECT count(A.CUST_CODE)
+        FROM TBND01 A
+        WHERE 1=1
+        AND A.PRC_GUBN = '2'
+        AND EMG_GUBN = '1'
+        AND TO_CHAR(IN_DATE, 'YYYYMM') = TO_CHAR(SYSDATE, 'YYYYMM')
+        )todayEme
+        from dual
+        )
+    </select>
+
+    <select id="findYesterdayDataForCard2" resultType="com.wio.crm.model.DashboardData">
+        SELECT
+            NVL(TO_CHAR(SUM(point) * -1, '999,999,999,999'), '0') AS dailyPoint,
+            NVL(SUM(point) * -1, 0) AS dailyPointN
+        FROM
+            tcnt01_point
+        WHERE
+            call_code IS NOT NULL
+            AND ISSUE_DATE = to_char(sysdate-1,'YYYYMMDD')
+            <if test="custCode != null and !custCode.isEmpty()">
+                AND CUST_CODE = #{custCode}
+            </if>
+    </select>
+
+    <select id="findWeeklyDataForCard2" resultType="com.wio.crm.model.DashboardData">
+        SELECT
+            NVL(TO_CHAR(SUM(point) * -1, '999,999,999,999'), '0') AS dailyPoint,
+            NVL(SUM(point) * -1, 0) AS dailyPointN
+        FROM
+            tcnt01_point
+        WHERE
+            call_code IS NOT NULL
+            AND ISSUE_DATE BETWEEN to_char(sysdate-7,'YYYYMMDD') AND to_char(sysdate,'YYYYMMDD')
+            <if test="custCode != null and !custCode.isEmpty()">
+                AND CUST_CODE = #{custCode}
+            </if>
+    </select>
+
+    <select id="findMonthlyDataForCard2" resultType="com.wio.crm.model.DashboardData">
+        SELECT
+            NVL(TO_CHAR(SUM(point) * -1, '999,999,999,999'), '0') AS dailyPoint,
+            NVL(SUM(point) * -1, 0) AS dailyPointN
+        FROM
+            tcnt01_point
+        WHERE
+            call_code IS NOT NULL
+            AND TO_CHAR(TO_DATE(ISSUE_DATE, 'YYYYMMDD'), 'YYYYMM') = TO_CHAR(SYSDATE, 'YYYYMM')
+            <if test="custCode != null and !custCode.isEmpty()">
+                AND CUST_CODE = #{custCode}
+            </if>
+    </select>
 
     <select id="findDataForCard2" resultType="com.wio.crm.model.DashboardData">
 
@@ -105,7 +350,7 @@
              )
 
     </select>
-    <select id="findPointList" resultType="com.wio.crm.model.DashboardData">
+    <select id="findPointList" resultMap="pointListDataMap">
 
 
 
@@ -149,7 +394,11 @@
                          END
              )
         SELECT
-            DECODE((SELECT ADM_SNAME FROM TSYS01 WHERE ADM_GUBN='4002' AND ADM_CODE= GroupingKey),NULL,'기타',(SELECT ADM_SNAME FROM TSYS01 WHERE ADM_GUBN='4002' AND ADM_CODE= GroupingKey)) AS CS_TYPE,
+            CASE 
+                WHEN GroupingKey = '기타' THEN '기타'
+                WHEN (SELECT ADM_SNAME FROM TSYS01 WHERE ADM_GUBN='4002' AND ADM_CODE = GroupingKey) IS NULL THEN NVL(GroupingKey, '분류없음')
+                ELSE (SELECT ADM_SNAME FROM TSYS01 WHERE ADM_GUBN='4002' AND ADM_CODE = GroupingKey)
+            END AS CS_TYPE,
             TO_CHAR(nvl(Points,0),'999,999,999,999') as dailyPoint , nvl(Points,0) dailyPointN
         FROM FinalData
         ORDER BY
@@ -243,7 +492,7 @@
         )todayEme
         from dual
     </select>
-    <select id="dashStatCount" resultType="com.wio.crm.model.DashboardData">
+    <select id="dashStatCount" resultMap="dashStatCountDataMap">
 
 
 
@@ -293,7 +542,12 @@
              )
             ]]>
         SELECT
-            DECODE((SELECT ADM_SNAME FROM TSYS01 WHERE ADM_GUBN='4002' AND ADM_CODE= GroupingKey),NULL,'기타',(SELECT ADM_SNAME FROM TSYS01 WHERE ADM_GUBN='4002' AND ADM_CODE= GroupingKey)) AS CS_TYPE,TotalCount,
+            CASE 
+                WHEN GroupingKey = '기타' THEN '기타'
+                WHEN (SELECT ADM_SNAME FROM TSYS01 WHERE ADM_GUBN='4002' AND ADM_CODE = GroupingKey) IS NULL THEN NVL(GroupingKey, '분류없음')
+                ELSE (SELECT ADM_SNAME FROM TSYS01 WHERE ADM_GUBN='4002' AND ADM_CODE = GroupingKey)
+            END AS CS_TYPE,
+            TotalCount,
             TO_CHAR(nvl(Points,0),'999,999,999,999') as dailyPoint , nvl(Points,0) dailyPointN
         FROM FinalData
         ORDER BY
@@ -303,89 +557,112 @@
 
 
     </select>
-    <select id="getDashboardCallCount" resultType="com.wio.crm.model.DashboardData">
-
-        SELECT  PRC_DATE,GUBN,HOUR_09,HOUR_10,HOUR_11,HOUR_12,HOUR_13,HOUR_14,HOUR_15,HOUR_16,HOUR_17,HOUR_18,HOUR_09+HOUR_10+HOUR_11+HOUR_12+HOUR_13+HOUR_14+HOUR_15+HOUR_16+HOUR_17+HOUR_18+HOUR_19 as callSum
-          FROM (
-                  SELECT TO_CHAR(IN_DATE, 'YYYYMMDD') PRC_DATE,'1' GUBN
-                       , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '09', 1, 0)) HOUR_09
-                       , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '10', 1, 0)) HOUR_10
-                       , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '11', 1, 0)) HOUR_11
-                       , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '12', 1, 0)) HOUR_12
-                       , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '13', 1, 0)) HOUR_13
-                       , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '14', 1, 0)) HOUR_14
-                       , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '15', 1, 0)) HOUR_15
-                       , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '16', 1, 0)) HOUR_16
-                       , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '17', 1, 0)) HOUR_17
-                       , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '18', 1, 0)) HOUR_18
-                       , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '19', 1, 0)) HOUR_19
-                  FROM TBND01 A
-                  WHERE 1=1
-                    AND PRC_GUBN ='2'
-                    AND TO_CHAR(IN_DATE, 'YYYYMMDD') = to_char(sysdate,'YYYYMMDD')
-                    <if test="custCode != null and !custCode.isEmpty()">
-                        AND A.CUST_CODE =  #{custCode}
-                    </if>
-                  GROUP BY TO_CHAR(IN_DATE, 'YYYYMMDD')
-                  UNION ALL
-                    SELECT TO_CHAR(IN_DATE, 'YYYYMMDD') PRC_DATE,'3' GUBN
-                    , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '09', 1, 0)) HOUR_09
-                    , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '10', 1, 0)) HOUR_10
-                    , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '11', 1, 0)) HOUR_11
-                    , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '12', 1, 0)) HOUR_12
-                    , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '13', 1, 0)) HOUR_13
-                    , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '14', 1, 0)) HOUR_14
-                    , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '15', 1, 0)) HOUR_15
-                    , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '16', 1, 0)) HOUR_16
-                    , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '17', 1, 0)) HOUR_17
-                    , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '18', 1, 0)) HOUR_18
-                    , SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '19', 1, 0)) HOUR_19
-                    FROM TBND01 A
-                    WHERE 1=1
-                    AND PRC_GUBN ='2'
-                    AND TO_CHAR(IN_DATE, 'YYYYMMDD') = to_char(sysdate-1,'YYYYMMDD')
-                    <if test="custCode != null and !custCode.isEmpty()">
-                        AND A.CUST_CODE =  #{custCode}
-                    </if>
-                    GROUP BY TO_CHAR(IN_DATE, 'YYYYMMDD')
-                    UNION ALL
-                  SELECT SUBSTR(REPLACE(CALLDATE,'-',''), 1,8) PRC_DATE ,'2' GUBN
-                       , SUM(DECODE(SUBSTR(CALLDATE, 12,2), '09', 1, 0)) HOUR_09
-                       , SUM(DECODE(SUBSTR(CALLDATE, 12,2), '10', 1, 0)) HOUR_10
-                       , SUM(DECODE(SUBSTR(CALLDATE, 12,2), '11', 1, 0)) HOUR_11
-                       , SUM(DECODE(SUBSTR(CALLDATE, 12,2), '12', 1, 0)) HOUR_12
-                       , SUM(DECODE(SUBSTR(CALLDATE, 12,2), '13', 1, 0)) HOUR_13
-                       , SUM(DECODE(SUBSTR(CALLDATE, 12,2), '14', 1, 0)) HOUR_14
-                       , SUM(DECODE(SUBSTR(CALLDATE, 12,2), '15', 1, 0)) HOUR_15
-                       , SUM(DECODE(SUBSTR(CALLDATE, 12,2), '16', 1, 0)) HOUR_16
-                       , SUM(DECODE(SUBSTR(CALLDATE, 12,2), '17', 1, 0)) HOUR_17
-                       , SUM(DECODE(SUBSTR(CALLDATE, 12,2), '18', 1, 0)) HOUR_18
-                       , SUM(DECODE(SUBSTR(CALLDATE, 12,2), '19', 1, 0)) HOUR_19
-                  FROM (SELECT B.CALLDATE,B.CLID,B.PERSON_CODE,B.CUST_CODE,B.PROJECT_CODE,B.empno,B.INCALL_NO ,1 COUNT,B.RESULT,B.CONTEXT
-                        FROM
-                            (SELECT MAX(CALLDATE)CALL_DATE ,CLID,CUST_CODE,PROJECT_CODE
-                            FROM CALL_LOG_D
-                            WHERE substr(calldate,0,10)=to_char(sysdate,'YYYY-MM-DD')
-                             and cust_code is not null
-                            GROUP BY SUBSTR(calldate,0,10) , CLID,CUST_CODE,PROJECT_CODE) A,CALL_LOG_D B
-                        WHERE A.CALL_DATE = B.CALLDATE
-                          AND substr(calldate,0,10)=to_char(sysdate,'YYYY-MM-DD')
-                          AND A.CLID = B.CLID
+    <select id="getDashboardCallCount" resultMap="CallCountResultMap">
+        SELECT 
+            PRC_DATE, 
+            GUBN, 
+            to_number(NVL(HOUR_09, 0)) as HOUR_09, 
+            to_number(NVL(HOUR_10, 0)) as HOUR_10, 
+            to_number(NVL(HOUR_11, 0)) as HOUR_11, 
+            to_number(NVL(HOUR_12, 0)) as HOUR_12, 
+            to_number(NVL(HOUR_13, 0)) as HOUR_13, 
+            to_number(NVL(HOUR_14, 0)) as HOUR_14, 
+            to_number(NVL(HOUR_15, 0)) as HOUR_15, 
+            to_number(NVL(HOUR_16, 0)) as HOUR_16, 
+            to_number(NVL(HOUR_17, 0)) as HOUR_17, 
+            to_number(NVL(HOUR_18, 0)) as HOUR_18, 
+            to_number(NVL(HOUR_19, 0)) as HOUR_19,
+            to_number(NVL((HOUR_09+HOUR_10+HOUR_11+HOUR_12+HOUR_13+HOUR_14+HOUR_15+HOUR_16+HOUR_17+HOUR_18+HOUR_19), 0)) as CALLSUM
+        FROM (
+            SELECT 
+                TO_CHAR(SYSDATE, 'YYYYMMDD') PRC_DATE, 
+                '1' GUBN,
+                nvl(SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '09', 1, 0)), 0) HOUR_09,
+                nvl(SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '10', 1, 0)), 0) HOUR_10,
+                nvl(SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '11', 1, 0)), 0) HOUR_11,
+                nvl(SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '12', 1, 0)), 0) HOUR_12,
+                nvl(SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '13', 1, 0)), 0) HOUR_13,
+                nvl(SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '14', 1, 0)), 0) HOUR_14,
+                nvl(SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '15', 1, 0)), 0) HOUR_15,
+                nvl(SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '16', 1, 0)), 0) HOUR_16,
+                nvl(SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '17', 1, 0)), 0) HOUR_17,
+                nvl(SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '18', 1, 0)), 0) HOUR_18,
+                nvl(SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '19', 1, 0)), 0) HOUR_19
+            FROM 
+                TBND01
+            WHERE 
+                PRC_GUBN = '2'
+                AND TO_CHAR(IN_DATE, 'YYYYMMDD') = TO_CHAR(SYSDATE, 'YYYYMMDD')
+            <if test="custCode != null and !custCode.isEmpty()">
+                AND CUST_CODE = #{custCode}
+            </if>
+            
+            UNION ALL
+            
+            SELECT 
+                TO_CHAR(SYSDATE, 'YYYYMMDD') PRC_DATE, 
+                '2' GUBN,
+                nvl(SUM(DECODE(SUBSTR(CALLDATE, 12, 2), '09', 1, 0)), 0) HOUR_09,
+                nvl(SUM(DECODE(SUBSTR(CALLDATE, 12, 2), '10', 1, 0)), 0) HOUR_10,
+                nvl(SUM(DECODE(SUBSTR(CALLDATE, 12, 2), '11', 1, 0)), 0) HOUR_11,
+                nvl(SUM(DECODE(SUBSTR(CALLDATE, 12, 2), '12', 1, 0)), 0) HOUR_12,
+                nvl(SUM(DECODE(SUBSTR(CALLDATE, 12, 2), '13', 1, 0)), 0) HOUR_13,
+                nvl(SUM(DECODE(SUBSTR(CALLDATE, 12, 2), '14', 1, 0)), 0) HOUR_14,
+                nvl(SUM(DECODE(SUBSTR(CALLDATE, 12, 2), '15', 1, 0)), 0) HOUR_15,
+                nvl(SUM(DECODE(SUBSTR(CALLDATE, 12, 2), '16', 1, 0)), 0) HOUR_16,
+                nvl(SUM(DECODE(SUBSTR(CALLDATE, 12, 2), '17', 1, 0)), 0) HOUR_17,
+                nvl(SUM(DECODE(SUBSTR(CALLDATE, 12, 2), '18', 1, 0)), 0) HOUR_18,
+                nvl(SUM(DECODE(SUBSTR(CALLDATE, 12, 2), '19', 1, 0)), 0) HOUR_19
+            FROM (
+                SELECT B.CALLDATE, B.CLID, B.PERSON_CODE, B.CUST_CODE, B.PROJECT_CODE, B.empno, B.INCALL_NO, 1 COUNT, B.RESULT, B.CONTEXT
+                FROM 
+                    (SELECT MAX(CALLDATE) CALL_DATE, CLID, CUST_CODE, PROJECT_CODE
+                    FROM CALL_LOG_D
+                    WHERE SUBSTR(calldate, 0, 10) = TO_CHAR(SYSDATE, 'YYYY-MM-DD')
+                        AND CUST_CODE IS NOT NULL
+                    GROUP BY SUBSTR(calldate, 0, 10), CLID, CUST_CODE, PROJECT_CODE) A
+                JOIN CALL_LOG_D B ON A.CALL_DATE = B.CALLDATE
+                    AND A.CLID = B.CLID
+                WHERE SUBSTR(B.calldate, 0, 10) = TO_CHAR(SYSDATE, 'YYYY-MM-DD')
                 <![CDATA[
-                          AND RESULT <>'ANSWER'
-                         -- and b.context <> 'outbound'
+                    AND B.RESULT <> 'ANSWER'
+                    -- AND B.CONTEXT <> 'outbound'
                 ]]>
-                        <if test="custCode != null and !custCode.isEmpty()">
-                          AND A.CUST_CODE =  #{custCode}
-                        </if>
-                        ORDER BY CALLDATE DESC) a
-                  WHERE 1=1
-                    AND CUST_CODE IS NOT NULL
-                  GROUP BY SUBSTR(REPLACE(CALLDATE,'-',''), 1,8)
-            )
+                <if test="custCode != null and !custCode.isEmpty()">
+                    AND A.CUST_CODE = #{custCode}
+                </if>
+                ORDER BY B.CALLDATE DESC
+            ) a
+            WHERE 1=1
+                AND CUST_CODE IS NOT NULL
+            GROUP BY SUBSTR(REPLACE(CALLDATE, '-', ''), 1, 8)
+            
+            UNION ALL
+            
+            SELECT 
+                TO_CHAR(SYSDATE-1, 'YYYYMMDD') PRC_DATE, 
+                '3' GUBN,
+                nvl(SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '09', 1, 0)), 0) HOUR_09,
+                nvl(SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '10', 1, 0)), 0) HOUR_10,
+                nvl(SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '11', 1, 0)), 0) HOUR_11,
+                nvl(SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '12', 1, 0)), 0) HOUR_12,
+                nvl(SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '13', 1, 0)), 0) HOUR_13,
+                nvl(SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '14', 1, 0)), 0) HOUR_14,
+                nvl(SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '15', 1, 0)), 0) HOUR_15,
+                nvl(SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '16', 1, 0)), 0) HOUR_16,
+                nvl(SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '17', 1, 0)), 0) HOUR_17,
+                nvl(SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '18', 1, 0)), 0) HOUR_18,
+                nvl(SUM(DECODE(TO_CHAR(IN_DATE, 'HH24'), '19', 1, 0)), 0) HOUR_19
+            FROM 
+                TBND01
+            WHERE 
+                PRC_GUBN = '2'
+                AND TO_CHAR(IN_DATE, 'YYYYMMDD') = TO_CHAR(SYSDATE-1, 'YYYYMMDD')
+            <if test="custCode != null and !custCode.isEmpty()">
+                AND CUST_CODE = #{custCode}
+            </if>
+        )
         ORDER BY PRC_DATE
-
-
     </select>
     <select id="getDashboardPersonCount" resultType="com.wio.crm.model.DashboardData">
         SELECT
@@ -782,7 +1059,7 @@
         FROM
         TotalPoints TP
     </select>
-    <select id="getPointList" resultType="com.wio.crm.model.DashboardData">
+    <select id="getPointList" resultMap="mileageResultMap">
         WITH DateRange AS (
             SELECT
             TRUNC(SYSDATE, 'MM') AS MonthStart,
@@ -815,6 +1092,13 @@
         TO_CHAR(A.IN_DATE, 'YYYY-MM-DD')
         ORDER BY
         POINT_DATE
+    </select>
+
+    <!-- 고객 코드를 기준으로 TCNT01 테이블에서 직접 고객 등급(cust_grade) 조회 -->
+    <select id="getCustomerGrade" resultType="java.lang.String" parameterType="java.util.Map">
+        SELECT CUST_GRADE 
+        FROM TCNT01 
+        WHERE CUST_CODE = #{custCode}
     </select>
 
     <select id="getCountSum" resultType="com.wio.crm.model.DashboardData">
@@ -927,4 +1211,12 @@
         ) A
         GROUP BY CUST_NAME
 </select>
+
+    <!-- 사용자 ID를 기준으로 N_TCNT01_EMP 테이블에서 직접 권한(authority) 정보 조회 -->
+    <select id="getUserAuthority" resultType="java.lang.String" parameterType="java.util.Map">
+        SELECT authority 
+        FROM N_TCNT01_EMP 
+        WHERE USERID = #{userId} OR ID = #{userId}
+    </select>
+
 </mapper>

@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+
+<div layout:fragment="content">
+    <script th:src="@{/js/consulting/image-fix.js}"></script>
+    <script th:src="@{/js/consulting/fixedScript.js}"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var attachmentsData = /*[[${attachments}]]*/ [];
+        window.console.log("첨부파일 데이터 로드:", attachmentsData);
+        
+        // 첨부파일 데이터를 전역 변수로 공유
+        window.attachmentsData = attachmentsData;
+        
+        // 이미지 로드 오류 처리 함수
+        function imageLoadError(imgElement) {
+            if (!imgElement) return;
+            
+            console.error('이미지 로드 실패:', imgElement.src);
+            
+            // 이미지 숨기기 및 오류 메시지 표시
+            var container = imgElement.closest('.position-relative');
+            if (container) {
+                imgElement.style.display = 'none';
+                
+                // 오류 메시지 생성
+                var errorMsg = document.createElement('div');
+                errorMsg.className = 'alert alert-danger text-center p-2 mt-2';
+                errorMsg.innerHTML = '<p>이미지를 불러올 수 없습니다</p>';
+                container.appendChild(errorMsg);
+                
+                // 로딩 스피너 숨기기
+                var fileId = imgElement.getAttribute('data-file-id');
+                if (fileId) {
+                    var loadingEl = document.getElementById('loading-' + fileId);
+                    if (loadingEl) loadingEl.style.display = 'none';
+                }
+            }
+        }
+        /*]]>*/
+    </script>
+    
+    <style>
+        /* 문의 내용 및 처리 내용 스타일 */
+        .inquiry-content {
+            padding: 1.5rem;
+            background-color: #f8f9fa;
+            border-radius: 0.5rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            min-height: 120px;
+        }
+    </style>
+    
+    <div class="app-main flex-column flex-row-fluid" id="kt_app_main">
+        <!--begin::Content wrapper-->
+        <div class="d-flex flex-column flex-column-fluid">
+            <!--begin::Toolbar-->
+            <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+                <!--begin::Toolbar container-->
+                <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                    <!--begin::Page title-->
+                    <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                        <!--begin::Title-->
+                        <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">상담 문의 상세</h1>
+                        <!--end::Title-->
+                        <!--begin::Breadcrumb-->
+                        <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                            <!--begin::Item-->
+                            <li class="breadcrumb-item text-muted">
+                                <a href="/main" class="text-muted text-hover-primary">Home</a>
+                            </li>
+                            <!--end::Item-->
+                            <!--begin::Item-->
+                            <li class="breadcrumb-item">
+                                <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                            </li>
+                            <!--end::Item-->
+                            <!--begin::Item-->
+                            <li class="breadcrumb-item text-muted">상담 관리</li>
+                            <!--end::Item-->
+                            <!--begin::Item-->
+                            <li class="breadcrumb-item">
+                                <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                            </li>
+                            <!--end::Item-->
+                            <!--begin::Item-->
+                            <li class="breadcrumb-item text-muted">상담 문의 상세</li>
+                            <!--end::Item-->
+                        </ul>
+                        <!--end::Breadcrumb-->
+                    </div>
+                    <!--end::Page title-->
+                    <!--begin::Actions-->
+                    <div class="d-flex align-items-center gap-2 gap-lg-3">
+                        <a th:href="@{/consulting/list}" class="btn btn-sm btn-light-primary">
+                            <i class="ki-duotone ki-arrow-left fs-5 me-1">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                            </i>
+                            목록으로
+                        </a>
+                    </div>
+                    <!--end::Actions-->
+                </div>
+                <!--end::Toolbar container-->
+            </div>
+            <!--end::Toolbar-->
+            
+            <!--begin::Content-->
+            <div id="kt_app_content" class="app-content flex-column-fluid">
+                <!--begin::Content container-->
+                <div id="kt_app_content_container" class="app-container container-xxl">
+                    <!--begin::Row-->
+                    <div class="row g-5 g-xl-8">
+                        <!--begin::Col-->
+                        <div class="col-xl-4">
+                            <!--begin::고객 정보 카드-->
+                            <div class="card mb-5">
+                                <!--begin::Card header-->
+                                <div class="card-header">
+                                    <div class="card-header-container">
+                                        <h3 class="card-title fw-bold">고객 정보</h3>
+                                        <div class="status-badge" th:classappend="${inquiry.status == 'PENDING' ? 'status-pending' : (inquiry.status == 'PROCESSING' ? 'status-processing' : 'status-completed')}">
+                                            <span th:if="${inquiry.status == 'PENDING'}">대기중</span>
+                                            <span th:if="${inquiry.status == 'PROCESSING'}">처리중</span>
+                                            <span th:if="${inquiry.status == 'COMPLETED'}">처리완료</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--end::Card header-->
+                                <!--begin::Card body-->
+                                <div class="card-body">
+                                    <div class="d-flex flex-column mb-5">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <span class="text-muted me-2">문의번호:</span>
+                                            <span class="fw-bold" th:text="${inquiry.inquiryId}">1</span>
+                                            <button type="button" class="btn btn-sm btn-icon btn-light-primary ms-2" onclick="copyText(this)" th:data-text="${inquiry.inquiryId}" data-bs-toggle="tooltip" title="복사하기">
+                                                <i class="ki-duotone ki-copy fs-4">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                </i>
+                                            </button>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-2">
+                                            <span class="text-muted me-2">고객명:</span>
+                                            <span class="fw-bold" th:text="${inquiry != null && inquiry.customerName != null ? inquiry.customerName : '-'}">홍길동</span>
+                                            <button type="button" class="btn btn-sm btn-icon btn-light-primary ms-2" onclick="copyText(this)" th:data-text="${inquiry.customerName}" data-bs-toggle="tooltip" title="복사하기">
+                                                <i class="ki-duotone ki-copy fs-4">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                </i>
+                                            </button>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-2">
+                                            <span class="text-muted me-2">연락처:</span>
+                                            <span class="fw-bold" th:text="${inquiry != null && inquiry.phoneNumber != null ? inquiry.phoneNumber : '-'}">010-1234-5678</span>
+                                            <button type="button" class="btn btn-sm btn-icon btn-light-primary ms-2" onclick="copyText(this)" th:data-text="${inquiry.phoneNumber}" data-bs-toggle="tooltip" title="복사하기">
+                                                <i class="ki-duotone ki-copy fs-4">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                </i>
+                                            </button>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-2">
+                                            <span class="text-muted me-2">주문번호:</span>
+                                            <span class="fw-bold" th:text="${inquiry != null && inquiry.orderNumber != null ? inquiry.orderNumber : '-'}">ORD12345</span>
+                                            <button type="button" class="btn btn-sm btn-icon btn-light-primary ms-2" onclick="copyText(this)" th:data-text="${inquiry.orderNumber}" data-bs-toggle="tooltip" title="복사하기">
+                                                <i class="ki-duotone ki-copy fs-4">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                </i>
+                                            </button>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-2">
+                                            <span class="text-muted me-2">문의유형:</span>
+                                            <span th:switch="${inquiry.inquiryType}" class="badge">
+                                                <span th:case="'FREE_PAINT'" class="badge" style="background-color: #3699FF; color: white;">물감구매(무료)</span>
+                                                <span th:case="'PAID_PAINT'" class="badge" style="background-color: #0BB783; color: white;">물감구매(유료)</span>
+                                                <span th:case="'ORDER_CANCEL'" class="badge" style="background-color: #F64E60; color: white;">주문취소</span>
+                                                <span th:case="'ORDER_CANCEL_CARD'" class="badge" style="background-color: #F64E60; color: white;">주문취소(카드)</span>
+                                                <span th:case="'ORDER_CANCEL_TRANSFER'" class="badge" style="background-color: #E63757; color: white;">주문취소(이체)</span>
+                                                <span th:case="'REFUND'" class="badge" style="background-color: #8950FC; color: white;">환불</span>
+                                                <span th:case="'RETURN'" class="badge" style="background-color: #F1BC00; color: white;">반품</span>
+                                                <span th:case="'EXCHANGE'" class="badge" style="background-color: #FFA800; color: white;">교환</span>
+                                                <span th:case="'DEFECTIVE'" class="badge" style="background-color: #FF4848; color: white;">불량</span>
+                                                <span th:case="'DELIVERY'" class="badge" style="background-color: #1BC5BD; color: white;">배송</span>
+                                                <span th:case="'GIFT_MISSING'" class="badge" style="background-color: #7239EA; color: white;">사은품누락</span>
+                                                <span th:case="'OTHER'" class="badge" style="background-color: #86B7FE; color: white;">기타</span>
+                                                <span th:case="*" class="badge" style="background-color: #A1A5B7; color: white;" th:text="${inquiry.inquiryType}"></span>
+                                            </span>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-2">
+                                            <span class="text-muted me-2">담당자:</span>
+                                            <span class="fw-bold" th:text="${inquiry != null && inquiry.assignedTo != null ? inquiry.assignedTo : '-'}">담당자</span>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <span class="text-muted me-2">등록일:</span>
+                                            <span class="fw-bold" th:text="${inquiry != null && inquiry.createdDate != null ? #temporals.format(inquiry.createdDate, 'yyyy-MM-dd HH:mm') : '-'}">2025-04-21 13:00</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="separator separator-dashed my-5"></div>
+                                    
+                                    <div class="d-flex justify-content-center">
+                                        <button type="button" class="btn btn-light-primary" onclick="changeStatus()">
+                                            <i class="ki-duotone ki-status-up fs-4 me-1">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                                <span class="path3"></span>
+                                            </i>
+                                            상태 변경
+                                        </button>
+
+                                        <button type="button" class="btn btn-light-success ms-3" onclick="copyAllInfo()">
+                                            <i class="ki-duotone ki-copy fs-4 me-1">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                            </i>
+                                            전체 정보 복사
+                                        </button>
+                                    </div>
+                                </div>
+                                <!--end::Card body-->
+                            </div>
+                            <!--end::고객 정보 카드-->
+                            
+                            <!--begin::내부 메모 카드-->
+                            <div class="card mb-5">
+                                <!--begin::Card header-->
+                                <div class="card-header">
+                                    <h3 class="card-title fw-bold">내부 메모</h3>
+                                </div>
+                                <!--end::Card header-->
+                                <!--begin::Card body-->
+                                <div class="card-body">
+                                    <form id="memoForm">
+                                        <div class="form-group mb-4">
+                                            <textarea id="memo" class="form-control" rows="5" placeholder="내부 메모를 입력하세요..." th:text="${inquiry != null && inquiry.memo != null ? inquiry.memo : ''}"></textarea>
+                                        </div>
+                                        <div class="d-flex justify-content-end">
+                                            <button type="button" class="btn btn-primary" onclick="updateMemo()">
+                                                <i class="ki-duotone ki-save-2 fs-5 me-1">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                </i>
+                                                메모 저장
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                                <!--end::Card body-->
+                            </div>
+                            <!--end::내부 메모 카드-->
+                            
+                            <!--begin::첨부 파일 카드-->
+                            <div class="card mb-5">
+                                <!--begin::Card header-->
+                                <div class="card-header">
+                                    <h3 class="card-title fw-bold">첨부 파일</h3>
+                                </div>
+                                <!--end::Card header-->
+                                <!--begin::Card body-->
+                                <div class="card-body">
+                                    <div class="thumbnail-container">
+                                        <div th:if="${attachments != null && !attachments.isEmpty()}">
+                                            <!-- 첨부파일 디버깅 정보 토글 기능 -->
+                                            <div class="alert alert-light-primary mb-4">
+                                                <strong>첨부파일 정보:</strong> <span th:text="${attachments.size()}"></span>개 파일
+                                                <button class="btn btn-sm btn-primary ms-2" onclick="showAttachmentDebug()" type="button">디버깅 정보 보기</button>
+                                                </div>
+                                            
+                                            <!-- 상세 디버깅 정보
+                                            <div id="attachmentDebugInfo" style="display: none; margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background: #f8f8f8;">
+                                                <h4 class="mb-3">첨부파일 디버깅 정보</h4>
+                                                <div th:each="attachment, attachmentStat : ${attachments}" style="margin-bottom: 10px; border-bottom: 1px dashed #ccc; padding-bottom: 10px;">
+                                                    <div><b>ID:</b> <span th:text="${attachment['attachment_id']}"></span></div>
+                                                    <div><b>파일명:</b> <span th:text="${attachment['file_name']}"></span></div>
+                                                    <div><b>경로:</b> <span th:text="${attachment['file_path'] != null ? attachment['file_path'] : '경로 없음'}"></span></div>
+                                                    <div><b>타입:</b> <span th:text="${attachment['file_type'] != null ? attachment['file_type'] : '타입 정보 없음'}"></span></div>
+                                                </div>
+                                            </div>
+                                            -->
+                                            <!-- 각 첨부파일 이미지 표시 -->
+                                            <div class="row g-3">
+                                                <div class="col-md-6" th:each="attachment, attachmentStat : ${attachments}">
+                                                    <div class="card">
+                                                        <div class="card-body p-3">
+                                                            <!-- 이미지 파일인 경우 -->
+                                                            <div th:if="${attachment != null && attachment['file_type'] != null && attachment['file_type'].startsWith('image/')}" class="text-center position-relative">
+                                                                <!-- 로딩 스피너 -->
+                                                                <div class="position-absolute top-50 start-50 translate-middle" th:id="'loading-' + ${attachment['attachment_id']}">
+                                                                    <div class="spinner-border text-primary" role="status">
+                                                                        <span class="visually-hidden">이미지 로딩 중...</span>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <!-- 이미지 태그 (프록시 사용) -->
+                                                                <img th:if="${attachment['file_path'] != null}" 
+                                                                    th:id="'attachment-img-' + ${attachment['attachment_id']}"
+                                                                    th:src="@{/api/image-proxy(path=${attachment['file_path']})}"
+                                                                    th:alt="${attachment['file_name'] != null ? attachment['file_name'] : '첨부파일 이미지'}"
+                                                                    class="attachment-img img-fluid rounded"
+                                                                    th:data-file-path="${attachment['file_path']}"
+                                                                    th:data-file-name="${attachment['file_name']}"
+                                                                    th:data-file-id="${attachment['attachment_id']}"
+                                                                    style="cursor: pointer; max-height: 200px; object-fit: contain;"
+                                                                    th:onclick="'showAttachmentImage(\'' + ${attachment['attachment_id']} + '\')'"
+                                                                    onload="hideLoader(this)"
+                                                                    onerror="imageLoadError(this)"
+                                                                />
+                                                                
+                                                                <!-- 파일 경로가 없는 경우 오류 표시 -->
+                                                                <div th:if="${attachment['file_path'] == null}" class="alert alert-danger text-center p-2 mt-2">
+                                                                    <p>파일 경로 정보가 없습니다.</p>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <!-- 이미지가 아닌 경우 -->
+                                                            <div th:if="${attachment == null || attachment['file_type'] == null || !attachment['file_type'].startsWith('image/')}" class="text-center py-4">
+                                                                <i class="ki-duotone ki-document fs-3x text-muted mb-3">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                    </i>
+                                                                <p class="text-muted">이미지 미리보기 불가</p>
+                                                </div>
+                                                            
+                                                            <!-- 파일 정보 -->
+                                                            <div class="mt-3">
+                                                                <h5 class="fs-6 fw-bold text-truncate" th:text="${attachment != null && attachment['file_name'] != null ? attachment['file_name'] : '-'}">파일명.jpg</h5>
+                                                                <p class="small text-muted mb-2" th:text="${attachment != null && attachment['file_size'] != null ? #numbers.formatDecimal(attachment['file_size'] / 1024, 0, 1) + ' KB' : '-'}">123.4 KB</p>
+                                                                
+                                                                <div class="d-flex gap-2">
+                                                                    <!-- 파일 경로가 있는 경우에만 버튼 표시 -->
+                                                                    <th:block th:if="${attachment['file_path'] != null}">
+                                                                        <!-- 원본 이미지 보기 버튼 (프록시 사용) -->
+                                                                        <a th:href="@{/api/image-proxy(path=${attachment['file_path']})}"
+                                                                           class="btn btn-sm btn-light-warning flex-grow-1"
+                                                                           target="_blank">
+                                                                            <i class="ki-duotone ki-external-link fs-6 me-1">
+                                                                                <span class="path1"></span>
+                                                                                <span class="path2"></span>
+                                                                            </i>
+                                                                            원본보기
+                                                                        </a>
+                                                                        
+                                                                        <!-- 다운로드 버튼 (다운로드 프록시 사용) -->
+                                                                        <a th:href="@{/api/download(path=${attachment['file_path']})}"
+                                                                           class="btn btn-sm btn-light-primary flex-grow-1"
+                                                                           download>
+                                                                            <i class="ki-duotone ki-download fs-6 me-1">
+                                                            <span class="path1"></span>
+                                                            <span class="path2"></span>
+                                                        </i>
+                                                        다운로드
+                                                    </a>
+                                                                    </th:block>
+                                                                    
+                                                                    <!-- 파일 경로가 없는 경우 안내 버튼 -->
+                                                                    <th:block th:if="${attachment['file_path'] == null}">
+                                                                        <button type="button" class="btn btn-sm btn-light-danger w-100" disabled>
+                                                                            <i class="ki-duotone ki-information-5 fs-6 me-1">
+                                                                                <span class="path1"></span>
+                                                                                <span class="path2"></span>
+                                                                                <span class="path3"></span>
+                                                                            </i>
+                                                                            파일 경로 없음
+                                                                        </button>
+                                                                    </th:block>
+                                                </div>
+                                            </div>
+                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- 첨부파일이 없는 경우 -->
+                                        <div th:if="${attachments == null || attachments.isEmpty()}" class="no-comments text-center py-5">
+                                            <i class="ki-duotone ki-document-missing fs-3x text-muted mb-3">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                            </i>
+                                            <p class="text-muted">첨부된 파일이 없습니다.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--end::Card body-->
+                            </div>
+                            <!--end::첨부 파일 카드-->
+                        </div>
+                        <!--end::Col-->
+                        
+                        <!--begin::Col-->
+                        <div class="col-xl-8">
+                            <!--begin::문의 내용 카드-->
+                            <div class="card mb-5">
+                                <!--begin::Card header-->
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h3 class="card-title fw-bold">문의 내용</h3>
+                                    <button type="button" class="btn btn-sm btn-light-primary" onclick="copyText(this)" th:data-text="${inquiry.inquiryContent}" data-bs-toggle="tooltip" title="문의 내용 복사하기">
+                                        <i class="ki-duotone ki-copy fs-5 me-1">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                        </i>
+                                        문의 내용 복사
+                                    </button>
+                                </div>
+                                <!--end::Card header-->
+                                <!--begin::Card body-->
+                                <div class="card-body">
+                                    <div class="inquiry-content" th:text="${inquiry != null && inquiry.inquiryContent != null ? inquiry.inquiryContent : '문의 내용이 없습니다.'}">
+                                        문의 내용이 여기에 표시됩니다.
+                                    </div>
+                                </div>
+                                <!--end::Card body-->
+                            </div>
+                            <!--end::문의 내용 카드-->
+                            
+                            <!--begin::처리 내용 카드-->
+                            <div class="card mb-5">
+                                <!--begin::Card header-->
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h3 class="card-title fw-bold">처리 내용</h3>
+                                    <div class="d-flex gap-2">
+                                        <button type="button" class="btn btn-sm btn-light-primary" onclick="copyText(this)" th:data-text="${inquiry.processContent}" data-bs-toggle="tooltip" title="처리 내용 복사하기">
+                                            <i class="ki-duotone ki-copy fs-5 me-1">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                            </i>
+                                            처리 내용 복사
+                                        </button>
+                                    </div>
+                                </div>
+                                <!--end::Card header-->
+                                <!--begin::Card body-->
+                                <div class="card-body">
+                                    <div class="inquiry-content" th:text="${inquiry != null && inquiry.processContent != null && inquiry.processContent != '' ? inquiry.processContent : '처리 내용이 없습니다.'}">
+                                        처리 내용이 여기에 표시됩니다.
+                                    </div>
+                                    
+                                    <div class="mt-4">
+                                        <button type="button" class="btn btn-sm btn-light-primary" data-bs-toggle="modal" data-bs-target="#processEditModal">
+                                            <i class="ki-duotone ki-edit fs-5 me-1">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                            </i>
+                                            처리 내용 수정
+                                        </button>
+                                        </div>
+                                </div>
+                                <!--end::Card body-->
+                            </div>
+                            <!--end::처리 내용 카드-->
+                            
+                            <!--begin::코멘트 카드-->
+                            <div class="card mb-5">
+                                <!--begin::Card header-->
+                                <div class="card-header">
+                                    <div class="card-header-container">
+                                        <h3 class="card-title fw-bold">코멘트</h3>
+                                        <span class="badge bg-primary rounded-pill" th:text="${comments != null ? comments.size() : '0'}"></span>
+                                    </div>
+                                </div>
+                                <!--end::Card header-->
+                                <!--begin::Card body-->
+                                <div class="card-body">
+                                    <div class="comment-list">
+                                        <!-- 코멘트 목록 (수정된 BigDecimal 체크 로직) -->
+                                        <div th:each="comment, iterStat : ${comments}" class="comment-item" 
+                                            th:classappend="${comment != null && comment['is_internal'] != null && (comment['is_internal'] == 1 || comment['is_internal'] == true) ? 'internal' : ''}" 
+                                            th:style="${'animation-delay: ' + (iterStat.index * 0.1) + 's;'}">
+                                            <div class="comment-header">
+                                                <div class="comment-author">
+                                                    <i class="ki-duotone ki-user-square fs-4 me-2">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                        <span class="path3"></span>
+                                                    </i>
+                                                    <span th:text="${comment != null && comment['commenter'] != null ? comment['commenter'] : '-'}">작성자</span>
+                                                </div>
+                                                <div class="comment-meta">
+                                                    <span th:if="${comment != null && comment['is_internal'] != null && (comment['is_internal'] == 1 || comment['is_internal'] == true)}" class="badge badge-warning me-2">내부용</span>
+                                                    <span class="comment-date" th:text="${comment != null && comment['comment_date'] != null ? comment['comment_date'].toString().substring(0, 16).replace('T', ' ') : '-'}">2025-04-21 13:05</span>
+                                                </div>
+                                            </div>
+                                            <div class="comment-content" th:text="${comment != null && comment['content'] != null ? comment['content'] : ''}">
+                                                코멘트 내용이 여기에 표시됩니다.
+                                            </div>
+                                        </div>
+                                        
+                                        <div th:if="${comments == null || comments.isEmpty()}" class="no-comments">
+                                            <i class="ki-duotone ki-message-text-2">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                                <span class="path3"></span>
+                                            </i>
+                                            <p>등록된 코멘트가 없습니다.</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="separator separator-dashed my-5"></div>
+                                    
+                                    <!-- 새 코멘트 등록 -->
+                                    <div class="form-group mb-4">
+                                        <label class="form-label">새 코멘트</label>
+                                        <textarea id="commentContent" class="form-control" rows="4" placeholder="코멘트를 입력하세요..."></textarea>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="form-check form-check-custom form-check-solid">
+                                            <input class="form-check-input" type="checkbox" id="isInternal" value="true">
+                                            <label class="form-check-label ms-2" for="isInternal">
+                                                내부용 코멘트 (고객에게 표시되지 않음)
+                                            </label>
+                                        </div>
+                                        
+                                        <button type="button" class="btn btn-success px-6" onclick="addComment()">
+                                            <i class="ki-duotone ki-message-add fs-5 me-1">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                                <span class="path3"></span>
+                                            </i>
+                                            코멘트 등록
+                                        </button>
+                                    </div>
+                                </div>
+                                <!--end::Card body-->
+                            </div>
+                            <!--end::코멘트 카드-->
+                        </div>
+                        <!--end::Col-->
+                    </div>
+                    <!--end::Row-->
+                </div>
+                <!--end::Content container-->
+            </div>
+            <!--end::Content-->
+        </div>
+        <!--end::Content wrapper-->
+    </div>
+    
+    <!-- 처리상태 변경 모달 -->
+    <div class="modal fade" id="statusModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="fw-bold">처리상태 변경</h2>
+                    <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="ki-duotone ki-cross fs-1">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                        </i>
+                    </div>
+                </div>
+                <div class="modal-body py-10 px-lg-17">
+                    <div class="mb-5">
+                        <label class="form-label fs-6 fw-semibold">처리상태 선택</label>
+                        <select id="statusSelect" class="form-select form-select-solid" data-control="select2" data-hide-search="true" data-placeholder="처리상태를 선택하세요">
+                            <option value="PENDING" th:selected="${inquiry != null && inquiry.status == 'PENDING'}">대기중</option>
+                            <option value="PROCESSING" th:selected="${inquiry != null && inquiry.status == 'PROCESSING'}">처리중</option>
+                            <option value="COMPLETED" th:selected="${inquiry != null && inquiry.status == 'COMPLETED'}">처리완료</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" onclick="updateStatus()">
+                        <i class="ki-duotone ki-check fs-5 me-1">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                        </i>
+                        변경
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 처리 내용 수정 모달 -->
+    <div class="modal fade" id="processEditModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="fw-bold">처리 내용 수정</h2>
+                    <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="ki-duotone ki-cross fs-1">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                        </i>
+                    </div>
+                </div>
+                <div class="modal-body py-10 px-lg-17">
+                    <form id="processForm">
+                        <input type="hidden" id="inquiryId" th:value="${inquiry.inquiryId}" />
+                        <div class="form-group mb-4">
+                            <label class="form-label fs-6 fw-semibold">처리 내용</label>
+                            <textarea id="processContent" class="form-control" rows="10" placeholder="처리 내용을 입력하세요..." th:text="${inquiry != null && inquiry.processContent != null ? inquiry.processContent : ''}"></textarea>
+                    </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" onclick="updateProcessContent()">
+                        <i class="ki-duotone ki-save-2 fs-5 me-1">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                            </i>
+                        저장
+                        </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 이미지 미리보기 모달 -->
+    <div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="fw-bold" id="previewImageTitle">이미지 미리보기</h2>
+                    <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="ki-duotone ki-cross fs-1">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                            </i>
+                    </div>
+                </div>
+                <div class="modal-body p-0" id="imagePreviewContainer">
+                    <div class="text-center">
+                        <img id="previewImageSrc" src="/assets/media/svg/files/blank-image.svg" alt="이미지 미리보기" 
+                            style="max-width: 100%; max-height: 75vh;"
+                            onerror="this.src='/assets/media/svg/files/blank-image.svg'; document.getElementById('previewImageTitle').textContent='이미지를 불러올 수 없습니다';">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <!-- 원본 이미지 버튼 -->
+                    <a id="originalImageBtn" href="#" class="btn btn-sm btn-light-primary me-2" target="_blank">
+                        원본 이미지
+                    </a>
+                    <!-- 다운로드 버튼 -->
+                    <a id="previewImageDownload" href="#" class="btn btn-primary" download>
+                        다운로드
+                    </a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 첨부파일 디버깅 정보 토글 함수
+        function showAttachmentDebug() {
+            var debugInfo = document.getElementById('attachmentDebugInfo');
+            if (debugInfo) {
+                if (debugInfo.style.display === 'none') {
+                    debugInfo.style.display = 'block';
+                    console.log('첨부파일 디버깅 정보 표시');
+                } else {
+                    debugInfo.style.display = 'none';
+                    console.log('첨부파일 디버깅 정보 숨김');
+                }
+            }
+        }
+        
+        // 처리상태 변경 모달 표시
+        function changeStatus() {
+            window.console.log("상태 변경 모달 표시");
+            var statusModal = new bootstrap.Modal(document.getElementById('statusModal'));
+            statusModal.show();
+        }
+        
+        // 처리상태 업데이트
+        function updateStatus() {
+            console.log("상태 업데이트 시작");
+            var inquiryId = document.getElementById('inquiryId').value;
+            var status = document.getElementById('statusSelect').value;
+            
+            $.ajax({
+                url: '/consulting/update-status',
+                type: 'POST',
+                data: {
+                    inquiryId: inquiryId,
+                    status: status
+                },
+                beforeSend: function(xhr) {
+                    // CSRF 토큰 추가 (Spring Security 사용 시)
+                    var token = $("meta[name='_csrf']").attr("content");
+                    var header = $("meta[name='_csrf_header']").attr("content");
+                    if (token && header) {
+                        xhr.setRequestHeader(header, token);
+                    }
+                },
+                success: function(response) {
+                    console.log("상태 업데이트 응답:", response);
+                    if (response.success) {
+                        var statusModal = bootstrap.Modal.getInstance(document.getElementById('statusModal'));
+                        statusModal.hide();
+                        
+                        // 성공 메시지 표시
+                        Swal.fire({
+                            text: "상태가 성공적으로 변경되었습니다.",
+                            icon: "success",
+                            buttonsStyling: false,
+                            confirmButtonText: "확인",
+                            customClass: {
+                                confirmButton: "btn btn-primary"
+                            }
+                        }).then(function() {
+                            // 페이지 새로고침
+                            window.location.reload();
+                        });
+                    } else {
+                        // 오류 메시지 표시
+                        Swal.fire({
+                            text: response.message || "상태 업데이트에 실패했습니다.",
+                            icon: "error",
+                            buttonsStyling: false,
+                            confirmButtonText: "확인",
+                            customClass: {
+                                confirmButton: "btn btn-primary"
+                            }
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("상태 업데이트 오류:", error);
+                    // 오류 메시지 표시
+                    Swal.fire({
+                        text: "상태 업데이트 중 오류가 발생했습니다.",
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "확인",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    });
+                }
+            });
+        }
+        
+        // 코멘트 추가
+        function addComment() {
+            console.log("코멘트 추가 시작");
+            var inquiryId = document.getElementById('inquiryId').value;
+            var content = document.getElementById('commentContent').value;
+            var isInternal = document.getElementById('isInternal').checked;
+            
+            if (!content.trim()) {
+                // 빈 내용 경고
+                Swal.fire({
+                    text: "코멘트 내용을 입력하세요.",
+                    icon: "warning",
+                    buttonsStyling: false,
+                    confirmButtonText: "확인",
+                    customClass: {
+                        confirmButton: "btn btn-primary"
+                    }
+                });
+                return;
+            }
+            
+            $.ajax({
+                url: '/consulting/add-comment',
+                type: 'POST',
+                data: {
+                    inquiryId: inquiryId,
+                    content: content,
+                    isInternal: isInternal
+                },
+                beforeSend: function(xhr) {
+                    // CSRF 토큰 추가 (Spring Security 사용 시)
+                    var token = $("meta[name='_csrf']").attr("content");
+                    var header = $("meta[name='_csrf_header']").attr("content");
+                    if (token && header) {
+                        xhr.setRequestHeader(header, token);
+                    }
+                },
+                success: function(response) {
+                    console.log("코멘트 추가 응답:", response);
+                    if (response.success) {
+                        // 페이지 새로고침
+                        window.location.reload();
+                    } else {
+                        // 오류 메시지 표시
+                        Swal.fire({
+                            text: response.message || "코멘트 등록에 실패했습니다.",
+                            icon: "error",
+                            buttonsStyling: false,
+                            confirmButtonText: "확인",
+                            customClass: {
+                                confirmButton: "btn btn-primary"
+                            }
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("코멘트 추가 오류:", error);
+                    // 오류 메시지 표시
+                    Swal.fire({
+                        text: "코멘트 등록 중 오류가 발생했습니다.",
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "확인",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    });
+                }
+            });
+        }
+        
+        // 처리 내용 업데이트
+        function updateProcessContent() {
+            console.log("처리 내용 업데이트 시작");
+            var inquiryId = document.getElementById('inquiryId').value;
+            var processContent = document.getElementById('processContent').value;
+            
+            $.ajax({
+                url: '/consulting/update-process',
+                type: 'POST',
+                data: {
+                    inquiryId: inquiryId,
+                    processContent: processContent
+                },
+                beforeSend: function(xhr) {
+                    // CSRF 토큰 추가 (Spring Security 사용 시)
+                    var token = $("meta[name='_csrf']").attr("content");
+                    var header = $("meta[name='_csrf_header']").attr("content");
+                    if (token && header) {
+                        xhr.setRequestHeader(header, token);
+                    }
+                },
+                success: function(response) {
+                    console.log("처리 내용 업데이트 응답:", response);
+                    if (response.success) {
+                        // 모달 벽 닫기
+                        var processEditModal = bootstrap.Modal.getInstance(document.getElementById('processEditModal'));
+                        processEditModal.hide();
+                        
+                        // 성공 메시지 표시
+                        Swal.fire({
+                            text: "처리 내용이 저장되었습니다.",
+                            icon: "success",
+                            buttonsStyling: false,
+                            confirmButtonText: "확인",
+                            customClass: {
+                                confirmButton: "btn btn-primary"
+                            }
+                        }).then(function() {
+                            // 페이지 새로고침
+                            window.location.reload();
+                        });
+                    } else {
+                        // 오류 메시지 표시
+                        Swal.fire({
+                            text: response.message || "처리 내용 저장에 실패했습니다.",
+                            icon: "error",
+                            buttonsStyling: false,
+                            confirmButtonText: "확인",
+                            customClass: {
+                                confirmButton: "btn btn-primary"
+                            }
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("처리 내용 업데이트 오류:", error);
+                    // 오류 메시지 표시
+                    Swal.fire({
+                        text: "처리 내용 저장 중 오류가 발생했습니다.",
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "확인",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    });
+                }
+            });
+        }
+        
+        // 메모 업데이트
+        function updateMemo() {
+            console.log("메모 업데이트 시작");
+            var inquiryId = document.getElementById('inquiryId').value;
+            var memo = document.getElementById('memo').value;
+            
+            $.ajax({
+                url: '/consulting/update-memo',
+                type: 'POST',
+                data: {
+                    inquiryId: inquiryId,
+                    memo: memo
+                },
+                beforeSend: function(xhr) {
+                    // CSRF 토큰 추가 (Spring Security 사용 시)
+                    var token = $("meta[name='_csrf']").attr("content");
+                    var header = $("meta[name='_csrf_header']").attr("content");
+                    if (token && header) {
+                        xhr.setRequestHeader(header, token);
+                    }
+                },
+                success: function(response) {
+                    console.log("메모 업데이트 응답:", response);
+                    if (response.success) {
+                        // 성공 메시지 표시
+                        Swal.fire({
+                            text: "메모가 저장되었습니다.",
+                            icon: "success",
+                            buttonsStyling: false,
+                            confirmButtonText: "확인",
+                            customClass: {
+                                confirmButton: "btn btn-primary"
+                            }
+                        });
+                    } else {
+                        // 오류 메시지 표시
+                        Swal.fire({
+                            text: response.message || "메모 저장에 실패했습니다.",
+                            icon: "error",
+                            buttonsStyling: false,
+                            confirmButtonText: "확인",
+                            customClass: {
+                                confirmButton: "btn btn-primary"
+                            }
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("메모 업데이트 오류:", error);
+                    // 오류 메시지 표시
+                    Swal.fire({
+                        text: "메모 저장 중 오류가 발생했습니다.",
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "확인",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                            }
+                        });
+                }
+            });
+        }
+
+        // 텍스트 복사 함수
+        function copyText(element) {
+            var textToCopy = element.getAttribute('data-text');
+            if (!textToCopy) {
+                console.error('복사할 텍스트가 없습니다:', element);
+                return;
+            }
+            
+            console.log('복사할 텍스트:', textToCopy);
+            
+            // 클립보드 API 사용 (모던 브라우저용)
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(textToCopy)
+                    .then(() => {
+                        // 성공 메시지 토스트
+                        showToast("복사되었습니다", "success");
+                    })
+                    .catch(err => {
+                        console.error('클립보드 API 복사 실패:', err);
+                        // 폴백: 기존 방식으로 시도
+                        legacyCopyText(textToCopy);
+                    });
+            } else {
+                // 폴백: 기존 방식으로 시도
+                legacyCopyText(textToCopy);
+            }
+        }
+        
+        // 레거시 복사 방식
+        function legacyCopyText(text) {
+            // textarea 생성 방식으로 텍스트 복사
+            var textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed'; // 화면 외부에 위치시키기
+            textarea.style.left = '-999999px';
+            textarea.style.top = '-999999px';
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+            
+            try {
+                var successful = document.execCommand('copy');
+                if (successful) {
+                    // 성공 메시지 토스트
+                    showToast("복사되었습니다", "success");
+                } else {
+                    throw new Error('복사 명령 실패');
+                }
+            } catch (err) {
+                console.error('복사 실패:', err);
+                // 실패 메시지
+                showToast("복사 실패", "error");
+            }
+            
+            document.body.removeChild(textarea);
+        }
+        
+        // 토스트 메시지 표시 함수
+        function showToast(message, icon) {
+            Swal.fire({
+                text: message,
+                icon: icon,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 1500,
+                timerProgressBar: true
+            });
+        }
+
+        // 전체 정보 복사 함수
+        function copyAllInfo() {
+            // 문의 정보 가져오기
+            var inquiryId = document.querySelector('.d-flex.align-items-center:nth-child(1) .fw-bold').textContent.trim();
+            var customerName = document.querySelector('.d-flex.align-items-center:nth-child(2) .fw-bold').textContent.trim();
+            var phoneNumber = document.querySelector('.d-flex.align-items-center:nth-child(3) .fw-bold').textContent.trim();
+            var orderNumber = document.querySelector('.d-flex.align-items-center:nth-child(4) .fw-bold').textContent.trim();
+            var inquiryType = document.querySelector('.d-flex.align-items-center:nth-child(5) .badge').textContent.trim();
+            var assignedTo = document.querySelector('.d-flex.align-items-center:nth-child(6) .fw-bold').textContent.trim();
+            var createdDate = document.querySelector('.d-flex.align-items-center:nth-child(7) .fw-bold').textContent.trim();
+            var inquiryContent = document.querySelector('.inquiry-content').textContent.trim();
+            var processContent = document.querySelectorAll('.inquiry-content')[1].textContent.trim();
+            
+            // 모든 코멘트 가져오기
+            var comments = [];
+            document.querySelectorAll('.comment-item').forEach(function(commentEl) {
+                var author = commentEl.querySelector('.comment-author span').textContent.trim();
+                var date = commentEl.querySelector('.comment-date').textContent.trim();
+                var isInternal = commentEl.querySelector('.badge-warning') !== null ? '[내부용]' : '';
+                var content = commentEl.querySelector('.comment-content').textContent.trim();
+                
+                comments.push(`${isInternal} ${author} (${date}):\n${content}`);
+            });
+            
+            // 전체 정보 포맷팅
+            var allInfo = `[문의정보]
+문의번호: ${inquiryId}
+고객명: ${customerName}
+연락처: ${phoneNumber}
+주문번호: ${orderNumber}
+문의유형: ${inquiryType}
+담당자: ${assignedTo}
+등록일: ${createdDate}
+
+[문의내용]
+${inquiryContent}
+
+[처리내용]
+${processContent}`;
+            
+            // 코멘트가 있는 경우 추가
+            if (comments.length > 0) {
+                allInfo += '\n\n[코멘트]\n' + comments.join('\n\n');
+            }
+            
+            // 클립보드 API 사용
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(allInfo)
+                    .then(() => {
+                        // 성공 메시지
+                        showToast("전체 정보가 복사되었습니다", "success");
+                    })
+                    .catch(err => {
+                        console.error('클립보드 API 복사 실패:', err);
+                        // 폴백: 레거시 방식으로 시도
+                        legacyCopyFullText(allInfo);
+                    });
+            } else {
+                // 폴백: 레거시 방식으로 시도
+                legacyCopyFullText(allInfo);
+            }
+        }
+        
+        // 전체 정보 레거시 복사 함수
+        function legacyCopyFullText(text) {
+            var textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.left = '-999999px';
+            textarea.style.top = '-999999px';
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+            
+            try {
+                var successful = document.execCommand('copy');
+                if (successful) {
+                    // 성공 메시지
+                    showToast("전체 정보가 복사되었습니다", "success");
+                } else {
+                    throw new Error('복사 명령 실패');
+                }
+            } catch (err) {
+                console.error('복사 실패:', err);
+                showToast("복사 실패", "error");
+            }
+            
+            document.body.removeChild(textarea);
+        }
+        
+        // 페이지 로드 시 실행
+        document.addEventListener('DOMContentLoaded', function() {
+            window.console.log("상담 문의 상세 페이지가 로드되었습니다.");
+            
+            // 자동으로 텍스트 영역 높이 조정
+            document.querySelectorAll('textarea').forEach(function(textarea) {
+                adjustTextareaHeight(textarea);
+                textarea.addEventListener('input', function() {
+                    adjustTextareaHeight(this);
+                });
+            });
+            
+            // Select2 초기화
+            if (typeof $.fn.select2 !== 'undefined') {
+                $('#statusSelect').select2({
+                    minimumResultsForSearch: -1 // 검색 상자 비활성화
+                });
+            }
+
+            // 툴팁 초기화
+            $('[data-bs-toggle="tooltip"]').tooltip();
+        });
+        
+        // 텍스트 영역 높이 자동 조정
+        function adjustTextareaHeight(textarea) {
+            window.console.log("텍스트 영역 높이 조정:", textarea.id);
+            textarea.style.height = 'auto';
+            textarea.style.height = (textarea.scrollHeight) + 'px';
+        }
+
+        // 이미지 로더 숨기기
+        function hideLoader(imgElement) {
+            if (!imgElement) return;
+            
+            var fileId = imgElement.getAttribute('data-file-id');
+            if (fileId) {
+                var loadingEl = document.getElementById('loading-' + fileId);
+                if (loadingEl) loadingEl.style.display = 'none';
+            }
+        }
+
+        // 첨부 이미지 보기
+        function showAttachmentImage(attachmentId) {
+            var img = document.getElementById('attachment-img-' + attachmentId);
+            if (!img) return;
+            
+            var filePath = img.getAttribute('data-file-path');
+            var fileName = img.getAttribute('data-file-name');
+            var fileId = img.getAttribute('data-file-id');
+            
+            // 미리보기 이미지 설정
+            var previewImageSrc = document.getElementById('previewImageSrc');
+            previewImageSrc.src = img.src;
+            
+            // 이미지 제목 설정
+            document.getElementById('previewImageTitle').textContent = fileName || '첨부이미지';
+            
+            // 원본 이미지 링크 설정
+            var originalImageBtn = document.getElementById('originalImageBtn');
+            var downloadBtn = document.getElementById('previewImageDownload');
+            
+            if (filePath) {
+                originalImageBtn.href = '/api/image-proxy?path=' + encodeURIComponent(filePath);
+                downloadBtn.href = '/api/download?path=' + encodeURIComponent(filePath);
+                downloadBtn.download = fileName || 'attachment-' + fileId;
+                downloadBtn.style.display = 'inline-block';
+                originalImageBtn.style.display = 'inline-block';
+            } else {
+                downloadBtn.style.display = 'none';
+                originalImageBtn.style.display = 'none';
+            }
+            
+            // 모달 열기
+            var imageModal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
+            imageModal.show();
+        }
+        
+        // 페이지 로드 시 실행
+        document.addEventListener('DOMContentLoaded', function() {
+            window.console.log("상담 문의 상세 페이지가 로드되었습니다.");
+            
+            // 자동으로 텍스트 영역 높이 조정
+            document.querySelectorAll('textarea').forEach(function(textarea) {
+                adjustTextareaHeight(textarea);
+                textarea.addEventListener('input', function() {
+                    adjustTextareaHeight(this);
+                });
+            });
+            
+            // Select2 초기화
+            if (typeof $.fn.select2 !== 'undefined') {
+                $('#statusSelect').select2({
+                    minimumResultsForSearch: -1 // 검색 상자 비활성화
+                });
+            }
+            
+            // 툴팁 초기화
+            $('[data-bs-toggle="tooltip"]').tooltip();
+        });
+        
+        // 텍스트 영역 높이 자동 조정
+        function adjustTextareaHeight(textarea) {
+            window.console.log("텍스트 영역 높이 조정:", textarea.id);
+            textarea.style.height = 'auto';
+            textarea.style.height = (textarea.scrollHeight) + 'px';
+        }
+    </script>
+</div>
+</html>

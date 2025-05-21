@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"><!--/*  layout 선언부 추가    */-->
@@ -8,7 +7,7 @@
 <head>
 	<title>WIO SERVICE</title>
 	<meta charset="utf-8" />
-		<link rel="shortcut icon" href="/assets/media/logos/logo.png" />
+	<link rel="shortcut icon" href="/assets/media/logos/logo.png" />
 	<!--begin::Fonts(mandatory for all pages)-->
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />
 	<!--end::Fonts-->
@@ -176,44 +175,47 @@
 		}
 	});
 	document.addEventListener('DOMContentLoaded', function() {
-		document.getElementById('downloadButton').addEventListener('click', function() {
-			var content = document.getElementById('contentToDownload');
+		var downloadButton = document.getElementById('downloadButton');
+		if (downloadButton) {  // 버튼이 존재하는지 확인
+			downloadButton.addEventListener('click', function() {
+				var content = document.getElementById('contentToDownload');
 
-			// Null 체크 및 에러 로깅 추가
-			if (!content) {
-				console.error('Content to download is null or undefined');
-				return;
-			}
-
-			html2canvas(content).then(function(canvas) {
-				if (!canvas) {
-					console.error('Failed to create canvas');
+				// Null 체크 및 에러 로깅 추가
+				if (!content) {
+					console.error('Content to download is null or undefined');
 					return;
 				}
 
-				var imgData = canvas.toDataURL('image/png');
-				var { jsPDF } = window.jspdf;
-				var pdf = new jsPDF('p', 'mm', 'a4');
-				var imgWidth = 210;
-				var pageHeight = 295;
-				var imgHeight = canvas.height * imgWidth / canvas.width;
-				var heightLeft = imgHeight;
-				var position = 0;
+				html2canvas(content).then(function(canvas) {
+					if (!canvas) {
+						console.error('Failed to create canvas');
+						return;
+					}
 
-				pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-				heightLeft -= pageHeight;
+					var imgData = canvas.toDataURL('image/png');
+					var { jsPDF } = window.jspdf;
+					var pdf = new jsPDF('p', 'mm', 'a4');
+					var imgWidth = 210;
+					var pageHeight = 295;
+					var imgHeight = canvas.height * imgWidth / canvas.width;
+					var heightLeft = imgHeight;
+					var position = 0;
 
-				while (heightLeft >= 0) {
-					position = heightLeft - imgHeight;
-					pdf.addPage();
 					pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
 					heightLeft -= pageHeight;
-				}
-				pdf.save('dashboard-content.pdf');
-			}).catch(function(error) {
-				console.error('Error generating PDF:', error);
+
+					while (heightLeft >= 0) {
+						position = heightLeft - imgHeight;
+						pdf.addPage();
+						pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+						heightLeft -= pageHeight;
+					}
+					pdf.save('dashboard-content.pdf');
+				}).catch(function(error) {
+					console.error('Error generating PDF:', error);
+				});
 			});
-		});
+		}
 	});
 </script>
 

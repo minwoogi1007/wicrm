@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wio.crm.mapper.ConsultingMapper">
+
+    <!-- 상담 문의 목록 조회 -->
+    <select id="findConsultingInquiries" parameterType="map" resultType="com.wio.crm.model.ConsultingInquiry">
+        SELECT 
+            ci.inquiry_id as inquiryId,
+            ci.customer_name as customerName,
+            ci.phone_number as phoneNumber,
+            ci.order_number as orderNumber,
+            ci.inquiry_type as inquiryType,
+            ci.inquiry_type as inquiryTypeName,
+            ci.inquiry_content as inquiryContent,
+            ci.process_content as processContent,
+            ci.status,
+            ci.created_date as createdDate,
+            ci.updated_date as updatedDate,
+            ci.assigned_to as assignedTo,
+            NVL((SELECT COUNT(*) FROM CONSULTING_INQUIRY_ATTACHMENT WHERE inquiry_id = ci.inquiry_id), 0) AS attachmentCount,
+            NVL((SELECT COUNT(*) FROM CONSULTING_INQUIRY_HISTORY WHERE inquiry_id = ci.inquiry_id AND action_type IN ('COMMENT', 'INTERNAL_COMMENT')), 0) AS commentCount
+        FROM 
+            consulting_inquiry ci
+        WHERE 
+            1=1
+            <if test="customerName != null and customerName != ''">
+                AND ci.customer_name LIKE '%' || #{customerName} || '%'
+            </if>
+            <if test="phoneNumber != null and phoneNumber != ''">
+                AND ci.phone_number LIKE '%' || #{phoneNumber} || '%'
+            </if>
+            <if test="orderNumber != null and orderNumber != ''">
+                AND ci.order_number LIKE '%' || #{orderNumber} || '%'
+            </if>
+            <if test="inquiryType != null and inquiryType != ''">
+                AND ci.inquiry_type = #{inquiryType}
+            </if>
+            <if test="status != null and status != ''">
+                AND ci.status = #{status}
+            </if>
+        ORDER BY
+            <choose>
+                <when test="sortField != null and sortField != ''">
+                    ci.${sortField}
+                </when>
+                <otherwise>
+                    ci.created_date
+                </otherwise>
+            </choose>
+            <choose>
+                <when test="sortDirection != null and sortDirection == 'asc'">
+                    ASC
+                </when>
+                <otherwise>
+                    DESC
+                </otherwise>
+            </choose>
+    </select>
+    
+    <!-- 상담 문의 상세 조회 -->
+    <select id="getConsultingInquiryById" resultType="com.wio.crm.model.ConsultingInquiry">
+        SELECT 
+            ci.inquiry_id as inquiryId,
+            ci.customer_name as customerName,
+            ci.phone_number as phoneNumber,
+            ci.order_number as orderNumber,
+            ci.inquiry_type as inquiryType,
+            CASE ci.inquiry_type
+                WHEN 'PRODUCT' THEN '상품문의'
+                WHEN 'DELIVERY' THEN '배송문의'
+                WHEN 'CHANGE' THEN '교환문의'
+                WHEN 'REFUND' THEN '환불문의'
+                WHEN 'CANCEL' THEN '취소문의'
+                WHEN 'ETC' THEN '기타문의'
+                ELSE ci.inquiry_type
+            END as inquiryTypeName,
+            ci.inquiry_content as inquiryContent,
+            ci.process_content as processContent,
+            ci.status,
+            ci.assigned_to as assignedTo,
+            ci.memo,
+            ci.image_path as imageUrl,
+            ci.created_date as createdDate,
+            ci.updated_date as updatedDate,
+            ci.created_by as createdBy,
+            ci.updated_by as updatedBy
+        FROM 
+            consulting_inquiry ci
+        WHERE 
+            ci.inquiry_id = #{inquiryId}
+    </select>
+    
+    <!-- 상담 문의 상태 업데이트 -->
+    <update id="updateInquiryStatus" parameterType="map">
+        UPDATE consulting_inquiry
+        SET 
+            status = #{status},
+            updated_by = #{updatedBy},
+            updated_date = SYSDATE
+        WHERE 
+            inquiry_id = #{inquiryId}
+    </update>
+    
+    <!-- 상담 문의 처리 내용 업데이트 -->
+    <update id="updateProcessContent" parameterType="map">
+        UPDATE consulting_inquiry
+        SET 
+            process_content = #{processContent},
+            updated_by = #{updatedBy},
+            updated_date = SYSDATE
+        WHERE 
+            inquiry_id = #{inquiryId}
+    </update>
+    
+    <!-- 코멘트 등록 -->
+    <insert id="insertComment" parameterType="map">
+        <!-- 코멘트 ID 생성 및 코멘트 삽입 -->
+        INSERT INTO CONSULTING_INQUIRY_HISTORY (
+            history_id,
+            inquiry_id,
+            action_type,
+            content,
+            handled_by,
+            created_date,
+            created_by
+        ) VALUES (
+            (SELECT NVL(MAX(history_id), 0) + 1 FROM CONSULTING_INQUIRY_HISTORY),
+            #{inquiryId},
+            CASE WHEN #{isInternal} = 1 THEN 'INTERNAL_COMMENT' ELSE 'COMMENT' END,
+            #{content},
+            #{commenter},
+            SYSDATE,
+            #{commenter}
+        )
+        
+        <!-- 이후 코멘트 날짜 반환 -->
+        <selectKey keyProperty="commentId" resultType="long" order="AFTER">
+            SELECT MAX(history_id) FROM CONSULTING_INQUIRY_HISTORY WHERE inquiry_id = #{inquiryId}
+        </selectKey>
+    </insert>
+    
+    <!-- 코멘트 날짜 조회 -->
+    <select id="getCommentDateById" resultType="string">
+        SELECT TO_CHAR(created_date, 'YYYY-MM-DD HH24:MI:SS') 
+        FROM CONSULTING_INQUIRY_HISTORY 
+        WHERE history_id = #{commentId}
+    </select>
+    
+    <!-- 첨부 파일 목록 조회 -->
+    <select id="getAttachmentsByInquiryId" resultType="map">
+        SELECT 
+            a.attachment_id AS "attachment_id",
+            a.inquiry_id AS "inquiry_id",
+            a.file_name AS "file_name",
+            a.file_path AS "file_path",
+            a.file_type AS "file_type",
+            a.file_size AS "file_size",
+            CASE WHEN a.source = 'MAIN_IMAGE' THEN 1 ELSE 0 END AS "is_main_image",
+            a.created_date AS "upload_date"
+        FROM 
+            CONSULTING_INQUIRY_ATTACHMENT a
+        WHERE 
+            a.inquiry_id = #{inquiryId}
+        ORDER BY 
+            CASE WHEN a.source = 'MAIN_IMAGE' THEN 0 ELSE 1 END, a.created_date DESC
+    </select>
+    
+    <!-- 코멘트 목록 조회 -->
+    <select id="getCommentsByInquiryId" resultType="map">
+        SELECT 
+            history_id as "comment_id",
+            inquiry_id as "inquiry_id",
+            DBMS_LOB.SUBSTR(content, 4000, 1) as "content",
+            handled_by as "commenter",
+            created_date as "comment_date",
+            CASE WHEN action_type = 'INTERNAL_COMMENT' THEN 1 ELSE 0 END as "is_internal"
+        FROM 
+            CONSULTING_INQUIRY_HISTORY
+        WHERE 
+            inquiry_id = #{inquiryId}
+            AND action_type IN ('COMMENT', 'INTERNAL_COMMENT')
+        ORDER BY 
+            created_date ASC
+    </select>
+    
+    <!-- 모든 문의 유형 조회 -->
+    <select id="getAllInquiryTypes" resultType="map">
+        SELECT DISTINCT
+            inquiry_type as inquiry_type,
+            inquiry_type as type_name
+        FROM 
+            CONSULTING_INQUIRY
+        WHERE 
+            inquiry_type IS NOT NULL
+        ORDER BY 
+            inquiry_type
+    </select>
+    
+    <!-- 활성화된 응답 템플릿 조회 -->
+    <select id="getActiveReplyTemplates" resultType="map">
+        SELECT 
+            rownum as id,
+            inquiry_type as title,
+            'Sample Content for ' || inquiry_type as content,
+            '기본' as category
+        FROM 
+            (SELECT DISTINCT inquiry_type FROM CONSULTING_INQUIRY WHERE inquiry_type IS NOT NULL)
+        WHERE
+            <![CDATA[
+            rownum <= 10
+            ]]>
+    </select>
+    
+    <!-- 카테고리별로 그룹화된 응답 템플릿 조회 -->
+    <select id="getGroupedReplyTemplatesByCategory" resultType="map">
+        SELECT 
+            rownum as id,
+            inquiry_type as title,
+            'Sample Content for ' || inquiry_type as content,
+            CASE
+                WHEN inquiry_type LIKE '%PAINT%' THEN '물감 관련'
+                WHEN inquiry_type LIKE '%ORDER%' THEN '주문 관련'
+                WHEN inquiry_type LIKE '%CANCEL%' THEN '취소 관련'
+                WHEN inquiry_type IN ('EXCHANGE', 'RETURN', 'REFUND') THEN '교환/반품/환불'
+                WHEN inquiry_type = 'DELIVERY' THEN '배송 관련'
+                ELSE '기타'
+            END as category
+        FROM 
+            (SELECT DISTINCT inquiry_type FROM CONSULTING_INQUIRY WHERE inquiry_type IS NOT NULL)
+        WHERE
+            <![CDATA[
+            rownum <= 20
+            ]]>
+    </select>
+    
+    <!-- 상담 문의 내부 메모 업데이트 -->
+    <update id="updateMemo" parameterType="map">
+        UPDATE consulting_inquiry
+        SET 
+            memo = #{memo},
+            updated_by = #{updatedBy},
+            updated_date = SYSDATE
+        WHERE 
+            inquiry_id = #{inquiryId}
+    </update>
+    
+    <!-- 상담 문의 등록 -->
+    <insert id="insertConsultingInquiry" parameterType="com.wio.crm.model.ConsultingInquiry">
+        <selectKey keyProperty="inquiryId" resultType="long" order="BEFORE">
+            SELECT NVL(MAX(inquiry_id), 0) + 1 FROM consulting_inquiry
+        </selectKey>
+        INSERT INTO consulting_inquiry (
+            inquiry_id,
+            customer_name,
+            phone_number,
+            order_number,
+            inquiry_type,
+            inquiry_content,
+            status,
+            assigned_to,
+            memo,
+            created_by,
+            updated_by,
+            created_date,
+            updated_date
+        ) VALUES (
+            #{inquiryId},
+            #{customerName},
+            #{phoneNumber},
+            #{orderNumber},
+            #{inquiryType},
+            #{inquiryContent},
+            #{status},
+            #{assignedTo},
+            #{memo},
+            #{createdBy},
+            #{updatedBy},
+            SYSDATE,
+            SYSDATE
+        )
+    </insert>
+    
+    <!-- 첨부 파일 등록 -->
+    <insert id="insertAttachment" parameterType="map">
+        INSERT INTO CONSULTING_INQUIRY_ATTACHMENT (
+            attachment_id,
+            inquiry_id,
+            file_name,
+            file_path,
+            file_type,
+            file_size,
+            created_date,
+            created_by,
+            source
+        ) VALUES (
+            (SELECT NVL(MAX(attachment_id), 0) + 1 FROM CONSULTING_INQUIRY_ATTACHMENT),
+            #{inquiryId},
+            #{fileName},
+            #{filePath},
+            #{fileType},
+            #{fileSize},
+            SYSDATE,
+            'SYSTEM',
+            'ATTACHMENT'
+        )
+    </insert>
+    
+    <!-- 페이징을 적용한 상담 문의 목록 조회 -->
+    <select id="findConsultingInquiriesWithPaging" parameterType="map" resultType="com.wio.crm.model.ConsultingInquiry">
+        SELECT * FROM (
+            SELECT a.*, ROWNUM as rn FROM (
+                SELECT 
+                    ci.inquiry_id as inquiryId,
+                    ci.customer_name as customerName,
+                    ci.phone_number as phoneNumber,
+                    ci.order_number as orderNumber,
+                    ci.inquiry_type as inquiryType,
+                    ci.inquiry_type as inquiryTypeName,
+                    ci.inquiry_content as inquiryContent,
+                    ci.process_content as processContent,
+                    ci.status,
+                    ci.created_date as createdDate,
+                    ci.updated_date as updatedDate,
+                    ci.assigned_to as assignedTo,
+                    ci.created_by as createdBy,
+                    ci.updated_by as updatedBy,
+                    NVL((SELECT COUNT(*) FROM CONSULTING_INQUIRY_ATTACHMENT WHERE inquiry_id = ci.inquiry_id), 0) AS attachmentCount,
+                    NVL((SELECT COUNT(*) FROM CONSULTING_INQUIRY_HISTORY WHERE inquiry_id = ci.inquiry_id AND action_type IN ('COMMENT', 'INTERNAL_COMMENT')), 0) AS commentCount
+                FROM 
+                    consulting_inquiry ci
+                WHERE 
+                    1=1
+                    <if test="customerName != null and customerName != ''">
+                        AND ci.customer_name LIKE '%' || #{customerName} || '%'
+                    </if>
+                    <if test="phoneNumber != null and phoneNumber != ''">
+                        AND ci.phone_number LIKE '%' || #{phoneNumber} || '%'
+                    </if>
+                    <if test="orderNumber != null and orderNumber != ''">
+                        AND ci.order_number LIKE '%' || #{orderNumber} || '%'
+                    </if>
+                    <if test="inquiryType != null and inquiryType != ''">
+                        AND ci.inquiry_type = #{inquiryType}
+                    </if>
+                    <if test="status != null and status != ''">
+                        AND ci.status = #{status}
+                    </if>
+                ORDER BY
+                    <choose>
+                        <when test="sortField != null and sortField != ''">
+                            ci.${sortField}
+                        </when>
+                        <otherwise>
+                            ci.created_date
+                        </otherwise>
+                    </choose>
+                    <choose>
+                        <when test="sortDirection != null and sortDirection == 'asc'">
+                            ASC
+                        </when>
+                        <otherwise>
+                            DESC
+                        </otherwise>
+                    </choose>
+            ) a 
+            WHERE 
+                <![CDATA[ 
+                ROWNUM <= (#{offset} + #{limit})
+                ]]>
+        ) 
+        WHERE 
+            <![CDATA[ 
+            rn > #{offset}
+            ]]>
+    </select>
+    
+    <!-- 조건에 맞는 전체 상담 문의 수 조회 -->
+    <select id="countConsultingInquiries" parameterType="map" resultType="long">
+        SELECT COUNT(*)
+        FROM consulting_inquiry ci
+        WHERE 1=1
+            <if test="customerName != null and customerName != ''">
+                AND ci.customer_name LIKE '%' || #{customerName} || '%'
+            </if>
+            <if test="phoneNumber != null and phoneNumber != ''">
+                AND ci.phone_number LIKE '%' || #{phoneNumber} || '%'
+            </if>
+            <if test="orderNumber != null and orderNumber != ''">
+                AND ci.order_number LIKE '%' || #{orderNumber} || '%'
+            </if>
+            <if test="inquiryType != null and inquiryType != ''">
+                AND ci.inquiry_type = #{inquiryType}
+            </if>
+            <if test="status != null and status != ''">
+                AND ci.status = #{status}
+            </if>
+    </select>
+    
+    <!-- 데이터베이스 테이블 정보 조회 (디버깅용) -->
+    <select id="getAllTableNames" resultType="map">
+        SELECT table_name
+        FROM user_tables
+        ORDER BY table_name
+    </select>
+    
+    <!-- 첨부파일이 있는 가장 최근 문의 ID 조회 -->
+    <select id="findLatestInquiryIdWithAttachments" resultType="long">
+        SELECT ci.inquiry_id
+        FROM consulting_inquiry ci
+        WHERE EXISTS (
+            SELECT 1 FROM CONSULTING_INQUIRY_ATTACHMENT
+            WHERE inquiry_id = ci.inquiry_id
+        )
+        ORDER BY ci.created_date DESC
+        FETCH FIRST 1 ROW ONLY
+    </select>
+</mapper>

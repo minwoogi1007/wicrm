@@ -25,6 +25,11 @@ public class Transaction {
     private String CHARGE_INS_EMPNO;
     private String POINT_CHARGE;
 
+    // 기본 생성자 추가
+    public Transaction() {
+        // 기본 생성자
+    }
+
     // Constructors, getters, and setters
     public Transaction(String date, String type, double amount, String description) {
         this.date = date;
@@ -183,5 +188,19 @@ public class Transaction {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+    
+    // 객체 디버깅을 위한 toString 메서드 추가
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "PRTN_CD='" + PRTN_CD + '\'' +
+                ", CUST_NAME='" + CUST_NAME + '\'' +
+                ", CHARGE_DATE='" + CHARGE_DATE + '\'' +
+                ", CHARGE_SERL_NO='" + CHARGE_SERL_NO + '\'' +
+                ", CHARGE_POINT='" + CHARGE_POINT + '\'' +
+                ", CHARGE_GUBN='" + CHARGE_GUBN + '\'' +
+                ", POINT_CHARGE='" + POINT_CHARGE + '\'' +
+                '}';
     }
 }

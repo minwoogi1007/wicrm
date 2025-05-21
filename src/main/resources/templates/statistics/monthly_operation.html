@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{main}">
+<!--begin::Main-->
+<meta name="_csrf" th:content="${_csrf.token}"/>
+<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+<div layout:fragment="content">
+    <script src="/assets/plugins/global/plugins.bundle.js"></script>
+    <!-- 월별 선택 플러그인 추가 -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
+    <div class="d-flex flex-column flex-column-fluid">
+        <!--begin::Toolbar-->
+        <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+            <!--begin::Toolbar container-->
+            <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                <!--begin::Page title-->
+                <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                    <!--begin::Title-->
+                    <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">월간 운영현황</h1>
+                    <!--end::Title-->
+                    <!--begin::Breadcrumb-->
+                    <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                        <!--begin::Item-->
+                        <li class="breadcrumb-item text-muted">
+                            <a href="/main" class="text-muted text-hover-primary">Home</a>
+                        </li>
+                        <!--end::Item-->
+                        <!--begin::Item-->
+                        <li class="breadcrumb-item">
+                            <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                        </li>
+                        <!--end::Item-->
+                        <!--begin::Item-->
+                        <li class="breadcrumb-item text-muted">통계</li>
+                        <!--end::Item-->
+                        <!--begin::Item-->
+                        <li class="breadcrumb-item">
+                            <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                        </li>
+                        <!--end::Item-->
+                        <!--begin::Item-->
+                        <li class="breadcrumb-item text-muted">월간 운영현황</li>
+                        <!--end::Item-->
+                    </ul>
+                    <!--end::Breadcrumb-->
+                </div>
+                <!--end::Page title-->
+            </div>
+            <!--end::Toolbar container-->
+        </div>
+        <!--end::Toolbar-->
+
+        <!--begin::Content-->
+        <div id="kt_app_content" class="app-content flex-column-fluid">
+            <!--begin::Content container-->
+            <div id="kt_app_content_container" class="app-container container-xxl">
+                <!-- 월 선택 영역 -->
+                <div class="card card-flush mb-6">
+                    <div class="card-header border-0 pt-5">
+                        <h3 class="card-title align-items-start flex-column">
+                            <span class="card-label fw-bold fs-3 mb-1">월간 운영현황 조회</span>
+                        </h3>
+                        <div class="card-toolbar">
+                            <div class="d-flex align-items-center position-relative">
+                                <input class="form-control form-control-solid w-200px" placeholder="월 선택" id="monthly_datepicker" readonly/>
+                                <button type="button" class="btn btn-primary ms-3" id="searchBtn">조회</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 1.월간 요약 통계 -->
+                <div class="row g-5 g-xl-8 mb-6">
+                    <div class="col-xl-3">
+                        <div class="card card-flush h-md-100">
+                            <div class="card-header pt-5">
+                                <div class="card-title d-flex flex-column">
+                                    <span class="fs-2hx fw-bold text-gray-900 me-2 lh-1 ls-n2">154</span>
+                                    <span class="text-gray-600 pt-1 fw-semibold fs-6">총 통화 건수</span>
+                                </div>
+                            </div>
+                            <div class="card-body d-flex flex-column justify-content-end pe-0">
+                                <div class="d-flex fs-6 fw-semibold align-items-center">
+                                    <div class="text-success flex-grow-1 fw-bold">12% 증가</div>
+                                    <div class="fw-bold text-gray-600">전월 대비</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3">
+                        <div class="card card-flush h-md-100">
+                            <div class="card-header pt-5">
+                                <div class="card-title d-flex flex-column">
+                                    <span class="fs-2hx fw-bold text-gray-900 me-2 lh-1 ls-n2">82.5%</span>
+                                    <span class="text-gray-600 pt-1 fw-semibold fs-6">평균 취결율</span>
+                                </div>
+                            </div>
+                            <div class="card-body d-flex flex-column justify-content-end pe-0">
+                                <div class="d-flex fs-6 fw-semibold align-items-center">
+                                    <div class="text-danger flex-grow-1 fw-bold">-2.5% 감소</div>
+                                    <div class="fw-bold text-gray-600">전월 대비</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3">
+                        <div class="card card-flush h-md-100">
+                            <div class="card-header pt-5">
+                                <div class="card-title d-flex flex-column">
+                                    <span class="fs-2hx fw-bold text-gray-900 me-2 lh-1 ls-n2">87</span>
+                                    <span class="text-gray-600 pt-1 fw-semibold fs-6">총 취결 건수</span>
+                                </div>
+                            </div>
+                            <div class="card-body d-flex flex-column justify-content-end pe-0">
+                                <div class="d-flex fs-6 fw-semibold align-items-center">
+                                    <div class="text-success flex-grow-1 fw-bold">5% 증가</div>
+                                    <div class="fw-bold text-gray-600">전월 대비</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3">
+                        <div class="card card-flush h-md-100">
+                            <div class="card-header pt-5">
+                                <div class="card-title d-flex flex-column">
+                                    <span class="fs-2hx fw-bold text-gray-900 me-2 lh-1 ls-n2">3:42</span>
+                                    <span class="text-gray-600 pt-1 fw-semibold fs-6">평균 통화 시간</span>
+                                </div>
+                            </div>
+                            <div class="card-body d-flex flex-column justify-content-end pe-0">
+                                <div class="d-flex fs-6 fw-semibold align-items-center">
+                                    <div class="text-success flex-grow-1 fw-bold">+18초 증가</div>
+                                    <div class="fw-bold text-gray-600">전월 대비</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2.월간 통계 추이 -->
+                <div class="card card-flush mb-6">
+                    <div class="card-header border-0 pt-5">
+                        <h3 class="card-title align-items-start flex-column">
+                            <span class="card-label fw-bold fs-3 mb-1">2.월간 통계 추이</span>
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="kt_monthly_trend_chart" style="height: 350px;"></div>
+                    </div>
+                </div>
+
+                <!-- 3.주차별 통계 -->
+                <div class="card card-flush mb-6">
+                    <div class="card-header border-0 pt-5">
+                        <h3 class="card-title align-items-start flex-column">
+                            <span class="card-label fw-bold fs-3 mb-1">3.주차별 통계</span>
+                        </h3>
+                    </div>
+                    <div class="card-body pt-0">
+                        <table class="table table-row-bordered table-striped gy-5 gs-7">
+                            <thead>
+                                <tr class="fw-semibold fs-6 text-gray-800 text-center border-bottom border-gray-200">
+                                    <th>구분</th>
+                                    <th>총통화</th>
+                                    <th>인입호</th>
+                                    <th>단순문의호</th>
+                                    <th>응대가능호</th>
+                                    <th>조회호</th>
+                                    <th>취결호</th>
+                                    <th>부결호수</th>
+                                    <th>총취결율</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-center">
+                                <tr>
+                                    <td>1주차</td>
+                                    <td>41</td>
+                                    <td>32</td>
+                                    <td>9</td>
+                                    <td>32</td>
+                                    <td>28</td>
+                                    <td>4</td>
+                                    <td>4</td>
+                                    <td>87.5%</td>
+                                </tr>
+                                <tr>
+                                    <td>2주차</td>
+                                    <td>38</td>
+                                    <td>31</td>
+                                    <td>7</td>
+                                    <td>31</td>
+                                    <td>26</td>
+                                    <td>5</td>
+                                    <td>3</td>
+                                    <td>83.9%</td>
+                                </tr>
+                                <tr>
+                                    <td>3주차</td>
+                                    <td>45</td>
+                                    <td>35</td>
+                                    <td>10</td>
+                                    <td>35</td>
+                                    <td>29</td>
+                                    <td>6</td>
+                                    <td>5</td>
+                                    <td>82.9%</td>
+                                </tr>
+                                <tr>
+                                    <td>4주차</td>
+                                    <td>30</td>
+                                    <td>24</td>
+                                    <td>6</td>
+                                    <td>24</td>
+                                    <td>20</td>
+                                    <td>4</td>
+                                    <td>2</td>
+                                    <td>83.3%</td>
+                                </tr>
+                                <tr class="fw-bold bg-light-primary">
+                                    <td>합계</td>
+                                    <td>154</td>
+                                    <td>122</td>
+                                    <td>32</td>
+                                    <td>122</td>
+                                    <td>103</td>
+                                    <td>19</td>
+                                    <td>14</td>
+                                    <td>84.4%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 4.상담유형 분석 -->
+                <div class="row g-5 g-xl-8 mb-6">
+                    <!-- 파이 차트 -->
+                    <div class="col-xl-6">
+                        <div class="card card-flush h-xl-100">
+                            <div class="card-header border-0 pt-5">
+                                <h3 class="card-title align-items-start flex-column">
+                                    <span class="card-label fw-bold fs-3 mb-1">4.상담유형 분석</span>
+                                </h3>
+                            </div>
+                            <div class="card-body">
+                                <div id="kt_monthly_counseling_types" class="min-h-auto" style="height: 350px"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 데이터 테이블 -->
+                    <div class="col-xl-6">
+                        <div class="card card-flush h-xl-100">
+                            <div class="card-header border-0 pt-5">
+                                <h3 class="card-title align-items-start flex-column">
+                                    <span class="card-label fw-bold fs-3 mb-1">상담유형 상세 내역</span>
+                                </h3>
+                            </div>
+                            <div class="card-body pt-0">
+                                <table class="table table-row-bordered table-striped gy-5 gs-7">
+                                    <thead>
+                                        <tr class="fw-semibold fs-6 text-gray-800 text-center border-bottom border-gray-200">
+                                            <th>상담유형</th>
+                                            <th>상담수</th>
+                                            <th>비율</th>
+                                            <th>취결율</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text-center">
+                                        <tr>
+                                            <td>상품</td>
+                                            <td>68</td>
+                                            <td>44.2%</td>
+                                            <td>89.7%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>직원</td>
+                                            <td>43</td>
+                                            <td>27.9%</td>
+                                            <td>83.7%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>운영</td>
+                                            <td>12</td>
+                                            <td>7.8%</td>
+                                            <td>75.0%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>결제</td>
+                                            <td>21</td>
+                                            <td>13.6%</td>
+                                            <td>81.0%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>기타</td>
+                                            <td>10</td>
+                                            <td>6.5%</td>
+                                            <td>70.0%</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5.전월 대비 실적 비교 -->
+                <div class="card card-flush mb-6">
+                    <div class="card-header border-0 pt-5">
+                        <h3 class="card-title align-items-start flex-column">
+                            <span class="card-label fw-bold fs-3 mb-1">5.전월 대비 실적 비교</span>
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="kt_monthly_comparison_chart" style="height: 350px;"></div>
+                    </div>
+                </div>
+            </div>
+            <!--end::Content container-->
+        </div>
+        <!--end::Content-->
+    </div>
+
+    <!--begin::Javascript-->
+    <script>
+        // 월 선택 초기화 (수정됨)
+        $("#monthly_datepicker").flatpickr({
+            altInput: true,
+            altFormat: "F Y",
+            dateFormat: "Y-m",
+            plugins: []
+        });
+
+        // 검색 버튼 이벤트
+        document.getElementById('searchBtn').addEventListener('click', function() {
+            console.log('검색 버튼 클릭됨: ' + document.getElementById('monthly_datepicker').value);
+            // 검색 로직은 백엔드 구현 후 추가 예정
+        });
+
+        // 월간 추이 차트
+        var monthlyTrendElement = document.getElementById('kt_monthly_trend_chart');
+        var monthlyTrendOptions = {
+            series: [{
+                name: '통화건수',
+                type: 'column',
+                data: [12, 9, 15, 18, 10, 8, 11, 13, 14, 8, 9, 16, 14, 13, 10, 9, 12, 15, 10, 14, 16, 13, 11, 9, 7, 6, 9, 13, 15]
+            }, {
+                name: '취결율',
+                type: 'line',
+                data: [85, 80, 85, 90, 82, 75, 85, 88, 90, 83, 80, 85, 87, 82, 78, 80, 85, 90, 85, 87, 88, 85, 80, 77, 75, 80, 82, 85, 90]
+            }],
+            chart: {
+                height: 350,
+                type: 'line',
+                stacked: false
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                width: [0, 3]
+            },
+            title: {
+                text: '2월 일별 통화건수 및 취결율',
+                align: 'left'
+            },
+            xaxis: {
+                categories: ['02-01', '02-02', '02-03', '02-04', '02-05', '02-06', '02-07', '02-08', '02-09', '02-10',
+                    '02-11', '02-12', '02-13', '02-14', '02-15', '02-16', '02-17', '02-18', '02-19', '02-20',
+                    '02-21', '02-22', '02-23', '02-24', '02-25', '02-26', '02-27', '02-28', '02-29'],
+            },
+            yaxis: [{
+                title: {
+                    text: '통화건수',
+                },
+            }, {
+                opposite: true,
+                title: {
+                    text: '취결율(%)'
+                }
+            }],
+            tooltip: {
+                y: {
+                    formatter: function (val, opts) {
+                        if (opts.seriesIndex === 0) {
+                            return val + " 건";
+                        } else if (opts.seriesIndex === 1) {
+                            return val + "%";
+                        }
+                        return val;
+                    }
+                }
+            },
+            fill: {
+                opacity: [0.85, 1],
+                colors: ['#009ef7', '#ff6384']
+            },
+            legend: {
+                position: 'top',
+                horizontalAlign: 'right',
+                offsetY: -25
+            }
+        };
+        var monthlyTrendChart = new ApexCharts(monthlyTrendElement, monthlyTrendOptions);
+        monthlyTrendChart.render();
+
+        // 파이 차트 (상담유형)
+        var counselingTypesElement = document.getElementById('kt_monthly_counseling_types');
+        var counselingTypesOptions = {
+            series: [44.2, 27.9, 13.6, 7.8, 6.5],
+            chart: {
+                type: 'pie',
+                height: 350
+            },
+            labels: ['상품', '직원', '결제', '운영', '기타'],
+            colors: ['#fe5151', '#5ead60', '#7250e7', '#efc22e', '#487eb3'],
+            legend: {
+                position: 'bottom'
+            },
+            responsive: [{
+                breakpoint: 480,
+                options: {
+                    chart: {
+                        width: 300
+                    },
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }]
+        };
+        var counselingTypesChart = new ApexCharts(counselingTypesElement, counselingTypesOptions);
+        counselingTypesChart.render();
+
+        // 전월 대비 실적 비교 차트
+        var monthlyComparisonElement = document.getElementById('kt_monthly_comparison_chart');
+        var monthlyComparisonOptions = {
+            series: [{
+                name: '이번 달',
+                data: [154, 122, 103, 84.4]
+            }, {
+                name: '전월',
+                data: [138, 110, 92, 83.6]
+            }],
+            chart: {
+                type: 'bar',
+                height: 350
+            },
+            plotOptions: {
+                bar: {
+                    horizontal: false,
+                    columnWidth: '55%',
+                    endingShape: 'rounded'
+                }
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                show: true,
+                width: 2,
+                colors: ['transparent']
+            },
+            xaxis: {
+                categories: ['총 통화건수', '응대가능호', '취결건수', '취결율(%)'],
+            },
+            yaxis: {
+                title: {
+                    text: '건수'
+                }
+            },
+            fill: {
+                opacity: 1,
+                colors: ['#009ef7', '#ff6384']
+            },
+            tooltip: {
+                y: {
+                    formatter: function (val, opts) {
+                        if (opts.dataPointIndex === 3) {
+                            return val + "%";
+                        }
+                        return val + " 건";
+                    }
+                }
+            },
+            legend: {
+                position: 'top',
+                horizontalAlign: 'right'
+            }
+        };
+        var monthlyComparisonChart = new ApexCharts(monthlyComparisonElement, monthlyComparisonOptions);
+        monthlyComparisonChart.render();
+    </script>
+    <!--end::Javascript-->
+</div>
+</html> 

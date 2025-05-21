@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>이미지 URL 테스트</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .card { border: 1px solid #ccc; padding: 20px; margin-bottom: 20px; border-radius: 5px; }
+        .header { background-color: #f5f5f5; padding: 10px; margin-bottom: 15px; font-weight: bold; }
+        .image-test { display: flex; flex-wrap: wrap; gap: 20px; }
+        .image-container { border: 1px solid #ddd; padding: 10px; width: 250px; }
+        .image-preview { height: 150px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
+        .image-preview img { max-width: 100%; max-height: 100%; }
+        pre { background-color: #f5f5f5; padding: 10px; overflow: auto; font-size: 13px; }
+        .url-info { margin-bottom: 10px; }
+        .url-part { background-color: #e9f5ff; padding: 3px; }
+        button { padding: 8px 15px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #45a049; }
+        .status { margin-top: 5px; font-size: 12px; }
+        .success { color: green; }
+        .failed { color: red; }
+        .result-section { border-top: 1px dashed #ccc; margin-top: 15px; padding-top: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>첨부파일 이미지 URL 테스트</h1>
+        
+        <div class="card">
+            <div class="header">이미지 URL 정보</div>
+            <div class="url-info">
+                <p><strong>서버 기본 URL:</strong> <span class="url-part">http://175.119.224.45:8080/uploads/</span></p>
+                <p><strong>파일 경로 (DB에 저장된 값):</strong> <span class="url-part">images/파일명.jpg</span></p>
+                <p><strong>전체 경로:</strong> <span class="url-part">http://175.119.224.45:8080/uploads/images/파일명.jpg</span></p>
+            </div>
+            <div class="text-center">
+                <button onclick="testSingleImageUrl()">URL 구성 테스트 실행</button>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="header">첨부파일 정보</div>
+            <div th:if="${attachments != null && !attachments.isEmpty()}">
+                <div th:each="attachment, status : ${attachments}" class="image-container"
+                     th:data-id="${attachment['attachment_id']}"
+                     th:data-file-path="${attachment['file_path']}"
+                     th:data-file-name="${attachment['file_name']}"
+                     th:data-file-type="${attachment['file_type']}">
+                    <h3 th:text="${'첨부파일 #' + (status.index + 1)}">첨부파일 #1</h3>
+                    
+                    <!-- 파일 정보 출력 -->
+                    <p><strong>ID:</strong> <span th:text="${attachment['attachment_id']}">ID</span></p>
+                    <p><strong>파일명:</strong> <span th:text="${attachment['file_name']}">파일명</span></p>
+                    <p><strong>경로:</strong> <span th:text="${attachment['file_path']}">경로</span></p>
+                    <p><strong>유형:</strong> <span th:text="${attachment['file_type']}">유형</span></p>
+                    
+                    <!-- 이미지 경로 구성 -->
+                    <div>
+                        <strong>서버 URL:</strong> http://175.119.224.45:8080/uploads/<br/>
+                        <strong>파일경로:</strong> <span th:text="${attachment['file_path']}">경로</span><br/>
+                        <strong>전체 URL:</strong> <span th:text="${'http://175.119.224.45:8080/uploads/' + attachment['file_path']}">전체 URL</span>
+                    </div>
+                    
+                    <!-- 이미지 미리보기 -->
+                    <div class="image-preview" th:if="${attachment['file_type'] != null && attachment['file_type'].startsWith('image/')}">
+                        <img th:src="${'http://175.119.224.45:8080/uploads/' + attachment['file_path']}" 
+                             th:alt="${attachment['file_name'] != null ? attachment['file_name'] : '첨부파일 이미지'}"
+                             onerror="this.onerror=null; console.error('이미지 로드 실패:', this.src); this.src='https://via.placeholder.com/150'; console.log('대체 이미지로 변경됨');">
+                    </div>
+                    
+                    <!-- HTML 태그 예시 -->
+                    <pre th:text="${'<img src=\"http://175.119.224.45:8080/uploads/' + attachment['file_path'] + '\" alt=\"' + (attachment['file_name'] != null ? attachment['file_name'] : '첨부파일') + '\">'}">&lt;img src="..."&gt;</pre>
+                    
+                    <!-- 다운로드 링크 -->
+                    <a th:href="${'http://175.119.224.45:8080/uploads/' + attachment['file_path']}" 
+                       download
+                       target="_blank">파일 다운로드</a>
+                </div>
+            </div>
+            <div th:if="${attachments == null || attachments.isEmpty()}">
+                <p>첨부된 파일이 없습니다.</p>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="header">이미지 로드 테스트</div>
+            
+            <div style="margin-bottom: 20px;">
+                <h4>직접 URL 테스트</h4>
+                <p>알려진 이미지 경로로 이미지 로드 테스트:</p>
+                <div style="margin-top: 10px;">
+                    <button onclick="testKnownImageUrl()" style="padding: 8px 15px; background-color: #2196F3; color: white; border: none; border-radius: 4px; cursor: pointer;">고정 URL 테스트</button>
+                </div>
+                <div id="known-images-result" style="margin-top: 15px;"></div>
+            </div>
+            
+            <div class="image-test">
+                <div th:each="attachment : ${attachments}" th:if="${attachment['file_type'] != null && attachment['file_type'].startsWith('image/')}">
+                    <!-- 직접 하드코딩된 URL로 테스트 -->
+                    <div class="image-container">
+                        <h4>방법 1: 하드코딩 URL</h4>
+                        <div class="image-preview">
+                            <img th:src="@{|http://175.119.224.45:8080/uploads/${attachment['file_path']}|}" 
+                                 th:alt="${attachment['file_name']}"
+                                 onerror="console.error('방법1 실패:', this.src); this.src='https://via.placeholder.com/150';"
+                                 onload="console.log('방법1 성공:', this.src);">
+                        </div>
+                    </div>
+                    
+                    <!-- 문자열 결합으로 테스트 -->
+                    <div class="image-container">
+                        <h4>방법 2: 문자열 결합</h4>
+                        <div class="image-preview">
+                            <img th:src="'http://175.119.224.45:8080/uploads/' + ${attachment['file_path']}" 
+                                 th:alt="${attachment['file_name']}"
+                                 onerror="console.error('방법2 실패:', this.src); this.src='https://via.placeholder.com/150';"
+                                 onload="console.log('방법2 성공:', this.src);">
+                        </div>
+                    </div>
+                    
+                    <!-- URL 구성으로 테스트 -->
+                    <div class="image-container">
+                        <h4>방법 3: URL 표현식</h4>
+                        <div class="image-preview">
+                            <img th:src="@{${'http://175.119.224.45:8080/uploads/' + attachment['file_path']}}" 
+                                 th:alt="${attachment['file_name']}"
+                                 onerror="console.error('방법3 실패:', this.src); this.src='https://via.placeholder.com/150';"
+                                 onload="console.log('방법3 성공:', this.src);">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 페이지 로드 시 상세 정보 로깅
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("========== 이미지 URL 테스트 페이지 ==========");
+            
+            // 이미지 요소 정보 출력
+            var images = document.querySelectorAll('img');
+            console.log(`페이지 내 이미지 요소: ${images.length}개`);
+            
+            images.forEach(function(img, index) {
+                console.log(`[이미지 ${index+1}]`);
+                console.log(`- src: ${img.src}`);
+                console.log(`- alt: ${img.alt}`);
+            });
+            
+            // 첨부파일 가져오기
+            window.attachments = [];
+            try {
+                var attachmentElements = document.querySelectorAll('.image-container');
+                for (var i = 0; i < attachmentElements.length; i++) {
+                    var filePath = attachmentElements[i].getAttribute('data-file-path');
+                    var fileName = attachmentElements[i].getAttribute('data-file-name');
+                    var fileId = attachmentElements[i].getAttribute('data-id');
+                    
+                    if (filePath) {
+                        window.attachments.push({
+                            file_path: filePath,
+                            file_name: fileName,
+                            attachment_id: fileId
+                        });
+                    }
+                }
+                console.log('첨부파일 가져오기 성공:', window.attachments.length);
+            } catch (e) {
+                console.error('첨부파일 가져오기 오류:', e);
+            }
+        });
+        
+        // 특정 첨부파일 테스트 함수
+        function testImageUrl(attachmentId) {
+            console.log('ID로 이미지 URL 테스트:', attachmentId);
+            
+            // 해당 첨부파일 요소 찾기
+            var attachmentElement = document.querySelector(`.image-container[data-id="${attachmentId}"]`);
+            if (!attachmentElement) {
+                console.error('첨부파일 요소를 찾을 수 없습니다:', attachmentId);
+                return;
+            }
+            
+            // 파일 경로 가져오기
+            var filePath = attachmentElement.getAttribute('data-file-path');
+            var fileName = attachmentElement.getAttribute('data-file-name');
+            
+            if (!filePath) {
+                console.error('파일 경로가 없습니다.');
+                return;
+            }
+            
+            // URL 구성
+            var baseUrl = 'http://175.119.224.45:8080/uploads/';
+            var fullUrl = baseUrl + filePath;
+            var timestamp = new Date().getTime();
+            var finalUrl = fullUrl + '?t=' + timestamp;
+            
+            console.log('구성된 URL:', finalUrl);
+            
+            // 결과 표시
+            var resultDiv = document.createElement('div');
+            resultDiv.className = 'result-section';
+            resultDiv.innerHTML = `
+                <h4>테스트 결과: ${fileName || '첨부파일 ' + attachmentId}</h4>
+                <p><strong>URL:</strong> <code>${finalUrl}</code></p>
+                <div class="image-preview">
+                    <img src="${finalUrl}" alt="첨부파일 테스트" 
+                        crossorigin="anonymous"
+                        style="max-width: 100%; max-height: 150px;"
+                        onload="this.parentNode.insertAdjacentHTML('beforeend', '<div class=\'status success\'>이미지 로드 성공</div>')" 
+                        onerror="this.parentNode.insertAdjacentHTML('beforeend', '<div class=\'status failed\'>이미지 로드 실패</div>'); this.src='https://via.placeholder.com/150?text=로드+실패';"
+                    >
+                </div>
+            `;
+            
+            // 기존 결과 삭제
+            var existingResult = attachmentElement.querySelector('.result-section');
+            if (existingResult) {
+                existingResult.remove();
+            }
+            
+            // 결과 추가
+            attachmentElement.appendChild(resultDiv);
+        }
+        
+        // 일괄 이미지 URL 테스트 함수
+        function testSingleImageUrl() {
+            console.log('이미지 URL 구성 테스트 시작...');
+            
+            // 테스트용 파일 경로 생성
+            var testPaths = [
+                'images/pasted_42571bea-e64f-4672-9dd8-2e557be12f1b_20250418115006.png',
+                'images/pasted_1257bea-e64f-4c72-9d88-2e557bc121fb_20250411150006.png',
+                'images/pasted_79d9ec9-5cae-4b5a-b420-20a2799d3ff_20250418152754.png',
+                'images/pasted_5e7cf414-c1d5-4f02-aa2d-e7540787cd34_20250418152754.png',
+                'images/pasted_dda2056f-5b63-4dec-a486-0f21da442485_20250422142313.jpg'
+            ];
+            
+            // 결과 상세 섹션 생성
+            var resultSection = document.createElement('div');
+            resultSection.className = 'result-section';
+            resultSection.innerHTML = '<h3>테스트 결과</h3>';
+            
+            // 각 경로로 URL 구성 테스트
+            testPaths.forEach(function(path, index) {
+                var baseUrl = 'http://175.119.224.45:8080/uploads/';
+                var fullUrl = baseUrl + path;
+                var timestamp = new Date().getTime();
+                var finalUrl = fullUrl + '?t=' + timestamp;
+                
+                console.log(`[테스트 ${index+1}] URL 구성: ${finalUrl}`);
+                
+                // 결과 표시
+                var resultItem = document.createElement('div');
+                resultItem.innerHTML = `
+                    <div style="margin-bottom: 15px;">
+                        <h4>테스트 ${index+1}: ${path}</h4>
+                        <p><strong>구성된 URL:</strong> <code>${finalUrl}</code></p>
+                        <div class="image-preview">
+                            <img src="${finalUrl}" alt="테스트 이미지 ${index+1}" 
+                                crossorigin="anonymous" 
+                                onload="this.parentNode.insertAdjacentHTML('beforeend', '<div class=\'status success\'>이미지 로드 성공</div>')" 
+                                onerror="this.parentNode.insertAdjacentHTML('beforeend', '<div class=\'status failed\'>이미지 로드 실패</div>'); this.src='https://via.placeholder.com/150?text=로드+실패';"
+                                style="max-width: 100%; max-height: 120px;">
+                        </div>
+                    </div>
+                `;
+                resultSection.appendChild(resultItem);
+            });
+            
+            // 결과 섹션 추가
+            document.querySelector('.card:first-child').appendChild(resultSection);
+        }
+        
+        // 고정 URL 테스트 함수
+        function testKnownImageUrl() {
+            console.log('고정 이미지 URL 테스트 시작...');
+            
+            // 알려진 이미지 경로
+            var knownUrls = [
+                'http://175.119.224.45:8080/uploads/images/pasted_42571bea-e64f-4672-9dd8-2e557be12f1b_20250418115006.png',
+                'http://175.119.224.45:8080/uploads/images/pasted_1257bea-e64f-4c72-9d88-2e557bc121fb_20250411150006.png',
+                'http://175.119.224.45:8080/uploads/images/pasted_79d9ec9-5cae-4b5a-b420-20a2799d3ff_20250418152754.png',
+                'http://175.119.224.45:8080/uploads/images/pasted_5e7cf414-c1d5-4f02-aa2d-e7540787cd34_20250418152754.png',
+                'http://175.119.224.45:8080/uploads/images/pasted_dda2056f-5b63-4dec-a486-0f21da442485_20250422142313.jpg'
+            ];
+            
+            // 결과 표시
+            var resultContainer = document.getElementById('known-images-result');
+            resultContainer.innerHTML = '';
+            
+            // 각 URL 테스트
+            knownUrls.forEach(function(url, index) {
+                var timestamp = new Date().getTime();
+                var finalUrl = url + '?t=' + timestamp;
+                
+                console.log(`[URL 테스트 ${index + 1}] ${finalUrl}`);
+                
+                var resultItem = document.createElement('div');
+                resultItem.style.marginBottom = '20px';
+                resultItem.style.padding = '10px';
+                resultItem.style.border = '1px solid #ddd';
+                resultItem.style.borderRadius = '5px';
+                
+                resultItem.innerHTML = `
+                    <h4>URL 테스트 ${index + 1}</h4>
+                    <p><code>${finalUrl}</code></p>
+                    <div class="image-preview" style="height: 150px; display: flex; align-items: center; justify-content: center; margin: 10px 0;">
+                        <img src="${finalUrl}" alt="테스트 ${index + 1}" 
+                            crossorigin="anonymous"
+                            style="max-width: 100%; max-height: 140px;"
+                            onload="this.parentNode.insertAdjacentHTML('beforeend', '<div class=\'status success\'>이미지 로드 성공</div>')" 
+                            onerror="this.parentNode.insertAdjacentHTML('beforeend', '<div class=\'status failed\'>이미지 로드 실패</div>'); this.src='https://via.placeholder.com/150?text=로드+실패';"
+                        >
+                    </div>
+                `;
+                
+                resultContainer.appendChild(resultItem);
+            });
+        }
+    </script>
+</body>
+</html>

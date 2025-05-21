@@ -15,7 +15,7 @@ public interface BoardMapper {
     List<Board> noticeBoardList();
 
     Board selectPostById(String id,String category);
-    List<Board> selectComment(String category,String id);
+    List<Board> selectComment(@Param("category") String category, @Param("id") Integer id);
 
     void insertComment(Board board);
 
@@ -30,41 +30,11 @@ public interface BoardMapper {
 
     void updatePost(Board board); // 새로 추가된 메서드
 
-    @Select("SELECT * FROM BOARD_CALL WHERE CAT_GROUP = 'G' AND UNO = (SELECT MAX(UNO) FROM BOARD_CALL WHERE CAT_GROUP = 'G')")
+
+    // 공지사항 댓글 조회(고객코드 없이)
+    List<Board> selectCommentWithoutCustCode(@Param("id") Integer id);
+    
+    // 최신 공지사항 조회
     Board getLatestNotice();
-
-    @Select("SELECT\n" +
-            "            gno,\n" +
-            "            uno,\n" +
-            "            REPLY_DEPTH,\n" +
-            "            CAT_GROUP,\n" +
-            "            SUBJECT,\n" +
-            "            EMPNM,\n" +
-            "            IN_DATE,\n" +
-            "            ID,\n" +
-            "            CONTENT,\n" +
-            "            ATT_FILE\n" +
-            "        FROM BOARD_CALL\n" +
-            "        WHERE CAT_GROUP = 'G'\n" +
-            "          AND uno=#{id}")
-    Board selectPostByIdWithoutCustCode(String id);
-
-    @Select("SELECT\n" +
-            "            gno,\n" +
-            "            uno,\n" +
-            "            REPLY_DEPTH,\n" +
-            "            CAT_GROUP,\n" +
-            "            SUBJECT,\n" +
-            "            EMPNM,\n" +
-            "            TO_DATE(IN_DATE,'YYYY-MM-DD HH24:MI:SS')  IN_DATE,\n" +
-            "            ID,\n" +
-            "            CONTENT,\n" +
-            "            ATT_FILE\n" +
-            "        FROM BOARD_CALL\n" +
-            "        WHERE CAT_GROUP = 'G'\n" +
-            "          AND gno=(select gno from board_call where uno= #{id} and CAT_GROUP ='G')\n" +
-            "          AND SUBJECT IS NULL\n" +
-            "        ORDER BY IN_DATE")
-    List<Board> selectCommentWithoutCustCode(String id);
 
 }

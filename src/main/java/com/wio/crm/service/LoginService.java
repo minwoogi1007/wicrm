@@ -18,7 +18,7 @@ public class LoginService {
         // 암호화된 비밀번호로 userInfo 객체 업데이트
         userInfo.setPassword(encryptedPassword);
         // 데이터베이스에 저장
-        System.out.println(userInfo);
+        //System.out.println(userInfo);
 
         userMapper.insertUser(userInfo);
 

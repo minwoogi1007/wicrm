@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+
+<div layout:fragment="content">
+    <style>
+        /* 테이블 스타일 개선 */
+        table td, table th {
+            padding: 14px 10px !important;
+            vertical-align: middle;
+        }
+        
+        /* 테이블 헤더 디자인 */
+        thead th {
+            background-color: #F3F6F9 !important;
+            color: #3F4254 !important;
+            font-weight: 600 !important;
+            border-bottom: 2px solid #E4E6EF !important;
+            text-align: center;
+            font-size: 13px;
+        }
+        
+        /* 테이블 행 스타일 */
+        tbody tr {
+            border-bottom: 1px solid #EBEDF3;
+        }
+        
+        tbody tr:hover {
+            background-color: #F3F6F9;
+        }
+        
+        /* 테이블 체크박스 스타일 */
+        .form-check {
+            display: flex;
+            justify-content: center;
+        }
+        
+        #selectAllCheckbox, .row-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        /* 태그/뱃지 스타일 */
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.4em 0.7em;
+            border-radius: 0.25rem;
+            font-weight: 500;
+            display: inline-block;
+            min-width: 80px;
+            text-align: center;
+            letter-spacing: 0.3px;
+        }
+        
+        /* 뱃지 색상 */
+        .badge-primary {
+            background-color: #3699FF;
+            color: white;
+        }
+        
+        .badge-danger {
+            background-color: #F64E60;
+            color: white;
+        }
+        
+        .badge-warning {
+            background-color: #FFA800;
+            color: white;
+        }
+        
+        .badge-success {
+            background-color: #1BC5BD;
+            color: white;
+        }
+        
+        .badge-info {
+            background-color: #8950FC;
+            color: white;
+        }
+        
+        .badge-secondary {
+            background-color: #E4E6EF;
+            color: #3F4254;
+        }
+        
+        .badge-waiting {
+            background-color: #FFE2E5;
+            color: #F64E60;
+        }
+        
+        /* 텍스트 색상 */
+        .text-dark {
+            color: #212121;
+        }
+        
+        .text-muted {
+            color: #B5B5C3;
+        }
+        
+        /* 텍스트 잘림 처리 */
+        .text-truncate-custom {
+            max-width: 210px;
+            white-space: normal;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            max-height: 60px;
+        }
+        
+        /* 버튼 스타일 */
+        .btn {
+            font-weight: 500;
+            border-radius: 0.42rem;
+            padding: 0.55rem 0.95rem;
+            font-size: 0.9rem;
+        }
+        
+        .btn-view {
+            background-color: #3699FF;
+            color: white;
+        }
+        
+        .btn-view:hover {
+            background-color: #187DE4;
+            color: white;
+        }
+        
+        .btn-edit {
+            background-color: #FFA800;
+            color: white;
+        }
+        
+        .btn-save {
+            background-color: #1BC5BD;
+            color: white;
+        }
+        
+        .btn-delete {
+            background-color: #F64E60;
+            color: white;
+        }
+
+        /* 날짜 스타일 */
+        .date-column {
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        /* 번호 열 스타일 */
+        .number-column {
+            text-align: center;
+            font-weight: 600;
+            color: #464E5F;
+        }
+
+        /* 고객명 및 연락처 스타일 */
+        .customer-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .customer-name {
+            font-weight: 600;
+            color: #212121;
+            font-size: 14px;
+        }
+
+        .customer-phone {
+            color: #7E8299;
+            font-size: 0.85rem;
+            margin-top: 2px;
+        }
+
+        /* 상태 스타일 */
+        .status-column {
+            text-align: center;
+        }
+
+        /* 카드 스타일 */
+        .card {
+            border-radius: 0.42rem;
+            box-shadow: 0px 0px 30px 0px rgba(82, 63, 105, 0.05);
+            border: 0;
+        }
+
+        .card-header {
+            background-color: transparent;
+            border-bottom: 1px solid #EBEDF3;
+            padding: 1.75rem 2.25rem;
+        }
+
+        .card-body {
+            padding: 1.25rem 2.25rem;
+        }
+        
+        /* 페이지네이션 스타일 */
+        .pagination .page-item.active .page-link {
+            background-color: #3699FF !important;
+            border-color: #3699FF !important;
+            color: #FFFFFF !important;
+        }
+        
+        .pagination .page-link {
+            padding: 0.5rem 0.75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            border-radius: 0.35rem;
+            color: #3699FF;
+            margin: 0 3px;
+        }
+        
+        .pagination .page-item:not(.active) .page-link:hover {
+            background-color: #E1F0FF;
+            color: #3699FF;
+        }
+        
+        /* 테이블 내용 가독성 향상 */
+        .table td {
+            font-size: 13px;
+            color: #464E5F;
+            vertical-align: middle;
+            word-break: break-all; /* 긴 텍스트 줄바꿈 처리 */
+        }
+        
+        /* 테이블 줄바꿈과 정렬 */
+        .table td {
+            white-space: normal; /* 자동 줄바꿈 허용 */
+        }
+        
+        /* 상담 내용과 처리 내용 칼럼 */
+        .content-column {
+            white-space: normal;
+            width: 230px;
+            max-width: 230px;
+            overflow: hidden;
+        }
+        
+        /* 테이블 행 간격 늘림 */
+        .table-row-dashed tr {
+            border-bottom-width: 1px;
+            border-bottom-style: dashed;
+            border-bottom-color: #E4E6EF;
+        }
+        
+        /* 홀수/짝수 행 색상 */
+        .table-striped > tbody > tr:nth-of-type(odd) {
+            background-color: #FCFCFC;
+        }
+    </style>
+    <script src="/assets/plugins/global/plugins.bundle.js"></script>
+    <div class="app-main flex-column flex-row-fluid" id="kt_app_main">
+        <!--begin::Content wrapper-->
+        <div class="d-flex flex-column flex-column-fluid">
+            <!--begin::Toolbar-->
+            <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+                <!--begin::Toolbar container-->
+                <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                    <!--begin::Page title-->
+                    <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                        <!--begin::Title-->
+                        <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">상담 문의 리스트</h1>
+                        <!--end::Title-->
+                        <!--begin::Breadcrumb-->
+                        <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                            <!--begin::Item-->
+                            <li class="breadcrumb-item text-muted">
+                                <a href="/main" class="text-muted text-hover-primary">Home</a>
+                            </li>
+                            <!--end::Item-->
+                            <!--begin::Item-->
+                            <li class="breadcrumb-item">
+                                <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                            </li>
+                            <!--end::Item-->
+                            <!--begin::Item-->
+                            <li class="breadcrumb-item text-muted">상담 관리</li>
+                            <!--end::Item-->
+                            <!--begin::Item-->
+                            <li class="breadcrumb-item">
+                                <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                            </li>
+                            <!--end::Item-->
+                            <!--begin::Item-->
+                            <li class="breadcrumb-item text-muted">상담 문의 리스트</li>
+                            <!--end::Item-->
+                        </ul>
+                        <!--end::Breadcrumb-->
+                    </div>
+                    <!--end::Page title-->
+                </div>
+                <!--end::Toolbar container-->
+            </div>
+            <!--end::Toolbar-->
+            <!--begin::Content-->
+            <div id="kt_app_content" class="app-content flex-column-fluid">
+                <!--begin::Content container-->
+                <div id="kt_app_content_container" class="app-container container-fluid px-2">
+                    <!--begin::Card-->
+                    <div class="card mb-7">
+                        <!--begin::Card body-->
+                        <div class="card-body">
+                            <!--begin::Compact form-->
+                            <div class="d-flex align-items-center">
+                                <!--begin::Input group-->
+                                <div class="position-relative w-md-400px me-md-2">
+                                    <i class="ki-duotone ki-magnifier fs-3 text-gray-500 position-absolute top-50 translate-middle ms-6">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                    <input type="text" class="form-control form-control-solid ps-10" id="quickSearch" name="search" value="" placeholder="빠른 검색..." />
+                                </div>
+                                <!--end::Input group-->
+                                <!--begin:Action-->
+                                <div class="d-flex align-items-center">
+                                    <button type="button" class="btn btn-primary me-5" onclick="quickSearch()">조회</button>
+                                    <a href="#" id="kt_horizontal_search_advanced_link" class="btn btn-link">상세조회</a>
+                                </div>
+                                <!--end:Action-->
+                            </div>
+                            <!--end::Compact form-->
+                            <!--begin::Advance form-->
+                            <div class="collapse" id="kt_advanced_search_form">
+                                <!--begin::Separator-->
+                                <div class="separator separator-dashed mt-9 mb-6"></div>
+                                <!--end::Separator-->
+                                <form id="searchForm" method="get" th:action="@{/consulting/list}">
+                                    <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                                    <!--begin::Row-->
+                                    <div class="row g-8 mb-8">
+                                        <div class="col-xxl-12">
+                                            <div class="row g-8">
+                                                <div class="col-lg-4">
+                                                    <label class="fs-6 form-label fw-bold text-gray-900">고객명</label>
+                                                    <input type="text" name="customerName" th:value="${customerName}" class="form-control form-control-solid" placeholder="고객명"/>
+                                                </div>
+                                                <div class="col-lg-4">
+                                                    <label class="fs-6 form-label fw-bold text-gray-900">연락처</label>
+                                                    <input type="text" name="phoneNumber" th:value="${phoneNumber}" class="form-control form-control-solid" placeholder="연락처"/>
+                                                </div>
+                                                <div class="col-lg-4">
+                                                    <label class="fs-6 form-label fw-bold text-gray-900">주문번호</label>
+                                                    <input type="text" name="orderNumber" th:value="${orderNumber}" class="form-control form-control-solid" placeholder="주문번호"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--end::Row-->
+                                    <!--begin::Row-->
+                                    <div class="row g-8 mb-8">
+                                        <div class="col-xxl-12">
+                                            <div class="row g-8">
+                                                <div class="col-lg-4">
+                                                    <label class="fs-6 form-label fw-bold text-gray-900">문의유형</label>
+                                                    <select name="inquiryType" class="form-select form-select-solid" data-control="select2" data-hide-search="true">
+                                                        <option value="">전체</option>
+                                                        <option value="FREE_PAINT" th:selected="${inquiryType == 'FREE_PAINT'}">물감구매(무료)</option>
+                                                        <option value="PAID_PAINT" th:selected="${inquiryType == 'PAID_PAINT'}">물감구매(유료)</option>
+                                                        <option value="ORDER_CANCEL" th:selected="${inquiryType == 'ORDER_CANCEL'}">주문취소</option>
+                                                        <option value="ORDER_CANCEL_CARD" th:selected="${inquiryType == 'ORDER_CANCEL_CARD'}">주문취소(카드)</option>
+                                                        <option value="ORDER_CANCEL_TRANSFER" th:selected="${inquiryType == 'ORDER_CANCEL_TRANSFER'}">주문취소(이체)</option>
+                                                        <option value="REFUND" th:selected="${inquiryType == 'REFUND'}">환불</option>
+                                                        <option value="RETURN" th:selected="${inquiryType == 'RETURN'}">반품</option>
+                                                        <option value="EXCHANGE" th:selected="${inquiryType == 'EXCHANGE'}">교환</option>
+                                                        <option value="DEFECTIVE" th:selected="${inquiryType == 'DEFECTIVE'}">불량</option>
+                                                        <option value="DELIVERY" th:selected="${inquiryType == 'DELIVERY'}">배송</option>
+                                                        <option value="GIFT_MISSING" th:selected="${inquiryType == 'GIFT_MISSING'}">사은품누락</option>
+                                                        <option value="OTHER" th:selected="${inquiryType == 'OTHER'}">기타</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-lg-4">
+                                                    <label class="fs-6 form-label fw-bold text-gray-900">처리상태</label>
+                                                    <select name="status" class="form-select form-select-solid" data-control="select2" data-hide-search="true">
+                                                        <option value="">전체</option>
+                                                        <option value="PENDING" th:selected="${status == 'PENDING'}">대기중</option>
+                                                        <option value="PROCESSING" th:selected="${status == 'PROCESSING'}">처리중</option>
+                                                        <option value="COMPLETED" th:selected="${status == 'COMPLETED'}">처리완료</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-lg-4">
+                                                    <label class="fs-6 form-label fw-bold text-gray-900">정렬</label>
+                                                    <div class="d-flex align-items-center mt-3">
+                                                        <select name="sortField" class="form-select form-select-solid me-5" data-control="select2" data-hide-search="true">
+                                                            <option value="created_date" th:selected="${sortField == 'created_date'}">등록일</option>
+                                                            <option value="updated_date" th:selected="${sortField == 'updated_date'}">수정일</option>
+                                                            <option value="customer_name" th:selected="${sortField == 'customer_name'}">고객명</option>
+                                                        </select>
+                                                        <select name="sortDirection" class="form-select form-select-solid" data-control="select2" data-hide-search="true">
+                                                            <option value="desc" th:selected="${sortDirection == 'desc'}">내림차순</option>
+                                                            <option value="asc" th:selected="${sortDirection == 'asc'}">오름차순</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--end::Row-->
+                                    <div class="d-flex justify-content-end">
+                                        <button type="button" class="btn btn-light btn-active-light-primary me-2" onclick="resetForm()">초기화</button>
+                                        <button type="submit" class="btn btn-primary">검색</button>
+                                    </div>
+                                    <input type="hidden" id="pageInput" name="page" th:value="${currentPage}" />
+                                    <input type="hidden" name="size" th:value="${size}" />
+                                </form>
+                            </div>
+                            <!--end::Advance form-->
+                        </div>
+                        <!--end::Card body-->
+                    </div>
+                    <!--end::Card-->
+                    
+                    <!--begin::Toolbar-->
+                    <div class="d-flex flex-wrap flex-stack pb-7">
+                        <div class="d-flex flex-wrap align-items-center my-1">
+                            <h3 class="fw-bold me-5 my-1">총 <span th:text="${totalItems ?: 0}"></span> 건 
+                                (<span class="text-warning" th:text="${processingCount ?: 0}"></span> 처리중, 
+                                <span class="text-danger" th:text="${pendingCount ?: 0}"></span> 대기중, 
+                                <span class="text-success" th:text="${completedCount ?: 0}"></span> 처리완료)
+                            </h3>
+                        </div>
+                        <div class="d-flex align-items-center my-1">
+                            <div class="me-2">
+                                <select id="batchStatusSelect" class="form-select form-select-solid form-select-sm" style="width: 120px;">
+                                    <option value="">-- 선택 --</option>
+                                    <option value="PENDING">대기중</option>
+                                    <option value="PROCESSING">처리중</option>
+                                    <option value="COMPLETED">처리완료</option>
+                                </select>
+                            </div>
+                            <button id="batchUpdateBtn" class="btn btn-sm btn-light-primary me-3" onclick="updateSelectedStatus()">
+                                상태 일괄변경
+                            </button>
+                        </div>
+                    </div>
+                    <!--end::Toolbar-->
+                    
+                    <!--begin::Tab Content-->
+                    <div class="tab-content">
+                        <div id="kt_project_users_table_pane" class="tab-pane show active">
+                            <div class="card card-flush">
+                                <div class="card-body pt-0">
+                                    <div class="table-responsive">
+                                        <table id="kt_project_users_table" class="table table-row-bordered table-row-dashed table-striped gy-5 align-middle w-100">
+                                            <thead>
+                                                <tr class="fw-bold text-muted bg-light">
+                                                    <th width="40px">
+                                                        <input type="checkbox" class="form-check-input" id="selectAllCheckbox">  
+                                                    </th>
+                                                    <th width="50px">번호</th>
+                                                    <th width="180px">고객정보</th>
+                                                    <th width="180px">주문번호/유형</th>
+                                                    <th width="230px">상담내용</th>
+                                                    <th width="230px">처리내용</th>
+                                                    <th width="100px">상태</th>
+                                                    <th width="120px">등록일</th>
+                                                    <th width="80px">관리</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr th:each="inquiry, stat : ${inquiries}">
+                                                    <td width="40px" class="text-center"><input type="checkbox" class="form-check-input row-checkbox" th:data-id="${inquiry.inquiryId}"></td>
+                                                    <td width="50px" class="number-column" th:text="${stat.count}">1</td>
+                                                    <td width="180px">
+                                                        <div class="customer-info">
+                                                            <span class="customer-name" th:text="${inquiry.customerName}">백화슬</span>
+                                                            <span class="customer-phone" th:text="${inquiry.phoneNumber}">010-9021-1990</span>
+                                                        </div>
+                                                    </td>
+                                                    <td width="180px">
+                                                        <div class="d-flex flex-column">
+                                                            <span class="text-truncate-custom" th:text="${inquiry.orderNumber ?: '-'}">20250415-00028</span>
+                                                            <span th:switch="${inquiry.inquiryType}" class="badge mt-1">
+                                                                <span th:case="'FREE_PAINT'" class="badge" style="background-color: #3699FF; color: white;">물감구매(무료)</span>
+                                                                <span th:case="'PAID_PAINT'" class="badge" style="background-color: #0BB783; color: white;">물감구매(유료)</span>
+                                                                <span th:case="'ORDER_CANCEL'" class="badge" style="background-color: #F64E60; color: white;">주문취소</span>
+                                                                <span th:case="'ORDER_CANCEL_CARD'" class="badge" style="background-color: #F64E60; color: white;">주문취소(카드)</span>
+                                                                <span th:case="'ORDER_CANCEL_TRANSFER'" class="badge" style="background-color: #E63757; color: white;">주문취소(이체)</span>
+                                                                <span th:case="'REFUND'" class="badge" style="background-color: #8950FC; color: white;">환불</span>
+                                                                <span th:case="'RETURN'" class="badge" style="background-color: #F1BC00; color: white;">반품</span>
+                                                                <span th:case="'EXCHANGE'" class="badge" style="background-color: #FFA800; color: white;">교환</span>
+                                                                <span th:case="'DEFECTIVE'" class="badge" style="background-color: #FF4848; color: white;">불량</span>
+                                                                <span th:case="'DELIVERY'" class="badge" style="background-color: #1BC5BD; color: white;">배송</span>
+                                                                <span th:case="'GIFT_MISSING'" class="badge" style="background-color: #7239EA; color: white;">사은품누락</span>
+                                                                <span th:case="'OTHER'" class="badge" style="background-color: #86B7FE; color: white;">기타</span>
+                                                                <span th:case="*" class="badge" style="background-color: #A1A5B7; color: white;" th:text="${inquiry.inquiryType}"></span>
+                                                            </span>
+                                                        </div>
+                                                    </td>
+                                                    <td width="230px" class="content-column">
+                                                        <span class="text-truncate-custom" data-bs-toggle="tooltip" th:title="${inquiry.inquiryContent}" th:text="${inquiry.inquiryContent ?: '-'}">상담 내용입니다...</span>
+                                                    </td>
+                                                    <td width="230px" class="content-column">
+                                                        <span class="text-truncate-custom" data-bs-toggle="tooltip" th:title="${inquiry.processContent}" th:text="${inquiry.processContent ?: '-'}">처리 내용입니다...</span>
+                                                    </td>
+                                                    <td width="100px" class="status-column">
+                                                        <span th:if="${inquiry.status == 'PENDING'}" class="badge badge-waiting">대기중</span>
+                                                        <span th:if="${inquiry.status == 'PROCESSING'}" class="badge badge-warning">처리중</span>
+                                                        <span th:if="${inquiry.status == 'COMPLETED'}" class="badge badge-success">처리완료</span>
+                                                    </td>
+                                                    <td class="date-column" th:text="${#temporals.format(inquiry.createdDate, 'yyyy-MM-dd HH:mm')}">2025-04-18 15:33</td>
+                                                    <td class="text-center">
+                                                        <a th:href="@{/consulting/detail(id=${inquiry.inquiryId})}" class="btn btn-sm btn-primary">
+                                                            보기
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                                <tr th:if="${inquiries == null || inquiries.isEmpty()}">
+                                                    <td colspan="9" class="text-center py-4">검색 결과가 없습니다.</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    
+                                    <!-- 페이징 처리 -->
+                                    <div class="d-flex justify-content-center mt-7" th:if="${totalPages > 0}">
+                                        <ul class="pagination" id="pagination">
+                                            <!-- 이전 버튼 -->
+                                            <li class="page-item" th:classappend="${currentPage <= 1 ? 'disabled' : ''}">
+                                                <a class="page-link" th:if="${currentPage > 1}" href="javascript:void(0);" th:onclick="'goToPage(' + ${currentPage - 1} + ')'">
+                                                    <i class="previous"></i>
+                                                </a>
+                                                <a class="page-link disabled" th:if="${currentPage <= 1}" href="javascript:void(0);">
+                                                    <i class="previous"></i>
+                                                </a>
+                                            </li>
+                                            
+                                            <!-- 페이지 번호 -->
+                                            <li class="page-item" th:each="pageNum : ${#numbers.sequence(1, totalPages)}" 
+                                                th:classappend="${pageNum == currentPage ? 'active' : ''}">
+                                                <a class="page-link" href="javascript:void(0);" th:onclick="'goToPage(' + ${pageNum} + ')'" th:text="${pageNum}">1</a>
+                                            </li>
+                                            
+                                            <!-- 다음 버튼 -->
+                                            <li class="page-item" th:classappend="${currentPage >= totalPages ? 'disabled' : ''}">
+                                                <a class="page-link" th:if="${currentPage < totalPages}" href="javascript:void(0);" th:onclick="'goToPage(' + ${currentPage + 1} + ')'">
+                                                    <i class="next"></i>
+                                                </a>
+                                                <a class="page-link disabled" th:if="${currentPage >= totalPages}" href="javascript:void(0);">
+                                                    <i class="next"></i>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end::Tab Content-->
+                </div>
+                <!--end::Content container-->
+            </div>
+            <!--end::Content-->
+        </div>
+        <!--end::Content wrapper-->
+    </div>
+    
+    <!-- 처리상태 변경 모달 -->
+    <div class="modal fade" id="statusModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered mw-650px">
+            <div class="modal-content">
+                <div class="modal-header" id="kt_modal_header">
+                    <h2>처리상태 변경</h2>
+                    <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+                        <i class="ki-duotone ki-cross fs-1">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                        </i>
+                    </div>
+                </div>
+                <div class="modal-body py-10 px-lg-17">
+                    <input type="hidden" id="inquiryId" value="" />
+                    <div class="fv-row mb-7">
+                        <label class="fs-6 fw-semibold form-label mb-2">처리상태</label>
+                        <select id="statusSelect" class="form-select form-select-solid" data-control="select2" data-hide-search="true">
+                            <option value="PENDING">대기중</option>
+                            <option value="PROCESSING">처리중</option>
+                            <option value="COMPLETED">처리완료</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" onclick="updateStatus()">변경</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script>
+        // CSRF 토큰 설정 - 모든 AJAX 요청에 CSRF 헤더 포함
+        $(function() {
+            var token = $('input[name="_csrf"]').val();
+            var header = '_csrf';
+            
+            // 모든 AJAX 요청에 CSRF 토큰 자동 포함
+            $(document).ajaxSend(function(e, xhr, options) {
+                xhr.setRequestHeader(header, token);
+            });
+            
+            // selectAll 체크박스 기능 구현
+            $('#selectAllCheckbox').on('click', function() {
+                $('.row-checkbox').prop('checked', this.checked);
+                console.log('전체 체크박스 상태 변경:', this.checked);
+            });
+            
+            // 개별 체크박스 처리
+            $(document).on('click', '.row-checkbox', function() {
+                var allChecked = $('.row-checkbox:checked').length === $('.row-checkbox').length;
+                $('#selectAllCheckbox').prop('checked', allChecked);
+                console.log('개별 체크박스 클릭:', $(this).data('id'), '현재 채크된 개수:', $('.row-checkbox:checked').length);
+            });
+            
+            // 테이블 스트라이프 적용
+            $('#kt_project_users_table tbody tr:odd').addClass('table-row-gray-200');
+            
+            // 검색 이벤트 처리
+            $('#searchButton').click(function() {
+                $('#searchForm').submit();
+            });
+            
+            // 상세검색 토글 처리
+            $("#kt_horizontal_search_advanced_link").click(function(e) {
+                e.preventDefault();
+                $("#kt_advanced_search_form").collapse('toggle');
+            });
+            
+            // 툴팁 초기화
+            $('[data-bs-toggle="tooltip"]').tooltip({
+                html: true,
+                template: '<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner max-w-400px"></div></div>'
+            });
+            
+            // 상태 일괄변경 버튼 비활성화 처리
+            updateBatchButtonState();
+            
+            // 체크박스 상태 변경 시 버튼 가능여부 확인
+            $(document).on('change', '.row-checkbox, #selectAllCheckbox', function() {
+                updateBatchButtonState();
+            });
+            
+            // 상태 선택 드롭다운 변경 시
+            $('#batchStatusSelect').on('change', function() {
+                updateBatchButtonState();
+            });
+        });
+        
+        function resetForm() {
+            document.getElementById('searchForm').reset();
+        }
+        
+        function quickSearch() {
+            var searchTerm = document.getElementById('quickSearch').value;
+            var searchForm = document.getElementById('searchForm');
+            document.getElementsByName('customerName')[0].value = searchTerm;
+            searchForm.submit();
+        }
+        
+        function changeStatus(element) {
+            // data-* 속성에서 값을 가져옴
+            var inquiryId = element.getAttribute('data-inquiry-id');
+            var currentStatus = element.getAttribute('data-status');
+            
+            document.getElementById('inquiryId').value = inquiryId;
+            document.getElementById('statusSelect').value = currentStatus;
+            $('#statusModal').modal('show');
+        }
+        
+        function updateStatus() {
+            var inquiryId = document.getElementById('inquiryId').value;
+            var status = document.getElementById('statusSelect').value;
+            
+            $.ajax({
+                url: '/consulting/update-status',
+                type: 'POST',
+                data: {
+                    inquiryId: inquiryId,
+                    status: status,
+                    _csrf: $('input[name="_csrf"]').val()
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $('#statusModal').modal('hide');
+                        window.location.reload();
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    alert('상태 업데이트 중 오류가 발생했습니다.');
+                }
+            });
+        }
+        
+        // 일괄 상태 변경 처리
+        function updateSelectedStatus() {
+            var selectedStatus = $('#batchStatusSelect').val();
+            var selectedIds = [];
+            
+            // 체크된 항목들의 ID 가져오기
+            $('.row-checkbox:checked').each(function() {
+                selectedIds.push($(this).data('id'));
+            });
+            
+            //console.log('사용자가 선택한 상태:', selectedStatus);
+            //console.log('선택된 문의 ID들:', selectedIds);
+            
+            if (!selectedStatus) {
+                alert('변경할 상태를 선택해주세요.');
+                return;
+            }
+            
+            if (selectedIds.length === 0) {
+                alert('선택된 문의가 없습니다.');
+                return;
+            }
+            
+            // 확인 메시지
+            if (!confirm(selectedIds.length + '개의 문의를 [' + getStatusText(selectedStatus) + '] 상태로 변경하시겠습니까?')) {
+                return;
+            }
+            
+            // AJAX 요청
+            $.ajax({
+                url: '/consulting/update-multiple-status',
+                type: 'POST',
+                data: {
+                    inquiryIds: selectedIds,
+                    status: selectedStatus,
+                    _csrf: $('input[name="_csrf"]').val()
+                },
+                traditional: true, // 배열 데이터 전송을 위한 옵션
+                success: function(response) {
+                    //console.log('응답 결과:', response);
+                    if (response.success) {
+                        alert(response.message);
+                        window.location.reload();
+                    } else {
+                        alert(response.message || '상태 변경 중 오류가 발생했습니다.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                   // console.error('에러 발생:', error);
+                    alert('상태 업데이트 중 오류가 발생했습니다.');
+                }
+            });
+        }
+        
+        // 선택 상태에 따른 버튼 활성화 여부 처리
+        function updateBatchButtonState() {
+            var hasChecked = $('.row-checkbox:checked').length > 0;
+            var hasStatus = $('#batchStatusSelect').val() !== '';
+            
+            // 체크된 항목과 상태가 선택된 경우에만 버튼 활성화
+            $('#batchUpdateBtn').prop('disabled', !(hasChecked && hasStatus));
+            
+            //console.log('버튼 상태 변경 - 체크 여부:', hasChecked, '상태 선택 여부:', hasStatus);
+        }
+        
+        // 상태 코드를 텍스트로 변환
+        function getStatusText(statusCode) {
+            switch(statusCode) {
+                case 'PENDING': return '대기중';
+                case 'PROCESSING': return '처리중';
+                case 'COMPLETED': return '처리완료';
+                default: return statusCode;
+            }
+        }
+        
+        function goToPage(pageNumber) {
+            // 페이징 처리 개선
+            document.getElementById('pageInput').value = pageNumber;
+            document.getElementById('searchForm').submit();
+        }
+    </script>
+</div>
+</html>

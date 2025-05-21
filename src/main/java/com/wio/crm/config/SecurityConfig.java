@@ -29,15 +29,26 @@ public class SecurityConfig {
                                 new AntPathRequestMatcher("/download/**"), // "/download/**" 경로에 대해 CSRF 보호를 비활성화
                                 new AntPathRequestMatcher("/upload"), // 추가된 업로드 경로
                                 new AntPathRequestMatcher("/board/update"), // 게시판 업데이트 경로 추가
-                                new AntPathRequestMatcher("/board/uploadImage")  // 이 줄을 추가
+                                new AntPathRequestMatcher("/board/uploadImage"),  // 이 줄을 추가
+                                new AntPathRequestMatcher("/board/readBoard/comments"),  // 댓글 추가 경로
+                                new AntPathRequestMatcher("/board/create/saveBoard"),  // 게시글 저장 경로 추가
+                                new AntPathRequestMatcher("/consulting/**"),  // 상담 관련 모든 경로에 대해 CSRF 보호 비활성화
+                                new AntPathRequestMatcher("/return/**"),  // 교환/반품 관리 경로 추가
+                                new AntPathRequestMatcher("/admin/banners/**")  // 배너 관리 경로 추가
                         ).csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 )
                 .authorizeHttpRequests(auth -> auth
                         // 이 줄을 제거했습니다: .requestMatchers("/api/consultations","/board/**").hasAuthority("ROLE_USER")
 
                         .requestMatchers("/empl").hasAuthority("ROLE_EMPLOYEE")
-                        .requestMatchers("/encrypt-passwords","/encrypt-password", "/encryption","/check-userid-availability","/apply-userid").permitAll()
+                        .requestMatchers("/encrypt-passwords","/encrypt-password", "/chat","/encryption","/check-userid-availability","/apply-userid").permitAll()
                         .requestMatchers("/download/**", "/upload","/board/uploadImage").permitAll()
+                        .requestMatchers("/board/readBoard/comments").authenticated()  // 댓글 추가 경로는 인증된 사용자만 접근 가능
+                        .requestMatchers("/board/create/saveBoard").authenticated()  // 게시글 저장 경로는 인증된 사용자만 접근 가능
+                        .requestMatchers("/board/**").authenticated()  // 모든 게시판 관련 경로는 인증된 사용자만 접근 가능
+                        .requestMatchers("/return/**").authenticated()  // 교환/반품 관리 경로는 인증된 사용자만 접근 가능
+                        .requestMatchers("/api/log/user-action").authenticated()  // 사용자 액션 로깅 API 접근 설정
+                        .requestMatchers("/admin/banners/**").hasAuthority("ROLE_EMPLOYEE")  // 배너 관리 페이지는 내부 직원만 접근 가능
                         .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginPage("/login")

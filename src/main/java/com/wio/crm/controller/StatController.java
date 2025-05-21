@@ -20,6 +20,40 @@ public class StatController {
 
     @Autowired
     private StatisticsService statisticsService;
+    
+    // 새로 추가된 일일/주간/월간 운영현황 컨트롤러
+    @GetMapping("/stat/daily")
+    public String dailyOperationStat(Model model) {
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        model.addAttribute("today", today.format(formatter));
+        return "statistics/daily_operation";
+    }
+
+    @GetMapping("/stat/weekly")
+    public String weeklyOperationStat(Model model) {
+        LocalDate today = LocalDate.now();
+        LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - 1);
+        LocalDate endOfWeek = startOfWeek.plusDays(6);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        
+        model.addAttribute("startDate", startOfWeek.format(formatter));
+        model.addAttribute("endDate", endOfWeek.format(formatter));
+        return "statistics/weekly_operation";
+    }
+
+    @GetMapping("/stat/monthly")
+    public String monthlyOperationStat(Model model) {
+        LocalDate today = LocalDate.now();
+        LocalDate firstDayOfMonth = today.withDayOfMonth(1);
+        LocalDate lastDayOfMonth = today.withDayOfMonth(today.lengthOfMonth());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        
+        model.addAttribute("startDate", firstDayOfMonth.format(formatter));
+        model.addAttribute("endDate", lastDayOfMonth.format(formatter));
+        return "statistics/monthly_operation";
+    }
+    
     @GetMapping("/statCons")
     public String statCons() {
         return "statistics/statCons";

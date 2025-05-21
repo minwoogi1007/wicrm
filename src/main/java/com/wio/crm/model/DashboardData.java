@@ -1,5 +1,8 @@
 package com.wio.crm.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class DashboardData {
     private String count_Miss;
     private String count_Com;
@@ -30,20 +33,58 @@ public class DashboardData {
     private String cs_Type_Percentage;
 
     private String prc_Date;
+    
+    @JsonProperty("gubn")
     private String gubn;
+    
+    @JsonIgnore
+    private String GUBN;
+    
+    @JsonIgnore
+    private String PRC_DATE;
+    
+    // 추가: dashStatCount 쿼리 결과를 받기 위한 필드
+    private int totalCount;
+    
+    @JsonProperty("hour_09")
     private int hour_09;
+    
+    @JsonProperty("hour_10")
     private int hour_10;
+    
+    @JsonProperty("hour_11")
     private int hour_11;
+    
+    @JsonProperty("hour_12")
     private int hour_12;
+    
+    @JsonProperty("hour_13")
     private int hour_13;
+    
+    @JsonProperty("hour_14")
     private int hour_14;
+    
+    @JsonProperty("hour_15")
     private int hour_15;
+    
+    @JsonProperty("hour_16")
     private int hour_16;
+    
+    @JsonProperty("hour_17")
     private int hour_17;
+    
+    @JsonProperty("hour_18")
     private int hour_18;
+    
+    @JsonProperty("hour_19")
     private int hour_19;
 
+    @JsonProperty("callSum")
     private int callSum;
+
+    // CALLSUM 필드 추가 (대문자 버전)
+    @JsonProperty("CALLSUM")
+    private int CALLSUM;
 
     private String personMonth;
 
@@ -102,10 +143,13 @@ public class DashboardData {
     private String DPOINTUSE;
     private String DPOINTUSEDAY;
 
+    @JsonProperty("DPOINTUSEWEEK")
     private String DPOINTUSEWEEK;
 
-
+    @JsonProperty("SUM_POINT")
     private int SUM_POINT;
+    
+    @JsonProperty("POINT_DATE")
     private String POINT_DATE;
 
     private String SUMCOM;
@@ -440,11 +484,29 @@ public class DashboardData {
     }
 
     public String getCount_Com() {
-        return count_Com;
+        if (count_Com != null) {
+            return count_Com;
+        }
+        return todayCom;
     }
 
     public void setCount_Com(String count_Com) {
         this.count_Com = count_Com;
+        this.todayCom = count_Com;
+    }
+
+    public void setCount_Com(Integer count_Com) {
+        if (count_Com != null) {
+            this.count_Com = String.valueOf(count_Com);
+            this.todayCom = String.valueOf(count_Com);
+        }
+    }
+
+    public void setCount_Com(Long count_Com) {
+        if (count_Com != null) {
+            this.count_Com = String.valueOf(count_Com);
+            this.todayCom = String.valueOf(count_Com);
+        }
     }
 
     public String getCount_sum() {
@@ -454,6 +516,12 @@ public class DashboardData {
     public void setCount_sum(String count_sum) {
         this.count_sum = count_sum;
     }
+    
+    public void setCount_sum(Integer count_sum) {
+        if (count_sum != null) {
+            this.count_sum = String.valueOf(count_sum);
+        }
+    }
 
     public String getProcessing_rate() {
         return processing_rate;
@@ -461,6 +529,12 @@ public class DashboardData {
 
     public void setProcessing_rate(String processing_rate) {
         this.processing_rate = processing_rate;
+    }
+
+    public void setProcessing_rate(Double processing_rate) {
+        if (processing_rate != null) {
+            this.processing_rate = String.valueOf(processing_rate);
+        }
     }
 
     public String getDailyPoint() {
@@ -495,12 +569,42 @@ public class DashboardData {
         this.todayMiss = todayMiss;
     }
 
+    public void setTodayMiss(Integer todayMiss) {
+        if (todayMiss != null) {
+            this.todayMiss = String.valueOf(todayMiss);
+        }
+    }
+
+    public void setTodayMiss(Long todayMiss) {
+        if (todayMiss != null) {
+            this.todayMiss = String.valueOf(todayMiss);
+        }
+    }
+
     public String getTodayCom() {
+        if (count_Com != null) {
+            return count_Com;
+        }
         return todayCom;
     }
 
     public void setTodayCom(String todayCom) {
         this.todayCom = todayCom;
+        this.count_Com = todayCom;
+    }
+
+    public void setTodayCom(Integer todayCom) {
+        if (todayCom != null) {
+            this.todayCom = String.valueOf(todayCom);
+            this.count_Com = String.valueOf(todayCom);
+        }
+    }
+
+    public void setTodayCom(Long todayCom) {
+        if (todayCom != null) {
+            this.todayCom = String.valueOf(todayCom);
+            this.count_Com = String.valueOf(todayCom);
+        }
     }
 
     public String getTodayEme() {
@@ -509,6 +613,12 @@ public class DashboardData {
 
     public void setTodayEme(String todayEme) {
         this.todayEme = todayEme;
+    }
+
+    public void setTodayEme(Integer todayEme) {
+        if (todayEme != null) {
+            this.todayEme = String.valueOf(todayEme);
+        }
     }
 
     public String getYesterdayEme() {
@@ -584,14 +694,29 @@ public class DashboardData {
 
     public void setPrc_Date(String prc_Date) {
         this.prc_Date = prc_Date;
+        this.PRC_DATE = prc_Date;
     }
 
-    public String getGubn() {
-        return gubn;
+    @JsonIgnore
+    public String getGUBN() {
+        return GUBN;
     }
 
-    public void setGubn(String gubn) {
-        this.gubn = gubn;
+    @JsonIgnore
+    public void setGUBN(String GUBN) {
+        this.GUBN = GUBN;
+        this.gubn = GUBN;
+    }
+
+    @JsonIgnore
+    public String getPRC_DATE() {
+        return PRC_DATE;
+    }
+    
+    @JsonIgnore
+    public void setPRC_DATE(String PRC_DATE) {
+        this.PRC_DATE = PRC_DATE;
+        this.prc_Date = PRC_DATE;
     }
 
     public int getHour_09() {
@@ -601,6 +726,15 @@ public class DashboardData {
     public void setHour_09(int hour_09) {
         this.hour_09 = hour_09;
     }
+    
+    // 추가: 문자열로 설정할 수 있는 setHour_09 메서드
+    public void setHour_09(String hour_09) {
+        try {
+            this.hour_09 = Integer.parseInt(hour_09);
+        } catch (NumberFormatException e) {
+            this.hour_09 = 0;
+        }
+    }
 
     public int getHour_10() {
         return hour_10;
@@ -608,6 +742,15 @@ public class DashboardData {
 
     public void setHour_10(int hour_10) {
         this.hour_10 = hour_10;
+    }
+    
+    // 추가: 문자열로 설정할 수 있는 setHour_10 메서드
+    public void setHour_10(String hour_10) {
+        try {
+            this.hour_10 = Integer.parseInt(hour_10);
+        } catch (NumberFormatException e) {
+            this.hour_10 = 0;
+        }
     }
 
     public int getHour_11() {
@@ -617,6 +760,15 @@ public class DashboardData {
     public void setHour_11(int hour_11) {
         this.hour_11 = hour_11;
     }
+    
+    // 추가: 문자열로 설정할 수 있는 setHour_11 메서드
+    public void setHour_11(String hour_11) {
+        try {
+            this.hour_11 = Integer.parseInt(hour_11);
+        } catch (NumberFormatException e) {
+            this.hour_11 = 0;
+        }
+    }
 
     public int getHour_12() {
         return hour_12;
@@ -624,6 +776,15 @@ public class DashboardData {
 
     public void setHour_12(int hour_12) {
         this.hour_12 = hour_12;
+    }
+    
+    // 추가: 문자열로 설정할 수 있는 setHour_12 메서드
+    public void setHour_12(String hour_12) {
+        try {
+            this.hour_12 = Integer.parseInt(hour_12);
+        } catch (NumberFormatException e) {
+            this.hour_12 = 0;
+        }
     }
 
     public int getHour_13() {
@@ -633,6 +794,15 @@ public class DashboardData {
     public void setHour_13(int hour_13) {
         this.hour_13 = hour_13;
     }
+    
+    // 추가: 문자열로 설정할 수 있는 setHour_13 메서드
+    public void setHour_13(String hour_13) {
+        try {
+            this.hour_13 = Integer.parseInt(hour_13);
+        } catch (NumberFormatException e) {
+            this.hour_13 = 0;
+        }
+    }
 
     public int getHour_14() {
         return hour_14;
@@ -640,6 +810,15 @@ public class DashboardData {
 
     public void setHour_14(int hour_14) {
         this.hour_14 = hour_14;
+    }
+    
+    // 추가: 문자열로 설정할 수 있는 setHour_14 메서드
+    public void setHour_14(String hour_14) {
+        try {
+            this.hour_14 = Integer.parseInt(hour_14);
+        } catch (NumberFormatException e) {
+            this.hour_14 = 0;
+        }
     }
 
     public int getHour_15() {
@@ -649,6 +828,15 @@ public class DashboardData {
     public void setHour_15(int hour_15) {
         this.hour_15 = hour_15;
     }
+    
+    // 추가: 문자열로 설정할 수 있는 setHour_15 메서드
+    public void setHour_15(String hour_15) {
+        try {
+            this.hour_15 = Integer.parseInt(hour_15);
+        } catch (NumberFormatException e) {
+            this.hour_15 = 0;
+        }
+    }
 
     public int getHour_16() {
         return hour_16;
@@ -656,6 +844,15 @@ public class DashboardData {
 
     public void setHour_16(int hour_16) {
         this.hour_16 = hour_16;
+    }
+    
+    // 추가: 문자열로 설정할 수 있는 setHour_16 메서드
+    public void setHour_16(String hour_16) {
+        try {
+            this.hour_16 = Integer.parseInt(hour_16);
+        } catch (NumberFormatException e) {
+            this.hour_16 = 0;
+        }
     }
 
     public int getHour_17() {
@@ -665,6 +862,15 @@ public class DashboardData {
     public void setHour_17(int hour_17) {
         this.hour_17 = hour_17;
     }
+    
+    // 추가: 문자열로 설정할 수 있는 setHour_17 메서드
+    public void setHour_17(String hour_17) {
+        try {
+            this.hour_17 = Integer.parseInt(hour_17);
+        } catch (NumberFormatException e) {
+            this.hour_17 = 0;
+        }
+    }
 
     public int getHour_18() {
         return hour_18;
@@ -672,6 +878,15 @@ public class DashboardData {
 
     public void setHour_18(int hour_18) {
         this.hour_18 = hour_18;
+    }
+    
+    // 추가: 문자열로 설정할 수 있는 setHour_18 메서드
+    public void setHour_18(String hour_18) {
+        try {
+            this.hour_18 = Integer.parseInt(hour_18);
+        } catch (NumberFormatException e) {
+            this.hour_18 = 0;
+        }
     }
 
     public int getHour_19() {
@@ -681,13 +896,79 @@ public class DashboardData {
     public void setHour_19(int hour_19) {
         this.hour_19 = hour_19;
     }
+    
+    // 추가: 문자열로 설정할 수 있는 setHour_19 메서드
+    public void setHour_19(String hour_19) {
+        try {
+            this.hour_19 = Integer.parseInt(hour_19);
+        } catch (NumberFormatException e) {
+            this.hour_19 = 0;
+        }
+    }
 
+    // 소문자 callSum getter
     public int getCallSum() {
         return callSum;
     }
+    
+    // 모든 타입을 처리할 수 있는 단일 setter
+    public void setCallSum(Object callSum) {
+        if (callSum == null) {
+            this.callSum = 0;
+            this.CALLSUM = 0;
+            return;
+        }
+        
+        if (callSum instanceof Number) {
+            this.callSum = ((Number)callSum).intValue();
+            this.CALLSUM = this.callSum;
+        } else if (callSum instanceof String) {
+            try {
+                this.callSum = Integer.parseInt((String)callSum);
+                this.CALLSUM = this.callSum;
+            } catch (NumberFormatException e) {
+                this.callSum = 0;
+                this.CALLSUM = 0;
+            }
+        }
+    }
 
-    public void setCallSum(int callSum) {
-        this.callSum = callSum;
+    // 대문자 CALLSUM getter
+    public int getCALLSUM() {
+        return CALLSUM;
+    }
+    
+    // 모든 타입을 처리할 수 있는 단일 setter
+    public void setCALLSUM(Object CALLSUM) {
+        if (CALLSUM == null) {
+            this.CALLSUM = 0;
+            this.callSum = 0;
+            return;
+        }
+        
+        if (CALLSUM instanceof Number) {
+            this.CALLSUM = ((Number)CALLSUM).intValue();
+            this.callSum = this.CALLSUM;
+        } else if (CALLSUM instanceof String) {
+            try {
+                this.CALLSUM = Integer.parseInt((String)CALLSUM);
+                this.callSum = this.CALLSUM;
+            } catch (NumberFormatException e) {
+                this.CALLSUM = 0;
+                this.callSum = 0;
+            }
+        }
+    }
+
+    // 추가: Javascript 호환을 위한 문자열 버전 getter (JsonIgnore 제거)
+    @JsonIgnore
+    public String getcallSum() {
+        return String.valueOf(callSum);
+    }
+    
+    @JsonIgnore
+    public String getcallsum() {
+        return String.valueOf(callSum);
     }
 
     public String getPersonMonth() {
@@ -792,5 +1073,22 @@ public class DashboardData {
 
     public void setAvg12months(int avg12months) {
         this.avg12months = avg12months;
+    }
+
+    public int getTotalCount() {
+        return totalCount;
+    }
+    
+    public void setTotalCount(int totalCount) {
+        this.totalCount = totalCount;
+    }
+
+    public String getGubn() {
+        return gubn;
+    }
+
+    public void setGubn(String gubn) {
+        this.gubn = gubn;
+        this.GUBN = gubn;
     }
 }

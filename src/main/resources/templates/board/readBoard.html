@@ -5,6 +5,10 @@
 
 <body>
 <div layout:fragment="content">
+    <!-- CSRF 토큰 명시적 추가 -->
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.css">
 
     <!-- 컨텐츠 래퍼 시작 -->
@@ -58,7 +62,7 @@
                                 <h3 id="post-title-display" th:text="${post.SUBJECT}"></h3>
                                 <input type="text" id="post-title-input" name="title" class="form-control form-control-lg form-control-solid" style="display: none;" th:value="${post.SUBJECT}">
 
-                                <span class="fs-6 fw-bold text-gray-500" th:text="${post.EMPNM} + ' / ' + ${post.IN_DATE}"></span>
+                                <span class="fs-6 fw-bold text-gray-500" th:text="${post.ID} + ' / ' + ${post.IN_DATE}"></span>
                             </div>
                             <!-- 제목 끝 -->
                             <!-- 구분선 시작 -->
@@ -90,17 +94,29 @@
                                 <div id="editor-container" style="display: none;">
                                     <textarea id="summernote" th:text="${post.CONTENT}"></textarea>
                                 </div>
-
+                                <script src="https://ads-partners.coupang.com/g.js"></script>
+                                <div style="width:100%; max-width:780px; margin:0 auto;">
+                                    <div style="position:relative; width:100%; padding-bottom:17.95%; height:0; overflow:hidden;">
+                                        <iframe
+                                                src="https://ads-partners.coupang.com/widgets.html?id=860875&template=carousel&trackingCode=AF7221409&subId=&width=780&height=140&tsource="
+                                                style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;"
+                                                scrolling="no"
+                                                referrerpolicy="unsafe-url"
+                                                browsingtopics
+                                                allowfullscreen>
+                                        </iframe>
+                                    </div>
+                                </div>
                                 <!-- 컬럼 끝 -->
                             </div>
                             <div class="separator separator-dashed mb-9"></div>
                             <div class="d-flex flex-column mb-5 fv-row">
                                 <div class="d-flex">
                                     <input type="hidden" id="gno" name="gno" th:value="${post.GNO}" />
-                                    <input type="hidden" id="id" name="gno" th:value="${post.ID}" />
+                                    <input type="hidden" id="id" name="id" th:value="${post.ID}" />
                                     <input type="hidden" id="uno" name="uno" th:value="${post.UNO}" />
-                                    <input type="hidden" id="category" name="category" th:value="${post.CAT_GROUP}" />
-                                    <input type="hidden" id="replyDepth" name="category" th:value="${post.REPLY_DEPTH}" />
+                                    <input type="hidden" id="category" name="CAT_GROUP" th:value="${post.CAT_GROUP}" />
+                                    <input type="hidden" id="replyDepth" name="replyDepth" th:value="${post.REPLY_DEPTH}" />
 
 
                                     <div  th:if="${post.CAT_GROUP != 'G'}" id="commentInputSection" class="d-flex flex-column mb-5 fv-row" style="width: 100%;">
@@ -121,12 +137,21 @@
                                     <p> 댓글 없음 </p>
                                 </div>
                                 <div th:unless="${#lists.isEmpty(list)}">
-                                    <table id="commentsTable">
+                                    <table id="commentsTable" class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>작성일</th>
+                                                <th>작성자</th>
+                                                <th>내용</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
                                         <tr th:each="list, iterStat : ${list}">
                                             <td class="comment-item mb-2 p-2" th:text="${list.IN_DATE}"></td>
                                             <td class="comment-item mb-2 p-2" th:text="${list.ID}"></td>
                                             <td class="comment-item mb-2 p-2" th:utext="${list.CONTENT}"></td>
                                         </tr>
+                                        </tbody>
                                     </table>
                                 </div>
                             </div>
@@ -237,21 +262,28 @@
                 });
                 // 저장 버튼 클릭 이벤트
                 $('#saveButton').click(function() {
-                    console.log('saveButton');
-                    var content = $('#summernote').val().trim();
+                    console.log('saveButton 클릭됨');
+                    var content = $('#summernote').summernote('code'); // 서머노트 내용 가져오는 방식 변경
                     var title = $('#post-title-input').val();
                     var gno = $('#gno').val();
                     var id = $('#id').val();
                     var uno = $('#uno').val();
                     var catGroup = $('#category').val();
 
+                    console.log('게시글 수정 요청 파라미터:');
+                    console.log('UNO:', uno);
+                    console.log('GNO:', gno);
+                    console.log('ID:', id);
+                    console.log('CAT_GROUP:', catGroup);
+                    console.log('SUBJECT:', title);
+                    console.log('CONTENT 길이:', content ? content.length : 0);
+                    console.log('deletedFiles:', deletedFiles);
 
                     var formData = new FormData();
                     formData.append('GNO', gno);
                     formData.append('ID', id);
                     formData.append('UNO', uno);
                     formData.append('CAT_GROUP', catGroup);
-                    console.log('CAT_GROUP:', catGroup);
                     formData.append('SUBJECT', title);
                     formData.append('CONTENT', content);
                     formData.append('deletedFiles', JSON.stringify(deletedFiles));
@@ -262,27 +294,51 @@
                         var totalSize = 0;
                         for (var i = 0; i < fileInput.files.length; i++) {
                             formData.append('files', fileInput.files[i]);
+                            console.log('파일 추가:', fileInput.files[i].name, fileInput.files[i].size);
+                            totalSize += fileInput.files[i].size;
                         }
+                        console.log('총 파일 크기:', totalSize);
                         // 파일 크기 제한 (예: 10MB)
                         if (totalSize > 10 * 1024 * 1024) {
                             alert('파일 크기가 너무 큽니다. 총 10MB 이하로 업로드해주세요.');
                             return;
                         }
                     }
-                    $.ajax({
 
+                    // FormData 내용 확인
+                    var formDataEntries = [];
+                    for (var pair of formData.entries()) {
+                        // 파일이나 큰 콘텐츠는 '(binary data)'로 표시
+                        var value = pair[1] instanceof File ? '(File: ' + pair[1].name + ')' : 
+                                   (typeof pair[1] === 'string' && pair[1].length > 100) ? 
+                                   pair[1].substring(0, 100) + '... (길이: ' + pair[1].length + ')' : pair[1];
+                        formDataEntries.push(pair[0] + ': ' + value);
+                    }
+                    console.log('FormData 내용:', formDataEntries);
+                    console.log('AJAX 요청 URL:', '/board/update');
+
+                    $.ajax({
                         url: '/board/update',
                         type: 'POST',
                         data: formData,
                         processData: false,
                         contentType: false,
-
+                        beforeSend: function(xhr) {
+                            console.log('AJAX 요청 전 CSRF 설정:', csrfHeader + "=" + csrfToken);
+                            xhr.setRequestHeader(csrfHeader, csrfToken);
+                        },
                         success: function(response) {
+                            console.log('수정 성공 응답:', response);
                             alert('게시글이 성공적으로 수정되었습니다.');
                             // 서버에서 받은 URL로 리다이렉트
                             window.location.href = response;
                         },
                         error: function(xhr, status, error) {
+                            console.error('수정 오류:', xhr);
+                            console.error('상태:', status);
+                            console.error('오류 메시지:', error);
+                            console.error('응답 상태:', xhr.status);
+                            console.error('응답 텍스트:', xhr.responseText);
                             alert('게시글 수정 중 오류가 발생했습니다: ' + error);
                         }
                     });
@@ -334,6 +390,16 @@
                     var uno = $('#uno').val();
                     var category = $('#category').val();
                     var replyDepth = $('#replyDepth').val();
+                    
+                    // 더 자세한 디버깅을 위해 값들을 콘솔에 출력
+                    console.log('댓글 등록 요청 파라미터:');
+                    console.log('GNO:', gno);
+                    console.log('UNO:', uno);
+                    console.log('category 요소:', $('#category'));
+                    console.log('category 값:', category);
+                    console.log('REPLY_DEPTH:', replyDepth);
+                    console.log('CONTENT:', commentText);
+                    
                     if (commentText === "") {
                         alert("댓글을 입력하세요.");
                         return;
@@ -343,14 +409,20 @@
                         return;
                     }
 
+                    // CSRF 토큰 가져오기
+                    var csrfToken = $("meta[name='_csrf']").attr("content");
+                    var csrfHeader = $("meta[name='_csrf_header']").attr("content");
 
+                    // POST 요청 시 소문자 cat_group이 아닌 정확한 파라미터 이름 사용
                     var formData = {
                         GNO: gno,
                         UNO: uno,
-                        CAT_GROUP: category,
+                        CAT_GROUP: category,  // 서버에서 기대하는 정확한 파라미터 이름
                         CONTENT: commentText,
-                        REPLY_DEPTH :replyDepth
+                        REPLY_DEPTH: replyDepth
                     };
+
+                    console.log('전송 데이터:', formData);
 
                     $.ajax({
                         url: '/board/readBoard/comments',
@@ -358,23 +430,53 @@
                         contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
                         data: formData,
                         beforeSend: function(xhr) {
+                            if (csrfHeader && csrfToken) {
                             xhr.setRequestHeader(csrfHeader, csrfToken); // CSRF 토큰 설정
+                            console.log('요청 헤더:', csrfHeader, '=', csrfToken);
+                            }
                         },
                         success: function(response) {
-                            //console.log(response);
+                            console.log('성공 응답:', response);
+                            // 댓글 추가 후 화면 갱신
+                            var newDate = response.in_date || new Date().toLocaleString();
+                            var newId = response.id || "Unknown";
+                            var newContent = response.content || commentText;
+                            
                             var newComment = `<tr>
-                        <td class="comment-item mb-2 p-2">${response.in_date}</td>
-                        <td class="comment-item mb-2 p-2">${response.id}</td>
-                        <td class="comment-item mb-2 p-2">${response.content}</td>
+                                <td class="comment-item mb-2 p-2">${newDate}</td>
+                                <td class="comment-item mb-2 p-2">${newId}</td>
+                                <td class="comment-item mb-2 p-2">${newContent}</td>
                     </tr>`;
-                            $('#commentsTable').append(newComment);
+                            
+                            // 댓글이 없었을 경우 테이블 생성
+                            if ($('#commentsTable').length === 0) {
+                                var newTable = `
+                                <table id="commentsTable" class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>작성일</th>
+                                            <th>작성자</th>
+                                            <th>내용</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${newComment}
+                                    </tbody>
+                                </table>`;
+                                $('#commentListSection div:first').html(newTable);
+                            } else {
+                                $('#commentsTable tbody').append(newComment);
+                            }
+                            
                             $('#floatingTextarea2').val("");
                             alert("댓글이 등록되었습니다.");
-                            location.reload();
                         },
-                        error: function(error) {
-                            console.error("Error adding comment:", error.responseText);
-                            alert("댓글 추가 실패.");
+                        error: function(xhr, status, error) {
+                            console.error("Error adding comment:", xhr);
+                            console.error("Error status:", status);
+                            console.error("Error message:", error);
+                            console.error("Response text:", xhr.responseText);
+                            alert("댓글 추가 실패: " + (xhr.responseText || error));
                         }
                     });
                 });

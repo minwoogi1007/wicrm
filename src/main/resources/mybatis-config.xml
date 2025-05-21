@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+  <settings>
+    <!-- 로깅 활성화 - SLF4J 로깅 사용 -->
+    <setting name="logImpl" value="SLF4J" />
+    
+    <!-- 기타 설정 -->
+    <setting name="mapUnderscoreToCamelCase" value="true" />
+    <setting name="callSettersOnNulls" value="true" />
+    <setting name="jdbcTypeForNull" value="NULL" />
+    <setting name="defaultStatementTimeout" value="30" />
+  </settings>
+</configuration> 

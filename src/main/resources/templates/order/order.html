@@ -1,0 +1,166 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{main}">
+<body>
+<div layout:fragment="content">
+
+
+  <div class="d-flex flex-column flex-column-fluid">
+    <!--begin::Toolbar-->
+    <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+      <!--begin::Toolbar container-->
+      <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+        <!--begin::Page title-->
+        <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+          <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">당일 주문서 및 송장 등록</h1>
+          <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+            <li class="breadcrumb-item text-muted">
+              <a href="/main" class="text-muted text-hover-primary">Home</a>
+            </li>
+            <li class="breadcrumb-item">
+              <span class="bullet bg-gray-500 w-5px h-2px"></span>
+            </li>
+            <li class="breadcrumb-item text-muted">주문 관리</li>
+          </ul>
+        </div>
+        <!--end::Page title-->
+      </div>
+      <!--end::Toolbar container-->
+    </div>
+    <!--end::Toolbar-->
+
+    <!--begin::Content-->
+    <div id="kt_app_content" class="app-content flex-column-fluid">
+      <!--begin::Content container-->
+      <div id="kt_app_content_container" class="app-container container-xxl">
+        <!--begin::Order Upload Card-->
+        <div class="card card-flush mb-4">
+          <div class="card-header align-items-center py-5 gap-2 gap-md-5">
+            <div class="card-title">
+              <h4>엑셀 파일 업로드</h4>
+            </div>
+          </div>
+          <div class="card-body">
+            <form th:action="@{/order/uploadExcel}" method="post" enctype="multipart/form-data">
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+              <div class="mb-3">
+                <label for="orderFile" class="form-label">당일 주문서 파일:</label>
+                <input type="file" class="form-control" id="orderFile" name="orderFile" required>
+              </div>
+              <div class="mb-3">
+                <label for="invoiceFile" class="form-label">송장 파일:</label>
+                <input type="file" class="form-control" id="invoiceFile" name="invoiceFile">
+              </div>
+              <button type="submit" class="btn btn-primary">파일 업로드</button>
+            </form>
+          </div>
+        </div>
+        <!--end::Order Upload Card-->
+
+        <!--begin::Missing Order List Card-->
+        <div class="card card-flush">
+          <div class="card-header align-items-center py-5 gap-2 gap-md-5">
+            <div class="card-title">
+              <h4>미출 주문서 조회</h4>
+            </div>
+            <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
+              <button class="btn btn-warning" onclick="location.href='/missingInvoice'">미출 주문서 조회</button>
+            </div>
+          </div>
+          <div class="card-body pt-0">
+            <div class="table-responsive" th:if="${missingOrders != null}">
+              <table class="table align-middle table-striped table-row-dashed fs-6 gy-5" id="kt_missing_orders_table">
+                <thead>
+                <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
+                  <th>순번</th>
+                  <th>발주일시</th>
+                  <th>주문일시</th>
+                  <th>사방넷주문번호</th>
+                  <th>쇼핑몰주문번호</th>
+                  <th>수취인명</th>
+                  <th>주문몰</th>
+                  <th>연락처1</th>
+                  <th>연락처2</th>
+                  <th>우편번호</th>
+                  <th>주소</th>
+                  <th>수량</th>
+                  <th>품번(수집상품명)</th>
+                  <th>옵션</th>
+                  <th>판매금액</th>
+                  <th>결제금액</th>
+                  <th>사은품</th>
+                  <th>운임타입</th>
+                  <th>배송메모</th>
+                  <th>출고번호</th>
+                  <th>쇼핑몰명</th>
+                  <th>품번2</th>
+                  <th>주문자명</th>
+                  <th>송장번호</th>
+                  <th>배송 상태</th>
+                  <th>도서</th>
+                  <th>운임 Type</th>
+                  <th>지불조건</th>
+                  <th>특기사항</th>
+                  <th>메모1</th>
+                  <th>메모2</th>
+                  <th>메모3</th>
+                  <th>메모4</th>
+                </tr>
+                </thead>
+                <tbody class="fw-semibold text-gray-600">
+                <tr th:each="order : ${missingOrders}" th:data-id="${order.sequence}">
+                  <td th:text="${order.sequence}"></td>
+                  <td th:text="${order.orderTimestamp}"></td>
+                  <td th:text="${order.orderDate}"></td>
+                  <td th:text="${order.sabangnetOrderNumber}"></td>
+                  <td th:text="${order.shoppingOrderNumber}"></td>
+                  <td th:text="${order.recipientName}"></td>
+                  <td th:text="${order.orderMall}"></td>
+                  <td th:text="${order.contact1}"></td>
+                  <td th:text="${order.contact2}"></td>
+                  <td th:text="${order.postalCode}"></td>
+                  <td th:text="${order.address}"></td>
+                  <td th:text="${order.quantity}"></td>
+                  <td th:text="${order.productCode}"></td>
+                  <td th:text="${order.option}"></td>
+                  <td th:text="${order.salePrice}"></td>
+                  <td th:text="${order.paymentAmount}"></td>
+                  <td th:text="${order.gift}"></td>
+                  <td th:text="${order.shippingType}"></td>
+                  <td th:text="${order.deliveryMemo}"></td>
+                  <td th:text="${order.releaseNumber}"></td>
+                  <td th:text="${order.shoppingMallName}"></td>
+                  <td th:text="${order.productCode2}"></td>
+                  <td th:text="${order.ordererName}"></td>
+                  <td th:text="${order.trackingNumber}"></td>
+                  <td th:text="${order.deliveryStatus}"></td>
+                  <td th:text="${order.region}"></td>
+                  <td th:text="${order.freightType}"></td>
+                  <td th:text="${order.paymentCondition}"></td>
+                  <td th:text="${order.specialNote}"></td>
+                  <td th:text="${order.memo1}"></td>
+                  <td th:text="${order.memo2}"></td>
+                  <td th:text="${order.memo3}"></td>
+                  <td th:text="${order.memo4}"></td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <!--end::Missing Order List Card-->
+      </div>
+      <!--end::Content container-->
+    </div>
+    <!--end::Content-->
+  </div>
+</div>
+<script>
+  function redirectToPost(element) {
+    var postId = element.getAttribute('data-id');
+    window.location.href = `/order/readOrder?id=${postId}`;
+  }
+</script>
+<div th:replace="footer :: footer"></div>
+</body>
+</html>

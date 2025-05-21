@@ -133,33 +133,61 @@
                                         <!--begin::Card body-->
                                         <div class="card-body pt-0 pb-5">
                                             <!--begin::Table-->
-                                            <table class="table align-middle table-row-dashed gy-5" id="kt_table_customers_payment">
-                                                <thead class="border-bottom border-gray-200 fs-7 fw-bold">
-                                                <tr class="text-start text-muted text-uppercase gs-0">
-
-                                                    <th style="text-align: center;" class="min-w-100px">일자</th>
-                                                    <th>구분</th>
-                                                    <th style="text-align: center;">충전</th>
-                                                    <th style="text-align: center;">내용</th>
-                                                </tr>
-                                                </thead>
+                                            <div class="table-responsive">
+                                                <table class="table align-middle table-row-dashed gy-5" id="kt_table_customers_payment">
+                                                    <thead class="border-bottom border-gray-200 fs-7 fw-bold">
+                                                        <tr class="text-start text-muted text-uppercase gs-0">
+                                                            <th style="text-align: center;" class="min-w-100px">일자</th>
+                                                            <th>구분</th>
+                                                            <th style="text-align: center;">충전</th>
+                                                            <th style="text-align: center;">내용</th>
+                                                        </tr>
+                                                    </thead>
                                                 <tbody class="fs-6 fw-semibold text-gray-600">
-                                                <tr th:each="transaction : ${transactions}">
-                                                    <td style="text-align: center;" th:text="${transaction.CHARGE_DATE}"></td>
-
-                                                    <td>
-                                                        <div th:switch="${transaction.CHARGE_GUBN}">
-                                                            <span  th:case="'C'" class="badge badge-light-success">충전</span>
-                                                            <span  th:case="'D'" class="badge badge-light-warning">차감</span>
-                                                        </div>
-                                                    </td>
-                                                    <td th:text="${transaction.CHARGE_POINT}" style="text-align: right;"></td>
-
-                                                    <td th:text="${transaction.POINT_CHARGE}" style="text-align: center;"></td>
-                                                </tr>
-
+                                                    <!-- 각 트랜잭션 레코드 표시 -->
+                                                    <tr th:if="${transaction != null}" th:each="transaction : ${transactions}">
+                                                        <!-- 디버깅용 코드 (console 로그 확인) -->
+                                                        <script th:inline="javascript">
+                                                            console.log('Rendering transaction row:', /*[[${transaction}]]*/);
+                                                            // 필드별 디버깅 추가
+                                                            console.log('Fields check -', {
+                                                                date: /*[[${transaction != null ? transaction.CHARGE_DATE : null}]]*/, 
+                                                                type: /*[[${transaction != null ? transaction.CHARGE_GUBN : null}]]*/, 
+                                                                amount: /*[[${transaction != null ? transaction.CHARGE_POINT : null}]]*/, 
+                                                                desc: /*[[${transaction != null ? transaction.POINT_CHARGE : null}]]*/
+                                                            });
+                                                        </script>
+                                                        
+                                                        <td style="text-align: center;" th:text="${transaction != null && transaction.CHARGE_DATE != null ? transaction.CHARGE_DATE : '-'}"></td>
+                                                        <td style="text-align: center;">
+                                                            <span th:if="${transaction != null && transaction.CHARGE_GUBN != null && transaction.CHARGE_GUBN == 'C'}" class="badge badge-light-success d-inline-flex align-items-center px-3 py-2">
+                                                                <i class="ki-duotone ki-arrow-up fs-5 me-1 text-success">
+                                                                    <span class="path1"></span>
+                                                                    <span class="path2"></span>
+                                                                </i>
+                                                                충전
+                                                            </span>
+                                                            <span th:if="${transaction != null && transaction.CHARGE_GUBN != null && transaction.CHARGE_GUBN == 'D'}" class="badge badge-light-danger d-inline-flex align-items-center px-3 py-2">
+                                                                <i class="ki-duotone ki-arrow-down fs-5 me-1 text-danger">
+                                                                    <span class="path1"></span>
+                                                                    <span class="path2"></span>
+                                                                </i>
+                                                                차감
+                                                            </span>
+                                                        </td>
+                                                        <td style="text-align: center;">
+                                                            <span th:if="${transaction != null && transaction.CHARGE_GUBN != null && transaction.CHARGE_GUBN == 'C'}" class="text-success fw-bold" th:text="${transaction != null && transaction.CHARGE_POINT != null ? transaction.CHARGE_POINT : '-'}"></span>
+                                                            <span th:if="${transaction != null && transaction.CHARGE_GUBN != null && transaction.CHARGE_GUBN == 'D'}" class="text-danger fw-bold" th:text="${transaction != null && transaction.CHARGE_POINT != null ? transaction.CHARGE_POINT : '-'}"></span>
+                                                        </td>
+                                                        <td style="text-align: center;" th:text="${transaction != null && transaction.POINT_CHARGE != null ? transaction.POINT_CHARGE : '-'}"></td>
+                                                    </tr>
+                                                    <!-- 테이블 데이터가 없는 경우 -->
+                                                    <tr th:if="${transactions == null || transactions.isEmpty()}">
+                                                        <td colspan="4" style="text-align: center;">마일리지 내역이 없습니다.</td>
+                                                    </tr>
                                                 </tbody>
-                                            </table>
+                                                </table>
+                                            </div>
                                             <!--end::Table-->
                                         </div>
                                         <!--end::Card body-->
@@ -201,8 +229,7 @@
                 <!--end::Content container-->
             </div>
             <!--end::Content-->
-            <script src="/assets/plugins/global/plugins.bundle.js"></script>
-            <script src="/assets/js/board/scripts.bundle.js"></script>
+            <!-- DataTables 초기화는 transaction-history.js에서 처리함 -->
             <script src="/assets/js/custom/apps/ecommerce/customers/details/transaction-history.js"></script>
         </div>
         <!--end::Content wrapper-->

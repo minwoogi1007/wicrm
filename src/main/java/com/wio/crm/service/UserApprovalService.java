@@ -67,7 +67,7 @@ public class UserApprovalService {
         // Prepare the data for insertion into N_TCNT01_EMP
         empTempData.put("companyCode", companyCode); // Add the companyCode to the data
         empTempData.put("EMPNO", newEmpNo); // Add the generated EMPNO
-System.out.println("empTempData=========="+empTempData);
+//System.out.println("empTempData=========="+empTempData);
         // Insert the data into N_TCNT01_EMP
         userApprovalMapper.insertEmpData(empTempData);
     }

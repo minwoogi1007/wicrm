@@ -14,14 +14,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Map;
 
 @Controller
 public class MainController {
 
-    private final Logger logger = LoggerFactory.getLogger(LoginController.class);
-
+    private static final Logger logger = LoggerFactory.getLogger(MainController.class);
 
     @Autowired
     private DashboardService dashboardService;
@@ -29,6 +29,8 @@ public class MainController {
     @Autowired
     private BoardService boardService;
 
+    @Value("${file.upload-dir}")
+    private String fileUploadDir;
 
     @GetMapping("/main")
     public String mainPage(Model model, HttpSession session) {
@@ -38,18 +40,17 @@ public class MainController {
             return "redirect:/sign-in";
         }
 
-
         String username = authentication.getName();
-       // String userid = authentication.getName(); // 현재 인증된 사용자의 ID를 가져옵니다.
-       // model.addAttribute("userMenus", menuService.getCompanyUserMenus(userid));
+        // String userid = authentication.getName(); // 현재 인증된 사용자의 ID를 가져옵니다.
+        // model.addAttribute("userMenus", menuService.getCompanyUserMenus(userid));
         // 서비스를 호출하여 사용자 등급에 따른 데이터를 가져옵니다.
         Map<String, Object> tcntEmpData = dashboardService.getTcntEmp();
         if(tcntEmpData!=null){
             model.addAllAttributes(tcntEmpData);
+
         }else{
             return "redirect:/sign-in";
         }
-
 
         boolean isEmployee = authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_EMPLOYEE"));
 
@@ -63,7 +64,5 @@ public class MainController {
         return "contents";
     }
 
-
-
-
+    // 배너 관련 메서드 제거 (BannerController로 이관)
 }
