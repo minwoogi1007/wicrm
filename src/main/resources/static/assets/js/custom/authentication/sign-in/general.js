@@ -47,33 +47,39 @@ var KTSigninGeneral = function() {
                         e.setAttribute("data-kt-indicator", "on");
                         e.disabled = true;
 
+                        // 폼 데이터 추출
+                        const formData = new FormData(t);
+                        
+                        // AJAX 헤더 설정
+                        const headers = {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json, text/plain, */*'
+                        };
+                        
                         // Fetch 요청으로 로그인 처리
                         fetch(e.closest("form").getAttribute("action"), {
                             method: 'POST',
-                            body: new FormData(t)
+                            headers: headers,
+                            body: formData,
+                            credentials: 'same-origin'
                         }).then(response => {
+                            // 로그인 성공 시 메인 페이지로 리다이렉트
                             if (response.ok) {
-                                return response.text().then(text => {
-                                    try {
-                                        return JSON.parse(text); // JSON으로 파싱 시도
-                                    } catch (e) {
-                                        return text; // JSON이 아니면 텍스트 그대로 반환
-                                    }
-                                });
-                            } else {
-
-                                // 서버 응답이 OK(200) 상태가 아닌 경우, 에러 처리
-                                return response.json().then(data => {
-                                    throw new Error(data.error || "An unknown error occurred."); // 서버로부터 에러 메시지 추출
-                                });
+                                window.location.href = '/main';
+                                return;
                             }
-                        }).then(data => {
-                            // 로그인 성공 후 리디렉션 또는 추가 처리
-                            window.location.href ='/main';
+                            
+                            // 401 에러인 경우 - 인증 실패
+                            if (response.status === 401) {
+                                throw new Error("아이디 또는 비밀번호가 일치하지 않습니다.");
+                            }
+                            
+                            // 기타 에러
+                            throw new Error("로그인 처리 중 오류가 발생했습니다.");
                         }).catch(error => {
                             console.error('Error:', error);
                             Swal.fire({
-                                text: error.message, // 서버로부터의 오류 메시지를 표시
+                                text: error.message,
                                 icon: "error",
                                 buttonsStyling: false,
                                 confirmButtonText: "확인",
@@ -88,13 +94,11 @@ var KTSigninGeneral = function() {
                     } else {
                         // 유효성 검사 실패 시 처리
                         Swal.fire({
-
                             text: "아이디 비밀번호 입력을 다시 해보세요",
                             icon: "error",
                             buttonsStyling: false,
-                            confirmButtonText: "Ok, got it!",
+                            confirmButtonText: "확인",
                             customClass: {
-
                                 confirmButton: "btn btn-primary"
                             }
                         });

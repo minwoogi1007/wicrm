@@ -71,76 +71,94 @@
                             <thead>
                                 <tr class="fw-semibold fs-6 text-gray-800 text-center border-bottom border-gray-200">
                                     <th>일자</th>
-                                    <th>요일</th>
-                                    <th>총통화</th>
-                                    <th>인입호</th>
-                                    <th>단순문의호</th>
-                                    <th>응대가능호</th>
-                                    <th>조회호</th>
-                                    <th>취결호</th>
-                                    <th>부결호수</th>
-                                    <th>총취결율</th>
+                                    <th>총콜</th>
+                                    <th>중복제거호</th>
+                                    <th>응대호</th>
+                                    <th>포기호</th>
+                                    <th>부재호(BUSY)</th>
+                                    <th>총상담완료호</th>
+                                    <th>수신호</th>
+                                    <th>발신호</th>
+                                    <th>응대율</th>
+                                    <th>완료율</th>
+                                    <th>수신비율</th>
+                                    <th>발신비율</th>
                                 </tr>
                             </thead>
                             <tbody class="text-center">
                                 <tr>
                                     <td>2024-02-02</td>
-                                    <td>금</td>
                                     <td>23</td>
                                     <td>15</td>
                                     <td>6</td>
                                     <td>17</td>
                                     <td>16</td>
                                     <td>1</td>
-                                    <td>1</td>
+                                    <td>18</td>
+                                    <td>5</td>
                                     <td>94.1%</td>
+                                    <td>94.1%</td>
+                                    <td>78.3%</td>
+                                    <td>21.7%</td>
                                 </tr>
                                 <tr>
                                     <td>2024-02-05</td>
-                                    <td>월</td>
                                     <td>21</td>
                                     <td>8</td>
                                     <td>9</td>
                                     <td>12</td>
                                     <td>11</td>
                                     <td>1</td>
-                                    <td>1</td>
+                                    <td>12</td>
+                                    <td>9</td>
                                     <td>91.7%</td>
+                                    <td>91.7%</td>
+                                    <td>52.4%</td>
+                                    <td>47.6%</td>
                                 </tr>
                                 <tr>
                                     <td>2024-02-06</td>
-                                    <td>화</td>
                                     <td>18</td>
                                     <td>11</td>
                                     <td>5</td>
                                     <td>13</td>
                                     <td>8</td>
                                     <td>5</td>
-                                    <td>3</td>
+                                    <td>10</td>
+                                    <td>8</td>
                                     <td>61.5%</td>
+                                    <td>61.5%</td>
+                                    <td>55.6%</td>
+                                    <td>44.4%</td>
                                 </tr>
                                 <tr>
                                     <td>2024-02-07</td>
-                                    <td>수</td>
                                     <td>10</td>
                                     <td>7</td>
                                     <td>3</td>
                                     <td>7</td>
                                     <td>5</td>
                                     <td>2</td>
-                                    <td>1</td>
+                                    <td>5</td>
+                                    <td>5</td>
                                     <td>71.4%</td>
+                                    <td>71.4%</td>
+                                    <td>50.0%</td>
+                                    <td>50.0%</td>
                                 </tr>
                                 <tr>
                                     <td>2024-02-08</td>
-                                    <td>목</td>
                                     <td>6</td>
                                     <td>3</td>
                                     <td>3</td>
                                     <td>3</td>
                                     <td>3</td>
                                     <td>0</td>
-                                    <td>0</td>
+                                    <td>3</td>
+                                    <td>3</td>
+                                    <td>100%</td>
+                                    <td>100%</td>
+                                    <td>100%</td>
                                     <td>100%</td>
                                 </tr>
                             </tbody>
@@ -160,7 +178,7 @@
                     </div>
                 </div>
 
-                <!-- 2.주간 통화 시간 현황 -->
+                <!-- 2.주간 통화 시간 현황
                 <div class="card card-flush mb-6">
                     <div class="card-header border-0 pt-5">
                         <h3 class="card-title align-items-start flex-column">
@@ -286,14 +304,14 @@
                         </table>
                     </div>
                 </div>
-
+ -->
                 <!-- 3.상담유형 상담현황 -->
                 <div class="row g-5 g-xl-8">
                     <div class="col-xl-5">
                         <div class="card card-flush h-xl-100">
                             <div class="card-header border-0 pt-5">
                                 <h3 class="card-title align-items-start flex-column">
-                                    <span class="card-label fw-bold fs-3 mb-1">3.상담유형 상담현황</span>
+                                    <span class="card-label fw-bold fs-3 mb-1">2.상담유형 상담현황</span>
                                 </h3>
                             </div>
                             <div class="card-body pt-0">
@@ -301,7 +319,6 @@
                                     <thead>
                                         <tr class="fw-semibold fs-6 text-gray-800 text-center border-bottom border-gray-200">
                                             <th>상담유형</th>
-                                            <th>상담경로</th>
                                             <th>상담수</th>
                                             <th>비율</th>
                                         </tr>
@@ -309,18 +326,15 @@
                                     <tbody class="text-center">
                                         <tr>
                                             <td rowspan="2">직원</td>
-                                            <td>기타</td>
                                             <td>0</td>
                                             <td>0%</td>
                                         </tr>
                                         <tr>
                                             <td>적극권유/추천</td>
-                                            <td>0</td>
                                             <td>0%</td>
                                         </tr>
                                         <tr>
                                             <td rowspan="3">상품</td>
-                                            <td>기타</td>
                                             <td>1</td>
                                             <td>3.2%</td>
                                         </tr>
@@ -336,12 +350,10 @@
                                         </tr>
                                         <tr>
                                             <td>결제</td>
-                                            <td>기타</td>
                                             <td>0</td>
                                             <td>0%</td>
                                         </tr>
                                         <tr>
-                                            <td>기타</td>
                                             <td>기타</td>
                                             <td>0</td>
                                             <td>0%</td>
@@ -364,7 +376,8 @@
                 <div class="card card-flush mt-6">
                     <div class="card-header border-0 pt-5">
                         <h3 class="card-title align-items-start flex-column">
-                            <span class="card-label fw-bold fs-3 mb-1">4.주간 현황 비교</span>
+                            <span class="card-label fw-bold fs-3 mb-1">3.주간 현황 비교 (금주 vs 전주)</span>
+                            <span class="text-muted mt-1 fw-semibold fs-7">전주 대비 이번주 통계 비교</span>
                         </h3>
                     </div>
                     <div class="card-body">
@@ -379,170 +392,492 @@
 
     <!--begin::Javascript-->
     <script>
+        // 평일 기준으로 이전 5 영업일(주말 제외)의 시작일과 종료일을 계산하는 함수
+        function getLastFiveBusinessDays() {
+            const today = new Date();
+            let endDate = new Date(today);
+            
+            // 오늘이 주말인 경우 금요일로 조정
+            const dayOfWeek = today.getDay(); // 0: 일요일, 6: 토요일
+            if (dayOfWeek === 0) { // 일요일인 경우
+                endDate = new Date(today);
+                endDate.setDate(today.getDate() - 2); // 금요일로 설정
+            } else if (dayOfWeek === 6) { // 토요일인 경우
+                endDate = new Date(today);
+                endDate.setDate(today.getDate() - 1); // 금요일로 설정
+            }
+            
+            // 시작일 계산 (평일 5일 전으로, 주말 제외)
+            let startDate = new Date(endDate);
+            let businessDays = 0;
+            while (businessDays < 4) { // 시작일 포함 5일이므로 4일 전으로 설정
+                startDate.setDate(startDate.getDate() - 1);
+                const dayOfWeek = startDate.getDay();
+                if (dayOfWeek !== 0 && dayOfWeek !== 6) { // 주말이 아닌 경우
+                    businessDays++;
+                }
+            }
+            
+            return [startDate, endDate];
+        }
+        
         // 날짜 범위 선택 초기화
-        $("#weekly_datepicker").flatpickr({
+        const defaultDateRange = getLastFiveBusinessDays();
+        var datepicker = $("#weekly_datepicker").flatpickr({
             mode: "range",
             dateFormat: "Y-m-d",
-            defaultDate: [new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() - new Date().getDay() + 1), new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() - new Date().getDay() + 7)],
-            locale: "ko"
+            defaultDate: defaultDateRange,
+            locale: "ko",
+            onChange: function(selectedDates, dateStr, instance) {
+                if (selectedDates.length === 2) {
+                    // 날짜 선택 시 바로 조회 함수 호출
+                    fetchWeeklyOperationData(selectedDates[0], selectedDates[1]);
+                }
+            }
+        });
+
+        // 페이지 로드 시 기본 날짜로 데이터 조회
+        $(document).ready(function() {
+            const initialDates = datepicker.selectedDates;
+            if (initialDates.length === 2) {
+                fetchWeeklyOperationData(initialDates[0], initialDates[1]);
+            }
         });
 
         // 검색 버튼 이벤트
         document.getElementById('searchBtn').addEventListener('click', function() {
-            console.log('검색 버튼 클릭됨: ' + document.getElementById('weekly_datepicker').value);
-            // 검색 로직은 백엔드 구현 후 추가 예정
+            const selectedDates = datepicker.selectedDates;
+            if (selectedDates.length === 2) {
+                fetchWeeklyOperationData(selectedDates[0], selectedDates[1]);
+            }
         });
 
-        // 주간 운영 추이 차트
-        var weeklyTrendElement = document.getElementById('kt_weekly_trend_chart');
-        var weeklyTrendOptions = {
-            series: [{
-                name: '통화건수',
-                type: 'column',
-                data: [23, 21, 18, 10, 6]
-            }, {
-                name: '취결율',
-                type: 'line',
-                data: [94.1, 91.7, 61.5, 71.4, 100]
-            }],
-            chart: {
-                height: 350,
-                type: 'line',
-                stacked: false
-            },
-            dataLabels: {
-                enabled: false
-            },
-            stroke: {
-                width: [0, 3]
-            },
-            title: {
-                text: '주간 통화건수 및 취결율',
-                align: 'left'
-            },
-            xaxis: {
-                categories: ['2024-02-02(금)', '2024-02-05(월)', '2024-02-06(화)', '2024-02-07(수)', '2024-02-08(목)'],
-            },
-            yaxis: [{
-                title: {
-                    text: '통화건수',
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function fetchWeeklyOperationData(startDate, endDate) {
+            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+            
+            // Date 객체를 YYYY-MM-DD 형식의 문자열로 변환
+            const formattedStartDate = startDate instanceof Date ? formatDate(startDate) : startDate;
+            const formattedEndDate = endDate instanceof Date ? formatDate(endDate) : endDate;
+            
+            $.ajax({
+                url: '/stat/weekly/search',
+                type: 'POST',
+                data: {
+                    startDate: formattedStartDate,
+                    endDate: formattedEndDate
                 },
-            }, {
-                opposite: true,
-                title: {
-                    text: '취결율(%)'
-                }
-            }],
-            tooltip: {
-                y: {
-                    formatter: function (val, opts) {
-                        if (opts.seriesIndex === 0) {
-                            return val + " 건";
-                        } else if (opts.seriesIndex === 1) {
-                            return val + "%";
-                        }
-                        return val;
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader(csrfHeader, csrfToken);
+                },
+                success: function(response) {
+                    console.log('주간 데이터 수신 성공:', response);
+                    if (response) {
+                        // 1. 주간 통계 현황 테이블 업데이트
+                        updateSummaryTable(response.summaryStatsList);
+                        // 2. 주간 운영 추이 차트 업데이트
+                        updateWeeklyTrendChart(response.summaryStatsList);
+                        // 3. 상담유형 현황 테이블 및 차트 업데이트
+                        updateCounselingTypeTableAndChart(response.counselingTypeStats);
+                        // 4. 주간 현황 비교 차트 업데이트
+                        updateWeeklyComparisonChart(response.yearlyComparison);
+                    } else {
+                        console.error('수신된 데이터가 비어있습니다.');
+                        // 테이블 및 차트 초기화 또는 에러 메시지 표시 로직 추가
                     }
+                },
+                error: function(xhr, status, error) {
+                    console.error('주간 데이터 조회 실패:', error);
+                    alert('데이터 조회 중 오류가 발생했습니다.');
                 }
-            },
-            fill: {
-                opacity: [0.85, 1],
-                colors: ['#009ef7', '#ff6384']
-            },
-            legend: {
-                position: 'top',
-                horizontalAlign: 'right',
-                offsetY: -25
-            }
-        };
-        var weeklyTrendChart = new ApexCharts(weeklyTrendElement, weeklyTrendOptions);
-        weeklyTrendChart.render();
+            });
+        }
 
-        // 파이 차트 (상담유형)
-        var counselingTypesElement = document.getElementById('kt_weekly_counseling_types');
-        var counselingTypesOptions = {
-            series: [44.2, 36.8, 10.1, 5.9, 3.0],
-            chart: {
-                type: 'pie',
-                height: 400
-            },
-            labels: ['상품', '직원', '결제', '운영', '기타'],
-            colors: ['#fe5151', '#5ead60', '#7250e7', '#efc22e', '#487eb3'],
-            legend: {
-                position: 'right',
-                offsetY: 50
-            },
-            responsive: [{
-                breakpoint: 480,
-                options: {
-                    chart: {
-                        width: 200
+        // 1. 주간 통계 현황 테이블 업데이트 함수 (tbody 내용 교체)
+        function updateSummaryTable(summaryStatsList) {
+            const tbody = $('#kt_app_content_container .card:eq(0) tbody'); // 첫번째 카드의 tbody
+            tbody.empty(); // 기존 내용 삭제
+
+            console.log('주간 통계 현황 데이터:', summaryStatsList);
+
+            if (summaryStatsList && summaryStatsList.length > 0) { // 데이터가 배열 형태라고 가정
+                summaryStatsList.forEach(stat => {
+                    // 필드 매핑:
+                    // statDate: 일자
+                    // totalCalls: 총콜
+                    // uniqueInboundCalls: 중복제거호
+                    // answeredCalls: 응대호
+                    // abandonedCalls: 포기호
+                    // busyCalls: 부재호(BUSY)
+                    // completedCounselingCalls: 총상담완료호
+                    // inboundCalls: 수신호
+                    // outboundCalls: 발신호
+                    // answerRate: 응대율
+                    // completionRate: 완료율
+                    // inboundRate: 수신비율
+                    // outboundRate: 발신비율
+                    const row = `<tr>
+                                    <td>${stat.statDate || 'N/A'}</td> 
+                                    <td>${stat.totalCalls || 0}</td>
+                                    <td>${stat.uniqueInboundCalls || 0}</td>
+                                    <td>${stat.answeredCalls || 0}</td>
+                                    <td>${stat.abandonedCalls || 0}</td>
+                                    <td>${stat.busyCalls || 0}</td>
+                                    <td>${stat.completedCounselingCalls || 0}</td>
+                                    <td>${stat.inboundCalls || 0}</td>
+                                    <td>${stat.outboundCalls || 0}</td>
+                                    <td>${(stat.answerRate !== undefined ? stat.answerRate.toFixed(1) : '0.0')}%</td>
+                                    <td>${(stat.completionRate !== undefined ? stat.completionRate.toFixed(1) : '0.0')}%</td>
+                                    <td>${(stat.inboundRate !== undefined ? stat.inboundRate.toFixed(1) : '0.0')}%</td>
+                                    <td>${(stat.outboundRate !== undefined ? stat.outboundRate.toFixed(1) : '0.0')}%</td>
+                               </tr>`;
+                    tbody.append(row);
+                });
+            } else if (summaryStatsList) { // 단일 객체 데이터인 경우 (예: 합계)
+                const row = `<tr>
+                                    <td>전체기간</td> 
+                                    <td>${summaryStatsList.totalCalls || 0}</td>
+                                    <td>${summaryStatsList.uniqueInboundCalls || 0}</td>
+                                    <td>${summaryStatsList.answeredCalls || 0}</td>
+                                    <td>${summaryStatsList.abandonedCalls || 0}</td>
+                                    <td>${summaryStatsList.busyCalls || 0}</td>
+                                    <td>${summaryStatsList.completedCounselingCalls || 0}</td>
+                                    <td>${summaryStatsList.inboundCalls || 0}</td>
+                                    <td>${summaryStatsList.outboundCalls || 0}</td>
+                                    <td>${(summaryStatsList.answerRate !== undefined ? summaryStatsList.answerRate.toFixed(1) : '0.0')}%</td>
+                                    <td>${(summaryStatsList.completionRate !== undefined ? summaryStatsList.completionRate.toFixed(1) : '0.0')}%</td>
+                                    <td>${(summaryStatsList.inboundRate !== undefined ? summaryStatsList.inboundRate.toFixed(1) : '0.0')}%</td>
+                                    <td>${(summaryStatsList.outboundRate !== undefined ? summaryStatsList.outboundRate.toFixed(1) : '0.0')}%</td>
+                           </tr>`;
+                tbody.append(row);
+            } else {
+                tbody.append('<tr><td colspan="13">데이터가 없습니다.</td></tr>');
+            }
+        }
+
+        // 2. 주간 운영 추이 차트 업데이트 함수
+        var weeklyTrendChartInstance = null; // 차트 인스턴스 저장용
+        function updateWeeklyTrendChart(summaryStatsList) {
+            var weeklyTrendElement = document.getElementById('kt_weekly_trend_chart');
+            if (!weeklyTrendElement) return;
+
+            console.log('주간 운영 추이 차트 데이터:', summaryStatsList);
+
+            // summaryStatsList를 기반으로 차트 시리즈와 x축을 동적으로 생성
+            let categories = [];
+            let totalCallsData = [];
+            let uniqueCallsData = [];
+            let completionRateData = [];
+
+            if (summaryStatsList && summaryStatsList.length > 0) {
+                // 날짜순으로 정렬 (필요한 경우)
+                summaryStatsList.sort((a, b) => {
+                    return new Date(a.statDate) - new Date(b.statDate);
+                });
+                
+                summaryStatsList.forEach(data => {
+                    categories.push(data.statDate);
+                    totalCallsData.push(data.totalCalls || 0);
+                    uniqueCallsData.push(data.uniqueInboundCalls || 0);
+                    completionRateData.push(data.completionRate || 0.0);
+                });
+            }
+
+            var weeklyTrendOptions = {
+                series: [{
+                    name: '총콜',
+                    type: 'column',
+                    data: totalCallsData
+                }, {
+                    name: '중복제거호',
+                    type: 'column',
+                    data: uniqueCallsData
+                }, {
+                    name: '완료율',
+                    type: 'line',
+                    data: completionRateData
+                }],
+                chart: {
+                    height: 350,
+                    type: 'line',
+                    stacked: false
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    width: [0, 0, 3]
+                },
+                title: {
+                    text: '주간 통화건수 및 완료율',
+                    align: 'left'
+                },
+                xaxis: {
+                    categories: categories
+                },
+                yaxis: [{
+                    title: {
+                        text: '통화건수(건)',
                     },
-                    legend: {
-                        position: 'bottom'
+                    labels: { formatter: function (val) { return val.toFixed(0); } }
+                }, {
+                    opposite: true,
+                    title: {
+                        text: '완료율(%)'
+                    },
+                    labels: { formatter: function (val) { return val.toFixed(1) + '%'; } }
+                }],
+                tooltip: {
+                    y: {
+                        formatter: function (val, opts) {
+                            if (opts.seriesIndex === 0 || opts.seriesIndex === 1) {
+                                return val + " 건";
+                            } else if (opts.seriesIndex === 2) {
+                                return val.toFixed(1) + "%";
+                            }
+                            return val;
+                        }
                     }
+                },
+                fill: {
+                    opacity: [0.85, 0.85, 1],
+                    colors: ['#009ef7', '#50cd89', '#ff6384']
+                },
+                legend: {
+                    position: 'top',
+                    horizontalAlign: 'right',
+                    offsetY: -25
                 }
-            }]
-        };
-        var counselingTypesChart = new ApexCharts(counselingTypesElement, counselingTypesOptions);
-        counselingTypesChart.render();
+            };
 
-        // 주간 현황 비교 차트
-        var weeklyComparisonElement = document.getElementById('kt_weekly_comparison_chart');
-        var weeklyComparisonOptions = {
-            series: [{
-                name: '통화건수',
-                data: [78, 52, 40, 58, 92]
-            }, {
-                name: '취결건수',
-                data: [42, 33, 30, 41, 69]
-            }],
-            chart: {
-                type: 'bar',
-                height: 350,
-                stacked: false
-            },
-            plotOptions: {
-                bar: {
-                    horizontal: false,
-                    columnWidth: '55%',
-                    endingShape: 'rounded'
-                }
-            },
-            dataLabels: {
-                enabled: false
-            },
-            stroke: {
-                show: true,
-                width: 2,
-                colors: ['transparent']
-            },
-            xaxis: {
-                categories: ['월요일', '화요일', '수요일', '목요일', '금요일'],
-            },
-            yaxis: {
-                title: {
-                    text: '건수'
-                }
-            },
-            fill: {
-                opacity: 1,
-                colors: ['#009ef7', '#ff6384']
-            },
-            tooltip: {
-                y: {
-                    formatter: function (val) {
-                        return val + " 건";
-                    }
-                }
-            },
-            legend: {
-                position: 'top',
-                horizontalAlign: 'right'
+            if (weeklyTrendChartInstance) {
+                weeklyTrendChartInstance.updateOptions(weeklyTrendOptions);
+            } else {
+                weeklyTrendChartInstance = new ApexCharts(weeklyTrendElement, weeklyTrendOptions);
+                weeklyTrendChartInstance.render();
             }
-        };
-        var weeklyComparisonChart = new ApexCharts(weeklyComparisonElement, weeklyComparisonOptions);
-        weeklyComparisonChart.render();
+        }
+
+        // 3. 상담유형 현황 테이블 및 차트 업데이트 함수
+        var counselingTypesChartInstance = null;
+        function updateCounselingTypeTableAndChart(counselingTypeStats) {
+            const tableBody = $('#kt_app_content_container .row.g-5.g-xl-8 .card:eq(0) tbody'); // 상담유형 테이블의 tbody
+            tableBody.empty();
+
+            let chartSeries = [];
+            let chartLabels = [];
+
+            if (counselingTypeStats && counselingTypeStats.length > 0) {
+                let groupedStats = {};
+                // 데이터 구조가 { counselingType: "유형명", count: 10, percentage: 20.0 } 형태의 배열로 가정
+                // 만약 유형별로 여러 항목(예: 상담경로)이 있다면, 서버에서 주 유형별로 집계해서 내려주거나 클라이언트에서 추가 처리 필요
+                // 현재는 counselingType이 주 유형이라고 가정하고 진행
+                counselingTypeStats.forEach(stat => {
+                    const row = `<tr>
+                                    <td>${stat.counselingTypeName || 'N/A'}</td>
+                                    <td>${stat.count || 0}</td>
+                                    <td>${(stat.percentage !== undefined ? stat.percentage.toFixed(1) : '0.0')}%</td>
+                                 </tr>`;
+                    tableBody.append(row);
+                    chartLabels.push(stat.counselingTypeName || 'N/A');
+                    chartSeries.push(stat.count || 0); // 파이차트 series는 값의 배열
+                });
+            } else {
+                tableBody.append('<tr><td colspan="4">데이터가 없습니다.</td></tr>');
+            }
+
+            var counselingTypesElement = document.getElementById('kt_weekly_counseling_types');
+            if (!counselingTypesElement) return;
+
+            var counselingTypesOptions = {
+                series: chartSeries, // 예시: [44, 55, 13, 43, 22]
+                chart: {
+                    type: 'pie',
+                    height: 400
+                },
+                labels: chartLabels, // 예시: ['상품', '직원', '결제', '운영', '기타']
+                colors: ['#fe5151', '#5ead60', '#7250e7', '#efc22e', '#487eb3', '#009ef7', '#78c091', '#9d69dd', '#ff9900', '#50cd89'],
+                legend: {
+                    position: 'right',
+                    offsetY: 50
+                },
+                responsive: [{
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            width: 200
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }]
+            };
+
+            if (counselingTypesChartInstance) {
+                counselingTypesChartInstance.updateOptions(counselingTypesOptions);
+            } else {
+                counselingTypesChartInstance = new ApexCharts(counselingTypesElement, counselingTypesOptions);
+                counselingTypesChartInstance.render();
+            }
+        }
+
+        // 4. 주간 현황 비교 차트 업데이트 함수
+        var weeklyComparisonChartInstance = null;
+        function updateWeeklyComparisonChart(yearlyComparison) {
+            var weeklyComparisonElement = document.getElementById('kt_weekly_comparison_chart');
+            if (!weeklyComparisonElement) return;
+
+            console.log('주간 현황 비교 데이터:', yearlyComparison);
+            
+            // 데이터 가져오기
+            let currentTotalCalls = yearlyComparison ? (yearlyComparison.totalCallsCurrentYear || 0) : 0;
+            let previousTotalCalls = yearlyComparison ? (yearlyComparison.totalCallsPreviousYear || 0) : 0;
+            let currentCompletedCalls = yearlyComparison ? (yearlyComparison.cmplCslCurrYr || 0) : 0;
+            let previousCompletedCalls = yearlyComparison ? (yearlyComparison.cmplCslPrevYr || 0) : 0;
+            
+            // 증감률 계산
+            let totalCallsRate = yearlyComparison ? (yearlyComparison.totalCallsComparisonRate || 0) : 0;
+            let completedCallsRate = yearlyComparison ? (yearlyComparison.completedCounselingCallsComparisonRate || 0) : 0;
+            
+            // 비교 차트 설정
+            var weeklyComparisonOptions = {
+                series: [{
+                    name: '금주',
+                    data: [currentTotalCalls, currentCompletedCalls]
+                }, {
+                    name: '전주',
+                    data: [previousTotalCalls, previousCompletedCalls]
+                }],
+                chart: {
+                    type: 'bar',
+                    height: 350,
+                    stacked: false,
+                    toolbar: {
+                        show: true
+                    },
+                    title: {
+                        text: '금주와 전주 통계 비교',
+                        align: 'center',
+                        style: {
+                            fontSize: '14px'
+                        }
+                    }
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: false,
+                        columnWidth: '55%',
+                        endingShape: 'rounded',
+                        dataLabels: {
+                            position: 'top'
+                        }
+                    }
+                },
+                dataLabels: {
+                    enabled: true,
+                    formatter: function(val) {
+                        return val;
+                    },
+                    offsetY: -20,
+                    style: {
+                        fontSize: '12px',
+                        colors: ["#304758"]
+                    }
+                },
+                stroke: {
+                    show: true,
+                    width: 2,
+                    colors: ['transparent']
+                },
+                xaxis: {
+                    categories: ['총콜', '완료콜'],
+                    title: {
+                        text: '구분'
+                    }
+                },
+                yaxis: {
+                    title: {
+                        text: '건수'
+                    },
+                    labels: { 
+                        formatter: function (val) { 
+                            return val.toFixed(0); 
+                        } 
+                    }
+                },
+                fill: {
+                    opacity: 1,
+                    colors: ['#009ef7', '#ff6384']
+                },
+                tooltip: {
+                    y: {
+                        formatter: function (val) {
+                            return val + " 건";
+                        }
+                    }
+                },
+                legend: {
+                    position: 'top',
+                    horizontalAlign: 'right'
+                },
+                // 차트 하단에 증감률 표시
+                annotations: {
+                    texts: [
+                        {
+                            x: '총콜',
+                            y: 0,
+                            yAxisIndex: 0,
+                            borderColor: '#775DD0',
+                            label: {
+                                borderColor: '#775DD0',
+                                style: {
+                                    color: '#fff',
+                                    background: '#775DD0',
+                                },
+                                text: '증감률: ' + totalCallsRate.toFixed(1) + '%',
+                                position: 'bottom',
+                                offsetY: 10
+                            }
+                        },
+                        {
+                            x: '완료콜',
+                            y: 0,
+                            yAxisIndex: 0,
+                            borderColor: '#775DD0',
+                            label: {
+                                borderColor: '#775DD0',
+                                style: {
+                                    color: '#fff',
+                                    background: '#775DD0',
+                                },
+                                text: '증감률: ' + completedCallsRate.toFixed(1) + '%',
+                                position: 'bottom',
+                                offsetY: 10
+                            }
+                        }
+                    ]
+                }
+            };
+
+            // 차트 인스턴스 생성 또는 업데이트
+            if (weeklyComparisonChartInstance) {
+                weeklyComparisonChartInstance.updateOptions(weeklyComparisonOptions);
+            } else {
+                weeklyComparisonChartInstance = new ApexCharts(weeklyComparisonElement, weeklyComparisonOptions);
+                weeklyComparisonChartInstance.render();
+            }
+        }
+
+        // 기존 차트 초기화 코드는 삭제 (fetchWeeklyOperationData 성공 시 동적으로 생성 및 업데이트)
+
     </script>
     <!--end::Javascript-->
 </div>

@@ -148,14 +148,14 @@
                                                     <tr th:if="${transaction != null}" th:each="transaction : ${transactions}">
                                                         <!-- 디버깅용 코드 (console 로그 확인) -->
                                                         <script th:inline="javascript">
-                                                            console.log('Rendering transaction row:', /*[[${transaction}]]*/);
+                                                           // console.log('Rendering transaction row:', /*[[${transaction}]]*/);
                                                             // 필드별 디버깅 추가
-                                                            console.log('Fields check -', {
-                                                                date: /*[[${transaction != null ? transaction.CHARGE_DATE : null}]]*/, 
-                                                                type: /*[[${transaction != null ? transaction.CHARGE_GUBN : null}]]*/, 
-                                                                amount: /*[[${transaction != null ? transaction.CHARGE_POINT : null}]]*/, 
-                                                                desc: /*[[${transaction != null ? transaction.POINT_CHARGE : null}]]*/
-                                                            });
+                                                           //console.log('Fields check -', {
+                                                           //     date: /*[[${transaction != null ? transaction.CHARGE_DATE : null}]]*/,
+                                                           //     type: /*[[${transaction != null ? transaction.CHARGE_GUBN : null}]]*/,
+                                                           //     amount: /*[[${transaction != null ? transaction.CHARGE_POINT : null}]]*/,
+                                                           //     desc: /*[[${transaction != null ? transaction.POINT_CHARGE : null}]]*/
+                                                           // });
                                                         </script>
                                                         
                                                         <td style="text-align: center;" th:text="${transaction != null && transaction.CHARGE_DATE != null ? transaction.CHARGE_DATE : '-'}"></td>

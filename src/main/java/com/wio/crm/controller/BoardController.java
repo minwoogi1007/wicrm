@@ -9,6 +9,7 @@ import com.wio.crm.model.Temp01;
 import com.wio.crm.service.BoardService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.env.Environment;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,8 +48,15 @@ public class BoardController {
     @Autowired
     private Environment env;
     @GetMapping("/error")
-    public String error() {
+    public String error(Model model, HttpServletRequest request) {
         logger.info("에러 페이지 요청");
+        
+        // CSRF 토큰을 모델에 추가
+        CsrfToken csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
+        if (csrfToken != null) {
+            model.addAttribute("_csrf", csrfToken);
+        }
+        
         return "error"; // Thymeleaf 템플릿 이름
     }
 

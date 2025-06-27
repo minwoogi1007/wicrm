@@ -2,6 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.wio.crm.mapper.StaticsMapper">
 
+    <resultMap id="yearlyComparisonResultMap" type="com.wio.crm.dto.YearlyComparisonDataDto">
+        <result property="totalCallsCurrentYear" column="TOTALCALLSCURRENTYEAR"/>
+        <result property="totalCallsPreviousYear" column="TOTALCALLSPREVIOUSYEAR"/>
+        <result property="cmplCslCurrYr" column="CMPL_CSL_CURR_YR"/>
+        <result property="cmplCslPrevYr" column="CMPL_CSL_PREV_YR"/>
+    </resultMap>
+
     <select id="getStatisticsCons"  resultType="com.wio.crm.model.Statics">
         SELECT IN_DATE INDATE,CS_TYPE CSTYPE,CS_NAME CSNAME,to_char(SUM(CS_COUNT),'999,999,999') CSCOUNTST , SUM(CS_COUNT) CSCOUNT
         FROM (
@@ -205,4 +212,438 @@
 
 
     </select>
+
+    <!-- 일일 운영 현황 통계 쿼리 -->
+    <select id="getDailySummaryStats" resultType="com.wio.crm.dto.DailySummaryStatsDto">
+        SELECT
+            #{date} AS statDate,
+            COALESCE(cl.total_calls, 0) AS totalCalls,
+            COALESCE(cl.answered_calls, 0) AS answeredCalls,
+            COALESCE(cl.abandoned_calls, 0) AS abandonedCalls,
+            COALESCE(cl.unique_inbound_calls, 0) AS uniqueInboundCalls,
+            COALESCE(cl.busy_calls, 0) AS busyCalls,
+            COALESCE(tc.completed_counseling_calls, 0) AS completedCounselingCalls,
+            COALESCE(cl.inbound_calls, 0) AS inboundCalls,
+            COALESCE(cl.outbound_calls, 0) AS outboundCalls
+        FROM (
+            SELECT
+                COUNT(*) AS total_calls,
+                SUM(CASE WHEN RESULT = 'ANSWER' THEN 1 ELSE 0 END) AS answered_calls,
+                SUM(CASE WHEN RESULT = 'CANCEL' THEN 1 ELSE 0 END) AS abandoned_calls,
+                COUNT(DISTINCT CLID) AS unique_inbound_calls,
+                SUM(CASE WHEN RESULT = 'BUSY' AND CONTEXT = 'inbound' THEN 1 ELSE 0 END) AS busy_calls,
+                SUM(CASE WHEN CONTEXT = 'inbound' THEN 1 ELSE 0 END) AS inbound_calls,
+                SUM(CASE WHEN CONTEXT = 'outbound' THEN 1 ELSE 0 END) AS outbound_calls
+            FROM CALL_LOG_D
+            WHERE SUBSTR(CALLDATE, 1, 10) = TO_CHAR(TO_DATE(#{date}, 'YYYYMMDD'), 'YYYY-MM-DD')
+              AND CUST_CODE = #{custCode}
+        ) cl
+        LEFT JOIN (
+            SELECT
+                COUNT(*) AS completed_counseling_calls
+            FROM TBND01
+            WHERE TRUNC(IN_DATE) = TO_DATE(#{date}, 'YYYYMMDD')
+              AND CUST_CODE = #{custCode}
+              AND PRC_GUBN = '2'
+        ) tc ON 1=1
+    </select>
+
+    <select id="getDailyCallTimeStats" resultType="com.wio.crm.dto.DailyCallTimeStatsDto">
+        SELECT
+            #{date} AS statDate,
+            0 AS totalCallDurationSeconds,
+            0 AS averageCallDurationSeconds
+        FROM DUAL
+    </select>
+
+    <select id="getDailyCounselingTypeStats" resultType="com.wio.crm.dto.DailyCounselingTypeStatsDto">
+        SELECT
+            T.CS_TYPE AS counselingType,
+            (SELECT adm_sname FROM tsys01 WHERE adm_code = T.CS_TYPE AND adm_gubn = '4002') AS counselingTypeName,
+            COUNT(*) AS count
+        FROM TBND01 T
+        WHERE TRUNC(IN_DATE) = TO_DATE(#{date}, 'YYYYMMDD')
+          AND CUST_CODE = #{custCode}
+          AND PRC_GUBN = '2'
+        GROUP BY T.CS_TYPE
+        ORDER BY count DESC
+    </select>
+
+    <!-- 연도 대비 총콜 수 비교 (일일, 주간, 월간 공용) -->
+    <select id="getYearlyTotalCallsComparison" resultMap="yearlyComparisonResultMap">
+        SELECT
+            (SELECT COUNT(*) FROM CALL_LOG_D
+             WHERE SUBSTR(CALLDATE, 1, 10) = TO_CHAR(TO_DATE(#{currentPeriodStartDate}, 'YYYYMMDD'), 'YYYY-MM-DD')
+               AND CUST_CODE = #{custCode}) AS TOTALCALLSCURRENTYEAR,
+            (SELECT COUNT(*) FROM CALL_LOG_D
+             WHERE SUBSTR(CALLDATE, 1, 10) = TO_CHAR(TO_DATE(#{previousPeriodStartDate}, 'YYYYMMDD'), 'YYYY-MM-DD')
+               AND CUST_CODE = #{custCode}) AS TOTALCALLSPREVIOUSYEAR
+        FROM DUAL
+    </select>
+
+    <!-- 연도 대비 상담 완료 수 비교 (일일, 주간, 월간 공용) -->
+    <select id="getYearlyCompletedCounselingComparison" resultMap="yearlyComparisonResultMap">
+        SELECT
+            SUM(CASE
+                    WHEN TRUNC(IN_DATE) = TO_DATE(#{currentPeriodStartDate}, 'YYYYMMDD')
+                        THEN 1 END)  AS CMPL_CSL_CURR_YR,
+            SUM(CASE
+                    WHEN TRUNC(IN_DATE) = TO_DATE(#{previousPeriodStartDate}, 'YYYYMMDD')
+                        THEN 1 END)  AS CMPL_CSL_PREV_YR
+        FROM TBND01
+        WHERE CUST_CODE = #{custCode}
+          AND PRC_GUBN   = '2'
+          AND TRUNC(IN_DATE) IN ( TO_DATE(#{currentPeriodStartDate}, 'YYYYMMDD')
+            , TO_DATE(#{previousPeriodStartDate}, 'YYYYMMDD') )
+    </select>
+
+    <!-- 주간 운영 현황 통계 쿼리 -->
+    <select id="getWeeklySummaryStats" resultType="com.wio.crm.dto.WeeklySummaryStatsDto">
+        WITH DATE_RANGE AS (
+            SELECT STAT_DATE
+            FROM (
+                SELECT TO_DATE(#{startDate}, 'YYYYMMDD') + LEVEL - 1 AS STAT_DATE,
+                       TO_CHAR(TO_DATE(#{startDate}, 'YYYYMMDD') + LEVEL - 1, 'D') AS DAY_OF_WEEK
+                FROM DUAL
+                CONNECT BY LEVEL <![CDATA[<= (TO_DATE(#{endDate}, 'YYYYMMDD') - TO_DATE(#{startDate}, 'YYYYMMDD') + 1)]]>
+            )
+            WHERE DAY_OF_WEEK NOT IN ('1', '7') -- 주말 제외 (1: 일요일, 7: 토요일)
+        )
+        SELECT
+            TO_CHAR(DR.STAT_DATE, 'YYYY-MM-DD') AS statDate,
+            COALESCE(CL.total_calls, 0) AS totalCalls,
+            COALESCE(CL.answered_calls, 0) AS answeredCalls,
+            COALESCE(CL.abandoned_calls, 0) AS abandonedCalls,
+            COALESCE(CL.unique_inbound_calls, 0) AS uniqueInboundCalls,
+            COALESCE(CL.busy_calls, 0) AS busyCalls,
+            COALESCE(TC.completed_counseling_calls, 0) AS completedCounselingCalls,
+            COALESCE(CL.inbound_calls, 0) AS inboundCalls,
+            COALESCE(CL.outbound_calls, 0) AS outboundCalls
+        FROM DATE_RANGE DR
+        LEFT JOIN (
+            SELECT
+                TO_DATE(SUBSTR(CALLDATE, 1, 10), 'YYYY-MM-DD') AS CALL_DATE,
+                COUNT(*) AS total_calls,
+                SUM(CASE WHEN RESULT = 'ANSWER' THEN 1 ELSE 0 END) AS answered_calls,
+                SUM(CASE WHEN RESULT = 'CANCEL' THEN 1 ELSE 0 END) AS abandoned_calls,
+                COUNT(DISTINCT CLID) AS unique_inbound_calls,
+                SUM(CASE WHEN RESULT = 'BUSY' AND CONTEXT = 'inbound' THEN 1 ELSE 0 END) AS busy_calls,
+                SUM(CASE WHEN CONTEXT = 'inbound' THEN 1 ELSE 0 END) AS inbound_calls,
+                SUM(CASE WHEN CONTEXT = 'outbound' THEN 1 ELSE 0 END) AS outbound_calls
+            FROM CALL_LOG_D
+            WHERE SUBSTR(CALLDATE, 1, 10) BETWEEN TO_CHAR(TO_DATE(#{startDate}, 'YYYYMMDD'), 'YYYY-MM-DD')
+                                          AND TO_CHAR(TO_DATE(#{endDate}, 'YYYYMMDD'), 'YYYY-MM-DD')
+              AND CUST_CODE = #{custCode}
+            GROUP BY TO_DATE(SUBSTR(CALLDATE, 1, 10), 'YYYY-MM-DD')
+        ) CL ON DR.STAT_DATE = CL.CALL_DATE
+        LEFT JOIN (
+            SELECT
+                TRUNC(IN_DATE) AS COUNSEL_DATE,
+                COUNT(*) AS completed_counseling_calls
+            FROM TBND01
+            WHERE TRUNC(IN_DATE) BETWEEN TO_DATE(#{startDate}, 'YYYYMMDD')
+                                    AND TO_DATE(#{endDate}, 'YYYYMMDD')
+              AND CUST_CODE = #{custCode}
+              AND PRC_GUBN = '2'
+            GROUP BY TRUNC(IN_DATE)
+        ) TC ON DR.STAT_DATE = TC.COUNSEL_DATE
+        ORDER BY DR.STAT_DATE
+    </select>
+
+    <select id="getWeeklyCallTimeStats" resultType="com.wio.crm.dto.WeeklyCallTimeStatsDto">
+        SELECT
+            #{startDate} AS statDate,
+            0 AS totalCallDurationSeconds,
+            0 AS averageCallDurationSeconds
+        FROM DUAL
+    </select>
+
+    <select id="getWeeklyCounselingTypeStats" resultType="com.wio.crm.dto.WeeklyCounselingTypeStatsDto">
+        SELECT
+            T.CS_TYPE AS counselingType,
+            (SELECT adm_sname FROM tsys01 WHERE adm_code = T.CS_TYPE AND adm_gubn = '4002') AS counselingTypeName,
+            COUNT(*) AS count
+        FROM TBND01 T
+        WHERE TRUNC(IN_DATE) BETWEEN TO_DATE(#{startDate}, 'YYYYMMDD')
+                                AND TO_DATE(#{endDate}, 'YYYYMMDD')
+          AND CUST_CODE = #{custCode}
+          AND PRC_GUBN = '2'
+        GROUP BY T.CS_TYPE
+        ORDER BY count DESC
+    </select>
+
+    <!-- 월간 운영 현황 통계 쿼리 -->
+    <select id="getMonthlySummaryStats" resultType="com.wio.crm.dto.MonthlySummaryStatsDto">
+        SELECT
+            #{startDate} AS statDate,
+            COALESCE(cl.total_calls, 0) AS totalCalls,
+            COALESCE(cl.answered_calls, 0) AS answeredCalls,
+            COALESCE(cl.abandoned_calls, 0) AS abandonedCalls,
+            COALESCE(cl.unique_inbound_calls, 0) AS uniqueInboundCalls,
+            COALESCE(cl.busy_calls, 0) AS busyCalls,
+            COALESCE(tc.completed_counseling_calls, 0) AS completedCounselingCalls,
+            COALESCE(cl.inbound_calls, 0) AS inboundCalls,
+            COALESCE(cl.outbound_calls, 0) AS outboundCalls
+        FROM DUAL
+        LEFT JOIN (
+            SELECT
+                COUNT(*) AS total_calls,
+                SUM(CASE WHEN RESULT = 'ANSWER' THEN 1 ELSE 0 END) AS answered_calls,
+                SUM(CASE WHEN RESULT = 'CANCEL' THEN 1 ELSE 0 END) AS abandoned_calls,
+                COUNT(DISTINCT CLID) AS unique_inbound_calls,
+                SUM(CASE WHEN RESULT = 'BUSY' AND CONTEXT = 'inbound' THEN 1 ELSE 0 END) AS busy_calls,
+                SUM(CASE WHEN CONTEXT = 'inbound' THEN 1 ELSE 0 END) AS inbound_calls,
+                SUM(CASE WHEN CONTEXT = 'outbound' THEN 1 ELSE 0 END) AS outbound_calls
+            FROM CALL_LOG_D
+            WHERE SUBSTR(CALLDATE, 1, 10) BETWEEN TO_CHAR(TO_DATE(#{startDate}, 'YYYYMMDD'), 'YYYY-MM-DD')
+                                          AND TO_CHAR(TO_DATE(#{endDate}, 'YYYYMMDD'), 'YYYY-MM-DD')
+              AND CUST_CODE = #{custCode}
+        ) cl ON 1=1
+        LEFT JOIN (
+            SELECT
+                COUNT(*) AS completed_counseling_calls
+            FROM TBND01
+            WHERE TRUNC(IN_DATE) BETWEEN TO_DATE(#{startDate}, 'YYYYMMDD')
+                                    AND TO_DATE(#{endDate}, 'YYYYMMDD')
+              AND CUST_CODE = #{custCode}
+              AND PRC_GUBN = '2'
+        ) tc ON 1=1
+    </select>
+
+    <select id="getMonthlyCallTimeStats" resultType="com.wio.crm.dto.MonthlyCallTimeStatsDto">
+        SELECT
+            #{startDate} AS statDate,
+            0 AS totalCallDurationSeconds,
+            0 AS averageCallDurationSeconds
+        FROM DUAL
+    </select>
+
+    <select id="getMonthlyCounselingTypeStats" resultType="com.wio.crm.dto.MonthlyCounselingTypeStatsDto">
+        SELECT
+            T.CS_TYPE AS counselingType,
+            (SELECT adm_sname FROM tsys01 WHERE adm_code = T.CS_TYPE AND adm_gubn = '4002') AS counselingTypeName,
+            COUNT(*) AS count
+        FROM TBND01 T
+        WHERE TRUNC(IN_DATE) BETWEEN TO_DATE(#{startDate}, 'YYYYMMDD')
+                                AND TO_DATE(#{endDate}, 'YYYYMMDD')
+          AND CUST_CODE = #{custCode}
+          AND PRC_GUBN = '2'
+        GROUP BY T.CS_TYPE
+        ORDER BY count DESC
+    </select>
+
+    <!-- 주간 통계 비교용 쿼리 추가 -->
+    <select id="getWeeklyTotalCallsForComparison" resultType="java.lang.Integer">
+        SELECT
+            COUNT(*)
+        FROM CALL_LOG_D
+        WHERE SUBSTR(CALLDATE, 1, 10) BETWEEN TO_CHAR(TO_DATE(#{startDate}, 'YYYYMMDD'), 'YYYY-MM-DD')
+                                      AND TO_CHAR(TO_DATE(#{endDate}, 'YYYYMMDD'), 'YYYY-MM-DD')
+          AND CUST_CODE = #{custCode}
+    </select>
+
+    <select id="getWeeklyCompletedCallsForComparison" resultType="java.lang.Integer">
+        SELECT
+            COUNT(*)
+        FROM TBND01
+        WHERE TRUNC(IN_DATE) BETWEEN TO_DATE(#{startDate}, 'YYYYMMDD')
+                                AND TO_DATE(#{endDate}, 'YYYYMMDD')
+          AND CUST_CODE = #{custCode}
+          AND PRC_GUBN = '2'
+    </select>
+
+    <!-- 월간 일별 통계 조회 (차트용) -->
+    <select id="getDailyStatsForMonth" resultType="com.wio.crm.dto.DailySummaryStatsDto">
+        WITH DATE_RANGE AS (
+            SELECT TO_DATE(#{startDate}, 'YYYYMMDD') + LEVEL - 1 AS STAT_DATE
+            FROM DUAL
+            CONNECT BY LEVEL <![CDATA[<= (TO_DATE(#{endDate}, 'YYYYMMDD') - TO_DATE(#{startDate}, 'YYYYMMDD') + 1)]]>
+        )
+        SELECT
+            TO_CHAR(DR.STAT_DATE, 'YYYY-MM-DD') AS statDate,
+            COALESCE(CL.total_calls, 0) AS totalCalls,
+            COALESCE(CL.answered_calls, 0) AS answeredCalls,
+            COALESCE(CL.abandoned_calls, 0) AS abandonedCalls,
+            COALESCE(CL.unique_inbound_calls, 0) AS uniqueInboundCalls,
+            COALESCE(CL.busy_calls, 0) AS busyCalls,
+            COALESCE(TC.completed_counseling_calls, 0) AS completedCounselingCalls
+        FROM DATE_RANGE DR
+        LEFT JOIN (
+            SELECT
+                TO_DATE(SUBSTR(CALLDATE, 1, 10), 'YYYY-MM-DD') AS CALL_DATE,
+                COUNT(*) AS total_calls,
+                SUM(CASE WHEN RESULT = 'ANSWER' THEN 1 ELSE 0 END) AS answered_calls,
+                SUM(CASE WHEN RESULT = 'CANCEL' THEN 1 ELSE 0 END) AS abandoned_calls,
+                COUNT(DISTINCT CLID) AS unique_inbound_calls,
+                SUM(CASE WHEN RESULT = 'BUSY' AND CONTEXT = 'inbound' THEN 1 ELSE 0 END) AS busy_calls
+            FROM CALL_LOG_D
+            WHERE SUBSTR(CALLDATE, 1, 10) BETWEEN TO_CHAR(TO_DATE(#{startDate}, 'YYYYMMDD'), 'YYYY-MM-DD')
+                                          AND TO_CHAR(TO_DATE(#{endDate}, 'YYYYMMDD'), 'YYYY-MM-DD')
+              AND CUST_CODE = #{custCode}
+            GROUP BY TO_DATE(SUBSTR(CALLDATE, 1, 10), 'YYYY-MM-DD')
+        ) CL ON DR.STAT_DATE = CL.CALL_DATE
+        LEFT JOIN (
+            SELECT
+                TRUNC(IN_DATE) AS COUNSEL_DATE,
+                COUNT(*) AS completed_counseling_calls
+            FROM TBND01
+            WHERE TRUNC(IN_DATE) BETWEEN TO_DATE(#{startDate}, 'YYYYMMDD')
+                                    AND TO_DATE(#{endDate}, 'YYYYMMDD')
+              AND CUST_CODE = #{custCode}
+              AND PRC_GUBN = '2'
+            GROUP BY TRUNC(IN_DATE)
+        ) TC ON DR.STAT_DATE = TC.COUNSEL_DATE
+        ORDER BY DR.STAT_DATE
+    </select>
+    
+    <!-- 월간 주차별 통계 조회 -->
+    <select id="getWeeklyStatsForMonth" resultType="com.wio.crm.dto.WeeklySummaryStatsDto">
+        WITH WEEK_DATA AS (
+            SELECT 
+                CEIL((TO_NUMBER(TO_CHAR(DR.STAT_DATE, 'DD')) - TO_NUMBER(TO_CHAR(DR.STAT_DATE, 'D')) + 1) / 7) AS WEEK_NUM,
+                DR.STAT_DATE
+            FROM (
+                SELECT TO_DATE(#{startDate}, 'YYYYMMDD') + LEVEL - 1 AS STAT_DATE
+                FROM DUAL
+                CONNECT BY LEVEL <![CDATA[<= (TO_DATE(#{endDate}, 'YYYYMMDD') - TO_DATE(#{startDate}, 'YYYYMMDD') + 1)]]>
+            ) DR
+        ),
+        WEEKLY_AGGREGATION AS (
+            SELECT
+                WD.WEEK_NUM,
+                SUM(COALESCE(CL.total_calls, 0)) AS totalCalls,
+                SUM(COALESCE(CL.answered_calls, 0)) AS answeredCalls,
+                SUM(COALESCE(CL.abandoned_calls, 0)) AS abandonedCalls,
+                SUM(COALESCE(CL.unique_inbound_calls, 0)) AS uniqueInboundCalls,
+                SUM(COALESCE(CL.busy_calls, 0)) AS busyCalls,
+                SUM(COALESCE(TC.completed_counseling_calls, 0)) AS completedCounselingCalls,
+                SUM(COALESCE(CL.inbound_calls, 0)) AS inboundCalls,
+                SUM(COALESCE(CL.outbound_calls, 0)) AS outboundCalls
+            FROM WEEK_DATA WD
+            LEFT JOIN (
+                SELECT
+                    TO_DATE(SUBSTR(CALLDATE, 1, 10), 'YYYY-MM-DD') AS CALL_DATE,
+                    COUNT(*) AS total_calls,
+                    SUM(CASE WHEN RESULT = 'ANSWER' THEN 1 ELSE 0 END) AS answered_calls,
+                    SUM(CASE WHEN RESULT = 'CANCEL' THEN 1 ELSE 0 END) AS abandoned_calls,
+                    COUNT(DISTINCT CLID) AS unique_inbound_calls,
+                    SUM(CASE WHEN RESULT = 'BUSY' AND CONTEXT = 'inbound' THEN 1 ELSE 0 END) AS busy_calls,
+                    SUM(CASE WHEN CONTEXT = 'inbound' THEN 1 ELSE 0 END) AS inbound_calls,
+                    SUM(CASE WHEN CONTEXT = 'outbound' THEN 1 ELSE 0 END) AS outbound_calls
+                FROM CALL_LOG_D
+                WHERE SUBSTR(CALLDATE, 1, 10) BETWEEN TO_CHAR(TO_DATE(#{startDate}, 'YYYYMMDD'), 'YYYY-MM-DD')
+                                              AND TO_CHAR(TO_DATE(#{endDate}, 'YYYYMMDD'), 'YYYY-MM-DD')
+                  AND CUST_CODE = #{custCode}
+                GROUP BY TO_DATE(SUBSTR(CALLDATE, 1, 10), 'YYYY-MM-DD')
+            ) CL ON WD.STAT_DATE = CL.CALL_DATE
+            LEFT JOIN (
+                SELECT
+                    TRUNC(IN_DATE) AS COUNSEL_DATE,
+                    COUNT(*) AS completed_counseling_calls
+                FROM TBND01
+                WHERE TRUNC(IN_DATE) BETWEEN TO_DATE(#{startDate}, 'YYYYMMDD')
+                                        AND TO_DATE(#{endDate}, 'YYYYMMDD')
+                  AND CUST_CODE = #{custCode}
+                  AND PRC_GUBN = '2'
+                GROUP BY TRUNC(IN_DATE)
+            ) TC ON WD.STAT_DATE = TC.COUNSEL_DATE
+            GROUP BY WD.WEEK_NUM
+        )
+        SELECT
+            WEEK_NUM || '주차' AS statDate,
+            totalCalls,
+            answeredCalls,
+            abandonedCalls,
+            uniqueInboundCalls,
+            busyCalls,
+            completedCounselingCalls,
+            inboundCalls,
+            outboundCalls,
+            CASE WHEN totalCalls > 0 THEN ROUND((answeredCalls / totalCalls) * 100, 1) ELSE 0 END AS answerRate,
+            CASE WHEN answeredCalls > 0 THEN ROUND((completedCounselingCalls / answeredCalls) * 100, 1) ELSE 0 END AS completionRate,
+            CASE WHEN totalCalls > 0 THEN ROUND((inboundCalls / totalCalls) * 100, 1) ELSE 0 END AS inboundRate,
+            CASE WHEN totalCalls > 0 THEN ROUND((outboundCalls / totalCalls) * 100, 1) ELSE 0 END AS outboundRate
+        FROM WEEKLY_AGGREGATION
+        ORDER BY WEEK_NUM
+    </select>
+    
+    <!-- 월간 전월 대비 비교 데이터 조회 -->
+    <select id="getMonthlyComparisonData" resultMap="yearlyComparisonResultMap">
+        SELECT
+            (SELECT COUNT(*) FROM CALL_LOG_D
+             WHERE SUBSTR(CALLDATE, 1, 7) = TO_CHAR(TO_DATE(#{currentStartDate}, 'YYYYMMDD'), 'YYYY-MM')
+               AND CUST_CODE = #{custCode}) AS TOTALCALLSCURRENTYEAR,
+            (SELECT COUNT(*) FROM CALL_LOG_D
+             WHERE SUBSTR(CALLDATE, 1, 7) = TO_CHAR(TO_DATE(#{previousStartDate}, 'YYYYMMDD'), 'YYYY-MM')
+               AND CUST_CODE = #{custCode}) AS TOTALCALLSPREVIOUSYEAR,
+            (SELECT COUNT(*) FROM TBND01
+             WHERE TO_CHAR(IN_DATE, 'YYYY-MM') = TO_CHAR(TO_DATE(#{currentStartDate}, 'YYYYMMDD'), 'YYYY-MM')
+               AND CUST_CODE = #{custCode}
+               AND PRC_GUBN = '2') AS CMPL_CSL_CURR_YR,
+            (SELECT COUNT(*) FROM TBND01
+             WHERE TO_CHAR(IN_DATE, 'YYYY-MM') = TO_CHAR(TO_DATE(#{previousStartDate}, 'YYYYMMDD'), 'YYYY-MM')
+               AND CUST_CODE = #{custCode}
+               AND PRC_GUBN = '2') AS CMPL_CSL_PREV_YR
+        FROM DUAL
+    </select>
+
+    <!-- 시간대별 통화량 데이터 조회 (시간별 그래프용) -->
+    <select id="getHourlyCallsData" resultType="java.util.Map">
+        SELECT 
+            EXTRACT(HOUR FROM TO_TIMESTAMP(SUBSTR(CALLDATE, 12, 8), 'HH24:MI:SS')) AS HOUR,
+            COUNT(*) AS CALL_COUNT,
+            'TODAY' AS DATA_TYPE
+        FROM CALL_LOG_D
+        WHERE SUBSTR(CALLDATE, 1, 10) = TO_CHAR(TO_DATE(#{date}, 'YYYYMMDD'), 'YYYY-MM-DD')
+          AND CUST_CODE = #{custCode}
+        GROUP BY EXTRACT(HOUR FROM TO_TIMESTAMP(SUBSTR(CALLDATE, 12, 8), 'HH24:MI:SS'))
+        UNION ALL
+        SELECT 
+            EXTRACT(HOUR FROM TO_TIMESTAMP(SUBSTR(CALLDATE, 12, 8), 'HH24:MI:SS')) AS HOUR,
+            COUNT(*) AS CALL_COUNT,
+            'YESTERDAY' AS DATA_TYPE
+        FROM CALL_LOG_D
+        WHERE SUBSTR(CALLDATE, 1, 10) = TO_CHAR(TO_DATE(#{yesterdayDate}, 'YYYYMMDD'), 'YYYY-MM-DD')
+          AND CUST_CODE = #{custCode}
+        GROUP BY EXTRACT(HOUR FROM TO_TIMESTAMP(SUBSTR(CALLDATE, 12, 8), 'HH24:MI:SS'))
+        ORDER BY HOUR, DATA_TYPE
+    </select>
+
+    <!-- 월간 비교 데이터 쿼리 추가 -->
+    <!-- 월간 총 통화건수 조회 -->
+    <select id="getMonthlyTotalCallsForComparison" resultType="java.lang.Integer">
+        SELECT COUNT(*) AS total_calls
+        FROM CALL_LOG_D
+        WHERE REPLACE(SUBSTR(CALLDATE, 1, 10), '-', '') BETWEEN #{startDate} AND #{endDate}
+          AND CUST_CODE = #{custCode}
+    </select>
+    
+    <!-- 월간 완료 상담건수 조회 -->
+    <select id="getMonthlyCompletedCallsForComparison" resultType="java.lang.Integer">
+        SELECT COUNT(*) AS completed_calls
+        FROM TBND01
+        WHERE TO_CHAR(IN_DATE, 'YYYYMMDD') BETWEEN #{startDate} AND #{endDate}
+          AND CUST_CODE = #{custCode}
+          AND PRC_GUBN = '2'
+    </select>
+    
+    <!-- 월간 응답률 조회 -->
+    <select id="getMonthlyCompletionRate" resultType="java.lang.Double">
+        SELECT 
+            CASE 
+                WHEN (cl.total_calls - cl.abandoned_calls) > 0 
+                THEN ROUND(cl.answered_calls * 100 / (cl.total_calls - cl.abandoned_calls), 1)
+                ELSE 0 
+            END AS completion_rate
+        FROM (
+            SELECT
+                COUNT(*) AS total_calls,
+                SUM(CASE WHEN RESULT = 'ANSWER' THEN 1 ELSE 0 END) AS answered_calls,
+                SUM(CASE WHEN RESULT = 'CANCEL' THEN 1 ELSE 0 END) AS abandoned_calls
+            FROM CALL_LOG_D
+            WHERE REPLACE(SUBSTR(CALLDATE, 1, 10), '-', '') BETWEEN #{startDate} AND #{endDate}
+              AND CUST_CODE = #{custCode}
+        ) cl
+    </select>
+
 </mapper>
