@@ -199,6 +199,103 @@ WiCRM은 고객 관계 관리(CRM) 시스템으로, 통합 고객 관리 솔루�
     - 실시간 데이터 기반의 통계 정보 제공으로 의사결정 지원 강화
     - 직관적인 시각화로 복잡한 통계 데이터의 이해도 향상
 
+## 최신 수정 사항 (2025-06-29)
+
+### 입금 등록 시스템 개선 및 오류 수정 (2025-06-29)
+- **배경**: 
+  - 배송비 입금 등록 시스템에서 여러 기술적 오류 발생
+  - Oracle TIMESTAMP 직렬화 오류, JavaScript 오류, 브랜드 제약조건 위배 등 복합적 문제
+  - 사용자 경험 저하 및 시스템 불안정성 문제
+
+- **해결된 주요 문제들**:
+  
+  1. **로그인 사용자 정보 자동 등록 기능 구현**
+     - PaymentController에 Spring Security Authentication 파라미터 추가
+     - 입금 등록 시 REGISTRAR 필드에 로그인 사용자 아이디 자동 설정
+     - register.html에 현재 사용자 정보 표시 (readonly 필드)
+     - 수동 입력 오류 방지 및 데이터 일관성 향상
+  
+  2. **Oracle TIMESTAMP 직렬화 오류 해결**
+     - 문제: Oracle TIMESTAMP 타입이 Jackson JSON 직렬화에서 ByteArrayInputStream 오류 발생
+     - 해결: ShippingPaymentMapper.xml에서 TO_CHAR 함수 사용하여 문자열 변환
+     - 수정 필드: REGISTER_DATE, PAYMENT_DATE, MAPPED_DATE를 'YYYY-MM-DD HH24:MI:SS' 형식으로 변환
+     - /payment/api/recent 엔드포인트 정상 작동 복구
+
+  3. **브랜드 제약조건 수정**
+     - 문제: 데이터베이스 CHK_SP_BRAND 제약조건이 'CORALIK'로 설정되어 있으나 화면에서는 'CORALIQUE' 사용
+     - 해결: fix_brand_constraint.sql 파일 생성
+     - 제약조건을 CHECK (BRAND IN ('RENOMA', 'CORALIQUE'))로 수정
+     - 브랜드명 일관성 확보
+
+- **템플릿 및 UI 오류 수정**:
+  
+  1. **404 오류 해결**
+     - 문제: main.html에서 존재하지 않는 CSS/JS 파일 참조로 ERR_ABORTED 404 오류 발생
+     - 해결: 필요한 파일들 생성
+       - src/main/resources/static/assets/css/return/return.css
+       - src/main/resources/static/assets/js/return/return.js  
+       - src/main/resources/static/assets/js/user-action-logger.js
+     - 각 파일에 기본 구조와 네임스페이스 설정 추가
+
+  2. **Thymeleaf 템플릿 파싱 오류 해결**
+     - 문제: #httpServletRequest가 null이어서 조건부 로딩 시 오류 발생
+     - 해결: 조건부 로딩 제거하고 모든 페이지에서 CSS/JS 로드하도록 단순화
+     - ERR_INCOMPLETE_CHUNKED_ENCODING 오류 해결
+
+  3. **JavaScript 오류 수정**  
+     - 문제: Oracle Map 키가 대문자로 반환되어 payment.amount가 undefined
+     - 해결: Oracle Map 키 대소문자 모두 지원하도록 수정
+     - 안전한 숫자 변환 후 toLocaleString() 적용
+     - 날짜/시간 파싱 오류 방지 코드 추가
+
+- **입금 내역 표시 기능 대폭 개선**:
+  
+  1. **브랜드 배지 시스템 구현**
+     - 레노마: 보라색 그라데이션 배지 (linear-gradient(135deg, #667eea 0%, #764ba2 100%))
+     - 코랄리크: 핑크색 그라데이션 배지 (linear-gradient(135deg, #f093fb 0%, #f5576c 100%))
+     - 브랜드별 시각적 구분으로 사용자 경험 향상
+
+  2. **입금 정보 완전 표시**
+     - 기존: 고객명, 은행명, 시간만 표시
+     - 개선: 브랜드, 고객명, 입금은행, 입금일자, 입금시간 모두 표시
+     - 아이콘 추가: 🏦 은행 아이콘, 📅 달력 아이콘으로 시각적 구분
+     - 레이아웃 개선: payment-brand-customer, payment-bank-time, payment-date 구조
+
+  3. **CSS 스타일 현대화**
+     - 호버 효과: box-shadow와 transform 추가
+     - 그라데이션 배경: 상태 배지에 그라데이션 효과 적용
+     - 반응형 디자인: 모바일 환경 고려한 스타일 적용
+     - 타이포그래피 개선: 폰트 크기, 색상, 간격 최적화
+
+- **데이터 연동 개선**:
+  
+  1. **Thymeleaf 템플릿과 JavaScript 동기화**
+     - 서버 사이드 렌더링: Thymeleaf로 초기 데이터 표시
+     - 클라이언트 사이드 업데이트: JavaScript로 동적 데이터 갱신
+     - 두 방식 모두 동일한 데이터 구조와 스타일 적용
+
+  2. **Oracle 데이터베이스 최적화**
+     - Map 키 처리: 대문자/소문자 모두 지원하는 안전한 접근 방식
+     - 날짜 형식 통일: TO_CHAR 함수로 일관된 날짜 문자열 생성
+     - 제약조건 정리: 브랜드명 표준화로 데이터 일관성 확보
+
+- **구현 효과**:
+  - ✅ 입금 등록 시 모든 오류 해결
+  - ✅ 시각적으로 개선된 입금 내역 표시
+  - ✅ 브랜드별 색상 구분으로 직관적 인터페이스
+  - ✅ 완전한 입금 정보 표시 (브랜드, 은행, 일자, 시간, 고객명)
+  - ✅ Oracle 11g 호환성 확보
+  - ✅ JavaScript 오류 완전 해결
+  - ✅ 템플릿 파싱 안정성 향상
+  - ✅ 사용자 자동 등록으로 데이터 품질 향상
+
+- **기술적 성과**:
+  - Oracle TIMESTAMP → String 변환 방식 정립
+  - Spring Security와 MyBatis 연동 최적화  
+  - Thymeleaf + JavaScript 하이브리드 렌더링 구현
+  - CSS 그라데이션 및 현대적 UI 디자인 적용
+  - 에러 처리 및 예외 상황 대응 코드 강화
+
 ## 최근 수정 사항 (2025-06-27)
 
 ### 교환/반품 관리 시스템 UI/UX 대폭 개선 (2025-06-27)
