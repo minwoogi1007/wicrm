@@ -10,6 +10,8 @@
     <!-- 월별 선택 플러그인 추가 -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
+    <!-- html2canvas for image generation -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <div class="d-flex flex-column flex-column-fluid">
         <!--begin::Toolbar-->
         <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
@@ -66,6 +68,7 @@
                             <div class="d-flex align-items-center position-relative">
                                 <input class="form-control form-control-solid w-200px" placeholder="월 선택" id="monthly_datepicker" readonly/>
                                 <button type="button" class="btn btn-primary ms-3" id="searchBtn">조회</button>
+                                <button type="button" class="btn btn-success ms-3" id="excelDownloadBtn">📥 엑셀 다운로드</button>
                             </div>
                         </div>
                     </div>
@@ -275,6 +278,16 @@
             } else {
                 alert('월을 선택해주세요.');
             }
+        });
+        
+        // 엑셀 다운로드 버튼 이벤트
+        document.getElementById('excelDownloadBtn').addEventListener('click', function() {
+            var yearMonth = document.getElementById('monthly_datepicker').value;
+            if (!yearMonth) {
+                alert('월을 선택해주세요.');
+                return;
+            }
+            downloadMonthlyOperationExcel();
         });
         
         // 월간 운영현황 데이터 조회 함수
@@ -489,10 +502,12 @@
                 tooltip: {
                     y: {
                         formatter: function (val, opts) {
+                            if (!isFinite(val) || isNaN(val)) return '0';
+                            
                             if (opts.seriesIndex === 0) {
-                                return val + " 건";
+                                return Number(val).toFixed(0) + " 건";
                             } else if (opts.seriesIndex === 1) {
-                                return val.toFixed(1) + "%";
+                                return Number(val).toFixed(1) + "%";
                             }
                             return val;
                         }
@@ -747,10 +762,12 @@
                 tooltip: {
                     y: {
                         formatter: function (val, opts) {
+                            if (!isFinite(val) || isNaN(val)) return '0';
+                            
                             if (opts.dataPointIndex === 2) {
-                                return val.toFixed(1) + "%";
+                                return Number(val).toFixed(1) + "%";
                             }
-                            return val + " 건";
+                            return Number(val).toFixed(0) + " 건";
                         }
                     }
                 },
@@ -766,6 +783,207 @@
                 monthlyComparisonChartInstance = new ApexCharts(monthlyComparisonElement, monthlyComparisonOptions);
                 monthlyComparisonChartInstance.render();
             }
+        }
+        
+        // 월간 운영현황 엑셀 다운로드 함수
+        async function downloadMonthlyOperationExcel() {
+            try {
+                console.log('📥 월간 운영현황 이미지 포함 엑셀 다운로드 시작...');
+                showToast('차트와 테이블을 이미지로 변환 중입니다...', 'info');
+                
+                const images = {};
+                
+                // 1. 월간 요약 통계 카드 섹션 이미지 생성
+                const summaryCards = document.querySelector('.row.g-5.g-xl-8.mb-6');
+                if (summaryCards) {
+                    console.log('📊 월간 요약 통계 카드 이미지 생성 중...');
+                    const cardsCanvas = await html2canvas(summaryCards, {
+                        backgroundColor: '#ffffff',
+                        scale: 2,  // 적절한 해상도로 조정
+                        useCORS: true,
+                        allowTaint: true,
+                        width: summaryCards.offsetWidth,
+                        height: summaryCards.offsetHeight,
+                        scrollX: 0,
+                        scrollY: 0,
+                        foreignObjectRendering: true
+                    });
+                    images.summaryCardsImage = cardsCanvas.toDataURL('image/png', 1.0);
+                }
+                
+                // 2. 월간 통계 추이 차트 이미지 생성 (ApexCharts - 원본 크기 비율 유지)
+                if (monthlyTrendChartInstance) {
+                    console.log('📈 월간 통계 추이 차트 이미지 생성 중...');
+                    try {
+                        images.monthlyTrendChartImage = await monthlyTrendChartInstance.dataURI({
+                            type: 'png',
+                            scale: 1  // 원본 크기 비율 유지
+                        });
+                    } catch (error) {
+                        console.warn('월간 통계 추이 차트 이미지 생성 실패:', error);
+                    }
+                }
+                
+                // 3. 주차별 통계 테이블 이미지 생성
+                const weeklyStatsTable = document.querySelector('#weekly-stats-card');
+                if (weeklyStatsTable) {
+                    console.log('📊 주차별 통계 테이블 이미지 생성 중...');
+                    const weeklyCanvas = await html2canvas(weeklyStatsTable, {
+                        backgroundColor: '#ffffff',
+                        scale: 2,  // 적절한 해상도로 조정
+                        useCORS: true,
+                        allowTaint: true,
+                        width: weeklyStatsTable.offsetWidth,
+                        height: weeklyStatsTable.offsetHeight,
+                        scrollX: 0,
+                        scrollY: 0,
+                        foreignObjectRendering: true
+                    });
+                    images.weeklyStatsTableImage = weeklyCanvas.toDataURL('image/png', 1.0);
+                }
+                
+                // 4. 상담유형 분석 섹션 이미지 생성
+                const counselingAnalysisSection = document.querySelector('.row.g-5.g-xl-8.mb-6:last-of-type');
+                if (counselingAnalysisSection) {
+                    console.log('📊 상담유형 분석 섹션 이미지 생성 중...');
+                    const analysisCanvas = await html2canvas(counselingAnalysisSection, {
+                        backgroundColor: '#ffffff',
+                        scale: 2,  // 적절한 해상도로 조정
+                        useCORS: true,
+                        allowTaint: true,
+                        width: counselingAnalysisSection.offsetWidth,
+                        height: counselingAnalysisSection.offsetHeight,
+                        scrollX: 0,
+                        scrollY: 0,
+                        foreignObjectRendering: true
+                    });
+                    images.counselingAnalysisSectionImage = analysisCanvas.toDataURL('image/png', 1.0);
+                }
+                
+                // 5. 상담유형 차트 이미지 생성 (ApexCharts - 원본 크기 비율 유지)
+                if (counselingTypesChartInstance) {
+                    console.log('🍕 상담유형 차트 이미지 생성 중...');
+                    try {
+                        images.counselingTypesChartImage = await counselingTypesChartInstance.dataURI({
+                            type: 'png',
+                            scale: 1  // 원본 크기 비율 유지
+                        });
+                    } catch (error) {
+                        console.warn('상담유형 차트 이미지 생성 실패:', error);
+                    }
+                }
+                
+                // 6. 전월 대비 실적 비교 차트 이미지 생성 (ApexCharts - 원본 크기 비율 유지)
+                if (monthlyComparisonChartInstance) {
+                    console.log('📊 전월 대비 실적 비교 차트 이미지 생성 중...');
+                    try {
+                        images.monthlyComparisonChartImage = await monthlyComparisonChartInstance.dataURI({
+                            type: 'png',
+                            scale: 1  // 원본 크기 비율 유지
+                        });
+                    } catch (error) {
+                        console.warn('전월 대비 실적 비교 차트 이미지 생성 실패:', error);
+                    }
+                }
+                
+                console.log('✅ 모든 이미지 생성 완료');
+                
+                // 파라미터 준비
+                const yearMonth = document.getElementById('monthly_datepicker').value;
+                const params = {
+                    yearMonth: yearMonth,
+                    ...images
+                };
+                
+                // 서버로 POST 요청 (이미지 포함)
+                await downloadMonthlyExcelWithImages(params);
+                
+            } catch (error) {
+                console.error('❌ 이미지 생성 실패:', error);
+                showToast('이미지 생성 중 오류가 발생했습니다.', 'error');
+            }
+        }
+
+        // 이미지를 포함한 월간 운영현황 엑셀 다운로드 요청
+        async function downloadMonthlyExcelWithImages(params) {
+            try {
+                showToast('이미지가 포함된 엑셀 파일을 생성 중입니다...', 'info');
+                
+                const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+                
+                const response = await fetch('/stat/monthly/excel-with-images', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify(params)
+                });
+                
+                if (response.ok) {
+                    // 파일 다운로드
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = '월간운영현황_' + params.yearMonth + '.xlsx';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                    
+                    showToast('이미지가 포함된 엑셀 다운로드가 완료되었습니다!', 'success');
+                } else {
+                    throw new Error('서버 응답 오류');
+                }
+                
+            } catch (error) {
+                console.error('❌ 엑셀 다운로드 실패:', error);
+                showToast('엑셀 다운로드 중 오류가 발생했습니다.', 'error');
+            }
+        }
+
+        // 토스트 메시지 표시 함수
+        function showToast(message, type = 'info') {
+            const existingToast = document.querySelector('.toast-message');
+            if (existingToast) {
+                existingToast.remove();
+            }
+            
+            const toast = document.createElement('div');
+            toast.className = `toast-message toast-${type}`;
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 600;
+                z-index: 10000;
+                max-width: 400px;
+                animation: slideInRight 0.3s ease;
+            `;
+            
+            switch (type) {
+                case 'success':
+                    toast.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                    break;
+                case 'error':
+                    toast.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+                    break;
+                default:
+                    toast.style.background = 'linear-gradient(135deg, #3b82f6, #2563eb)';
+            }
+            
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 5000);
         }
         
         // 초기 차트는 데이터 로드 후 업데이트되므로 여기서는 생성하지 않음

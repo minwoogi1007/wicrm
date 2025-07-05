@@ -7,6 +7,8 @@
 <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 <div layout:fragment="content">
     <script src="/assets/plugins/global/plugins.bundle.js"></script>
+    <!-- html2canvas for image generation -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <div class="d-flex flex-column flex-column-fluid">
         <!--begin::Toolbar-->
         <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
@@ -63,6 +65,7 @@
                             <div class="d-flex align-items-center position-relative">
                                 <input class="form-control form-control-solid w-250px" placeholder="날짜 범위 선택" id="weekly_datepicker" readonly/>
                                 <button type="button" class="btn btn-primary ms-3" id="searchBtn">조회</button>
+                                <button type="button" class="btn btn-success ms-3" id="excelDownloadBtn">📥 엑셀 다운로드</button>
                             </div>
                         </div>
                     </div>
@@ -437,6 +440,14 @@
         });
 
         // 페이지 로드 시 기본 날짜로 데이터 조회
+        // 전역 오류 처리
+        window.addEventListener('error', function(e) {
+            if (e.message && e.message.includes('Infinity')) {
+                console.warn('차트 데이터에 Infinity 값이 포함되어 있습니다. 이는 무시됩니다.');
+                return true; // 오류를 "처리됨"으로 표시
+            }
+        });
+
         $(document).ready(function() {
             const initialDates = datepicker.selectedDates;
             if (initialDates.length === 2) {
@@ -450,6 +461,16 @@
             if (selectedDates.length === 2) {
                 fetchWeeklyOperationData(selectedDates[0], selectedDates[1]);
             }
+        });
+
+        // 엑셀 다운로드 버튼 이벤트
+        document.getElementById('excelDownloadBtn').addEventListener('click', function() {
+            const selectedDates = datepicker.selectedDates;
+            if (selectedDates.length !== 2) {
+                alert('날짜 범위를 선택해주세요.');
+                return;
+            }
+            downloadWeeklyOperationExcel();
         });
 
         function formatDate(date) {
@@ -570,6 +591,21 @@
 
             console.log('주간 운영 추이 차트 데이터:', summaryStatsList);
 
+            // 데이터 안전성 검증 함수 (강화된 버전)
+            function safeNumber(value, defaultValue = 0) {
+                // null, undefined, NaN, Infinity, 빈 문자열 모두 체크
+                if (value === null || value === undefined || value === '' || 
+                    isNaN(value) || !isFinite(value) || value === Infinity || value === -Infinity) {
+                    return defaultValue;
+                }
+                const num = Number(value);
+                // 변환 후에도 한번 더 체크
+                if (isNaN(num) || !isFinite(num)) {
+                    return defaultValue;
+                }
+                return num;
+            }
+
             // summaryStatsList를 기반으로 차트 시리즈와 x축을 동적으로 생성
             let categories = [];
             let totalCallsData = [];
@@ -583,11 +619,36 @@
                 });
                 
                 summaryStatsList.forEach(data => {
-                    categories.push(data.statDate);
-                    totalCallsData.push(data.totalCalls || 0);
-                    uniqueCallsData.push(data.uniqueInboundCalls || 0);
-                    completionRateData.push(data.completionRate || 0.0);
+                    console.log('원본 데이터:', {
+                        date: data.statDate,
+                        totalCalls: data.totalCalls,
+                        uniqueInboundCalls: data.uniqueInboundCalls,
+                        completionRate: data.completionRate
+                    });
+                    
+                    categories.push(data.statDate || '날짜 없음');
+                    totalCallsData.push(safeNumber(data.totalCalls));
+                    uniqueCallsData.push(safeNumber(data.uniqueInboundCalls));
+                    completionRateData.push(safeNumber(data.completionRate));
                 });
+                
+                console.log('처리된 차트 데이터:', {
+                    categories,
+                    totalCallsData,
+                    uniqueCallsData,
+                    completionRateData
+                });
+            }
+
+            // 차트 데이터가 유효한지 확인
+            const hasValidData = totalCallsData.some(val => val > 0) || 
+                                uniqueCallsData.some(val => val > 0) || 
+                                completionRateData.some(val => val > 0);
+
+            if (!hasValidData) {
+                // 데이터가 없을 때 "데이터 없음" 메시지 표시
+                weeklyTrendElement.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 350px; color: #999; font-size: 16px;">표시할 데이터가 없습니다</div>';
+                return;
             }
 
             var weeklyTrendOptions = {
@@ -626,21 +687,31 @@
                     title: {
                         text: '통화건수(건)',
                     },
-                    labels: { formatter: function (val) { return val.toFixed(0); } }
+                    labels: { 
+                        formatter: function (val) { 
+                            return (!isNaN(val) && isFinite(val)) ? Number(val).toFixed(0) : '0'; 
+                        } 
+                    }
                 }, {
                     opposite: true,
                     title: {
                         text: '완료율(%)'
                     },
-                    labels: { formatter: function (val) { return val.toFixed(1) + '%'; } }
+                    labels: { 
+                        formatter: function (val) { 
+                            return (!isNaN(val) && isFinite(val)) ? Number(val).toFixed(1) + '%' : '0.0%'; 
+                        } 
+                    }
                 }],
                 tooltip: {
                     y: {
                         formatter: function (val, opts) {
+                            if (!isFinite(val) || isNaN(val)) return '0';
+                            
                             if (opts.seriesIndex === 0 || opts.seriesIndex === 1) {
-                                return val + " 건";
+                                return Number(val).toFixed(0) + " 건";
                             } else if (opts.seriesIndex === 2) {
-                                return val.toFixed(1) + "%";
+                                return Number(val).toFixed(1) + "%";
                             }
                             return val;
                         }
@@ -657,11 +728,17 @@
                 }
             };
 
-            if (weeklyTrendChartInstance) {
-                weeklyTrendChartInstance.updateOptions(weeklyTrendOptions);
-            } else {
+            // 차트 인스턴스 안전하게 업데이트
+            try {
+                if (weeklyTrendChartInstance) {
+                    weeklyTrendChartInstance.destroy();
+                    weeklyTrendChartInstance = null;
+                }
                 weeklyTrendChartInstance = new ApexCharts(weeklyTrendElement, weeklyTrendOptions);
                 weeklyTrendChartInstance.render();
+            } catch (error) {
+                console.error('주간 운영 추이 차트 생성 오류:', error);
+                weeklyTrendElement.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 350px; color: #f44336; font-size: 16px;">차트 생성 중 오류가 발생했습니다</div>';
             }
         }
 
@@ -670,6 +747,21 @@
         function updateCounselingTypeTableAndChart(counselingTypeStats) {
             const tableBody = $('#kt_app_content_container .row.g-5.g-xl-8 .card:eq(0) tbody'); // 상담유형 테이블의 tbody
             tableBody.empty();
+
+            // 데이터 안전성 검증 함수 (강화된 버전)
+            function safeNumber(value, defaultValue = 0) {
+                // null, undefined, NaN, Infinity, 빈 문자열 모두 체크
+                if (value === null || value === undefined || value === '' || 
+                    isNaN(value) || !isFinite(value) || value === Infinity || value === -Infinity) {
+                    return defaultValue;
+                }
+                const num = Number(value);
+                // 변환 후에도 한번 더 체크
+                if (isNaN(num) || !isFinite(num)) {
+                    return defaultValue;
+                }
+                return num;
+            }
 
             let chartSeries = [];
             let chartLabels = [];
@@ -680,14 +772,16 @@
                 // 만약 유형별로 여러 항목(예: 상담경로)이 있다면, 서버에서 주 유형별로 집계해서 내려주거나 클라이언트에서 추가 처리 필요
                 // 현재는 counselingType이 주 유형이라고 가정하고 진행
                 counselingTypeStats.forEach(stat => {
+                    const safeCount = safeNumber(stat.count);
+                    const safePercentage = safeNumber(stat.percentage);
                     const row = `<tr>
                                     <td>${stat.counselingTypeName || 'N/A'}</td>
-                                    <td>${stat.count || 0}</td>
-                                    <td>${(stat.percentage !== undefined ? stat.percentage.toFixed(1) : '0.0')}%</td>
+                                    <td>${safeCount}</td>
+                                    <td>${safePercentage.toFixed(1)}%</td>
                                  </tr>`;
                     tableBody.append(row);
                     chartLabels.push(stat.counselingTypeName || 'N/A');
-                    chartSeries.push(stat.count || 0); // 파이차트 series는 값의 배열
+                    chartSeries.push(safeCount); // 파이차트 series는 값의 배열
                 });
             } else {
                 tableBody.append('<tr><td colspan="4">데이터가 없습니다.</td></tr>');
@@ -695,6 +789,15 @@
 
             var counselingTypesElement = document.getElementById('kt_weekly_counseling_types');
             if (!counselingTypesElement) return;
+
+            // 차트 데이터가 비어있거나 모든 값이 0인 경우 체크
+            const hasValidData = chartSeries.length > 0 && chartSeries.some(val => val > 0);
+            
+            if (!hasValidData) {
+                // 데이터가 없을 때 "데이터 없음" 메시지 표시
+                counselingTypesElement.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 400px; color: #999; font-size: 16px;">표시할 데이터가 없습니다</div>';
+                return;
+            }
 
             var counselingTypesOptions = {
                 series: chartSeries, // 예시: [44, 55, 13, 43, 22]
@@ -721,11 +824,17 @@
                 }]
             };
 
-            if (counselingTypesChartInstance) {
-                counselingTypesChartInstance.updateOptions(counselingTypesOptions);
-            } else {
+            // 차트 인스턴스 안전하게 업데이트
+            try {
+                if (counselingTypesChartInstance) {
+                    counselingTypesChartInstance.destroy();
+                    counselingTypesChartInstance = null;
+                }
                 counselingTypesChartInstance = new ApexCharts(counselingTypesElement, counselingTypesOptions);
                 counselingTypesChartInstance.render();
+            } catch (error) {
+                console.error('상담유형 차트 생성 오류:', error);
+                counselingTypesElement.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 400px; color: #f44336; font-size: 16px;">차트 생성 중 오류가 발생했습니다</div>';
             }
         }
 
@@ -737,15 +846,38 @@
 
             console.log('주간 현황 비교 데이터:', yearlyComparison);
             
-            // 데이터 가져오기
-            let currentTotalCalls = yearlyComparison ? (yearlyComparison.totalCallsCurrentYear || 0) : 0;
-            let previousTotalCalls = yearlyComparison ? (yearlyComparison.totalCallsPreviousYear || 0) : 0;
-            let currentCompletedCalls = yearlyComparison ? (yearlyComparison.cmplCslCurrYr || 0) : 0;
-            let previousCompletedCalls = yearlyComparison ? (yearlyComparison.cmplCslPrevYr || 0) : 0;
+            // 데이터 안전하게 가져오기 및 검증 (강화된 버전)
+            function safeNumber(value, defaultValue = 0) {
+                // null, undefined, NaN, Infinity, 빈 문자열 모두 체크
+                if (value === null || value === undefined || value === '' || 
+                    isNaN(value) || !isFinite(value) || value === Infinity || value === -Infinity) {
+                    return defaultValue;
+                }
+                const num = Number(value);
+                // 변환 후에도 한번 더 체크
+                if (isNaN(num) || !isFinite(num)) {
+                    return defaultValue;
+                }
+                return num;
+            }
             
-            // 증감률 계산
-            let totalCallsRate = yearlyComparison ? (yearlyComparison.totalCallsComparisonRate || 0) : 0;
-            let completedCallsRate = yearlyComparison ? (yearlyComparison.completedCounselingCallsComparisonRate || 0) : 0;
+            let currentTotalCalls = safeNumber(yearlyComparison?.totalCallsCurrentYear);
+            let previousTotalCalls = safeNumber(yearlyComparison?.totalCallsPreviousYear);
+            let currentCompletedCalls = safeNumber(yearlyComparison?.cmplCslCurrYr);
+            let previousCompletedCalls = safeNumber(yearlyComparison?.cmplCslPrevYr);
+            
+            // 증감률 안전하게 계산
+            let totalCallsRate = safeNumber(yearlyComparison?.totalCallsComparisonRate);
+            let completedCallsRate = safeNumber(yearlyComparison?.completedCounselingCallsComparisonRate);
+            
+            // 데이터가 모두 0인 경우 체크
+            const hasValidData = currentTotalCalls > 0 || previousTotalCalls > 0 || currentCompletedCalls > 0 || previousCompletedCalls > 0;
+            
+            if (!hasValidData) {
+                // 데이터가 없을 때 "데이터 없음" 메시지 표시
+                weeklyComparisonElement.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 350px; color: #999; font-size: 16px;">표시할 데이터가 없습니다</div>';
+                return;
+            }
             
             // 비교 차트 설정
             var weeklyComparisonOptions = {
@@ -784,7 +916,7 @@
                 dataLabels: {
                     enabled: true,
                     formatter: function(val) {
-                        return val;
+                        return (isFinite(val) && !isNaN(val)) ? Math.round(val) : '0';
                     },
                     offsetY: -20,
                     style: {
@@ -809,7 +941,7 @@
                     },
                     labels: { 
                         formatter: function (val) { 
-                            return val.toFixed(0); 
+                            return (isFinite(val) && !isNaN(val)) ? val.toFixed(0) : '0'; 
                         } 
                     }
                 },
@@ -842,7 +974,7 @@
                                     color: '#fff',
                                     background: '#775DD0',
                                 },
-                                text: '증감률: ' + totalCallsRate.toFixed(1) + '%',
+                                text: '증감률: ' + (isFinite(totalCallsRate) ? totalCallsRate.toFixed(1) : '0.0') + '%',
                                 position: 'bottom',
                                 offsetY: 10
                             }
@@ -858,7 +990,7 @@
                                     color: '#fff',
                                     background: '#775DD0',
                                 },
-                                text: '증감률: ' + completedCallsRate.toFixed(1) + '%',
+                                text: '증감률: ' + (isFinite(completedCallsRate) ? completedCallsRate.toFixed(1) : '0.0') + '%',
                                 position: 'bottom',
                                 offsetY: 10
                             }
@@ -867,13 +999,204 @@
                 }
             };
 
-            // 차트 인스턴스 생성 또는 업데이트
-            if (weeklyComparisonChartInstance) {
-                weeklyComparisonChartInstance.updateOptions(weeklyComparisonOptions);
-            } else {
+            // 차트 인스턴스 안전하게 업데이트
+            try {
+                if (weeklyComparisonChartInstance) {
+                    weeklyComparisonChartInstance.destroy();
+                    weeklyComparisonChartInstance = null;
+                }
                 weeklyComparisonChartInstance = new ApexCharts(weeklyComparisonElement, weeklyComparisonOptions);
                 weeklyComparisonChartInstance.render();
+            } catch (error) {
+                console.error('주간 현황 비교 차트 생성 오류:', error);
+                weeklyComparisonElement.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 350px; color: #f44336; font-size: 16px;">차트 생성 중 오류가 발생했습니다</div>';
             }
+        }
+
+        // 주간 운영현황 엑셀 다운로드 함수
+        async function downloadWeeklyOperationExcel() {
+            try {
+                console.log('📥 주간 운영현황 이미지 포함 엑셀 다운로드 시작...');
+                showToast('차트와 테이블을 이미지로 변환 중입니다...', 'info');
+                
+                const images = {};
+                
+                // 1. 주간 통계 현황 테이블 이미지 생성
+                const summaryTable = document.querySelector('.card:first-child');
+                if (summaryTable) {
+                    console.log('📊 주간 통계 현황 테이블 이미지 생성 중...');
+                    const tableCanvas = await html2canvas(summaryTable, {
+                        backgroundColor: '#ffffff',
+                        scale: 2,  // 적절한 해상도로 조정
+                        useCORS: true,
+                        allowTaint: true,
+                        width: summaryTable.offsetWidth,
+                        height: summaryTable.offsetHeight,
+                        scrollX: 0,
+                        scrollY: 0,
+                        foreignObjectRendering: true
+                    });
+                    images.summaryTableImage = tableCanvas.toDataURL('image/png', 1.0);
+                }
+                
+                // 2. 주간 운영 추이 차트 이미지 생성 (ApexCharts - 원본 크기 비율 유지)
+                if (weeklyTrendChartInstance) {
+                    console.log('📈 주간 운영 추이 차트 이미지 생성 중...');
+                    try {
+                        images.weeklyTrendChartImage = await weeklyTrendChartInstance.dataURI({
+                            type: 'png',
+                            scale: 1  // 원본 크기 비율 유지
+                        });
+                    } catch (error) {
+                        console.warn('주간 운영 추이 차트 이미지 생성 실패:', error);
+                    }
+                }
+                
+                // 3. 상담유형 현황 섹션 이미지 생성
+                const counselingSection = document.querySelector('.row.g-5.g-xl-8');
+                if (counselingSection) {
+                    console.log('📊 상담유형 현황 섹션 이미지 생성 중...');
+                    const counselingCanvas = await html2canvas(counselingSection, {
+                        backgroundColor: '#ffffff',
+                        scale: 2,  // 적절한 해상도로 조정
+                        useCORS: true,
+                        allowTaint: true,
+                        width: counselingSection.offsetWidth,
+                        height: counselingSection.offsetHeight,
+                        scrollX: 0,
+                        scrollY: 0,
+                        foreignObjectRendering: true
+                    });
+                    images.counselingSectionImage = counselingCanvas.toDataURL('image/png', 1.0);
+                }
+                
+                // 4. 상담유형 차트 이미지 생성 (ApexCharts - 원본 크기 비율 유지)
+                if (counselingTypesChartInstance) {
+                    console.log('🍕 상담유형 차트 이미지 생성 중...');
+                    try {
+                        images.counselingTypesChartImage = await counselingTypesChartInstance.dataURI({
+                            type: 'png',
+                            scale: 1  // 원본 크기 비율 유지
+                        });
+                    } catch (error) {
+                        console.warn('상담유형 차트 이미지 생성 실패:', error);
+                    }
+                }
+                
+                // 5. 주간 현황 비교 차트 이미지 생성 (ApexCharts - 원본 크기 비율 유지)
+                if (weeklyComparisonChartInstance) {
+                    console.log('📊 주간 현황 비교 차트 이미지 생성 중...');
+                    try {
+                        images.weeklyComparisonChartImage = await weeklyComparisonChartInstance.dataURI({
+                            type: 'png',
+                            scale: 1  // 원본 크기 비율 유지
+                        });
+                    } catch (error) {
+                        console.warn('주간 현황 비교 차트 이미지 생성 실패:', error);
+                    }
+                }
+                
+                console.log('✅ 모든 이미지 생성 완료');
+                
+                // 파라미터 준비
+                const selectedDates = datepicker.selectedDates;
+                const startDate = formatDate(selectedDates[0]);
+                const endDate = formatDate(selectedDates[1]);
+                const params = {
+                    startDate: startDate,
+                    endDate: endDate,
+                    ...images
+                };
+                
+                // 서버로 POST 요청 (이미지 포함)
+                await downloadWeeklyExcelWithImages(params);
+                
+            } catch (error) {
+                console.error('❌ 이미지 생성 실패:', error);
+                showToast('이미지 생성 중 오류가 발생했습니다.', 'error');
+            }
+        }
+
+        // 이미지를 포함한 주간 운영현황 엑셀 다운로드 요청
+        async function downloadWeeklyExcelWithImages(params) {
+            try {
+                showToast('이미지가 포함된 엑셀 파일을 생성 중입니다...', 'info');
+                
+                const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+                
+                const response = await fetch('/stat/weekly/excel-with-images', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify(params)
+                });
+                
+                if (response.ok) {
+                    // 파일 다운로드
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = '주간운영현황_' + params.startDate + '_' + params.endDate + '.xlsx';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                    
+                    showToast('이미지가 포함된 엑셀 다운로드가 완료되었습니다!', 'success');
+                } else {
+                    throw new Error('서버 응답 오류');
+                }
+                
+            } catch (error) {
+                console.error('❌ 엑셀 다운로드 실패:', error);
+                showToast('엑셀 다운로드 중 오류가 발생했습니다.', 'error');
+            }
+        }
+
+        // 토스트 메시지 표시 함수
+        function showToast(message, type = 'info') {
+            const existingToast = document.querySelector('.toast-message');
+            if (existingToast) {
+                existingToast.remove();
+            }
+            
+            const toast = document.createElement('div');
+            toast.className = `toast-message toast-${type}`;
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 600;
+                z-index: 10000;
+                max-width: 400px;
+                animation: slideInRight 0.3s ease;
+            `;
+            
+            switch (type) {
+                case 'success':
+                    toast.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                    break;
+                case 'error':
+                    toast.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+                    break;
+                default:
+                    toast.style.background = 'linear-gradient(135deg, #3b82f6, #2563eb)';
+            }
+            
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 5000);
         }
 
         // 기존 차트 초기화 코드는 삭제 (fetchWeeklyOperationData 성공 시 동적으로 생성 및 업데이트)

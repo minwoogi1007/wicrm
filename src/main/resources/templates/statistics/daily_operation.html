@@ -7,6 +7,8 @@
 <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 <div layout:fragment="content">
     <script src="/assets/plugins/global/plugins.bundle.js"></script>
+    <!-- html2canvas for image generation -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <div class="d-flex flex-column flex-column-fluid">
         <!--begin::Toolbar-->
         <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
@@ -63,6 +65,7 @@
                             <div class="d-flex align-items-center position-relative">
                                 <input class="form-control form-control-solid w-250px" placeholder="날짜 선택" id="daily_datepicker" readonly/>
                                 <button type="button" class="btn btn-primary ms-3" id="searchBtn">조회</button>
+                                <button type="button" class="btn btn-success ms-3" id="excelDownloadBtn">📥 엑셀 다운로드</button>
                             </div>
                         </div>
                     </div>
@@ -649,6 +652,21 @@
                 }
             });
 
+            // 엑셀 다운로드 버튼 이벤트
+            $('#excelDownloadBtn').on('click', function() {
+                try {
+                    const selectedDate = $('#daily_datepicker').val();
+                    if (!selectedDate) {
+                        alert('날짜를 선택해주세요.');
+                        return;
+                    }
+                    downloadDailyOperationExcel();
+                } catch (error) {
+                    console.error('엑셀 다운로드 오류:', error);
+                    alert('엑셀 다운로드 중 오류가 발생했습니다.');
+                }
+            });
+
             // ApexCharts 초기화 - kt_chart_counseling_types
             var chartElement = document.querySelector("#kt_chart_counseling_types");
             if (chartElement && typeof ApexCharts !== 'undefined') {
@@ -728,7 +746,7 @@
                     tooltip: {
                         y: {
                             formatter: function (val) {
-                                return val + " 건";
+                                return (!isNaN(val) && isFinite(val)) ? Number(val).toFixed(0) + " 건" : "0 건";
                             }
                         }
                     }
@@ -738,6 +756,330 @@
             }
 
             loadInitialDailyData();
+            
+            // 일일 운영현황 엑셀 다운로드 함수
+            async function downloadDailyOperationExcel() {
+                try {
+                    console.log('📥 일일 운영현황 엑셀 다운로드 시작...');
+                    
+                    // 데이터 로딩 상태 확인
+                    const totalCallsValue = document.getElementById('totalCalls')?.textContent?.trim();
+                    if (!totalCallsValue || totalCallsValue === '-') {
+                        showToast('먼저 데이터를 조회해주세요!', 'warning');
+                        return;
+                    }
+                    
+                    showToast('차트 이미지와 테이블 데이터를 준비 중입니다...', 'info');
+                    
+                    const images = {};
+                    const tableData = {};
+                    
+                    // 실제 테이블 데이터 수집 (이미지 대신)
+                    console.log('📊 테이블 데이터 수집 중...');
+                    
+                    // 1. 통계 현황 테이블 데이터 수집 (ID 기반으로 가로형 데이터를 세로형으로 변환)
+                    const summaryData = [
+                        { label: '일자', value: document.getElementById('statDate')?.textContent?.trim() || '-' },
+                        { label: '총콜', value: document.getElementById('totalCalls')?.textContent?.trim() || '-' },
+                        { label: '중복제거호', value: document.getElementById('uniqueInboundCalls')?.textContent?.trim() || '-' },
+                        { label: '응대호', value: document.getElementById('answeredCalls')?.textContent?.trim() || '-' },
+                        { label: '포기호', value: document.getElementById('abandonedCalls')?.textContent?.trim() || '-' },
+                        { label: '부재호', value: document.getElementById('busyCalls')?.textContent?.trim() || '-' },
+                        { label: '총상담완료호', value: document.getElementById('completedCounselingCalls')?.textContent?.trim() || '-' },
+                        { label: '수신호', value: document.getElementById('inboundCalls')?.textContent?.trim() || '-' },
+                        { label: '발신호', value: document.getElementById('outboundCalls')?.textContent?.trim() || '-' },
+                        { label: '응대율', value: document.getElementById('answerRate')?.textContent?.trim() || '-' },
+                        { label: '완료율', value: document.getElementById('completionRate')?.textContent?.trim() || '-' },
+                        { label: '수신비율', value: document.getElementById('inboundRate')?.textContent?.trim() || '-' },
+                        { label: '발신비율', value: document.getElementById('outboundRate')?.textContent?.trim() || '-' }
+                    ];
+                    tableData.summaryTableData = summaryData;
+                    console.log('✅ 통계 현황 테이블 데이터:', summaryData);
+                    
+                    // 2. 통화 시간 현황 테이블 데이터 수집 (ID 기반으로 정확하게)
+                    const comparisonData = [
+                        {
+                            time: '총통화시간(초)',
+                            today: document.getElementById('todayTotalCallDuration')?.textContent?.trim() || '-',
+                            yesterday: document.getElementById('yesterdayTotalCallDuration')?.textContent?.trim() || '-',
+                            change: document.getElementById('callDurationChangeRate')?.textContent?.trim() || '-'
+                        },
+                        {
+                            time: '평균통화시간(초)',
+                            today: document.getElementById('todayAvgCallDuration')?.textContent?.trim() || '-',
+                            yesterday: document.getElementById('yesterdayAvgCallDuration')?.textContent?.trim() || '-',
+                            change: document.getElementById('avgCallDurationChangeRate')?.textContent?.trim() || '-'
+                        }
+                    ];
+                    tableData.comparisonTableData = comparisonData;
+                    console.log('✅ 통화 시간 현황 테이블 데이터:', comparisonData);
+                    
+                    // 3. 상담유형 현황 테이블 데이터 수집 (정확한 선택자 사용)
+                    const counselingTableRows = document.querySelectorAll('#counselingTypeStatsTableBody tr');
+                    const counselingData = [];
+                    counselingTableRows.forEach(row => {
+                        const cells = row.querySelectorAll('td');
+                        if (cells.length >= 3 && !cells[0].textContent.includes('데이터를 불러오는 중') && !cells[0].textContent.includes('데이터가 없습니다')) {
+                            counselingData.push({
+                                type: cells[0].textContent.trim(),
+                                count: cells[1].textContent.trim(),
+                                percentage: cells[2].textContent.trim()
+                            });
+                        }
+                    });
+                    tableData.counselingTableData = counselingData;
+                    console.log('✅ 상담유형 현황 테이블 데이터:', counselingData);
+                    
+                    // 수집된 테이블 데이터 전체 검증
+                    console.log('🔍 수집된 모든 테이블 데이터 확인:');
+                    console.log('- 통계 현황:', tableData.summaryTableData?.length || 0, '개 항목');
+                    console.log('- 통화 시간:', tableData.comparisonTableData?.length || 0, '개 항목');
+                    console.log('- 상담유형:', tableData.counselingTableData?.length || 0, '개 항목');
+                    
+                    // 빈 데이터 체크
+                    if ((tableData.summaryTableData?.length || 0) === 0) {
+                        console.warn('⚠️ 통계 현황 데이터가 비어있습니다.');
+                    }
+                    if ((tableData.comparisonTableData?.length || 0) === 0) {
+                        console.warn('⚠️ 통화 시간 현황 데이터가 비어있습니다.');
+                    }
+                    if ((tableData.counselingTableData?.length || 0) === 0) {
+                        console.warn('⚠️ 상담유형 현황 데이터가 비어있습니다.');
+                    }
+                    
+                    // 4. 상담유형 차트 이미지 생성 (ApexCharts)
+                    if (counselingTypeChart) {
+                        console.log('🍕 상담유형 차트 이미지 생성 중...');
+                        console.log('🍕 차트 객체 정보:', {
+                            type: typeof counselingTypeChart,
+                            hasDataURI: typeof counselingTypeChart.dataURI === 'function'
+                        });
+                        
+                        try {
+                            const chartResult = await counselingTypeChart.dataURI({
+                                type: 'png',
+                                scale: 3,
+                                width: 500,
+                                height: 400
+                            });
+                            
+                            console.log('🍕 차트 이미지 결과 타입:', typeof chartResult);
+                            console.log('🍕 차트 이미지 결과 샘플:', chartResult);
+                            
+                            // ApexCharts dataURI 결과가 객체인 경우 처리
+                            if (typeof chartResult === 'object' && chartResult !== null) {
+                                if (chartResult.imgURI && typeof chartResult.imgURI === 'string') {
+                                    images.counselingTypeChartImage = chartResult.imgURI;
+                                    console.log('✅ 상담유형 차트 이미지 생성 성공 (객체에서 추출)');
+                                } else {
+                                    console.error('❌ 상담유형 차트 이미지 형식이 잘못됨:', chartResult);
+                                }
+                            } else if (typeof chartResult === 'string' && chartResult.startsWith('data:image/')) {
+                                images.counselingTypeChartImage = chartResult;
+                                console.log('✅ 상담유형 차트 이미지 생성 성공 (문자열)');
+                            } else {
+                                console.error('❌ 상담유형 차트 이미지 형식이 잘못됨:', chartResult);
+                            }
+                        } catch (error) {
+                            console.warn('❌ 상담유형 차트 이미지 생성 실패:', error);
+                        }
+                    }
+                    
+                    // 5. 시간대별 통화량 차트 이미지 생성 (ApexCharts)
+                    if (hourlyCallsChart) {
+                        console.log('📊 시간대별 통화량 차트 이미지 생성 중...');
+                        console.log('📊 차트 객체 정보:', {
+                            type: typeof hourlyCallsChart,
+                            hasDataURI: typeof hourlyCallsChart.dataURI === 'function'
+                        });
+                        
+                        try {
+                            const chartResult = await hourlyCallsChart.dataURI({
+                                type: 'png',
+                                scale: 3,
+                                width: 800,
+                                height: 350
+                            });
+                            
+                            console.log('📊 차트 이미지 결과 타입:', typeof chartResult);
+                            console.log('📊 차트 이미지 결과 샘플:', chartResult);
+                            
+                            // ApexCharts dataURI 결과가 객체인 경우 처리
+                            if (typeof chartResult === 'object' && chartResult !== null) {
+                                if (chartResult.imgURI && typeof chartResult.imgURI === 'string') {
+                                    images.hourlyCallsChartImage = chartResult.imgURI;
+                                    console.log('✅ 시간대별 통화량 차트 이미지 생성 성공 (객체에서 추출)');
+                                } else {
+                                    console.error('❌ 시간대별 통화량 차트 이미지 형식이 잘못됨:', chartResult);
+                                }
+                            } else if (typeof chartResult === 'string' && chartResult.startsWith('data:image/')) {
+                                images.hourlyCallsChartImage = chartResult;
+                                console.log('✅ 시간대별 통화량 차트 이미지 생성 성공 (문자열)');
+                            } else {
+                                console.error('❌ 시간대별 통화량 차트 이미지 형식이 잘못됨:', chartResult);
+                            }
+                        } catch (error) {
+                            console.warn('❌ 시간대별 통화량 차트 이미지 생성 실패:', error);
+                        }
+                    }
+                    
+                    console.log('✅ 모든 이미지 생성 완료');
+                    console.log('📊 생성된 이미지 정보:', {
+                        counselingTypeChartImage: !!images.counselingTypeChartImage,
+                        hourlyCallsChartImage: !!images.hourlyCallsChartImage
+                    });
+                    
+                    // 최종 이미지 데이터 검증
+                    console.log('🔍 최종 이미지 생성 결과 확인:');
+                    Object.keys(images).forEach(key => {
+                        const image = images[key];
+                        if (image && typeof image === 'string' && image.startsWith('data:image/')) {
+                            console.log(`✅ ${key}: 크기 ${image.length}, 시작 부분: ${image.substring(0, 50)}...`);
+                        } else {
+                            console.log(`❌ ${key}: 유효하지 않은 이미지 데이터`);
+                        }
+                    });
+                    
+                    // 파라미터 준비
+                    const selectedDate = $('#daily_datepicker').val();
+                    const params = {
+                        date: formatDateToYYYYMMDD(selectedDate),
+                        ...images,
+                        ...tableData
+                    };
+                    
+                    // 서버로 POST 요청 (이미지와 테이블 데이터 포함)
+                    await downloadDailyExcelWithTableData(params);
+                    
+                } catch (error) {
+                    console.error('❌ 이미지 생성 실패:', error);
+                    showToast('이미지 생성 중 오류가 발생했습니다.', 'error');
+                }
+            }
+
+            // 테이블 데이터와 이미지를 포함한 일일 운영현황 엑셀 다운로드 요청
+            async function downloadDailyExcelWithTableData(params) {
+                try {
+                    showToast('테이블 데이터와 차트가 포함된 엑셀 파일을 생성 중입니다...', 'info');
+                    
+                    const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+                    
+                    const response = await fetch('/stat/daily/excel-with-data', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        body: JSON.stringify(params)
+                    });
+                    
+                    if (response.ok) {
+                        // 파일 다운로드
+                        const blob = await response.blob();
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = '일일운영현황_' + params.date + '.xlsx';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        window.URL.revokeObjectURL(url);
+                        
+                        showToast('일일 운영현황 엑셀 다운로드가 완료되었습니다!', 'success');
+                    } else {
+                        throw new Error('서버 응답 오류');
+                    }
+                    
+                } catch (error) {
+                    console.error('❌ 엑셀 다운로드 실패:', error);
+                    showToast('엑셀 다운로드 중 오류가 발생했습니다.', 'error');
+                }
+            }
+
+            // 이미지를 포함한 일일 운영현황 엑셀 다운로드 요청 (기존 - 호환성 유지)
+            async function downloadDailyExcelWithImages(params) {
+                try {
+                    showToast('이미지가 포함된 엑셀 파일을 생성 중입니다...', 'info');
+                    
+                    const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+                    
+                    const response = await fetch('/stat/daily/excel-with-images', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        body: JSON.stringify(params)
+                    });
+                    
+                    if (response.ok) {
+                        // 파일 다운로드
+                        const blob = await response.blob();
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = '일일운영현황_' + params.date + '.xlsx';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        window.URL.revokeObjectURL(url);
+                        
+                        showToast('이미지가 포함된 엑셀 다운로드가 완료되었습니다!', 'success');
+                    } else {
+                        throw new Error('서버 응답 오류');
+                    }
+                    
+                } catch (error) {
+                    console.error('❌ 엑셀 다운로드 실패:', error);
+                    showToast('엑셀 다운로드 중 오류가 발생했습니다.', 'error');
+                }
+            }
+
+            // 토스트 메시지 표시 함수
+            function showToast(message, type = 'info') {
+                const existingToast = document.querySelector('.toast-message');
+                if (existingToast) {
+                    existingToast.remove();
+                }
+                
+                const toast = document.createElement('div');
+                toast.className = `toast-message toast-${type}`;
+                toast.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 15px 20px;
+                    border-radius: 8px;
+                    color: white;
+                    font-weight: 600;
+                    z-index: 10000;
+                    max-width: 400px;
+                    animation: slideInRight 0.3s ease;
+                `;
+                
+                switch (type) {
+                    case 'success':
+                        toast.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                        break;
+                    case 'error':
+                        toast.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+                        break;
+                    case 'warning':
+                        toast.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
+                        break;
+                    default:
+                        toast.style.background = 'linear-gradient(135deg, #3b82f6, #2563eb)';
+                }
+                
+                toast.textContent = message;
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 5000);
+            }
         });
     </script>
     <!--end::Javascript-->

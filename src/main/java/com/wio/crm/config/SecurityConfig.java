@@ -60,6 +60,7 @@ public class SecurityConfig {
                                 new AntPathRequestMatcher("/exchange/**"),  // 교환/반품 관리 경로 추가
                                 new AntPathRequestMatcher("/payment/**"),  // 입금 관리 경로 추가
                                 new AntPathRequestMatcher("/admin/banners/**"),  // 배너 관리 경로 추가
+                                new AntPathRequestMatcher("/project-plan/**"),  // 프로젝트 모니터링 경로 추가
                                 new AntPathRequestMatcher("/error")  // 에러 페이지 CSRF 보호 비활성화
                         ).csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 )
@@ -68,6 +69,9 @@ public class SecurityConfig {
                         .requestMatchers("/empl").hasAuthority("ROLE_EMPLOYEE")
                         .requestMatchers("/encrypt-passwords","/encrypt-password", "/chat","/encryption","/check-userid-availability","/apply-userid").permitAll()
                         .requestMatchers("/download/**", "/upload","/board/uploadImage").permitAll()
+                        .requestMatchers("/project-plan/**").permitAll() // 프로젝트 모니터링 페이지 허용
+                        .requestMatchers("/project-plan/monitor").permitAll() // 명시적 허용
+                        .requestMatchers("/project-plan/api/**").permitAll() // API 경로 명시적 허용
                         .requestMatchers("/board/readBoard/comments").authenticated()  // 댓글 추가 경로는 인증된 사용자만 접근 가능
                         .requestMatchers("/board/create/saveBoard").authenticated()  // 게시글 저장 경로는 인증된 사용자만 접근 가능
                         .requestMatchers("/board/**").authenticated()  // 모든 게시판 관련 경로는 인증된 사용자만 접근 가능

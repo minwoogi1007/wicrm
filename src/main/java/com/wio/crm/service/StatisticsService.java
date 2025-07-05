@@ -2,6 +2,7 @@ package com.wio.crm.service;
 
 import com.wio.crm.config.CustomUserDetails;
 import com.wio.crm.dto.*;
+import com.wio.crm.service.ReturnItemService;
 import com.wio.crm.mapper.StaticsMapper;
 import com.wio.crm.model.DateRange;
 import com.wio.crm.model.Statics;
@@ -28,6 +29,9 @@ public class StatisticsService {
 
     @Autowired
     private StaticsMapper staticsMapper;
+    
+    @Autowired
+    private ReturnItemService returnItemService;
 
     private String getCurrentCustCode() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -565,4 +569,5 @@ public class StatisticsService {
         
         return comparisonData;
     }
+
 }
