@@ -434,4 +434,16 @@ public interface ReturnItemService {
      * 검색 조건이 적용된 데이터에 대한 통합 통계
      */
     Map<String, Object> getDashboardStatsUnifiedBySearch(ReturnItemSearchDTO searchDTO);
+
+    // 🆕 이미지 관리 메소드들
+    
+    /**
+     * 이미지 URL 업데이트
+     */
+    void updateDefectPhotoUrl(Long itemId, String imageUrl);
+    
+    /**
+     * 불량상세 메모 업데이트
+     */
+    void updateDefectDetail(Long itemId, String defectDetail);
 } 

@@ -28,13 +28,20 @@ import org.apache.poi.xssf.usermodel.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.*;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestTemplate;
 import java.nio.file.*;
 import java.util.Base64;
 import java.util.UUID;
 import java.util.Arrays;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import java.net.*;
+import java.io.*;
 
 /**
  * 교환/반품 관리 컨트롤러
@@ -49,6 +56,9 @@ public class ExchangeController {
     
     @Value("${file.upload-dir:./uploads}")
     private String uploadBaseDir;
+    
+    @Value("${file.server-url:http://localhost:8080}")
+    private String fileServerUrl;
 
     /**
      * 교환/반품 목록 화면
@@ -59,8 +69,8 @@ public class ExchangeController {
             @ModelAttribute ReturnItemSearchDTO searchDTO,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "DESC") String sortDir,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) String sortDir,
             @RequestParam(required = false) String filters) {
         
         log.info("교환/반품 목록 조회 - 검색조건: {}, 필터: {}", searchDTO, filters);
@@ -839,8 +849,8 @@ public class ExchangeController {
             Model model,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "DESC") String sortDir) {
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) String sortDir) {
         
         log.info("🎯 카드 필터링 요청 - filterType: {}", filterType);
         
@@ -1027,12 +1037,14 @@ public class ExchangeController {
             @ModelAttribute ReturnItemSearchDTO searchDTO,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "DESC") String sortDir,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) String sortDir,
             @RequestParam(required = false) String filters,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate) {
+            @RequestParam(required = false) String endDate,
+            @RequestParam(required = false) String logisticsStartDate,
+            @RequestParam(required = false) String logisticsEndDate) {
         
         log.info("🎯 다중 필터 조회 - filters: {}, 검색조건: {}", filters, searchDTO);
         
@@ -1052,6 +1064,20 @@ public class ExchangeController {
                 searchDTO.setEndDate(LocalDate.parse(endDate.trim()));
             } catch (Exception e) {
                 log.warn("⚠️ 종료일 파싱 오류: {}", endDate, e);
+            }
+        }
+        if (logisticsStartDate != null && !logisticsStartDate.trim().isEmpty()) {
+            try {
+                searchDTO.setLogisticsStartDate(LocalDate.parse(logisticsStartDate.trim()));
+            } catch (Exception e) {
+                log.warn("⚠️ 물류확인 시작일 파싱 오류: {}", logisticsStartDate, e);
+            }
+        }
+        if (logisticsEndDate != null && !logisticsEndDate.trim().isEmpty()) {
+            try {
+                searchDTO.setLogisticsEndDate(LocalDate.parse(logisticsEndDate.trim()));
+            } catch (Exception e) {
+                log.warn("⚠️ 물류확인 종료일 파싱 오류: {}", logisticsEndDate, e);
             }
         }
         
@@ -1238,6 +1264,7 @@ public class ExchangeController {
     public String createForm(Model model) {
         log.info("📝 교환/반품 등록 폼 접속");
         model.addAttribute("returnItem", new ReturnItemDTO());
+        model.addAttribute("isEdit", false);
         model.addAttribute("pageTitle", "교환/반품 등록");
         return "exchange/form";
     }
@@ -1254,8 +1281,17 @@ public class ExchangeController {
         try {
             ReturnItemDTO returnItem = returnItemService.findById(id);
             model.addAttribute("returnItem", returnItem);
+            model.addAttribute("isEdit", true);
             model.addAttribute("returnTo", returnTo);
             model.addAttribute("pageTitle", "교환/반품 수정");
+            
+            // 🌐 이미지 절대 URL 추가
+            if (returnItem.getDefectPhotoUrl() != null && !returnItem.getDefectPhotoUrl().isEmpty()) {
+                String imageAbsoluteUrl = getImageAbsoluteUrl(returnItem.getDefectPhotoUrl());
+                model.addAttribute("imageAbsoluteUrl", imageAbsoluteUrl);
+                log.info("📷 이미지 절대 URL 생성: {}", imageAbsoluteUrl);
+            }
+            
             log.info("✅ 교환/반품 수정 폼 데이터 로드 완료 - ID: {}", id);
         } catch (Exception e) {
             log.error("❌ 교환/반품 수정 폼 데이터 로드 실패 - ID: {}, 오류: {}", id, e.getMessage());
@@ -1280,6 +1316,14 @@ public class ExchangeController {
             model.addAttribute("returnItem", returnItem);
             model.addAttribute("returnTo", returnTo);
         model.addAttribute("pageTitle", "교환/반품 상세");
+            
+            // 🌐 이미지 절대 URL 추가
+            if (returnItem.getDefectPhotoUrl() != null && !returnItem.getDefectPhotoUrl().isEmpty()) {
+                String imageAbsoluteUrl = getImageAbsoluteUrl(returnItem.getDefectPhotoUrl());
+                model.addAttribute("imageAbsoluteUrl", imageAbsoluteUrl);
+                log.info("📷 이미지 절대 URL 생성: {}", imageAbsoluteUrl);
+            }
+            
             log.info("✅ 교환/반품 상세 데이터 로드 완료 - ID: {}", id);
         } catch (Exception e) {
             log.error("❌ 교환/반품 상세 데이터 로드 실패 - ID: {}, 오류: {}", id, e.getMessage());
@@ -1423,13 +1467,39 @@ public class ExchangeController {
     @PostMapping("/download/excel")
     public void downloadExcel(
             @ModelAttribute ReturnItemSearchDTO searchDTO,
+            HttpServletRequest request,
             HttpServletResponse response) throws IOException {
         
-        log.info("📥 교환/반품 엑셀 다운로드 요청 - 검색조건: {}", searchDTO);
+        log.info("📥 교환/반품 엑셀 다운로드 요청");
+        log.info("🔍 받은 검색조건 전체: {}", searchDTO);
+        log.info("🔍 개별 필드 확인:");
+        log.info("  - keyword: '{}'", searchDTO.getKeyword());
+        log.info("  - startDate: {}", searchDTO.getStartDate());
+        log.info("  - endDate: {}", searchDTO.getEndDate());
+        log.info("  - logisticsStartDate: {}", searchDTO.getLogisticsStartDate());
+        log.info("  - logisticsEndDate: {}", searchDTO.getLogisticsEndDate());
+        log.info("  - returnTypeCode: '{}'", searchDTO.getReturnTypeCode());
+        log.info("  - returnStatusCode: '{}'", searchDTO.getReturnStatusCode());
+        log.info("  - siteName: '{}'", searchDTO.getSiteName());
+        log.info("  - paymentStatus: '{}'", searchDTO.getPaymentStatus());
+        log.info("  - brandFilter: '{}'", searchDTO.getBrandFilter());
+        log.info("🎯 검색 조건 존재 여부: {}", searchDTO.hasSearchCondition());
+        
+        // 🔍 HTTP 요청 파라미터도 확인
+        log.info("📋 요청 파라미터 전체:");
+        request.getParameterMap().forEach((key, values) -> {
+            log.info("  - {}: {}", key, String.join(", ", values));
+        });
         
         try {
-            // 🔥 페이징 없는 전체 데이터 조회 (성능 최적화)
+            // 🧪 테스트: 항상 검색 조건 적용하여 문제 확인 (일반 엑셀)
             List<ReturnItemDTO> allData;
+            log.info("🧪 테스트: 검색 조건과 관계없이 findBySearch 호출 (일반 엑셀)");
+            allData = returnItemService.findBySearch(searchDTO);
+            log.info("📊 검색 결과: {} 건의 데이터 추출 (일반 엑셀)", allData.size());
+            
+            // 원래 로직 (주석 처리)
+            /*
             if (searchDTO != null && searchDTO.hasSearchCondition()) {
                 // 검색 조건 있으면 페이징 없는 검색 결과
                 allData = returnItemService.findBySearch(searchDTO);
@@ -1439,6 +1509,7 @@ public class ExchangeController {
                 allData = returnItemService.findAll();
                 log.info("📊 전체 {} 건의 데이터 추출", allData.size());
             }
+            */
             
             // 파일명 생성 (날짜 포함)
             String fileName = "교환반품목록_" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + ".xlsx";
@@ -1473,6 +1544,93 @@ public class ExchangeController {
             response.setContentType("text/plain; charset=UTF-8");
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("엑셀 다운로드 중 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 📥🖼️ 이미지 포함 교환/반품 데이터 엑셀 다운로드
+     * 현재 검색 조건에 맞는 모든 데이터와 첨부 이미지를 엑셀로 다운로드
+     */
+    @PostMapping("/download/excel-with-images")
+    public void downloadExcelWithImages(
+            @ModelAttribute ReturnItemSearchDTO searchDTO,
+            HttpServletRequest request,
+            HttpServletResponse response) throws IOException {
+        
+        log.info("📥🖼️ 이미지 포함 교환/반품 엑셀 다운로드 요청");
+        log.info("🔍 받은 검색조건 전체: {}", searchDTO);
+        log.info("🔍 개별 필드 확인:");
+        log.info("  - keyword: '{}'", searchDTO.getKeyword());
+        log.info("  - startDate: {}", searchDTO.getStartDate());
+        log.info("  - endDate: {}", searchDTO.getEndDate());
+        log.info("  - logisticsStartDate: {}", searchDTO.getLogisticsStartDate());
+        log.info("  - logisticsEndDate: {}", searchDTO.getLogisticsEndDate());
+        log.info("  - returnTypeCode: '{}'", searchDTO.getReturnTypeCode());
+        log.info("  - returnStatusCode: '{}'", searchDTO.getReturnStatusCode());
+        log.info("  - siteName: '{}'", searchDTO.getSiteName());
+        log.info("  - paymentStatus: '{}'", searchDTO.getPaymentStatus());
+        log.info("  - brandFilter: '{}'", searchDTO.getBrandFilter());
+        log.info("🎯 검색 조건 존재 여부: {}", searchDTO.hasSearchCondition());
+        
+        // 🔍 HTTP 요청 파라미터도 확인
+        log.info("📋 요청 파라미터 전체:");
+        request.getParameterMap().forEach((key, values) -> {
+            log.info("  - {}: {}", key, String.join(", ", values));
+        });
+        
+        try {
+            // 🧪 테스트: 항상 검색 조건 적용하여 문제 확인 (이미지 포함 엑셀)
+            List<ReturnItemDTO> allData;
+            log.info("🧪 테스트: 검색 조건과 관계없이 findBySearch 호출 (이미지 포함 엑셀)");
+            allData = returnItemService.findBySearch(searchDTO);
+            log.info("📊 검색 결과: {} 건의 데이터 추출 (이미지 포함 엑셀)", allData.size());
+            
+            // 원래 로직 (주석 처리)
+            /*
+            if (searchDTO != null && searchDTO.hasSearchCondition()) {
+                // 검색 조건 있으면 페이징 없는 검색 결과
+                allData = returnItemService.findBySearch(searchDTO);
+                log.info("📊 검색 조건으로 {} 건의 데이터 추출", allData.size());
+            } else {
+                // 검색 조건 없으면 페이징 없는 전체 데이터
+                allData = returnItemService.findAll();
+                log.info("📊 전체 {} 건의 데이터 추출", allData.size());
+            }
+            */
+            
+            // 파일명 생성 (날짜 포함)
+            String fileName = "교환반품목록(이미지포함)_" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + ".xlsx";
+            
+            // HTTP 응답 헤더 설정 (한글 파일명 지원)
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setCharacterEncoding("UTF-8");
+            
+            // 파일명 인코딩 처리
+            String encodedFileName = java.net.URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
+            response.setHeader("Content-Disposition", "attachment; filename*=UTF-8''" + encodedFileName);
+            
+            // 캐시 방지
+            response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+            response.setHeader("Pragma", "no-cache");
+            response.setHeader("Expires", "0");
+            
+            // 이미지 포함 엑셀 파일 생성 및 출력
+            try (XSSFWorkbook workbook = createExcelFileWithImages(allData)) {
+                // 출력 스트림에 직접 쓰기
+                workbook.write(response.getOutputStream());
+                response.getOutputStream().flush();
+                
+                log.info("✅ 이미지 포함 엑셀 다운로드 완료 - 파일명: {}, 데이터 수: {}", fileName, allData.size());
+            }
+            
+        } catch (Exception e) {
+            log.error("❌ 이미지 포함 엑셀 다운로드 실패: {}", e.getMessage(), e);
+            
+            // 에러 응답 처리
+            response.reset();
+            response.setContentType("text/plain; charset=UTF-8");
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("이미지 포함 엑셀 다운로드 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
 
@@ -1658,6 +1816,251 @@ public class ExchangeController {
         }
         
         return workbook;
+    }
+
+    /**
+     * 📊🖼️ 이미지 포함 엑셀 파일 생성
+     * 실제 첨부 이미지 파일을 다운로드하여 엑셀에 포함
+     */
+    private XSSFWorkbook createExcelFileWithImages(List<ReturnItemDTO> data) throws IOException {
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("교환반품 목록(이미지포함)");
+        
+        // 헤더 스타일
+        CellStyle headerStyle = workbook.createCellStyle();
+        Font headerFont = workbook.createFont();
+        headerFont.setBold(true);
+        headerFont.setColor(IndexedColors.WHITE.getIndex());
+        headerStyle.setFont(headerFont);
+        headerStyle.setFillForegroundColor(IndexedColors.DARK_BLUE.getIndex());
+        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        headerStyle.setBorderTop(BorderStyle.THIN);
+        headerStyle.setBorderBottom(BorderStyle.THIN);
+        headerStyle.setBorderLeft(BorderStyle.THIN);
+        headerStyle.setBorderRight(BorderStyle.THIN);
+        
+        // 데이터 스타일
+        CellStyle dataStyle = workbook.createCellStyle();
+        dataStyle.setBorderTop(BorderStyle.THIN);
+        dataStyle.setBorderBottom(BorderStyle.THIN);
+        dataStyle.setBorderLeft(BorderStyle.THIN);
+        dataStyle.setBorderRight(BorderStyle.THIN);
+        
+        // 체크박스 스타일 (중앙 정렬)
+        CellStyle checkboxStyle = workbook.createCellStyle();
+        checkboxStyle.setBorderTop(BorderStyle.THIN);
+        checkboxStyle.setBorderBottom(BorderStyle.THIN);
+        checkboxStyle.setBorderLeft(BorderStyle.THIN);
+        checkboxStyle.setBorderRight(BorderStyle.THIN);
+        checkboxStyle.setAlignment(HorizontalAlignment.CENTER);
+        checkboxStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        
+        // 헤더 행 생성
+        Row headerRow = sheet.createRow(0);
+        String[] headers = {
+            "ID", "유형", "주문일", "CS접수일", "사이트명", "주문번호", "환불금액", 
+            "고객명", "고객연락처", "상품코드", "색상", "사이즈", "수량", "배송비",
+            "반품사유", "불량상세", "불량사진", "운송장번호", "회수완료일",
+            "물류확인일", "출고일", "환불일", "완료여부", "비고"
+        };
+        
+        for (int i = 0; i < headers.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(headers[i]);
+            cell.setCellStyle(headerStyle);
+        }
+        
+        // 🖼️ Drawing 객체를 미리 생성 (중요: 한 번만 생성)
+        XSSFDrawing drawing = (XSSFDrawing) sheet.createDrawingPatriarch();
+        
+        // 이미지 컬럼의 너비를 미리 설정 (더 넓게)
+        sheet.setColumnWidth(16, 4000); // 불량사진 컬럼
+        
+        int currentRow = 1;
+        
+        // 데이터 행 생성
+        for (int i = 0; i < data.size(); i++) {
+            Row row = sheet.createRow(currentRow);
+            ReturnItemDTO item = data.get(i);
+            
+            // 기본 행 높이 설정 (이미지 때문에 더 높게)
+            row.setHeightInPoints(80);
+            
+            setCellValue(row, 0, item.getId(), dataStyle);
+            // 🎯 유형을 한글명으로 변환
+            setCellValue(row, 1, convertReturnTypeToKorean(item.getReturnTypeCode()), dataStyle);
+            setCellValue(row, 2, item.getOrderDate(), dataStyle);
+            setCellValue(row, 3, item.getCsReceivedDate(), dataStyle);
+            setCellValue(row, 4, item.getSiteName(), dataStyle);
+            setCellValue(row, 5, item.getOrderNumber(), dataStyle);
+            setCellValue(row, 6, item.getRefundAmount(), dataStyle);
+            setCellValue(row, 7, item.getCustomerName(), dataStyle);
+            setCellValue(row, 8, item.getCustomerPhone(), dataStyle);
+            setCellValue(row, 9, item.getOrderItemCode(), dataStyle);
+            setCellValue(row, 10, item.getProductColor(), dataStyle);
+            setCellValue(row, 11, item.getProductSize(), dataStyle);
+            setCellValue(row, 12, item.getQuantity(), dataStyle);
+            setCellValue(row, 13, item.getShippingFee(), dataStyle);
+            setCellValue(row, 14, item.getReturnReason(), dataStyle);
+            setCellValue(row, 15, item.getDefectDetail(), dataStyle);
+            
+            // 🖼️ 이미지 처리 - 실제 이미지 파일을 엑셀에 삽입
+            Cell imageCell = row.createCell(16);
+            imageCell.setCellStyle(dataStyle);
+            
+            String imageUrl = item.getDefectPhotoUrl();
+            if (imageUrl != null && !imageUrl.trim().isEmpty()) {
+                try {
+                    // 원격 서버에서 이미지 다운로드하여 엑셀에 추가
+                    byte[] imageData = downloadImageFromUrl(imageUrl);
+                    if (imageData != null && imageData.length > 0) {
+                        insertImageIntoCell(workbook, sheet, drawing, imageData, currentRow, 16);
+                        imageCell.setCellValue("이미지 첨부됨");
+                        log.info("🖼️ 이미지 삽입 완료 - ID: {}, URL: {}", item.getId(), imageUrl);
+                    } else {
+                        imageCell.setCellValue("이미지 없음");
+                        log.warn("⚠️ 이미지 다운로드 실패 - ID: {}, URL: {}", item.getId(), imageUrl);
+                    }
+                } catch (Exception e) {
+                    imageCell.setCellValue("이미지 로딩 실패");
+                    log.error("❌ 이미지 처리 실패 - ID: {}, URL: {}, Error: {}", item.getId(), imageUrl, e.getMessage());
+                }
+            } else {
+                imageCell.setCellValue("이미지 없음");
+            }
+            
+            setCellValue(row, 17, item.getTrackingNumber(), dataStyle);
+            setCellValue(row, 18, item.getCollectionCompletedDate(), dataStyle);
+            setCellValue(row, 19, item.getLogisticsConfirmedDate(), dataStyle);
+            setCellValue(row, 20, item.getShippingDate(), dataStyle);
+            setCellValue(row, 21, item.getRefundDate(), dataStyle);
+            // 🎯 완료여부를 체크박스 스타일로 변환
+            setCellValue(row, 22, convertBooleanToCheckbox(item.getIsCompleted()), checkboxStyle);
+            setCellValue(row, 23, item.getRemarks(), dataStyle);
+            
+            currentRow++;
+        }
+        
+        // 컬럼 너비 자동 조정 (이미지 컬럼 제외)
+        for (int i = 0; i < headers.length; i++) {
+            if (i != 16) { // 이미지 컬럼은 제외
+                sheet.autoSizeColumn(i);
+            }
+        }
+        
+        log.info("📊 이미지 포함 엑셀 파일 생성 완료 - 총 {} 건", data.size());
+        return workbook;
+    }
+
+    /**
+     * 🌐 URL에서 이미지 다운로드
+     */
+    private byte[] downloadImageFromUrl(String imageUrl) {
+        try {
+            // 상대 경로인 경우 절대 URL로 변환
+            String fullUrl;
+            String remoteServerUrl = "http://175.119.224.45:8080";
+            
+            if (imageUrl.startsWith("http")) {
+                // 이미 절대 URL인 경우
+                fullUrl = imageUrl;
+            } else if (imageUrl.startsWith("/uploads/")) {
+                // /uploads/로 시작하는 경우
+                fullUrl = remoteServerUrl + imageUrl;
+            } else if (imageUrl.startsWith("uploads/")) {
+                // uploads/로 시작하는 경우
+                fullUrl = remoteServerUrl + "/" + imageUrl;
+            } else if (imageUrl.startsWith("/")) {
+                // 기타 절대 경로
+                fullUrl = remoteServerUrl + imageUrl;
+            } else {
+                // 상대 경로
+                fullUrl = remoteServerUrl + "/uploads/" + imageUrl;
+            }
+            
+            log.info("🔄 이미지 다운로드 시도: {} → {}", imageUrl, fullUrl);
+            
+            // URL 연결 및 이미지 다운로드
+            URL url = new URL(fullUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(5000); // 5초 타임아웃
+            connection.setReadTimeout(10000); // 10초 읽기 타임아웃
+            
+            // User-Agent 설정 (일부 서버에서 요구)
+            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
+            
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                try (InputStream inputStream = connection.getInputStream();
+                     ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+                    
+                    byte[] buffer = new byte[4096];
+                    int bytesRead;
+                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+                        outputStream.write(buffer, 0, bytesRead);
+                    }
+                    
+                    byte[] imageData = outputStream.toByteArray();
+                    log.info("✅ 이미지 다운로드 성공: {} bytes - {}", imageData.length, fullUrl);
+                    return imageData;
+                }
+            } else {
+                log.warn("⚠️ 이미지 다운로드 실패 - HTTP {}: {}", responseCode, fullUrl);
+                return null;
+            }
+            
+        } catch (Exception e) {
+            log.error("❌ 이미지 다운로드 예외: {} - URL: {}", e.getMessage(), imageUrl);
+            return null;
+        }
+    }
+
+    /**
+     * 🖼️ 엑셀 셀에 이미지 삽입
+     */
+    private void insertImageIntoCell(XSSFWorkbook workbook, Sheet sheet, XSSFDrawing drawing, byte[] imageData, int rowIndex, int colIndex) {
+        try {
+            // 이미지 타입 결정 (JPG, PNG 등)
+            int pictureType = XSSFWorkbook.PICTURE_TYPE_JPEG; // 기본값
+            
+            // 이미지 데이터의 시그니처로 타입 판별
+            if (imageData.length >= 8) {
+                // PNG 시그니처: 89 50 4E 47 0D 0A 1A 0A
+                if (imageData[0] == (byte) 0x89 && imageData[1] == 0x50 && 
+                    imageData[2] == 0x4E && imageData[3] == 0x47) {
+                    pictureType = XSSFWorkbook.PICTURE_TYPE_PNG;
+                }
+                // JPEG 시그니처: FF D8
+                else if (imageData[0] == (byte) 0xFF && imageData[1] == (byte) 0xD8) {
+                    pictureType = XSSFWorkbook.PICTURE_TYPE_JPEG;
+                }
+            }
+            
+            // 워크북에 이미지 추가
+            int pictureIndex = workbook.addPicture(imageData, pictureType);
+            
+            // 이미지 위치 설정 (셀 위치에 맞춤)
+            XSSFClientAnchor anchor = workbook.getCreationHelper().createClientAnchor();
+            anchor.setCol1(colIndex);
+            anchor.setRow1(rowIndex);
+            anchor.setCol2(colIndex + 1);
+            anchor.setRow2(rowIndex + 1);
+            
+            // 이미지를 셀 크기에 맞게 조정
+            anchor.setAnchorType(ClientAnchor.AnchorType.MOVE_AND_RESIZE);
+            
+            // 이미지 삽입
+            XSSFPicture picture = drawing.createPicture(anchor, pictureIndex);
+            
+            // 이미지 크기를 셀에 맞게 조정
+            picture.resize(0.9); // 셀 크기의 90%로 조정
+            
+            log.debug("🖼️ 이미지 삽입 완료 - Row: {}, Col: {}", rowIndex, colIndex);
+            
+        } catch (Exception e) {
+            log.error("❌ 이미지 삽입 실패: {}", e.getMessage());
+        }
     }
     
     /**
@@ -2772,28 +3175,241 @@ public class ExchangeController {
     // ============================================================================
     
     /**
+     * 🌐 이미지 절대 URL 생성 헬퍼 메서드
+     */
+    private String getImageAbsoluteUrl(String relativePath) {
+        if (relativePath == null || relativePath.isEmpty()) {
+            return null;
+        }
+        return fileServerUrl + "/uploads/" + relativePath;
+    }
+    
+    /**
      * 📷 이미지 업로드 처리 (파일 업로드 + 붙여넣기 지원)
      */
     private String processImageUpload(MultipartFile attachmentPhoto, String attachmentImageData) throws IOException {
         // 1. 파일 업로드가 있는 경우
         if (attachmentPhoto != null && !attachmentPhoto.isEmpty()) {
             log.info("📁 파일 업로드 처리: {}", attachmentPhoto.getOriginalFilename());
-            return saveUploadedFile(attachmentPhoto);
+            return uploadToRemoteServer(attachmentPhoto);
         }
         
         // 2. 붙여넣기 이미지 데이터가 있는 경우
         if (attachmentImageData != null && !attachmentImageData.trim().isEmpty()) {
             log.info("📋 붙여넣기 이미지 처리");
-            return savePastedImage(attachmentImageData);
+            return uploadBase64ToRemoteServer(attachmentImageData);
         }
         
         return null;
     }
     
     /**
-     * 📁 업로드된 파일 저장
+     * 🌐 원격 서버에 파일 업로드
      */
-    private String saveUploadedFile(MultipartFile file) throws IOException {
+    private String uploadToRemoteServer(MultipartFile file) throws IOException {
+        log.info("🌐 원격 서버({})에 파일 업로드 시작: {}", fileServerUrl, file.getOriginalFilename());
+        log.info("🔧 디버그 - fileServerUrl 값: {}", fileServerUrl);
+        
+        try {
+            // 고유 파일명 생성
+            String uniqueFilename = generateUniqueFilename(file.getOriginalFilename());
+            log.info("🔧 디버그 - 생성된 고유파일명: {}", uniqueFilename);
+            
+            // RestTemplate을 사용한 HTTP 업로드
+            RestTemplate restTemplate = new RestTemplate();
+            
+            // MultiValueMap 생성 (multipart/form-data)
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("file", new ByteArrayResource(file.getBytes()) {
+                @Override
+                public String getFilename() {
+                    return uniqueFilename;
+                }
+            });
+            
+            // HTTP 헤더 설정
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+            
+            // HTTP 요청 엔티티 생성
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+            
+            // 원격 서버 업로드 API 호출
+            String uploadUrl = fileServerUrl + "/exchange/api/upload";
+            log.info("🔧 디버그 - 파일 업로드 URL: {}", uploadUrl);
+            log.info("🔧 디버그 - 요청 헤더: {}", headers);
+            log.info("🔧 디버그 - 파일 크기: {} bytes", file.getSize());
+            
+            ResponseEntity<String> response = restTemplate.exchange(
+                uploadUrl, 
+                HttpMethod.POST, 
+                requestEntity, 
+                String.class
+            );
+            
+            log.info("🔧 디버그 - 응답 상태코드: {}", response.getStatusCode());
+            log.info("🔧 디버그 - 응답 본문: {}", response.getBody());
+            log.info("🔧 디버그 - 응답 헤더: {}", response.getHeaders());
+            
+            if (response.getStatusCode() == HttpStatus.OK) {
+                // 원격 서버 응답에서 실제 저장된 파일 경로 추출
+                try {
+                    String responseBody = response.getBody();
+                    log.info("🔧 디버그 - 원격 서버 응답: {}", responseBody);
+                    
+                    // JSON 응답에서 relativePath 추출 (간단한 문자열 파싱)
+                    if (responseBody != null && responseBody.contains("\"relativePath\"")) {
+                        int startIndex = responseBody.indexOf("\"relativePath\":\"") + 16;
+                        int endIndex = responseBody.indexOf("\"", startIndex);
+                        String actualRelativePath = responseBody.substring(startIndex, endIndex);
+                        log.info("✅ 원격 서버 업로드 성공 - 실제 파일경로: {}", actualRelativePath);
+                        return actualRelativePath;
+                    } else {
+                        // 응답 파싱 실패시 fallback
+                        String relativePath = "images/" + uniqueFilename;
+                        log.warn("⚠️ 응답 파싱 실패, fallback 경로 사용: {}", relativePath);
+                        return relativePath;
+                    }
+                } catch (Exception e) {
+                    log.error("❌ 응답 파싱 오류: {}", e.getMessage());
+                    String relativePath = "images/" + uniqueFilename;
+                    log.warn("⚠️ 파싱 오류, fallback 경로 사용: {}", relativePath);
+                    return relativePath;
+                }
+            } else {
+                log.error("❌ 원격 서버 업로드 실패 - 상태코드: {}, 응답: {}", response.getStatusCode(), response.getBody());
+                // 실패시 로컬에 저장 (폴백)
+                return saveUploadedFileLocally(file);
+            }
+            
+        } catch (Exception e) {
+            log.error("❌ 원격 서버 업로드 오류, 로컬 저장으로 폴백: {}", e.getMessage(), e);
+            log.error("❌ 상세 오류 정보: {}", e.getClass().getSimpleName());
+            if (e.getCause() != null) {
+                log.error("❌ 근본 원인: {}", e.getCause().getMessage());
+            }
+            // 오류시 로컬에 저장 (폴백)
+            return saveUploadedFileLocally(file);
+        }
+    }
+    
+    /**
+     * 🌐 Base64 이미지를 원격 서버에 업로드
+     */
+    private String uploadBase64ToRemoteServer(String base64Data) throws IOException {
+        log.info("🌐 원격 서버에 Base64 이미지 업로드 시작");
+        
+        try {
+            // Base64 데이터 파싱
+            String[] parts = base64Data.split(",");
+            String imageData = parts.length > 1 ? parts[1] : parts[0];
+            
+            // 파일 확장자 결정
+            String fileExtension = ".png";
+            if (parts.length > 1 && parts[0].contains("image/")) {
+                String mimeInfo = parts[0];
+                if (mimeInfo.contains("image/jpeg")) {
+                    fileExtension = ".jpg";
+                } else if (mimeInfo.contains("image/png")) {
+                    fileExtension = ".png";
+                } else if (mimeInfo.contains("image/gif")) {
+                    fileExtension = ".gif";
+                }
+            }
+            
+            // 고유 파일명 생성
+            String uniqueFilename = "pasted_" + UUID.randomUUID().toString() + "_" + 
+                                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")) + 
+                                fileExtension;
+            
+            // Base64 디코딩
+            byte[] imageBytes = Base64.getDecoder().decode(imageData);
+            
+            // RestTemplate을 사용한 HTTP 업로드
+            RestTemplate restTemplate = new RestTemplate();
+            
+            // MultiValueMap 생성
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("file", new ByteArrayResource(imageBytes) {
+                @Override
+                public String getFilename() {
+                    return uniqueFilename;
+                }
+            });
+            
+            // HTTP 헤더 설정
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+            
+            // HTTP 요청 엔티티 생성
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+            
+            // 원격 서버 업로드 API 호출
+            String uploadUrl = fileServerUrl + "/exchange/api/upload";
+            log.info("🔧 디버그 - Base64 업로드 URL: {}", uploadUrl);
+            ResponseEntity<String> response = restTemplate.exchange(
+                uploadUrl, 
+                HttpMethod.POST, 
+                requestEntity, 
+                String.class
+            );
+            
+            if (response.getStatusCode() == HttpStatus.OK) {
+                // 원격 서버 응답에서 실제 저장된 파일 경로 추출
+                try {
+                    String responseBody = response.getBody();
+                    log.info("🔧 디버그 - Base64 원격 서버 응답: {}", responseBody);
+                    
+                    // JSON 응답에서 relativePath 추출 (간단한 문자열 파싱)
+                    if (responseBody != null && responseBody.contains("\"relativePath\"")) {
+                        int startIndex = responseBody.indexOf("\"relativePath\":\"") + 16;
+                        int endIndex = responseBody.indexOf("\"", startIndex);
+                        String actualRelativePath = responseBody.substring(startIndex, endIndex);
+                        log.info("✅ 원격 서버 Base64 업로드 성공 - 실제 파일경로: {}", actualRelativePath);
+                        return actualRelativePath;
+                    } else {
+                        // 응답 파싱 실패시 fallback
+                        String relativePath = "images/" + uniqueFilename;
+                        log.warn("⚠️ Base64 응답 파싱 실패, fallback 경로 사용: {}", relativePath);
+                        return relativePath;
+                    }
+                } catch (Exception e) {
+                    log.error("❌ Base64 응답 파싱 오류: {}", e.getMessage());
+                    String relativePath = "images/" + uniqueFilename;
+                    log.warn("⚠️ Base64 파싱 오류, fallback 경로 사용: {}", relativePath);
+                    return relativePath;
+                }
+            } else {
+                log.error("❌ 원격 서버 Base64 업로드 실패 - 상태코드: {}", response.getStatusCode());
+                // 실패시 로컬에 저장 (폴백)
+                return savePastedImageLocally(base64Data);
+            }
+            
+        } catch (Exception e) {
+            log.error("❌ 원격 서버 Base64 업로드 오류, 로컬 저장으로 폴백: {}", e.getMessage());
+            // 오류시 로컬에 저장 (폴백)
+            return savePastedImageLocally(base64Data);
+        }
+    }
+    
+    /**
+     * 🔧 고유 파일명 생성
+     */
+    private String generateUniqueFilename(String originalFilename) {
+        String fileExtension = "";
+        if (originalFilename != null && originalFilename.contains(".")) {
+            fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        }
+        
+        return UUID.randomUUID().toString() + "_" + 
+               LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")) + 
+               fileExtension;
+    }
+    
+    /**
+     * 📁 로컬에 파일 저장 (폴백용)
+     */
+    private String saveUploadedFileLocally(MultipartFile file) throws IOException {
         // 업로드 디렉토리 준비
         Path uploadsPath = Paths.get(uploadBaseDir);
         if (!Files.exists(uploadsPath)) {
@@ -2828,9 +3444,9 @@ public class ExchangeController {
     }
     
     /**
-     * 📋 붙여넣기 이미지 저장
+     * 📋 붙여넣기 이미지 로컬 저장 (폴백용)
      */
-    private String savePastedImage(String base64Data) throws IOException {
+    private String savePastedImageLocally(String base64Data) throws IOException {
         // Base64 데이터에서 타입과 실제 데이터 분리
         String[] parts = base64Data.split(",");
         String imageData = parts.length > 1 ? parts[1] : parts[0];
@@ -3096,6 +3712,122 @@ public class ExchangeController {
             response.put("timestamp", LocalDateTime.now());
             
             return ResponseEntity.status(500).body(response);
+        }
+    }
+
+    // 🆕 이미지 첨부 API (불량상세 메모 포함) - 이미지 없이 메모만 수정도 가능
+    @PostMapping("/api/attach-image")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> attachImage(
+            @RequestParam(value = "defectPhoto", required = false) MultipartFile defectPhoto,
+            @RequestParam("itemId") Long itemId,
+            @RequestParam(value = "defectDetail", required = false) String defectDetail) {
+        
+        log.info("📷 이미지/메모 업데이트 요청: itemId={}, 파일명={}, 불량상세={}", 
+            itemId, (defectPhoto != null ? defectPhoto.getOriginalFilename() : "없음"), defectDetail);
+        
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            boolean hasFile = defectPhoto != null && !defectPhoto.isEmpty();
+            boolean hasDefectDetail = defectDetail != null && !defectDetail.trim().isEmpty();
+            
+            // 파일과 불량상세 둘 다 없으면 에러
+            if (!hasFile && !hasDefectDetail) {
+                response.put("success", false);
+                response.put("message", "이미지 또는 불량상세 메모 중 하나는 입력해주세요.");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            String imagePath = null;
+            
+            // 🖼️ 이미지 파일이 있는 경우에만 업로드 처리
+            if (hasFile) {
+                // 파일 크기 검사 (10MB)
+                if (defectPhoto.getSize() > 10 * 1024 * 1024) {
+                    response.put("success", false);
+                    response.put("message", "파일 크기가 10MB를 초과합니다.");
+                    return ResponseEntity.badRequest().body(response);
+                }
+                
+                // 이미지 파일인지 검사
+                String contentType = defectPhoto.getContentType();
+                if (contentType == null || !contentType.startsWith("image/")) {
+                    response.put("success", false);
+                    response.put("message", "이미지 파일만 업로드 가능합니다.");
+                    return ResponseEntity.badRequest().body(response);
+                }
+                
+                // 원격 서버에 이미지 업로드
+                imagePath = uploadToRemoteServer(defectPhoto);
+                
+                if (imagePath == null || imagePath.isEmpty()) {
+                    throw new RuntimeException("원격 서버 업로드 실패");
+                }
+                
+                // DB에 이미지 경로 저장
+                returnItemService.updateDefectPhotoUrl(itemId, imagePath);
+                log.info("✅ 이미지 업로드 완료: itemId={}, imagePath={}", itemId, imagePath);
+            }
+            
+            // 📝 불량상세 메모 업데이트 (이미지 없이도 가능)
+            if (hasDefectDetail) {
+                returnItemService.updateDefectDetail(itemId, defectDetail);
+                log.info("📝 불량상세 메모 업데이트 완료: itemId={}, defectDetail={}", itemId, defectDetail);
+            }
+            
+            // 📊 결과 메시지 생성
+            String message;
+            if (hasFile && hasDefectDetail) {
+                message = "이미지와 불량상세 정보가 성공적으로 저장되었습니다.";
+            } else if (hasFile) {
+                message = "이미지가 성공적으로 저장되었습니다.";
+            } else {
+                message = "불량상세 메모가 성공적으로 저장되었습니다.";
+            }
+            
+            response.put("success", true);
+            response.put("message", message);
+            response.put("imagePath", imagePath);
+            response.put("defectDetail", defectDetail);
+            response.put("hasImageUpdate", hasFile);
+            response.put("hasDefectDetailUpdate", hasDefectDetail);
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            log.error("❌ 이미지 첨부 실패: itemId={}, 오류={}", itemId, e.getMessage(), e);
+            response.put("success", false);
+            response.put("message", "이미지 첨부 중 오류가 발생했습니다: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    // 🆕 이미지 삭제 API
+    @DeleteMapping("/api/delete-image/{itemId}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> deleteImage(@PathVariable Long itemId) {
+        
+        log.info("🗑️ 이미지 삭제 요청: itemId={}", itemId);
+        
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            // DB에서 이미지 경로 제거
+            returnItemService.updateDefectPhotoUrl(itemId, null);
+            
+            log.info("✅ 이미지 삭제 완료: itemId={}", itemId);
+            
+            response.put("success", true);
+            response.put("message", "이미지가 성공적으로 삭제되었습니다.");
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            log.error("❌ 이미지 삭제 실패: itemId={}, 오류={}", itemId, e.getMessage(), e);
+            response.put("success", false);
+            response.put("message", "이미지 삭제 중 오류가 발생했습니다: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 } 

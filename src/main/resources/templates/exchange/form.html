@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+      layout:decorate="~{layouts/main}">
+<head>
+    <title th:text="${isEdit ? '교환/반품 수정' : '교환/반품 등록'}">교환/반품 등록</title>
+    <meta name="_csrf" th:if="${_csrf}" th:content="${_csrf.token}"/>
+    <meta name="_csrf" th:unless="${_csrf}" content=""/>
+    <meta name="_csrf_header" th:if="${_csrf}" th:content="${_csrf.headerName}"/>
+    <meta name="_csrf_header" th:unless="${_csrf}" content="X-CSRF-TOKEN"/>
+    
+    <style>
+        /* 🎨 폼 전용 스타일 */
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --success-color: #35b27f;
+            --warning-color: #ffc107;
+            --danger-color: #f44336;
+            --info-color: #06b6d4;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-400: #ced4da;
+            --gray-500: #adb5bd;
+            --gray-600: #6c757d;
+            --gray-700: #495057;
+            --gray-800: #343a40;
+            --gray-900: #212529;
+            --border-color: #e5e7eb;
+            --text-color: #374151;
+            --text-muted: #6b7280;
+            --bg-color: #ffffff;
+            --radius: 0.5rem;
+        }
+
+        .form-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: var(--bg-color);
+            border-radius: var(--radius);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .page-header h2 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-size: 1.875rem;
+            font-weight: 700;
+        }
+
+        .page-header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        /* 🎯 상단 선택 버튼 영역 */
+        .top-selections {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .selection-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            gap: 1rem;
+        }
+
+        .selection-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .selection-label {
+            min-width: 100px;
+            font-weight: 600;
+            color: var(--text-color);
+            font-size: 0.9rem;
+        }
+
+        .selection-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            flex: 1;
+        }
+
+        .selection-btn {
+            background: var(--bg-color);
+            border: 2px solid var(--border-color);
+            border-radius: 0.375rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-color);
+            white-space: nowrap;
+        }
+
+        .selection-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(67, 97, 238, 0.2);
+        }
+
+        .selection-btn.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(67, 97, 238, 0.3);
+        }
+
+        /* 선택된 정보 표시 */
+        .selected-info {
+            background: var(--success-color);
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius);
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(53, 178, 127, 0.3);
+        }
+
+        /* 🎯 폼 카드 스타일 */
+        .form-card {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-section-header {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-section-header::before {
+            content: '';
+            width: 4px;
+            height: 1.25rem;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: var(--text-color);
+            font-size: 0.875rem;
+        }
+
+        .form-group label.required::after {
+            content: ' *';
+            color: var(--danger-color);
+        }
+
+        .form-control {
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            background: var(--bg-color);
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        /* 🎨 필드 상태별 색상 */
+        .form-control.original-data {
+            background-color: #e8f5e8 !important;
+            border-color: var(--success-color) !important;
+            color: #2e7d32 !important;
+            font-weight: 600 !important;
+        }
+
+        .form-control.modified {
+            background-color: #ffebee !important;
+            border-color: var(--danger-color) !important;
+            color: #d32f2f !important;
+            font-weight: 600 !important;
+        }
+
+        .form-control.new-data {
+            background-color: #e3f2fd !important;
+            border-color: var(--info-color) !important;
+            color: #1976d2 !important;
+            font-weight: 600 !important;
+        }
+
+        /* Hidden 필드들 */
+        .hidden-fields {
+            display: none;
+        }
+
+        /* 🎯 액션 버튼 영역 */
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            background: var(--gray-100);
+            border-top: 1px solid var(--border-color);
+            margin-top: 2rem;
+            border-radius: 0 0 var(--radius) var(--radius);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary-color);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--gray-500);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-600);
+            transform: translateY(-1px);
+        }
+
+        /* 🖼️ 이미지 업로드 영역 */
+        .image-upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius);
+            padding: 2rem;
+            text-align: center;
+            background: var(--gray-100);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .image-upload-area:hover {
+            border-color: var(--primary-color);
+            background: rgba(67, 97, 238, 0.05);
+        }
+
+        .image-upload-area.dragover {
+            border-color: var(--success-color);
+            background: rgba(53, 178, 127, 0.1);
+        }
+
+        .image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: var(--radius);
+            margin-top: 1rem;
+        }
+
+        /* 🔥 불량상세메모 전용 스타일 */
+        .defect-detail-cell {
+            font-size: 0.75rem;
+            color: #dc3545;
+            background-color: #f8d7da;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            border: 1px solid #f1aeb5;
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            cursor: help;
+            transition: all 0.2s ease;
+        }
+
+        .defect-detail-cell:hover {
+            background-color: #f5c2c7;
+            border-color: #dc3545;
+            transform: scale(1.05);
+            z-index: 10;
+            position: relative;
+        }
+
+        /* 불량상세메모 입력 필드 스타일 */
+        #defectDetail {
+            resize: vertical;
+            min-height: 100px;
+            border-color: #dc3545 !important;
+            background-color: #fff5f5;
+            transition: all 0.3s ease;
+        }
+
+        #defectDetail:focus {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.15) !important;
+            background-color: #ffffff;
+        }
+
+        #defectDetail::placeholder {
+            color: #dc3545;
+            opacity: 0.7;
+        }
+
+        /* 불량상세메모 그룹 애니메이션 */
+        #defectDetailGroup {
+            border: 2px solid #f1aeb5;
+            border-radius: var(--radius);
+            background: linear-gradient(135deg, #fff5f5 0%, #fef2f2 100%);
+            padding: 1rem;
+            margin-top: 1rem;
+            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.1);
+        }
+
+        /* 불량 관련 강조 표시 */
+        .defect-highlight {
+            position: relative;
+        }
+
+        .defect-highlight::before {
+            content: '🔴';
+            position: absolute;
+            left: -25px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.875rem;
+        }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .form-container {
+                padding: 1rem;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .selection-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .selection-buttons {
+                width: 100%;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            /* 🔥 모바일에서 불량상세메모 최적화 */
+            .defect-detail-cell {
+                max-width: 100px;
+                font-size: 0.7rem;
+            }
+            
+            #defectDetailGroup {
+                padding: 0.75rem;
+                margin-top: 0.75rem;
+            }
+        }
+    </style>
+
+    <!-- 🔥 JavaScript 함수들 -->
+    <script th:inline="javascript">
+        // CSRF 토큰 설정
+        window.csrfToken = /*[[${_csrf != null ? _csrf.token : ''}]]*/ '';
+        window.csrfHeader = /*[[${_csrf != null ? _csrf.headerName : 'X-CSRF-TOKEN'}]]*/ 'X-CSRF-TOKEN';
+
+        // 🎯 서버 데이터를 JavaScript 변수로 전달
+        const serverData = {
+            isEdit: /*[[${isEdit}]]*/ false,
+            siteName: /*[[${returnItem?.siteName}]]*/ '',
+            returnTypeCode: /*[[${returnItem?.returnTypeCode}]]*/ '',
+            returnReason: /*[[${returnItem?.returnReason}]]*/ '',
+            orderNumber: /*[[${returnItem?.orderNumber}]]*/ '',
+            orderItemCode: /*[[${returnItem?.orderItemCode}]]*/ '',
+            customerName: /*[[${returnItem?.customerName}]]*/ '',
+            customerPhone: /*[[${returnItem?.customerPhone}]]*/ '',
+            productColor: /*[[${returnItem?.productColor}]]*/ '',
+            productSize: /*[[${returnItem?.productSize}]]*/ '',
+            quantity: /*[[${returnItem?.quantity}]]*/ '',
+            refundAmount: /*[[${returnItem?.refundAmount}]]*/ '',
+            shippingFee: /*[[${returnItem?.shippingFee}]]*/ '',
+            trackingNumber: /*[[${returnItem?.trackingNumber}]]*/ '',
+            processor: /*[[${returnItem?.processor}]]*/ '',
+            remarks: /*[[${returnItem?.remarks}]]*/ ''
+        };
+
+        console.log('🎯 서버 데이터:', serverData);
+
+        // 🎯 브랜드 선택 함수
+        function selectBrand(brand, element) {
+            console.log('🏷️ 브랜드 선택:', brand);
+
+            // 모든 브랜드 버튼 초기화
+            document.querySelectorAll('.selection-row:first-child .selection-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // 선택된 버튼 활성화
+            element.classList.add('active');
+
+            // 사이트 버튼 생성
+            const siteButtonsContainer = document.getElementById('siteButtons');
+            let siteButtons = '';
+
+            if (brand === '레노마') {
+                siteButtons = `
+                    <div class="selection-btn" onclick="selectSite('29CM-레노마', this)">29CM-레노마</div>
+                    <div class="selection-btn" onclick="selectSite('롯데온-레노마', this)">롯데온-레노마</div>
+                    <div class="selection-btn" onclick="selectSite('무신사-레노마', this)">무신사-레노마</div>
+                    <div class="selection-btn" onclick="selectSite('스토어팜-레노마', this)">스토어팜-레노마</div>
+                    <div class="selection-btn" onclick="selectSite('자사몰-레노마', this)">자사몰-레노마</div>
+                    <div class="selection-btn" onclick="selectSite('지그재그-레노마', this)">지그재그-레노마</div>
+                    <div class="selection-btn" onclick="selectSite('카카오-레노마', this)">카카오-레노마</div>
+                    <div class="selection-btn" onclick="selectSite('패션플러스-레노마', this)">패션플러스-레노마</div>
+                    <div class="selection-btn" onclick="selectSite('하프클럽-레노마', this)">하프클럽-레노마</div>
+                    <div class="selection-btn" onclick="selectSite('SSG-레노마', this)">SSG-레노마</div>
+                    <div class="selection-btn" onclick="selectSite('EQL-레노마', this)">EQL-레노마</div>
+                    <div class="selection-btn" onclick="selectSite('W컨셉-레노마', this)">W컨셉-레노마</div>
+                `;
+            } else if (brand === '코랄리크') {
+                siteButtons = `
+                    <div class="selection-btn" onclick="selectSite('29CM-코랄리크', this)">29CM-코랄리크</div>
+                    <div class="selection-btn" onclick="selectSite('무신사-코랄리크', this)">무신사-코랄리크</div>
+                    <div class="selection-btn" onclick="selectSite('자사몰-코랄리크', this)">자사몰-코랄리크</div>
+                    <div class="selection-btn" onclick="selectSite('지그재그-코랄리크', this)">지그재그-코랄리크</div>
+                    <div class="selection-btn" onclick="selectSite('CJ오쇼핑-코랄리크', this)">CJ오쇼핑-코랄리크</div>
+                    <div class="selection-btn" onclick="selectSite('SSG-코랄리크', this)">SSG-코랄리크</div>
+                    <div class="selection-btn" onclick="selectSite('EQL-코랄리크', this)">EQL-코랄리크</div>
+                    <div class="selection-btn" onclick="selectSite('LF몰-코랄리크', this)">LF몰-코랄리크</div>
+                    <div class="selection-btn" onclick="selectSite('스토어팜-코랄리크', this)">스토어팜-코랄리크</div>
+                `;
+            }
+
+            if (siteButtonsContainer) {
+                siteButtonsContainer.innerHTML = siteButtons;
+            }
+            updateSelectedInfo();
+        }
+
+        // 🎯 사이트 선택 함수
+        function selectSite(site, element) {
+            console.log('🌐 사이트 선택:', site);
+
+            // 모든 사이트 버튼 초기화
+            document.querySelectorAll('#siteButtons .selection-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // 선택된 버튼 활성화
+            element.classList.add('active');
+
+            // 폼에 사이트 정보 설정
+            const siteNameField = document.getElementById('siteName');
+            if (siteNameField) {
+                siteNameField.value = site;
+                updateFieldColor(siteNameField);
+            }
+
+            updateSelectedInfo();
+        }
+
+        // 🎯 유형 선택 함수
+        function selectType(type, element) {
+            console.log('📋 유형 선택:', type);
+
+            // 모든 유형 버튼 초기화
+            document.querySelectorAll('.selection-row:nth-child(3) .selection-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // 선택된 버튼 활성화
+            element.classList.add('active');
+
+            // 폼에 유형 정보 설정
+            const returnTypeCodeField = document.getElementById('returnTypeCode');
+            if (returnTypeCodeField) {
+                returnTypeCodeField.value = type;
+                updateFieldColor(returnTypeCodeField);
+            }
+
+            updateSelectedInfo();
+        }
+
+        // 🎯 사유 선택 함수
+        function selectReason(reason, element) {
+            console.log('📝 사유 선택:', reason);
+
+            // 모든 사유 버튼 초기화
+            document.querySelectorAll('.selection-row:nth-child(4) .selection-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // 선택된 버튼 활성화
+            element.classList.add('active');
+
+            // 폼에 사유 정보 설정
+            const returnReasonField = document.getElementById('returnReason');
+            if (returnReasonField) {
+                returnReasonField.value = reason;
+                updateFieldColor(returnReasonField);
+            }
+
+            // 🔥 불량상세메모 필드 조건부 표시/숨김
+            const defectDetailGroup = document.getElementById('defectDetailGroup');
+            const defectDetailField = document.getElementById('defectDetail');
+            
+            if (reason === '불량') {
+                // 불량 사유 선택 시 필드 표시 및 필수 설정
+                defectDetailGroup.style.display = 'block';
+                defectDetailField.setAttribute('required', 'required');
+                defectDetailField.setAttribute('aria-required', 'true');
+                
+                // 애니메이션 효과
+                defectDetailGroup.style.opacity = '0';
+                defectDetailGroup.style.transform = 'translateY(-10px)';
+                setTimeout(() => {
+                    defectDetailGroup.style.transition = 'all 0.3s ease';
+                    defectDetailGroup.style.opacity = '1';
+                    defectDetailGroup.style.transform = 'translateY(0)';
+                }, 10);
+                
+                console.log('🔴 불량 사유 선택: 불량상세메모 필드 표시');
+            } else {
+                // 다른 사유 선택 시 필드 숨김 및 필수 해제
+                defectDetailGroup.style.display = 'none';
+                defectDetailField.removeAttribute('required');
+                defectDetailField.removeAttribute('aria-required');
+                defectDetailField.value = ''; // 내용 초기화
+                
+                console.log('🟢 다른 사유 선택: 불량상세메모 필드 숨김');
+            }
+
+            updateSelectedInfo();
+        }
+
+        // 🎯 선택 정보 업데이트
+        function updateSelectedInfo() {
+            const siteName = document.getElementById('siteName')?.value || '';
+            const returnTypeCode = document.getElementById('returnTypeCode')?.value || '';
+            const returnReason = document.getElementById('returnReason')?.value || '';
+
+            const typeDisplayMap = {
+                'FULL_RETURN': '전체반품',
+                'FULL_EXCHANGE': '전체교환',
+                'PARTIAL_RETURN': '부분반품',
+                'PARTIAL_EXCHANGE': '부분교환'
+            };
+
+            const typeDisplay = typeDisplayMap[returnTypeCode] || returnTypeCode;
+
+            const selectedInfoElement = document.getElementById('selectedInfo');
+            if (selectedInfoElement) {
+                if (siteName && returnTypeCode && returnReason) {
+                    selectedInfoElement.innerHTML = `✅ ${siteName} → ${typeDisplay} → ${returnReason}`;
+                    selectedInfoElement.style.display = 'block';
+                } else {
+                    selectedInfoElement.style.display = 'none';
+                }
+            }
+        }
+
+        // 🎨 필드 색상 업데이트
+        function updateFieldColor(field) {
+            if (!field) return;
+
+            const originalValue = field.dataset.originalValue || '';
+            const currentValue = field.value || '';
+            const isEditMode = serverData.isEdit;
+
+            // 기존 클래스 제거
+            field.classList.remove('original-data', 'modified', 'new-data');
+
+            if (isEditMode) {
+                if (currentValue !== originalValue && currentValue !== '') {
+                    field.classList.add('modified'); // 수정됨 - 빨간색
+                } else if (currentValue === originalValue && originalValue !== '') {
+                    field.classList.add('original-data'); // 원본값 - 녹색
+                }
+            } else {
+                if (currentValue !== '') {
+                    field.classList.add('new-data'); // 신규 입력 - 파란색
+                }
+            }
+        }
+
+        // 🎯 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔥 페이지 로드 완료');
+
+            // 수정 모드일 때 원본값 설정
+            if (serverData.isEdit) {
+                console.log('🔧 수정 모드 - 원본값 설정');
+                Object.keys(serverData).forEach(key => {
+                    const field = document.getElementById(key);
+                    const value = serverData[key];
+                    
+                    if (field && value !== null && value !== undefined && value !== '') {
+                        field.dataset.originalValue = value;
+                        field.value = value;
+                        updateFieldColor(field);
+                    }
+                });
+            }
+
+            // CS 접수일 자동 설정 (등록 모드)
+            if (!serverData.isEdit) {
+                const csReceivedDateField = document.getElementById('csReceivedDate');
+                if (csReceivedDateField && !csReceivedDateField.value) {
+                    const today = new Date();
+                    const todayString = today.getFullYear() + '-' +
+                        String(today.getMonth() + 1).padStart(2, '0') + '-' +
+                        String(today.getDate()).padStart(2, '0');
+                    csReceivedDateField.value = todayString;
+                    updateFieldColor(csReceivedDateField);
+                }
+            }
+
+            // 모든 입력 필드에 이벤트 리스너 추가
+            const allFields = document.querySelectorAll('input, select, textarea');
+            allFields.forEach(field => {
+                ['input', 'change'].forEach(eventType => {
+                    field.addEventListener(eventType, function() {
+                        setTimeout(() => updateFieldColor(this), 100);
+                    });
+                });
+            });
+
+            // 🔥 수정 모드일 때 불량상세메모 필드 초기 표시 처리
+            if (serverData.isEdit && serverData.returnReason === '불량') {
+                const defectDetailGroup = document.getElementById('defectDetailGroup');
+                const defectDetailField = document.getElementById('defectDetail');
+                
+                if (defectDetailGroup && defectDetailField) {
+                    defectDetailGroup.style.display = 'block';
+                    defectDetailField.setAttribute('required', 'required');
+                    defectDetailField.setAttribute('aria-required', 'true');
+                    console.log('🔧 수정 모드: 불량 사유로 불량상세메모 필드 표시');
+                }
+            }
+        });
+
+        // 🎯 폼 제출 전 검증
+        function validateForm() {
+            const requiredFields = [
+                'siteName', 'returnTypeCode', 'returnReason', 'orderNumber', 
+                'customerName', 'customerPhone', 'orderItemCode', 'productColor', 
+                'productSize', 'quantity', 'csReceivedDate'
+            ];
+
+            for (let fieldId of requiredFields) {
+                const field = document.getElementById(fieldId);
+                if (!field || !field.value.trim()) {
+                    alert(`${field?.labels?.[0]?.textContent || fieldId} 항목을 입력해주세요.`);
+                    field?.focus();
+                    return false;
+                }
+            }
+
+            // 🔥 불량상세메모 필드 추가 검증
+            const returnReason = document.getElementById('returnReason')?.value;
+            const defectDetailField = document.getElementById('defectDetail');
+            
+            if (returnReason === '불량' && (!defectDetailField.value || !defectDetailField.value.trim())) {
+                alert('불량 사유 선택 시 불량상세메모를 입력해주세요.');
+                defectDetailField.focus();
+                return false;
+            }
+
+            return true;
+        }
+
+        // 🎯 폼 제출
+        function submitForm() {
+            if (!validateForm()) {
+                return false;
+            }
+
+            const form = document.getElementById('exchangeForm');
+            if (form) {
+                form.submit();
+            }
+        }
+    </script>
+</head>
+
+<div layout:fragment="content">
+    <div class="app-main flex-column flex-row-fluid" id="kt_app_main">
+        <div class="d-flex flex-column flex-column-fluid">
+            <!--begin::Toolbar-->
+            <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+                <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                    <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                        <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0" 
+                            th:text="${isEdit ? '교환/반품 수정' : '교환/반품 등록'}">교환/반품 등록</h1>
+                        <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                            <li class="breadcrumb-item text-muted">
+                                <a href="/main" class="text-muted text-hover-primary">Home</a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                            </li>
+                            <li class="breadcrumb-item text-muted">교환/반품 관리</li>
+                            <li class="breadcrumb-item">
+                                <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                            </li>
+                            <li class="breadcrumb-item text-muted" 
+                                th:text="${isEdit ? '수정' : '등록'}">등록</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!--end::Toolbar-->
+
+            <!--begin::Content-->
+            <div id="kt_app_content" class="app-content flex-column-fluid">
+                <div id="kt_app_content_container" class="app-container container-fluid">
+                    
+                    <div class="form-container">
+                        <div class="page-header">
+                            <h2 th:text="${isEdit ? '교환/반품 수정' : '교환/반품 등록'}">교환/반품 등록</h2>
+                            <p th:text="${isEdit ? '기존 정보를 수정하고 저장하세요' : '브랜드, 사이트, 유형을 선택한 후 정보를 입력하세요'}">브랜드, 사이트, 유형을 선택한 후 정보를 입력하세요</p>
+                        </div>
+
+                        <!-- 🎯 상단 선택 버튼들 -->
+                        <div class="top-selections">
+                            <div class="selection-row">
+                                <div class="selection-label">브랜드:</div>
+                                <div class="selection-buttons">
+                                    <div class="selection-btn" onclick="selectBrand('레노마', this)">레노마</div>
+                                    <div class="selection-btn" onclick="selectBrand('코랄리크', this)">코랄리크</div>
+                                </div>
+                            </div>
+
+                            <div class="selection-row">
+                                <div class="selection-label">사이트:</div>
+                                <div class="selection-buttons" id="siteButtons">
+                                    <!-- 사이트 버튼들이 동적으로 생성됩니다 -->
+                                </div>
+                            </div>
+
+                            <div class="selection-row">
+                                <div class="selection-label">유형:</div>
+                                <div class="selection-buttons">
+                                    <div class="selection-btn" onclick="selectType('FULL_RETURN', this)">전체반품</div>
+                                    <div class="selection-btn" onclick="selectType('PARTIAL_RETURN', this)">부분반품</div>
+                                    <div class="selection-btn" onclick="selectType('FULL_EXCHANGE', this)">전체교환</div>
+                                    <div class="selection-btn" onclick="selectType('PARTIAL_EXCHANGE', this)">부분교환</div>
+                                </div>
+                            </div>
+
+                            <div class="selection-row">
+                                <div class="selection-label">사유:</div>
+                                <div class="selection-buttons">
+                                    <div class="selection-btn" onclick="selectReason('고객변심', this)">고객변심</div>
+                                    <div class="selection-btn" onclick="selectReason('불량', this)">불량</div>
+                                    <div class="selection-btn" onclick="selectReason('오배송', this)">오배송</div>
+                                    <div class="selection-btn" onclick="selectReason('기타', this)">기타</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 선택 정보 표시 -->
+                        <div id="selectedInfo" class="selected-info" style="display: none;"></div>
+
+                        <!-- 🎯 메인 폼 -->
+                        <form id="exchangeForm" th:action="@{/exchange/save}" method="post" enctype="multipart/form-data" th:object="${returnItem}">
+                            <!-- Hidden 필드들 -->
+                            <div class="hidden-fields">
+                                <input type="hidden" th:if="${isEdit}" th:field="*{id}" />
+                                <input type="hidden" id="siteName" name="siteName" th:field="*{siteName}" />
+                                <input type="hidden" id="returnTypeCode" name="returnTypeCode" th:field="*{returnTypeCode}" />
+                                <input type="hidden" id="returnReason" name="returnReason" th:field="*{returnReason}" />
+                            </div>
+
+                            <!-- 주문 정보 -->
+                            <div class="form-card">
+                                <div class="form-section-header">📦 주문 정보</div>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="orderDate">주문일</label>
+                                        <input type="date" id="orderDate" name="orderDate" class="form-control" th:field="*{orderDate}">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="csReceivedDate" class="required">CS접수일</label>
+                                        <input type="date" id="csReceivedDate" name="csReceivedDate" class="form-control" th:field="*{csReceivedDate}" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="orderNumber" class="required">주문번호</label>
+                                        <input type="text" id="orderNumber" name="orderNumber" class="form-control" th:field="*{orderNumber}" placeholder="20250426-0001236-03" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="orderItemCode" class="required">주문품번</label>
+                                        <input type="text" id="orderItemCode" name="orderItemCode" class="form-control" th:field="*{orderItemCode}" placeholder="RN-GSZD962" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="productColor" class="required">색상</label>
+                                        <input type="text" id="productColor" name="productColor" class="form-control" th:field="*{productColor}" placeholder="PK" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="productSize" class="required">사이즈</label>
+                                        <input type="text" id="productSize" name="productSize" class="form-control" th:field="*{productSize}" placeholder="75" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="quantity" class="required">수량</label>
+                                        <input type="number" id="quantity" name="quantity" class="form-control" th:field="*{quantity}" min="1" value="1" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="refundAmount">환불금액</label>
+                                        <input type="number" id="refundAmount" name="refundAmount" class="form-control" th:field="*{refundAmount}" placeholder="39200">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="shippingFee">배송비</label>
+                                        <select id="shippingFee" name="shippingFee" class="form-control" th:field="*{shippingFee}">
+                                            <option value="">선택하세요</option>
+                                            <option value="6000">6000차감</option>
+                                            <option value="3000">3000차감</option>
+                                            <option value="0">무상</option>
+                                            <option value="6350">6350차감</option>
+                                            <option value="3350">3350차감</option>
+                                            <option value="입금예정">입금예정</option>
+                                            <option value="기타문의">기타문의</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 고객 정보 -->
+                            <div class="form-card">
+                                <div class="form-section-header">👤 고객 정보</div>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="customerName" class="required">고객명 (수취인)</label>
+                                        <input type="text" id="customerName" name="customerName" class="form-control" th:field="*{customerName}" placeholder="김민지" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="customerPhone" class="required">연락처</label>
+                                        <input type="tel" id="customerPhone" name="customerPhone" class="form-control" th:field="*{customerPhone}" placeholder="010-1234-5678" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 처리 정보 -->
+                            <div class="form-card">
+                                <div class="form-section-header">⚙️ 처리 정보</div>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="trackingNumber">운송장번호</label>
+                                        <input type="text" id="trackingNumber" name="trackingNumber" class="form-control" th:field="*{trackingNumber}" placeholder="5738757014">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="collectionCompletedDate">회수완료일</label>
+                                        <input type="date" id="collectionCompletedDate" name="collectionCompletedDate" class="form-control" th:field="*{collectionCompletedDate}">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="logisticsConfirmedDate">물류확인일</label>
+                                        <input type="date" id="logisticsConfirmedDate" name="logisticsConfirmedDate" class="form-control" th:field="*{logisticsConfirmedDate}">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="shippingDate">출고일자</label>
+                                        <input type="date" id="shippingDate" name="shippingDate" class="form-control" th:field="*{shippingDate}">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="refundDate">환불일자</label>
+                                        <input type="date" id="refundDate" name="refundDate" class="form-control" th:field="*{refundDate}">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="isCompleted">완료 처리</label>
+                                        <select id="isCompleted" name="isCompleted" class="form-control" th:field="*{isCompleted}">
+                                            <option value="">선택하세요</option>
+                                            <option value="true">완료</option>
+                                            <option value="false">미완료</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="processor">처리자</label>
+                                        <input type="text" id="processor" name="processor" class="form-control" th:field="*{processor}" placeholder="담당자명">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="remarks">비고</label>
+                                        <textarea id="remarks" name="remarks" class="form-control" th:field="*{remarks}" rows="3" placeholder="추가 메모사항"></textarea>
+                                    </div>
+                                    
+                                    <!-- 🔥 불량상세메모 필드 -->
+                                    <div class="form-group" id="defectDetailGroup" style="display: none;">
+                                        <label for="defectDetail" class="required text-danger">불량상세메모</label>
+                                        <textarea id="defectDetail" name="defectDetail" class="form-control border-danger" 
+                                                  th:field="*{defectDetail}" 
+                                                  rows="4" 
+                                                  maxlength="500" 
+                                                  placeholder="불량 상세 내용을 입력해주세요... (예: 지퍼 고장, 색상 불일치, 재봉선 풀림 등)"></textarea>
+                                        <small class="text-danger">⚠️ 불량 사유 선택 시 필수 입력 (최대 500자)</small>
+                                        <div class="mt-1">
+                                            <span class="badge bg-warning text-dark">💡 Tip</span>
+                                            <small class="text-muted ml-1">구체적인 불량 내용을 기록하면 처리 시 도움이 됩니다</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 이미지 첨부 -->
+                            <div class="form-card">
+                                <div class="form-section-header">🖼️ 이미지 첨부</div>
+                                <div class="form-group">
+                                    <label for="attachmentPhoto">이미지 파일</label>
+                                    <input type="file" id="attachmentPhoto" name="attachmentPhoto" class="form-control" accept="image/*">
+                                    <small class="text-muted">관련 이미지를 첨부해주세요 (선택사항)</small>
+                                    
+                                    <!-- 기존 이미지 표시 (수정 모드) -->
+                                    <div th:if="${isEdit and returnItem.defectPhotoUrl != null and !#strings.isEmpty(returnItem.defectPhotoUrl)}" class="mt-3">
+                                        <p class="text-primary"><strong>현재 등록된 이미지:</strong></p>
+                                        <img th:src="@{|http://175.119.224.45:8080/uploads/${returnItem.defectPhotoUrl}|}" class="image-preview" alt="현재 이미지" 
+                                             onerror="this.onerror=null; this.src='/uploads/' + '${returnItem.defectPhotoUrl}'; console.error('외부 이미지 로드 실패, 로컬 경로로 시도:', this.src);"
+                                             onclick="window.open(this.src, '_blank')" style="cursor: pointer;">
+                                        <br><small class="text-muted">새 이미지를 업로드하면 기존 이미지가 교체됩니다. (클릭하면 원본 크기로 보기)</small>
+                                        
+                                        <!-- 이미지 다운로드 링크 추가 -->
+                                        <div class="mt-2">
+                                            <a th:href="@{|http://175.119.224.45:8080/uploads/${returnItem.defectPhotoUrl}|}" 
+                                               class="btn btn-sm btn-light-primary" 
+                                               download th:download="${returnItem.defectPhotoUrl}" 
+                                               target="_blank">
+                                                📷 이미지 다운로드
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 액션 버튼 -->
+                            <div class="form-actions">
+                                <div>
+                                    <a href="/exchange/list" class="btn btn-secondary">
+                                        ← 목록으로
+                                    </a>
+                                </div>
+                                
+                                <div>
+                                    <button type="button" class="btn btn-primary" onclick="submitForm()">
+                                        💾 <span th:text="${isEdit ? '수정 완료' : '등록 완료'}">등록 완료</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+            <!--end::Content-->
+        </div>
+    </div>
+</div>
+</html> 

@@ -215,7 +215,8 @@
                             ${searchParams.sortBy} ${searchParams.sortOrder}
                         </when>
                         <otherwise>
-                            CREATE_DATE DESC
+                            CASE WHEN (IS_COMPLETED IS NULL OR IS_COMPLETED = 0) THEN 0 ELSE 1 END ASC,
+                            RETURN_ID DESC
                         </otherwise>
                     </choose>
             ) T
@@ -571,7 +572,7 @@
                 FROM TB_RETURN_ITEM
                 ]]>
                 <include refid="optimizedSearchCondition"/>
-                ORDER BY RETURN_ID DESC
+                ORDER BY CASE WHEN (IS_COMPLETED IS NULL OR IS_COMPLETED = 0) THEN 0 ELSE 1 END ASC, RETURN_ID DESC
             ) T
             WHERE ROWNUM &lt;= #{searchParams.endRow}
         )
@@ -615,6 +616,17 @@
             </if>
             <if test="searchParams.endDate != null and (searchParams.startDate == null or searchParams.startDate == '')">
                 AND CS_RECEIVED_DATE &lt;= TO_DATE(#{searchParams.endDate}, 'YYYY-MM-DD') + 0.99999
+            </if>
+            <!-- 물류확인일 검색 조건 -->
+            <if test="searchParams.logisticsStartDate != null and searchParams.logisticsEndDate != null">
+                AND LOGISTICS_CONFIRMED_DATE BETWEEN TO_DATE(#{searchParams.logisticsStartDate}, 'YYYY-MM-DD') 
+                                                 AND TO_DATE(#{searchParams.logisticsEndDate}, 'YYYY-MM-DD') + 0.99999
+            </if>
+            <if test="searchParams.logisticsStartDate != null and (searchParams.logisticsEndDate == null or searchParams.logisticsEndDate == '')">
+                AND LOGISTICS_CONFIRMED_DATE &gt;= TO_DATE(#{searchParams.logisticsStartDate}, 'YYYY-MM-DD')
+            </if>
+            <if test="searchParams.logisticsEndDate != null and (searchParams.logisticsStartDate == null or searchParams.logisticsStartDate == '')">
+                AND LOGISTICS_CONFIRMED_DATE &lt;= TO_DATE(#{searchParams.logisticsEndDate}, 'YYYY-MM-DD') + 0.99999
             </if>
             <!-- 고객명 검색 (인덱스 IDX_RETURN_ITEM_CUSTOMER 활용) -->
             <if test="searchParams.customerName != null and searchParams.customerName != ''">

@@ -22,7 +22,8 @@ import java.time.LocalDateTime;
 public class ReturnItem {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "return_item_seq")
+    @SequenceGenerator(name = "return_item_seq", sequenceName = "TB_RETURN_ITEM_SEQ", allocationSize = 1)
     @Column(name = "RETURN_ID")
     private Long id;
     

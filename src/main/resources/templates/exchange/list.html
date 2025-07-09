@@ -434,6 +434,10 @@
 
         .table-wrapper {
             overflow-x: auto;
+            overflow-y: auto;
+            max-height: 70vh; /* 화면 높이의 70%로 제한 */
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
         }
 
         .data-table {
@@ -454,6 +458,10 @@
             border: 1px solid #E4E6EF;
             text-align: center;
             white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .data-table td {
@@ -483,18 +491,48 @@
         } /* 연락처 - 한줄 표시를 위해 대폭 확대 */
         .data-table th:nth-child(11), .data-table td:nth-child(11) { min-width: 120px; } /* 진행상태 */
         .data-table th:nth-child(12), .data-table td:nth-child(12) { min-width: 100px; } /* 사유 */
-        .data-table th:nth-child(13), .data-table td:nth-child(13) { min-width: 160px; } /* 운송장번호 */
-        .data-table th:nth-child(14), .data-table td:nth-child(14) { min-width: 200px; } /* 회수완료일 - 더욱 대폭 확대 */
-        .data-table th:nth-child(15), .data-table td:nth-child(15) { min-width: 100px; } /* 배송비 */
-        .data-table th:nth-child(16), .data-table td:nth-child(16) { min-width: 160px; } /* 운송장번호2 */
-        .data-table th:nth-child(17), .data-table td:nth-child(17) { min-width: 200px; } /* 물류확인일 - 더욱 대폭 확대 */
-        .data-table th:nth-child(18), .data-table td:nth-child(18) { min-width: 200px; } /* 출고일 - 더욱 대폭 확대 */
-        .data-table th:nth-child(19), .data-table td:nth-child(19) { min-width: 200px; } /* 환불일 - 더욱 대폭 확대 */
+        .data-table th:nth-child(13), .data-table td:nth-child(13) { min-width: 120px; } /* 🔥 불량상세 */
+        .data-table th:nth-child(14), .data-table td:nth-child(14) { min-width: 160px; } /* 운송장번호 */
+        .data-table th:nth-child(15), .data-table td:nth-child(15) { min-width: 200px; } /* 회수완료일 - 더욱 대폭 확대 */
+        .data-table th:nth-child(16), .data-table td:nth-child(16) { min-width: 100px; } /* 배송비 */
+        .data-table th:nth-child(17), .data-table td:nth-child(17) { min-width: 160px; } /* 운송장번호2 */
+        .data-table th:nth-child(18), .data-table td:nth-child(18) { min-width: 200px; } /* 물류확인일 - 더욱 대폭 확대 */
+        .data-table th:nth-child(19), .data-table td:nth-child(19) { min-width: 200px; } /* 출고일 - 더욱 대폭 확대 */
+        .data-table th:nth-child(20), .data-table td:nth-child(20) { min-width: 200px; } /* 환불일 - 더욱 대폭 확대 */
         .data-table th:nth-child(20), .data-table td:nth-child(20) { 
             min-width: 120px; 
             white-space: nowrap;
         } /* 비고 - 확대하여 전체 텍스트 표시 */
-        .data-table th:nth-child(21), .data-table td:nth-child(21) { min-width: 100px; } /* 관리 */
+        .data-table th:nth-child(22), .data-table td:nth-child(22) { min-width: 100px; } /* 관리 */
+
+        /* 🔥 불량상세메모 셀 스타일 */
+        .defect-detail-cell {
+            font-size: 0.75rem;
+            color: #dc3545;
+            background-color: #f8d7da;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            border: 1px solid #f1aeb5;
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            cursor: help;
+            transition: all 0.2s ease;
+            display: inline-block;
+        }
+
+        .defect-detail-cell:hover {
+            background-color: #f5c2c7;
+            border-color: #dc3545;
+            transform: scale(1.05);
+            z-index: 10;
+            position: relative;
+            white-space: normal;
+            overflow: visible;
+            max-width: 200px;
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+        }
 
         .data-table tbody tr:hover {
             background: var(--bg-hover);
@@ -1357,31 +1395,18 @@
                             <input type="date" id="endDate" name="endDate" class="form-control" th:field="*{endDate}">
                         </div>
                         <div class="search-group">
+                            <label for="logisticsStartDate">물류확인 시작일</label>
+                            <input type="date" id="logisticsStartDate" name="logisticsStartDate" class="form-control" th:field="*{logisticsStartDate}">
+                        </div>
+                        <div class="search-group">
+                            <label for="logisticsEndDate">물류확인 종료일</label>
+                            <input type="date" id="logisticsEndDate" name="logisticsEndDate" class="form-control" th:field="*{logisticsEndDate}">
+                        </div>
+                        <div class="search-group">
                             <label>&nbsp;</label>
                             <div style="display: flex; gap: 0.5rem;">
                                 <button type="submit" class="btn btn-search">🔍 검색</button>
                                 <button type="button" class="btn btn-reset" onclick="window.location.href='/exchange/list'">🔄 초기화</button>
-                            </div>
-                        </div>
-                        <div class="search-group">
-                            <label>&nbsp;</label>
-                            <div class="button-group">
-                                <!-- 📥 엑셀 다운로드 버튼 -->
-                                <button type="button" class="btn btn-primary" style="font-size: 1.1rem; padding: 0.75rem 1.5rem;" onclick="downloadExcel()">📥 엑셀다운</button>
-                                
-                                <!-- 📤 엑셀 업로드 버튼
-                                <button type="button" class="btn btn-success" style="font-size: 1.1rem; padding: 0.75rem 1.5rem;" onclick="openExcelUploadModal()">📤 엑셀업로드</button>
-                                
-                               📄 템플릿 다운로드 버튼
-                                <button type="button" class="btn btn-secondary" style="font-size: 1.1rem; padding: 0.75rem 1.5rem;" onclick="downloadTemplate()">📄 템플릿</button>
-                                -->
-                                <button type="button" id="bulkSaveBtn" class="btn btn-success" style="font-size: 1.1rem; padding: 0.75rem 1.5rem; min-width: 180px; white-space: nowrap;" onclick="saveBulkDateChanges()" disabled>💾 날짜저장 (<span id="changeCount">0</span>건)</button>
-                                <!-- 완료처리 버튼 주석 처리
-                                <button type="button" id="bulkCompleteBtn" class="btn btn-warning" onclick="saveBulkCompletionChanges()" disabled style="min-width: 160px; white-space: nowrap;">✅ 완료처리 (<span id="completeCount">0</span>건)</button>
-                                -->
-                                <!-- 등록 버튼 주석 처리
-                                <a href="/exchange/create" class="btn btn-primary">➕ 등록</a>
-                                -->
                             </div>
                         </div>
                     </div>
@@ -1389,9 +1414,46 @@
                     <!-- 검색 도움말 -->
                     <div style="margin-top: 0.5rem; padding: 0.5rem; background-color: var(--primary-light); border-radius: var(--radius); font-size: 0.7rem; color: var(--text-muted);">
                         💡 <strong>검색 팁:</strong> 주문번호, 고객명, 연락처, 사이트명, 품번, 색상, 사이즈, 운송장번호, 유형, 반품사유, 처리자, 비고 등 모든 정보를 하나의 검색창에서 찾을 수 있습니다.<br/>
+                        📅 <strong>날짜 검색:</strong> CS접수일과 물류확인일을 각각 독립적으로 검색할 수 있습니다. 필요한 날짜 범위만 설정하세요.<br/>
                         🎯 <strong>완료 상태 검색:</strong> "완료" 또는 "전체완료" → 완료된 건만 조회 | "미완료" 또는 "진행중" → 미완료 건만 조회 | "Y" → 완료 | "N" → 미완료
                     </div>
                 </form>
+            </div>
+
+            <!-- 📋 관리 버튼 영역 -->
+            <div class="action-buttons-container" style="margin-top: 1rem; margin-bottom: 1rem; padding: 1rem; background-color: #f8f9fa; border-radius: var(--radius); border: 1px solid #e9ecef;">
+                <div class="button-group" style="display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: flex-start; align-items: center;">
+                                <!-- 📥 엑셀 다운로드 버튼 -->
+                                <button type="button" class="btn btn-primary" style="font-size: 1.1rem; padding: 0.75rem 1.5rem;" onclick="downloadExcel()">📥 엑셀다운</button>
+                    <!-- 📥🖼️ 이미지 포함 엑셀 다운로드 버튼 -->
+                    <button type="button" class="btn btn-info" style="font-size: 1.1rem; padding: 0.75rem 1.5rem;" onclick="downloadExcelWithImages()">🖼️ 이미지포함 엑셀</button>
+                                
+                                <!-- 📤 엑셀 업로드 버튼
+                                <button type="button" class="btn btn-success" style="font-size: 1.1rem; padding: 0.75rem 1.5rem;" onclick="openExcelUploadModal()">📤 엑셀업로드</button>
+                                
+                               📄 템플릿 다운로드 버튼
+                                <button type="button" class="btn btn-secondary" style="font-size: 1.1rem; padding: 0.75rem 1.5rem;" onclick="downloadTemplate()">📄 템플릿</button>
+                                -->
+                    
+                    <!-- 구분선 -->
+                    <div style="width: 1px; height: 40px; background-color: #dee2e6; margin: 0 0.5rem;"></div>
+                    
+                    <!-- 💾 날짜저장 버튼 -->
+                                <button type="button" id="bulkSaveBtn" class="btn btn-success" style="font-size: 1.1rem; padding: 0.75rem 1.5rem; min-width: 180px; white-space: nowrap;" onclick="saveBulkDateChanges()" disabled>💾 날짜저장 (<span id="changeCount">0</span>건)</button>
+                    
+                    <!-- 📝 이미지/메모 수정 버튼 -->
+                    <button type="button" id="imageAttachBtn" class="btn btn-info" style="font-size: 1.1rem; padding: 0.75rem 1.5rem; min-width: 160px; white-space: nowrap;" onclick="openImageAttachModal()" disabled>📝 이미지/메모</button>
+                    
+                                <!-- 완료처리 버튼 주석 처리
+                                <button type="button" id="bulkCompleteBtn" class="btn btn-warning" onclick="saveBulkCompletionChanges()" disabled style="min-width: 160px; white-space: nowrap;">✅ 완료처리 (<span id="completeCount">0</span>건)</button>
+                                -->
+                    
+                    <!-- 구분선 -->
+                    <div style="width: 1px; height: 40px; background-color: #dee2e6; margin: 0 0.5rem;"></div>
+                    
+                    <!-- ➕ 등록 버튼 -->
+                    <a href="/exchange/create" class="btn btn-primary" style="font-size: 1.1rem; padding: 0.75rem 1.5rem;">➕ 등록</a>
+                    </div>
             </div>
 
             <!-- 데이터 테이블 -->
@@ -1424,12 +1486,14 @@
                                 <th style="width: 55px;">배송비</th>
                                 <th style="width: 100px;">🎯 입금상태</th>
                                 <th style="width: 60px;">사유</th>
+                                <th style="width: 120px;">불량상세</th>
                                 <th style="width: 80px;">운송장번호</th>
                                 <th style="width: 70px;">회수완료</th>
                                 <th style="width: 70px;">출고일자</th>
                                 <th style="width: 70px;">환불일자</th>
                                 <th style="width: 40px;">완료</th>
                                 <th style="width: 80px;">비고</th>
+                                <th style="width: 60px;">첨부이미지</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1511,20 +1575,29 @@
                                           th:text="${item.shippingFee matches '[0-9]+' ? #numbers.formatInteger(T(java.lang.Integer).parseInt(item.shippingFee), 0, 'COMMA') : item.shippingFee}">3,000</span>
                                 </td>
                                 <td class="text-center">
-                                    <span th:if="${item.paymentStatus == 'COMPLETED'}" 
+                                    <span th:if="${item.paymentStatusText == '입금완료'}" 
                                           class="badge bg-success text-white" 
                                           th:text="${item.paymentStatusText}">입금완료</span>
-                                    <span th:if="${item.paymentStatus == 'PENDING'}" 
+                                    <span th:if="${item.paymentStatusText == '입금대기'}" 
                                           class="badge bg-warning text-dark" 
                                           th:text="${item.paymentStatusText}">입금대기</span>
-                                    <span th:if="${item.paymentStatus == 'NOT_REQUIRED'}" 
+                                    <span th:if="${item.paymentStatusText == '입금불필요'}" 
                                           class="badge bg-info text-white" 
                                           th:text="${item.paymentStatusText}">입금불필요</span>
-                                    <span th:if="${item.paymentStatus != 'COMPLETED' and item.paymentStatus != 'PENDING' and item.paymentStatus != 'NOT_REQUIRED'}" 
+                                    <span th:if="${item.paymentStatusText != '입금완료' and item.paymentStatusText != '입금대기' and item.paymentStatusText != '입금불필요'}" 
                                           class="badge bg-secondary text-white" 
-                                          th:text="${item.paymentStatusText}">기타</span>
+                                          th:text="${item.paymentStatusText != null ? item.paymentStatusText : '기타'}">기타</span>
                                 </td>
                                 <td class="text-left" th:text="${item.returnReason}">고객변심</td>
+                                <td class="text-left">
+                                    <div th:if="${item.defectDetail != null and item.defectDetail != ''}" 
+                                         class="defect-detail-cell" 
+                                         th:title="${item.defectDetail}">
+                                        <span th:text="${#strings.abbreviate(item.defectDetail, 25)}">불량 상세 내용...</span>
+                                    </div>
+                                    <div th:unless="${item.defectDetail != null and item.defectDetail != ''}" 
+                                         class="text-muted text-center">-</div>
+                                </td>
                                 <td class="order-info">
                                     <span class="tracking-number-copy" 
                                           th:text="${item.trackingNumber}" 
@@ -1543,6 +1616,23 @@
                                            style="transform: scale(1.2);">
                                 </td>
                                 <td class="text-left" th:text="${item.remarks}"></td>
+                                <td>
+                                    <div th:if="${item.defectPhotoUrl != null and item.defectPhotoUrl != ''}" class="image-container">
+                                        <img th:src="${item.defectPhotoUrl.startsWith('http') ? item.defectPhotoUrl : 'http://175.119.224.45:8080/uploads/' + item.defectPhotoUrl}" 
+                                             class="thumbnail-image" 
+                                             th:data-image-url="${item.defectPhotoUrl.startsWith('http') ? item.defectPhotoUrl : 'http://175.119.224.45:8080/uploads/' + item.defectPhotoUrl}"
+                                             onclick="showImageModalFromData(this)"
+                                             th:alt="${'첨부이미지-' + item.id}"
+                                             title="클릭하면 원본 크기로 보입니다"
+                                             onload="console.log('✅ 이미지 로드 성공 - ID:', this.getAttribute('data-item-id'), 'URL:', this.src, 'defectPhotoUrl:', this.getAttribute('data-defect-url'));"
+                                             onerror="console.error('❌ 이미지 로드 실패 - ID:', this.getAttribute('data-item-id'), 'URL:', this.src, 'defectPhotoUrl:', this.getAttribute('data-defect-url')); this.style.display='none';"
+                                             th:data-item-id="${item.id}"
+                                             th:data-defect-url="${item.defectPhotoUrl}">
+                                    </div>
+                                    <div th:if="${item.defectPhotoUrl == null or item.defectPhotoUrl == ''}" class="no-image">
+                                        <!-- 이미지 없을 때는 공백 -->
+                                    </div>
+                                </td>
                                 <!--<td>
                                     <a th:href="@{'/exchange/view/' + ${item.id}}" class="action-link" style="font-size: 1.0rem; font-weight: 600;">보기</a>
                                      수정, 삭제 버튼 주석 처리
@@ -1567,7 +1657,7 @@
                                 </td>-->
                             </tr>
                             <tr th:if="${returnItems == null or returnItems.empty}">
-                                <td colspan="24" class="no-data">등록된 교환/반품 내역이 없습니다.</td>
+                                <td colspan="25" class="no-data">등록된 교환/반품 내역이 없습니다.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -1584,6 +1674,8 @@
                                 keyword=${searchDTO != null ? searchDTO.keyword : ''},
                                 startDate=${searchDTO != null ? searchDTO.startDate : ''},
                                 endDate=${searchDTO != null ? searchDTO.endDate : ''},
+                                logisticsStartDate=${searchDTO != null ? searchDTO.logisticsStartDate : ''},
+                                logisticsEndDate=${searchDTO != null ? searchDTO.logisticsEndDate : ''},
                                 filters=${currentFilters != null ? currentFilters : ''}
                             )}">&laquo;</a>
                         </li>
@@ -1595,6 +1687,8 @@
                                 keyword=${searchDTO != null ? searchDTO.keyword : ''},
                                 startDate=${searchDTO != null ? searchDTO.startDate : ''},
                                 endDate=${searchDTO != null ? searchDTO.endDate : ''},
+                                logisticsStartDate=${searchDTO != null ? searchDTO.logisticsStartDate : ''},
+                                logisticsEndDate=${searchDTO != null ? searchDTO.logisticsEndDate : ''},
                                 filters=${currentFilters != null ? currentFilters : ''}
                             )}">&lt;</a>
                         </li>
@@ -1608,6 +1702,8 @@
                                    keyword=${searchDTO != null ? searchDTO.keyword : ''},
                                    startDate=${searchDTO != null ? searchDTO.startDate : ''},
                                    endDate=${searchDTO != null ? searchDTO.endDate : ''},
+                                   logisticsStartDate=${searchDTO != null ? searchDTO.logisticsStartDate : ''},
+                                   logisticsEndDate=${searchDTO != null ? searchDTO.logisticsEndDate : ''},
                                    filters=${currentFilters != null ? currentFilters : ''}
                                )}"
                                th:text="${i + 1}"
@@ -1622,6 +1718,8 @@
                                 keyword=${searchDTO != null ? searchDTO.keyword : ''},
                                 startDate=${searchDTO != null ? searchDTO.startDate : ''},
                                 endDate=${searchDTO != null ? searchDTO.endDate : ''},
+                                logisticsStartDate=${searchDTO != null ? searchDTO.logisticsStartDate : ''},
+                                logisticsEndDate=${searchDTO != null ? searchDTO.logisticsEndDate : ''},
                                 filters=${currentFilters != null ? currentFilters : ''}
                             )}">&gt;</a>
                         </li>
@@ -1633,6 +1731,8 @@
                                 keyword=${searchDTO != null ? searchDTO.keyword : ''},
                                 startDate=${searchDTO != null ? searchDTO.startDate : ''},
                                 endDate=${searchDTO != null ? searchDTO.endDate : ''},
+                                logisticsStartDate=${searchDTO != null ? searchDTO.logisticsStartDate : ''},
+                                logisticsEndDate=${searchDTO != null ? searchDTO.logisticsEndDate : ''},
                                 filters=${currentFilters != null ? currentFilters : ''}
                             )}">&raquo;</a>
                         </li>
@@ -1708,6 +1808,8 @@
             const keyword = document.getElementById('keyword').value || '';
             const startDate = document.getElementById('startDate').value || '';
             const endDate = document.getElementById('endDate').value || '';
+            const logisticsStartDate = document.getElementById('logisticsStartDate').value || '';
+            const logisticsEndDate = document.getElementById('logisticsEndDate').value || '';
             
             // 선택된 필터들을 쉼표로 구분된 문자열로 변환
             const filtersString = Array.from(selectedFilters).join(',');
@@ -1721,6 +1823,8 @@
             if (keyword.trim()) url.searchParams.set('keyword', keyword.trim());
             if (startDate.trim()) url.searchParams.set('startDate', startDate.trim());
             if (endDate.trim()) url.searchParams.set('endDate', endDate.trim());
+            if (logisticsStartDate.trim()) url.searchParams.set('logisticsStartDate', logisticsStartDate.trim());
+            if (logisticsEndDate.trim()) url.searchParams.set('logisticsEndDate', logisticsEndDate.trim());
             
             console.log('🚀 서버로 이동:', url.toString());
             window.location.href = url.toString();
@@ -1742,6 +1846,8 @@
             const keyword = document.getElementById('keyword').value || '';
             const startDate = document.getElementById('startDate').value || '';
             const endDate = document.getElementById('endDate').value || '';
+            const logisticsStartDate = document.getElementById('logisticsStartDate').value || '';
+            const logisticsEndDate = document.getElementById('logisticsEndDate').value || '';
             
             const url = new URL('/exchange/list', window.location.origin);
             url.searchParams.set('page', '0');
@@ -1750,6 +1856,8 @@
             if (keyword.trim()) url.searchParams.set('keyword', keyword.trim());
             if (startDate.trim()) url.searchParams.set('startDate', startDate.trim());
             if (endDate.trim()) url.searchParams.set('endDate', endDate.trim());
+            if (logisticsStartDate.trim()) url.searchParams.set('logisticsStartDate', logisticsStartDate.trim());
+            if (logisticsEndDate.trim()) url.searchParams.set('logisticsEndDate', logisticsEndDate.trim());
             
             console.log('🚀 기본 목록으로 이동:', url.toString());
             window.location.href = url.toString();
@@ -2305,6 +2413,7 @@
             
             // 선택된 개수 업데이트
             updateSelectedCount();
+            updateImageAttachButtonState(); // 🆕 이미지 첨부 버튼 상태 업데이트
         }
         
         // 개별 체크박스 클릭 시 헤더 체크박스 상태 업데이트
@@ -2330,6 +2439,7 @@
             }
             
             updateSelectedCount();
+            updateImageAttachButtonState(); // 🆕 이미지 첨부 버튼 상태 업데이트
         }
         
         // 선택된 항목 개수 표시 업데이트
@@ -2357,6 +2467,26 @@
                 tableContainer.parentNode.insertBefore(counter, tableContainer);
             }
         }
+
+        // 🆕 이미지 첨부 버튼 상태 업데이트
+        function updateImageAttachButtonState() {
+            const checkedCount = document.querySelectorAll('input[name="selected"]:checked').length;
+            const imageAttachBtn = document.getElementById('imageAttachBtn');
+            
+            if (imageAttachBtn) {
+                if (checkedCount === 1) {
+                    // 정확히 하나 선택된 경우만 활성화
+                    imageAttachBtn.disabled = false;
+                    imageAttachBtn.style.backgroundColor = '#17a2b8';
+                    imageAttachBtn.style.opacity = '1';
+                } else {
+                    // 0개 또는 2개 이상 선택된 경우 비활성화
+                    imageAttachBtn.disabled = true;
+                    imageAttachBtn.style.backgroundColor = '#6c757d';
+                    imageAttachBtn.style.opacity = '0.6';
+                }
+            }
+        }
         
         // 모든 선택 해제
         function clearAllSelections() {
@@ -2371,6 +2501,7 @@
             });
             
             updateSelectedCount();
+            updateImageAttachButtonState(); // 🆕 이미지 첨부 버튼 상태 업데이트
         }
         
         // 🎯 대표님 요청: 날짜 일괄 수정 기능
@@ -2378,6 +2509,12 @@
         
         // 🎯 대표님 요청: 완료 상태 일괄 수정 기능
         let completionChanges = new Map(); // 변경된 완료 상태들을 저장
+        
+        // 🆕 순차 처리용 변수들
+        let itemsToProcess = []; // 처리할 항목들의 배열
+        let currentItemIndex = 0; // 현재 처리 중인 항목 인덱스
+        let totalItemsCount = 0; // 전체 처리할 항목 수
+        let isProcessing = false; // 현재 처리 중인지 여부
         
         // 날짜 변경 시 호출되는 함수
         function markDateAsChanged(input) {
@@ -2428,26 +2565,270 @@
             }
         }
         
-        // 일괄 날짜 저장 함수
+        // 🆕 순차적 날짜 저장 함수 (항목별 개별 처리)
         function saveBulkDateChanges() {
             if (dateChanges.size === 0) {
                 alert('변경된 날짜가 없습니다.');
                 return;
             }
             
-            console.log('💾 일괄 날짜 저장 시작:', dateChanges);
+            console.log('📝 순차적 비고 처리 시작:', dateChanges);
             
-            // 저장 버튼 비활성화
+            // 처리할 항목들 준비
+            itemsToProcess = Array.from(dateChanges.keys());
+            totalItemsCount = itemsToProcess.length;
+            currentItemIndex = 0;
+            
+            console.log('📋 처리할 항목 목록:', itemsToProcess);
+            
+            // 첫 번째 항목부터 시작
+            processNextItem();
+        }
+        
+        // 🆕 다음 항목 처리 함수
+        function processNextItem() {
+            console.log(`🔍 processNextItem 호출 - currentItemIndex: ${currentItemIndex}, itemsToProcess.length: ${itemsToProcess.length}`);
+            
+            if (currentItemIndex >= itemsToProcess.length) {
+                // 모든 항목 처리 완료
+                console.log('✅ 모든 항목 처리 완료');
+                finishAllProcessing();
+                return;
+            }
+            
+            const currentItemId = itemsToProcess[currentItemIndex];
+            console.log(`📝 ${currentItemIndex + 1}/${totalItemsCount} 항목 처리: ID ${currentItemId}`);
+            
+            // 잠깐 대기 후 모달창 열기 (DOM 업데이트 대기)
+            setTimeout(() => {
+                openRemarksModalForItem(currentItemId);
+            }, 100);
+        }
+        
+        // 🆕 개별 항목 비고 모달창 열기 함수
+        function openRemarksModalForItem(itemId) {
+            const modal = document.getElementById('remarksModal');
+            const selectedCount = document.getElementById('selectedItemsCount');
+            const modalProgressText = document.getElementById('modalProgressText');
+            const remarksContent = document.getElementById('remarksContent');
+            const itemInfoContainer = document.getElementById('itemInfoContainer');
+            
+            if (modal && selectedCount) {
+                // 진행상황 표시 (두 곳 모두 업데이트)
+                const progressText = `${currentItemIndex + 1}/${totalItemsCount}`;
+                selectedCount.textContent = progressText;
+                if (modalProgressText) {
+                    modalProgressText.textContent = progressText;
+                }
+                
+                // 현재 항목의 정보 및 기존 비고 내용 로드
+                let existingRemarks = '';
+                let itemInfo = {};
+                
+                // 🔍 체크박스 값으로 행 찾기 (data-id 속성 대신)
+                const row = document.querySelector(`input[name="selected"][value="${itemId}"]`)?.closest('tr');
+                console.log('🔍 찾은 행:', row);
+                
+                if (row) {
+                    const cells = row.querySelectorAll('td');
+                    console.log('🔍 셀 개수:', cells.length);
+                    
+                    // 기존 비고 내용 로드
+                    const remarksCell = cells[22]; // 비고 컬럼 (23번째이지만 0-based이므로 22)
+                    if (remarksCell) {
+                        existingRemarks = remarksCell.textContent.trim();
+                    }
+                    
+                    // 🔍 중요한 셀들 디버깅
+                    console.log('🔍 비고 셀 (22):', cells[22]?.textContent);
+                    console.log('🔍 유형 셀 (1):', cells[1]?.innerHTML);
+                    console.log('🔍 주문번호 셀 (5):', cells[5]?.innerHTML);
+                    console.log('🔍 고객명 셀 (7):', cells[7]?.innerHTML);
+                    
+                    // 항목 정보 추출 (테이블 구조에 맞춰 조정)
+                    itemInfo = {
+                        id: itemId,
+                        type: cells[1]?.querySelector('span')?.textContent.trim() || cells[1]?.textContent.trim() || '-', // 유형 (span 태그 안에 있음)
+                        orderDate: cells[2]?.textContent.trim() || '-', // 주문일
+                        registrationDate: cells[3]?.textContent.trim() || '-', // CS접수일
+                        siteName: cells[4]?.textContent.trim() || '-', // 사이트명
+                        orderNumber: cells[5]?.querySelector('span')?.textContent.trim() || cells[5]?.textContent.trim() || '-', // 주문번호 (span 태그 안에 있음)
+                        refundAmount: cells[6]?.textContent.trim() || '-', // 환불금액
+                        customerName: cells[7]?.querySelector('span')?.textContent.trim() || cells[7]?.textContent.trim() || '-', // 수취인 (span 태그 안에 있음)
+                        customerPhone: cells[8]?.querySelector('span')?.textContent.trim() || cells[8]?.textContent.trim() || '-', // 연락처 (span 태그 안에 있음)
+                        orderItemCode: cells[10]?.querySelector('span')?.textContent.trim() || cells[10]?.textContent.trim() || '-', // 주문품번 (span 태그 안에 있음)
+                        productColor: cells[11]?.textContent.trim() || '-', // 색상
+                        productSize: cells[12]?.textContent.trim() || '-', // 사이즈
+                        quantity: cells[13]?.textContent.trim() || '-', // 수량
+                        shippingFee: cells[14]?.textContent.trim() || '-', // 배송비
+                        paymentStatus: cells[15]?.querySelector('span')?.textContent.trim() || cells[15]?.textContent.trim() || '-', // 입금상태 (badge span 태그 안에 있음)
+                        reason: cells[16]?.textContent.trim() || '-', // 사유
+                        trackingNumber: cells[17]?.querySelector('span')?.textContent.trim() || cells[17]?.textContent.trim() || '-', // 운송장번호 (span 태그 안에 있음)
+                        collectionCompletedDate: cells[18]?.textContent.trim() || '-', // 회수완료일
+                        shippingDate: cells[19]?.textContent.trim() || '-', // 출고일자
+                        refundDate: cells[20]?.textContent.trim() || '-', // 환불일자
+                        isCompleted: cells[21]?.querySelector('input[type="checkbox"]')?.checked ? '완료' : '미완료', // 완료상태
+                        logisticsConfirmedDate: cells[9]?.querySelector('input[type="date"]')?.value || '-' // 물류확인일
+                    };
+                    
+                    console.log('🔍 항목 정보 디버깅:', itemInfo);
+                }
+                
+                // 항목 정보 표시 업데이트
+                if (itemInfoContainer) {
+                    // 🔧 안전한 타입 체크
+                    const typeText = itemInfo.type || '미지정';
+                    const typeColor = (typeText && typeText.includes('교환')) ? '#3b82f6' : '#ef4444';
+                    const completedColor = (itemInfo.isCompleted === '완료') ? '#10b981' : '#f59e0b';
+                    
+                    itemInfoContainer.innerHTML = `
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 13px;">
+                            <div><strong>🆔 ID:</strong> ${itemInfo.id || '-'}</div>
+                            <div><strong>📋 유형:</strong> <span style="color: ${typeColor}; font-weight: 600;">${typeText}</span></div>
+                            <div><strong>📅 주문일:</strong> ${itemInfo.orderDate || '-'}</div>
+                            <div><strong>📞 CS접수일:</strong> ${itemInfo.registrationDate || '-'}</div>
+                            <div><strong>🏪 사이트명:</strong> ${itemInfo.siteName || '-'}</div>
+                            <div><strong>📦 주문번호:</strong> ${itemInfo.orderNumber || '-'}</div>
+                            <div><strong>👤 수취인:</strong> ${itemInfo.customerName || '-'}</div>
+                            <div><strong>📱 연락처:</strong> ${itemInfo.customerPhone || '-'}</div>
+                            <div><strong>🛍️ 주문품번:</strong> ${itemInfo.orderItemCode || '-'}</div>
+                            <div><strong>🎨 색상/사이즈:</strong> ${itemInfo.productColor || '-'} / ${itemInfo.productSize || '-'}</div>
+                            <div><strong>📝 사유:</strong> ${itemInfo.reason || '-'}</div>
+                            <div><strong>💰 환불금액:</strong> ${itemInfo.refundAmount || '-'}</div>
+                            <div><strong>📮 운송장번호:</strong> ${itemInfo.trackingNumber || '-'}</div>
+                            <div><strong>💳 입금상태:</strong> ${itemInfo.paymentStatus || '-'}</div>
+                            <div><strong>🚚 물류확인일:</strong> <span style="color: #10b981; font-weight: 600;">${itemInfo.logisticsConfirmedDate || '-'}</span></div>
+                            <div><strong>✅ 완료상태:</strong> <span style="color: ${completedColor}; font-weight: 600;">${itemInfo.isCompleted || '-'}</span></div>
+                        </div>
+                    `;
+                }
+                
+                // 텍스트 영역에 기존 비고 설정
+                if (remarksContent) {
+                    remarksContent.value = existingRemarks;
+                }
+                
+                // 현재 비고 상태 표시
+                const currentRemarksText = document.getElementById('currentRemarksText');
+                if (currentRemarksText) {
+                    currentRemarksText.textContent = existingRemarks || '(비고 없음)';
+                    currentRemarksText.style.color = existingRemarks ? '#374151' : '#9ca3af';
+                    currentRemarksText.style.fontStyle = existingRemarks ? 'normal' : 'italic';
+                }
+                
+                // 모달 표시 (이미 열려있는 경우 먼저 닫기)
+                if (modal.style.display === 'block') {
+                    console.log('🔍 모달이 이미 열려있음 - 먼저 닫기');
+                    modal.style.display = 'none';
+                    
+                    setTimeout(() => {
+                        modal.style.display = 'block';
+                        
+                        // 텍스트 영역에 포커스
+                        setTimeout(() => {
+                            if (remarksContent) {
+                                remarksContent.focus();
+                            }
+                        }, 100);
+                    }, 50);
+                } else {
+                    modal.style.display = 'block';
+                    
+                    // 텍스트 영역에 포커스
+                    setTimeout(() => {
+                        if (remarksContent) {
+                            remarksContent.focus();
+                        }
+                    }, 100);
+                }
+            }
+        }
+        
+        // 🆕 비고 모달창 단순 닫기 함수
+        function closeRemarksModal() {
+            const modal = document.getElementById('remarksModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+        
+        // 🆕 전체 처리 취소 함수
+        function cancelAllProcessing() {
+            const modal = document.getElementById('remarksModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+            
+            // 전체 처리 취소 확인
+            if (confirm('현재 진행 중인 비고 처리를 취소하시겠습니까?\n모든 변경사항이 취소됩니다.')) {
+                // 처리 상태 초기화
+                itemsToProcess = [];
+                currentItemIndex = 0;
+                totalItemsCount = 0;
+                isProcessing = false;
+                
+                // 저장 버튼 상태 복원
+                const saveBtn = document.getElementById('bulkSaveBtn');
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '💾 날짜저장 (<span id="changeCount">0</span>건)';
+                }
+                
+                // 변경 카운트 업데이트
+                updateDateChangeCount();
+                
+                console.log('❌ 비고 처리 취소됨');
+            } else {
+                // 취소하지 않으면 모달 다시 열기
+                modal.style.display = 'block';
+            }
+        }
+        
+        // 🆕 현재 항목 비고와 함께 저장 함수
+        function saveWithRemarks() {
+            const remarksContent = document.getElementById('remarksContent');
+            const remarks = remarksContent ? remarksContent.value.trim() : '';
+            
+            const currentItemId = itemsToProcess[currentItemIndex];
+            console.log('💾 현재 항목 저장:', { itemId: currentItemId, remarks });
+            
+            // 모달 닫기
+            const modal = document.getElementById('remarksModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+            
+            // 모달 닫힌 후 잠깐 대기 후 저장 처리
+            setTimeout(() => {
+                saveCurrentItemWithRemarks(currentItemId, remarks);
+            }, 100);
+        }
+        
+        // 🆕 현재 항목만 저장하는 함수
+        function saveCurrentItemWithRemarks(itemId, remarks = '') {
+            if (isProcessing) {
+                console.log('🔄 이미 처리 중 - 중복 호출 방지');
+                return;
+            }
+            
+            const changes = dateChanges.get(itemId);
+            if (!changes) {
+                console.error('❌ 해당 항목의 변경사항을 찾을 수 없음:', itemId);
+                return;
+            }
+            
+            isProcessing = true;
+            console.log('💾 개별 항목 저장 시작:', { itemId, changes, remarks });
+            
+            // 저장 버튼 비활성화 및 진행상황 표시
             const saveBtn = document.getElementById('bulkSaveBtn');
             if (saveBtn) {
                 saveBtn.disabled = true;
-                saveBtn.innerHTML = '💾 저장중...';
+                saveBtn.innerHTML = `💾 저장중... (${currentItemIndex + 1}/${totalItemsCount})`;
             }
             
-            // 서버로 전송할 데이터 준비 (null 값도 포함)
-            const updates = [];
-            dateChanges.forEach((changes, id) => {
-                const updateData = { id: parseInt(id) };
+            // 서버로 전송할 데이터 준비 (현재 항목만)
+            const updateData = { id: parseInt(itemId) };
                 
                 // undefined가 아닌 경우 모두 전송 (null 포함)
                 if (changes.collectionCompletedDate !== undefined) {
@@ -2463,59 +2844,120 @@
                     updateData.refundDate = changes.refundDate;
                 }
                 
-                updates.push(updateData);
-            });
+            // 🆕 비고 추가
+            if (remarks !== '') {
+                updateData.remarks = remarks;
+            }
             
-            console.log('📤 서버 전송 데이터:', updates);
+            console.log('📤 서버 전송 데이터 (개별 항목):', updateData);
             
-            // 서버로 AJAX 요청
+            // 서버로 AJAX 요청 (단일 항목)
             fetch('/exchange/api/bulk-update-dates', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     [window.csrfHeader]: window.csrfToken
                 },
-                body: JSON.stringify(updates)
+                body: JSON.stringify([updateData]) // 배열로 감싸서 전송
             })
             .then(response => response.json())
             .then(data => {
-                console.log('📥 서버 응답:', data);
+                console.log('📥 서버 응답 (개별 항목):', data);
                 
                 if (data.success) {
-                    alert(`✅ 성공적으로 저장되었습니다!\n업데이트된 건수: ${data.updatedCount}/${data.totalCount}건`);
+                    console.log(`✅ 항목 ${itemId} 저장 성공`);
                     
-                    // 변경사항 초기화
-                    dateChanges.clear();
+                    // 현재 항목의 변경사항을 dateChanges에서 제거
+                    dateChanges.delete(itemId);
                     
-                    // 변경된 행 배경색 원복
-                    document.querySelectorAll('.date-changed').forEach(row => {
+                    // 현재 항목의 행 배경색 원복
+                    const row = document.querySelector(`input[name="selected"][value="${itemId}"]`)?.closest('tr');
+                    if (row) {
                         row.style.backgroundColor = '';
                         row.classList.remove('date-changed');
-                    });
+                    }
                     
-                    // 버튼 상태 초기화
-                    updateDateChangeCount();
+                    // 다음 항목으로 이동
+                    currentItemIndex++;
+                    console.log(`🔍 다음 항목으로 이동: currentItemIndex = ${currentItemIndex}`);
                     
-                    // 🎯 실시간 카드 통계 업데이트
+                    // 처리 완료 플래그 해제
+                    isProcessing = false;
+                    
+                    // 잠깐 대기 후 다음 항목 처리 (서버 응답 처리 완료 대기)
                     setTimeout(() => {
-                        refreshCardStats();
-                    }, 500);
+                        processNextItem();
+                    }, 200);
                     
                 } else {
-                    alert(`❌ 저장 실패: ${data.message}`);
+                    console.error(`❌ 항목 ${itemId} 저장 실패:`, data.message);
+                    alert(`❌ 항목 저장 실패: ${data.message}`);
+                    
+                    // 처리 완료 플래그 해제
+                    isProcessing = false;
+                    
+                    // 실패해도 다음 항목으로 이동할지 묻기
+                    if (confirm('저장에 실패했습니다. 다음 항목을 계속 처리하시겠습니까?')) {
+                        currentItemIndex++;
+                        console.log(`🔍 실패 후 다음 항목으로 이동: currentItemIndex = ${currentItemIndex}`);
+                        
+                        setTimeout(() => {
+                            processNextItem();
+                        }, 200);
+                    } else {
+                        finishAllProcessing();
+                    }
                 }
             })
             .catch(error => {
                 console.error('❌ 저장 오류:', error);
-                alert('저장 중 오류가 발생했습니다. 다시 시도해주세요.');
-            })
-            .finally(() => {
-                // 버튼 상태 복원
+                alert('저장 중 오류가 발생했습니다. 다음 항목을 계속 처리하시겠습니까?');
+                
+                // 처리 완료 플래그 해제
+                isProcessing = false;
+                
+                if (confirm('다음 항목을 계속 처리하시겠습니까?')) {
+                    currentItemIndex++;
+                    console.log(`🔍 오류 후 다음 항목으로 이동: currentItemIndex = ${currentItemIndex}`);
+                    
+                    setTimeout(() => {
+                        processNextItem();
+                    }, 200);
+                } else {
+                    finishAllProcessing();
+                }
+            });
+        }
+        
+        // 🆕 모든 처리 완료 함수
+        function finishAllProcessing() {
+            console.log('🎉 모든 항목 처리 완료');
+            
+            // 처리 완료 플래그 해제
+            isProcessing = false;
+            
+            // 변경 카운트 업데이트
+            updateDateChangeCount();
+            
+            // 저장 버튼 상태 복원
+            const saveBtn = document.getElementById('bulkSaveBtn');
                 if (saveBtn) {
                     saveBtn.disabled = false;
                     saveBtn.innerHTML = '💾 날짜저장 (<span id="changeCount">0</span>건)';
                 }
-            });
+            
+            // 🎯 실시간 카드 통계 업데이트
+            setTimeout(() => {
+                refreshCardStats();
+            }, 500);
+            
+            // 완료 메시지
+            alert(`✅ 모든 항목 처리가 완료되었습니다!\n총 ${totalItemsCount}개 항목을 개별적으로 저장했습니다.`);
+            
+            // 처리 상태 초기화
+            itemsToProcess = [];
+            currentItemIndex = 0;
+            totalItemsCount = 0;
         }
         
         // 완료 상태 변경 시 호출되는 함수
@@ -2800,14 +3242,458 @@
            }, 3000);
        }
        
-       // 🎯 고객명 복사 기능
-       function copyCustomerName(element) {
-           const customerName = element.getAttribute('data-customer-name');
-           
-           // 클립보드에 복사
-           navigator.clipboard.writeText(customerName).then(function() {
-               console.log('👤 고객명 복사 성공:', customerName);
+               // 🎯 안전한 복사 함수 (HTTP/HTTPS 환경 모두 지원)
+        function safeCopyToClipboard(text, element, type) {
+            // Method 1: 최신 Clipboard API 시도 (HTTPS 환경)
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                return navigator.clipboard.writeText(text)
+                    .then(() => {
+                        showCopySuccess(element, type, text);
+                        return true;
+                    })
+                    .catch(() => {
+                        return fallbackCopyMethod(text, element, type);
+                    });
+            }
+            
+            // Method 2: 대체 방법 (HTTP 환경)
+            return Promise.resolve(fallbackCopyMethod(text, element, type));
+        }
+
+        // 🆕 이미지 첨부 관련 함수들
+        let selectedItemForImage = null;
+
+        // 이미지 첨부 모달 열기
+        function openImageAttachModal() {
+            const selectedCheckboxes = document.querySelectorAll('input[name="selected"]:checked');
+            
+            if (selectedCheckboxes.length === 0) {
+                alert('이미지를 첨부할 항목을 먼저 선택해주세요.');
+                return;
+            }
+            
+            if (selectedCheckboxes.length > 1) {
+                alert('이미지 첨부는 한 번에 하나의 항목만 가능합니다. 하나의 항목만 선택해주세요.');
+                return;
+            }
+            
+            const selectedItemId = selectedCheckboxes[0].value;
+            selectedItemForImage = selectedItemId;
+            
+            // 선택된 항목 정보 표시
+            displaySelectedItemInfo(selectedItemId);
+            
+            // 현재 이미지 표시
+            displayCurrentImage(selectedItemId);
+            
+            // 파일 입력 초기화
+            document.getElementById('imageFileInput').value = '';
+            document.getElementById('newImagePreview').style.display = 'none';
+            
+            // 모달 표시
+            document.getElementById('imageAttachModal').style.display = 'block';
+        }
+
+        // 이미지 첨부 모달 닫기
+        function closeImageAttachModal() {
+            document.getElementById('imageAttachModal').style.display = 'none';
+            selectedItemForImage = null;
+            
+            // 폼 초기화
+            document.getElementById('imageFileInput').value = '';
+            document.getElementById('newImagePreview').style.display = 'none';
+            document.getElementById('defectDetailInput').value = '';
+            updateDefectDetailCounter();
+        }
+
+        // 선택된 항목 정보 표시
+        function displaySelectedItemInfo(itemId) {
+            console.log('📝 모달 정보 로딩 시작 - itemId:', itemId);
+            
+            const row = document.querySelector(`input[name="selected"][value="${itemId}"]`).closest('tr');
+            const cells = row.getElementsByTagName('td');
+            
+            console.log('🔍 테이블 행 찾음, 총 셀 개수:', cells.length);
+            
+            const itemInfo = {
+                type: cells[1].textContent.trim(),
+                orderDate: cells[2].textContent.trim(),
+                csDate: cells[3].textContent.trim(),
+                site: cells[4].textContent.trim(),
+                orderNumber: cells[5].textContent.trim(),
+                refundAmount: cells[6].textContent.trim(),  // 환불금액
+                customerName: cells[7].textContent.trim(),   // 수취인
+                customerPhone: cells[8].textContent.trim(),  // 연락처
+                reason: cells[16].textContent.trim(),        // 사유 컬럼 (올바른 인덱스)
+                defectDetail: getDefectDetailFromCell(cells[17]) // 불량상세 컬럼 (올바른 인덱스)
+            };
+            
+            console.log('📋 추출된 항목 정보:', itemInfo);
+            
+            const infoContainer = document.getElementById('selectedItemInfo');
+            infoContainer.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-size: 13px;">
+                    <div><strong>유형:</strong> ${itemInfo.type}</div>
+                    <div><strong>주문일:</strong> ${itemInfo.orderDate}</div>
+                    <div><strong>CS접수일:</strong> ${itemInfo.csDate}</div>
+                    <div><strong>사이트:</strong> ${itemInfo.site}</div>
+                    <div style="grid-column: 1 / -1;"><strong>주문번호:</strong> ${itemInfo.orderNumber}</div>
+                    <div><strong>고객명:</strong> ${itemInfo.customerName}</div>
+                    <div><strong>연락처:</strong> ${itemInfo.customerPhone}</div>
+                    <div style="grid-column: 1 / -1;"><strong>사유:</strong> ${itemInfo.reason}</div>
+                </div>
+            `;
+            
+            // 불량상세 메모 textarea에 현재 값 설정
+            const defectDetailInput = document.getElementById('defectDetailInput');
+            const currentDefectDetail = itemInfo.defectDetail && itemInfo.defectDetail !== '-' && itemInfo.defectDetail.trim() !== '' ? itemInfo.defectDetail : '';
+            
+            console.log('📝 textarea에 설정할 불량상세 값:', currentDefectDetail);
+            console.log('📝 textarea 요소:', defectDetailInput);
+            
+            defectDetailInput.value = currentDefectDetail;
+            updateDefectDetailCounter(); // 글자 수 카운터 업데이트
+            
+            console.log('✅ 불량상세 메모 textarea 설정 완료, 현재 값:', defectDetailInput.value);
+        }
+        
+        // 불량상세 셀에서 실제 값 추출하는 헬퍼 함수
+        function getDefectDetailFromCell(cell) {
+            console.log('🔍 불량상세 셀 분석:', cell);
+            console.log('🔍 셀 HTML:', cell.innerHTML);
+            
+            // defect-detail-cell 클래스를 가진 div 찾기
+            const defectDetailDiv = cell.querySelector('.defect-detail-cell');
+            console.log('🔍 defect-detail-cell div:', defectDetailDiv);
+            
+            if (defectDetailDiv && defectDetailDiv.title) {
+                console.log('✅ title 속성에서 불량상세 발견:', defectDetailDiv.title);
+                // title 속성에 실제 전체 불량상세 내용이 있음
+                return defectDetailDiv.title.trim();
+            }
+            
+            // title이 없으면 텍스트 내용 확인
+            const textContent = cell.textContent.trim();
+            console.log('🔍 텍스트 내용:', textContent);
+            if (textContent && textContent !== '-') {
+                console.log('✅ 텍스트 내용에서 불량상세 발견:', textContent);
+                return textContent;
+            }
+            
+            console.log('❌ 불량상세 내용 없음');
+            return '';
+        }
+
+        // 현재 이미지 표시
+        function displayCurrentImage(itemId) {
+            const row = document.querySelector(`input[name="selected"][value="${itemId}"]`).closest('tr');
+            const imageCell = row.cells[row.cells.length - 1]; // 첨부이미지 컬럼 (마지막 컬럼)
+            const existingImage = imageCell.querySelector('img');
+            
+            const currentImagePreview = document.getElementById('currentImagePreview');
+            const deleteBtn = document.getElementById('deleteImageBtn');
+            
+            if (existingImage && existingImage.src && !existingImage.src.includes('undefined')) {
+                currentImagePreview.innerHTML = `
+                    <img src="${existingImage.src}" alt="현재 이미지" style="max-width: 100%; max-height: 200px; border-radius: 8px; border: 1px solid #d1d5db;">
+                `;
+                deleteBtn.style.display = 'block';
+            } else {
+                currentImagePreview.innerHTML = '<div style="color: #9ca3af; font-style: italic;">현재 첨부된 이미지가 없습니다.</div>';
+                deleteBtn.style.display = 'none';
+            }
+        }
+
+        // 불량상세 메모 글자 수 카운터 업데이트
+        function updateDefectDetailCounter() {
+            const textarea = document.getElementById('defectDetailInput');
+            const counter = document.getElementById('defectDetailCounter');
+            if (textarea && counter) {
+                const currentLength = textarea.value.length;
+                counter.textContent = `${currentLength}/500자`;
+                
+                // 글자 수에 따른 색상 변경
+                if (currentLength > 400) {
+                    counter.style.color = '#ef4444'; // 빨간색
+                } else if (currentLength > 300) {
+                    counter.style.color = '#f59e0b'; // 주황색
+                } else {
+                    counter.style.color = '#6b7280'; // 기본 회색
+                }
+            }
+        }
+        
+        // 파일 선택 이벤트 및 글자 수 카운터 이벤트
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('imageFileInput');
+            if (fileInput) {
+                fileInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        // 파일 크기 체크 (10MB)
+                        if (file.size > 10 * 1024 * 1024) {
+                            alert('파일 크기가 10MB를 초과합니다. 더 작은 파일을 선택해주세요.');
+                            this.value = '';
+                            return;
+                        }
+                        
+                        // 파일 형식 체크
+                        if (!file.type.startsWith('image/')) {
+                            alert('이미지 파일만 업로드 가능합니다.');
+                            this.value = '';
+                            return;
+                        }
+                        
+                        // 미리보기 표시
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            document.getElementById('newImagePreviewImg').src = e.target.result;
+                            document.getElementById('newImagePreview').style.display = 'block';
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        document.getElementById('newImagePreview').style.display = 'none';
+                    }
+                });
+            }
+            
+            // 불량상세 메모 글자 수 카운터 이벤트 리스너
+            const defectDetailInput = document.getElementById('defectDetailInput');
+            if (defectDetailInput) {
+                defectDetailInput.addEventListener('input', updateDefectDetailCounter);
+                defectDetailInput.addEventListener('keyup', updateDefectDetailCounter);
+                defectDetailInput.addEventListener('paste', function() {
+                    setTimeout(updateDefectDetailCounter, 10); // paste 후 약간의 지연
+                });
+            }
+        });
+
+        // 이미지/메모 저장
+        function saveImageAttachment() {
+            if (!selectedItemForImage) {
+                alert('선택된 항목이 없습니다.');
+                return;
+            }
+            
+            const fileInput = document.getElementById('imageFileInput');
+            const file = fileInput.files[0];
+            const defectDetailInput = document.getElementById('defectDetailInput');
+            const defectDetail = defectDetailInput.value.trim();
+            
+            // 이미지와 불량상세 메모 둘 다 없으면 경고
+            if (!file && !defectDetail) {
+                alert('이미지를 선택하거나 불량상세 메모를 입력해주세요.');
+                return;
+            }
+            
+            const saveBtn = document.getElementById('saveImageBtn');
+            const originalText = saveBtn.textContent;
+            saveBtn.disabled = true;
+            saveBtn.textContent = '⏳ 저장 중...';
+            
+            const formData = new FormData();
+            formData.append('itemId', selectedItemForImage);
+            
+            // 파일이 있으면 추가
+            if (file) {
+                formData.append('defectPhoto', file);
+            }
+            
+            // 불량상세 메모가 있으면 추가
+            if (defectDetail) {
+                formData.append('defectDetail', defectDetail);
+            }
+            
+            // CSRF 토큰 추가
+            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+            
+            fetch('/exchange/api/attach-image', {
+                method: 'POST',
+                headers: {
+                    [csrfHeader]: csrfToken
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✅ ' + data.message);
+                    
+                    // 이미지가 업데이트된 경우에만 이미지 컬럼 업데이트
+                    if (data.hasImageUpdate && data.imagePath) {
+                        updateTableImageCell(selectedItemForImage, data.imagePath);
+                    }
+                    
+                    // 불량상세가 업데이트된 경우에만 불량상세 컬럼 업데이트
+                    if (data.hasDefectDetailUpdate) {
+                        updateTableDefectDetailCell(selectedItemForImage, defectDetail);
+                    }
+                    
+                    // 모달 닫기
+                    closeImageAttachModal();
+                } else {
+                    alert('❌ 저장 실패: ' + (data.message || '알 수 없는 오류'));
+                }
+            })
+            .catch(error => {
+                console.error('저장 오류:', error);
+                alert('❌ 저장 중 오류가 발생했습니다.');
+            })
+            .finally(() => {
+                saveBtn.disabled = false;
+                saveBtn.textContent = originalText;
+            });
+        }
+
+        // 현재 이미지 삭제
+        function deleteCurrentImage() {
+            if (!selectedItemForImage) {
+                alert('선택된 항목이 없습니다.');
+                return;
+            }
+            
+            if (!confirm('현재 첨부된 이미지를 삭제하시겠습니까?')) {
+                return;
+            }
+            
+            const deleteBtn = document.getElementById('deleteImageBtn');
+            const originalText = deleteBtn.textContent;
+            deleteBtn.disabled = true;
+            deleteBtn.textContent = '⏳ 삭제 중...';
+            
+            // CSRF 토큰 추가
+            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+            
+            fetch(`/exchange/api/delete-image/${selectedItemForImage}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [csrfHeader]: csrfToken
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✅ 이미지가 성공적으로 삭제되었습니다!');
+                    
+                    // 테이블의 이미지 컬럼 업데이트 (빈 상태로)
+                    updateTableImageCell(selectedItemForImage, null);
+                    
+                    // 현재 이미지 미리보기 업데이트
+                    displayCurrentImage(selectedItemForImage);
+                } else {
+                    alert('❌ 이미지 삭제 실패: ' + (data.message || '알 수 없는 오류'));
+                }
+            })
+            .catch(error => {
+                console.error('이미지 삭제 오류:', error);
+                alert('❌ 이미지 삭제 중 오류가 발생했습니다.');
+            })
+            .finally(() => {
+                deleteBtn.disabled = false;
+                deleteBtn.textContent = originalText;
+            });
+        }
+
+        // 테이블의 이미지 셀 업데이트
+        function updateTableImageCell(itemId, imagePath) {
+            const row = document.querySelector(`input[name="selected"][value="${itemId}"]`).closest('tr');
+            const imageCell = row.cells[row.cells.length - 1]; // 첨부이미지 컬럼 (마지막 컬럼)
+            
+            if (imagePath) {
+                const imageUrl = imagePath.startsWith('http') ? imagePath : `http://175.119.224.45:8080/uploads/${imagePath}`;
+                imageCell.innerHTML = `
+                    <div class="image-container">
+                        <img src="${imageUrl}" 
+                             class="thumbnail-image" 
+                             data-image-url="${imageUrl}"
+                             onclick="showImageModalFromData(this)"
+                             alt="첨부이미지-${itemId}"
+                             title="클릭하면 원본 크기로 보입니다"
+                             onload="console.log('✅ 이미지 로드 성공 - ID:', '${itemId}', 'URL:', this.src);"
+                             onerror="console.error('❌ 이미지 로드 실패 - ID:', '${itemId}', 'URL:', this.src); this.style.display='none';"
+                             data-item-id="${itemId}"
+                             data-defect-url="${imagePath}">
+                    </div>
+                `;
+            } else {
+                imageCell.innerHTML = `
+                    <div class="no-image">
+                        <!-- 이미지 없을 때는 공백 -->
+                    </div>
+                `;
+            }
+        }
+        
+        // 테이블의 불량상세 셀 업데이트
+        function updateTableDefectDetailCell(itemId, defectDetail) {
+            const row = document.querySelector(`input[name="selected"][value="${itemId}"]`).closest('tr');
+            const defectDetailCell = row.cells[17]; // 불량상세 컬럼 (18번째 컬럼, 0-based index로 17)
+            
+            if (defectDetail && defectDetail.trim() !== '') {
+                const truncatedText = defectDetail.length > 25 ? defectDetail.substring(0, 25) + '...' : defectDetail;
+                defectDetailCell.innerHTML = `
+                    <div class="defect-detail-cell" title="${defectDetail}" style="max-width: 150px; cursor: help;">
+                        <span>${truncatedText}</span>
+                    </div>
+                `;
+            } else {
+                defectDetailCell.innerHTML = '<div class="text-muted text-center">-</div>';
+            }
+        }
+       
+       // 대체 복사 방법 (HTTP 환경용)
+       function fallbackCopyMethod(text, element, type) {
+           try {
+               // 임시 텍스트 영역 생성
+               const textArea = document.createElement('textarea');
+               textArea.value = text;
+               textArea.style.position = 'fixed';
+               textArea.style.left = '-9999px';
+               textArea.style.top = '-9999px';
+               document.body.appendChild(textArea);
                
+               // 텍스트 선택 및 복사
+               textArea.focus();
+               textArea.select();
+               
+               // execCommand로 복사 시도
+               const success = document.execCommand('copy');
+               document.body.removeChild(textArea);
+               
+               if (success) {
+                   showCopySuccess(element, type, text);
+                   return true;
+               } else {
+                   throw new Error('execCommand failed');
+               }
+           } catch (err) {
+               // 최후의 수단: 텍스트 선택 상태로 만들기
+               selectText(element);
+               showCopyError(element, type, text);
+               return false;
+           }
+       }
+       
+       // 텍스트 선택 함수
+       function selectText(element) {
+           if (document.selection) {
+               const range = document.body.createTextRange();
+               range.moveToElementText(element);
+               range.select();
+           } else if (window.getSelection) {
+               const range = document.createRange();
+               range.selectNodeContents(element);
+               const selection = window.getSelection();
+               selection.removeAllRanges();
+               selection.addRange(range);
+           }
+       }
+       
+       // 복사 성공 처리
+       function showCopySuccess(element, type, text) {
                // 시각적 피드백
                const originalText = element.textContent;
                const originalColor = element.style.color;
@@ -2828,144 +3714,51 @@
                }, 1000);
                
                // 토스트 메시지 표시
-               showCopyToast(customerName, '👤 고객명');
-               
-           }).catch(function(err) {
-               console.error('❌ 고객명 복사 실패:', err);
-               handleCopyError(element, customerName, '고객명');
-           });
+           showCopyToast(text, type);
        }
        
-       // 🎯 연락처 복사 기능
-       function copyCustomerPhone(element) {
-           const customerPhone = element.getAttribute('data-customer-phone');
-           
-           // 클립보드에 복사
-           navigator.clipboard.writeText(customerPhone).then(function() {
-               console.log('📞 연락처 복사 성공:', customerPhone);
-               
-               // 시각적 피드백
-               const originalText = element.textContent;
-               const originalColor = element.style.color;
-               const originalBg = element.style.backgroundColor;
-               
-               // 복사 완료 표시
-               element.style.backgroundColor = '#28a745';
-               element.style.color = 'white';
-               element.style.transform = 'scale(1.05)';
-               element.textContent = '✅ 복사완료!';
-               
-               // 1초 후 원래 상태로 복원
-               setTimeout(() => {
-                   element.style.backgroundColor = originalBg;
-                   element.style.color = originalColor;
-                   element.style.transform = 'scale(1)';
-                   element.textContent = originalText;
-               }, 1000);
-               
-               // 토스트 메시지 표시
-               showCopyToast(customerPhone, '📞 연락처');
-               
-           }).catch(function(err) {
-               console.error('❌ 연락처 복사 실패:', err);
-               handleCopyError(element, customerPhone, '연락처');
-           });
-       }
-       
-       // 복사 실패 처리 공통 함수
-       function handleCopyError(element, value, type) {
-           // 실패 시 대체 방법 (텍스트 선택)
-           const range = document.createRange();
-           range.selectNodeContents(element);
-           const selection = window.getSelection();
-           selection.removeAllRanges();
-           selection.addRange(range);
-           
+       // 복사 실패 처리
+       function showCopyError(element, type, text) {
            // 실패 피드백
            element.style.backgroundColor = '#dc3545';
            element.style.color = 'white';
+           element.style.transform = 'scale(1.05)';
            element.textContent = '❌ 복사실패';
            
            setTimeout(() => {
                element.style.backgroundColor = '';
                element.style.color = '';
-               element.textContent = value;
-               selection.removeAllRanges();
+               element.style.transform = 'scale(1)';
+               element.textContent = text;
            }, 1500);
            
-           alert(`${type} 복사에 실패했습니다. 텍스트가 선택되었으니 Ctrl+C로 복사해주세요.`);
+           alert(`${type} 자동 복사에 실패했습니다.\n텍스트가 선택된 상태입니다. Ctrl+C로 복사해주세요.\n\n📋 ${type}: ${text}`);
        }
+
+       // 🎯 고객명 복사 기능
+       function copyCustomerName(element) {
+           const customerName = element.getAttribute('data-customer-name');
+           safeCopyToClipboard(customerName, element, '👤 고객명');
+       }
+       
+       // 🎯 연락처 복사 기능
+       function copyCustomerPhone(element) {
+           const customerPhone = element.getAttribute('data-customer-phone');
+           safeCopyToClipboard(customerPhone, element, '📞 연락처');
+       }
+       
+
        
        // 🎯 주문품번 복사 기능
        function copyOrderItemCode(element) {
            const orderItemCode = element.getAttribute('data-order-item-code');
-           
-           // 클립보드에 복사
-           navigator.clipboard.writeText(orderItemCode).then(function() {
-               console.log('🏷️ 주문품번 복사 성공:', orderItemCode);
-               
-               // 시각적 피드백
-               const originalText = element.textContent;
-               const originalColor = element.style.color;
-               const originalBg = element.style.backgroundColor;
-               
-               // 복사 완료 표시
-               element.style.backgroundColor = '#28a745';
-               element.style.color = 'white';
-               element.style.transform = 'scale(1.05)';
-               element.textContent = '✅ 복사완료!';
-               
-               // 1초 후 원래 상태로 복원
-               setTimeout(() => {
-                   element.style.backgroundColor = originalBg;
-                   element.style.color = originalColor;
-                   element.style.transform = 'scale(1)';
-                   element.textContent = originalText;
-               }, 1000);
-               
-               // 토스트 메시지 표시
-               showCopyToast(orderItemCode, '🏷️ 주문품번');
-               
-           }).catch(function(err) {
-               console.error('❌ 주문품번 복사 실패:', err);
-               handleCopyError(element, orderItemCode, '주문품번');
-           });
+           safeCopyToClipboard(orderItemCode, element, '🏷️ 주문품번');
        }
        
        // 🎯 운송장번호 복사 기능
        function copyTrackingNumber(element) {
            const trackingNumber = element.getAttribute('data-tracking-number');
-           
-           // 클립보드에 복사
-           navigator.clipboard.writeText(trackingNumber).then(function() {
-               console.log('🚚 운송장번호 복사 성공:', trackingNumber);
-               
-               // 시각적 피드백
-               const originalText = element.textContent;
-               const originalColor = element.style.color;
-               const originalBg = element.style.backgroundColor;
-               
-               // 복사 완료 표시
-               element.style.backgroundColor = '#28a745';
-               element.style.color = 'white';
-               element.style.transform = 'scale(1.05)';
-               element.textContent = '✅ 복사완료!';
-               
-               // 1초 후 원래 상태로 복원
-               setTimeout(() => {
-                   element.style.backgroundColor = originalBg;
-                   element.style.color = originalColor;
-                   element.style.transform = 'scale(1)';
-                   element.textContent = originalText;
-               }, 1000);
-               
-               // 토스트 메시지 표시
-               showCopyToast(trackingNumber, '🚚 운송장번호');
-               
-           }).catch(function(err) {
-               console.error('❌ 운송장번호 복사 실패:', err);
-               handleCopyError(element, trackingNumber, '운송장번호');
-           });
+           safeCopyToClipboard(trackingNumber, element, '🚚 운송장번호');
        }
 
        // 🎯 대표님 요청: 실시간 카드 통계 업데이트 함수
@@ -3165,6 +3958,26 @@
                const searchForm = document.getElementById('searchForm');
                const formData = new FormData(searchForm);
                
+               // 🎯 현재 활성 필터들을 필터 데이터에 추가
+               if (selectedFilters && selectedFilters.size > 0) {
+                   const filtersString = Array.from(selectedFilters).join(',');
+                   formData.set('filters', filtersString);
+                   console.log('🎯 활성 필터들 추가:', filtersString);
+               }
+               
+               // 🔍 전송될 데이터 확인
+               console.log('📋 검색 폼에서 가져온 데이터:');
+               for (let [key, value] of formData.entries()) {
+                   console.log(`  - ${key}: '${value}'`);
+               }
+               
+               // 🔍 현재 URL 파라미터도 확인
+               const urlParams = new URLSearchParams(window.location.search);
+               console.log('📋 현재 URL 파라미터:');
+               for (let [key, value] of urlParams.entries()) {
+                   console.log(`  - ${key}: '${value}'`);
+               }
+               
                // 새로운 폼 생성 (다운로드용)
                const downloadForm = document.createElement('form');
                downloadForm.method = 'POST';
@@ -3178,6 +3991,17 @@
                    input.name = key;
                    input.value = value;
                    downloadForm.appendChild(input);
+               }
+               
+               // 🔍 URL 파라미터도 추가 (폼에 없는 것들, 단 filters는 제외 - 이미 위에서 처리함)
+               for (let [key, value] of urlParams.entries()) {
+                   if (!formData.has(key) && key !== 'filters') {
+                       const input = document.createElement('input');
+                       input.type = 'hidden';
+                       input.name = key;
+                       input.value = value;
+                       downloadForm.appendChild(input);
+                   }
                }
                
                // CSRF 토큰 추가
@@ -3200,6 +4024,86 @@
            } catch (error) {
                console.error('❌ 엑셀 다운로드 실패:', error);
                showToast('❌ 엑셀 다운로드 중 오류가 발생했습니다.', 'error');
+           }
+       }
+
+       /**
+        * 📥🖼️ 이미지 포함 엑셀 다운로드 (현재 검색 조건에 맞는 데이터 + 실제 첨부 이미지)
+        */
+       function downloadExcelWithImages() {
+           console.log('📥🖼️ 이미지 포함 엑셀 다운로드 시작...');
+           
+           try {
+               // 현재 검색 폼의 데이터를 가져와서 POST로 전송
+               const searchForm = document.getElementById('searchForm');
+               const formData = new FormData(searchForm);
+               
+               // 🎯 현재 활성 필터들을 필터 데이터에 추가
+               if (selectedFilters && selectedFilters.size > 0) {
+                   const filtersString = Array.from(selectedFilters).join(',');
+                   formData.set('filters', filtersString);
+                   console.log('🎯 활성 필터들 추가:', filtersString);
+               }
+               
+               // 🔍 전송될 데이터 확인
+               console.log('📋 검색 폼에서 가져온 데이터:');
+               for (let [key, value] of formData.entries()) {
+                   console.log(`  - ${key}: '${value}'`);
+               }
+               
+               // 🔍 현재 URL 파라미터도 확인
+               const urlParams = new URLSearchParams(window.location.search);
+               console.log('📋 현재 URL 파라미터:');
+               for (let [key, value] of urlParams.entries()) {
+                   console.log(`  - ${key}: '${value}'`);
+               }
+               
+               // 새로운 폼 생성 (다운로드용)
+               const downloadForm = document.createElement('form');
+               downloadForm.method = 'POST';
+               downloadForm.action = '/exchange/download/excel-with-images';
+               downloadForm.style.display = 'none';
+               
+               // 검색 조건들을 hidden input으로 추가
+               for (let [key, value] of formData.entries()) {
+                   const input = document.createElement('input');
+                   input.type = 'hidden';
+                   input.name = key;
+                   input.value = value;
+                   downloadForm.appendChild(input);
+               }
+               
+               // 🔍 URL 파라미터도 추가 (폼에 없는 것들, 단 filters는 제외 - 이미 위에서 처리함)
+               for (let [key, value] of urlParams.entries()) {
+                   if (!formData.has(key) && key !== 'filters') {
+                       const input = document.createElement('input');
+                       input.type = 'hidden';
+                       input.name = key;
+                       input.value = value;
+                       downloadForm.appendChild(input);
+                   }
+               }
+               
+               // CSRF 토큰 추가
+               const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+               const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+               const csrfInput = document.createElement('input');
+               csrfInput.type = 'hidden';
+               csrfInput.name = '_token';
+               csrfInput.value = csrfToken;
+               downloadForm.appendChild(csrfInput);
+               
+               // 폼 제출
+               document.body.appendChild(downloadForm);
+               downloadForm.submit();
+               document.body.removeChild(downloadForm);
+               
+               showToast('📥🖼️ 이미지 포함 엑셀 다운로드가 시작되었습니다. 처리 시간이 조금 걸릴 수 있습니다.', 'success');
+               console.log('✅ 이미지 포함 엑셀 다운로드 요청 완료');
+               
+           } catch (error) {
+               console.error('❌ 이미지 포함 엑셀 다운로드 실패:', error);
+               showToast('❌ 이미지 포함 엑셀 다운로드 중 오류가 발생했습니다.', 'error');
            }
        }
 
@@ -3425,6 +4329,59 @@
                }
            }, 3000);
        }
+       
+       // 📷 이미지 모달 관련 함수들
+       function showImageModal(imageUrl) {
+           if (!imageUrl || imageUrl.trim() === '') {
+               console.log('이미지 URL이 없습니다.');
+               return;
+           }
+           
+           const modal = document.getElementById('imageModal');
+           const modalImage = document.getElementById('modalImage');
+           
+           modalImage.src = imageUrl;
+           modal.style.display = 'flex';
+           
+           // 애니메이션 효과
+           modal.style.opacity = '0';
+           setTimeout(() => {
+               modal.style.opacity = '1';
+               modal.style.transition = 'opacity 0.3s ease';
+           }, 10);
+           
+           // ESC 키로 닫기
+           document.addEventListener('keydown', handleEscapeKey);
+       }
+       
+       // 📷 data 속성에서 이미지 URL을 읽어서 모달 표시
+       function showImageModalFromData(element) {
+           const imageUrl = element.getAttribute('data-image-url');
+           if (!imageUrl || imageUrl.trim() === '') {
+               console.log('이미지 URL이 없습니다.');
+               return;
+           }
+           showImageModal(imageUrl);
+       }
+       
+       function closeImageModal() {
+           const modal = document.getElementById('imageModal');
+           
+           modal.style.opacity = '0';
+           setTimeout(() => {
+               modal.style.display = 'none';
+               modal.style.transition = '';
+           }, 300);
+           
+           // ESC 키 이벤트 제거
+           document.removeEventListener('keydown', handleEscapeKey);
+       }
+       
+       function handleEscapeKey(event) {
+           if (event.key === 'Escape') {
+               closeImageModal();
+           }
+       }
     </script>
     
     <!-- 📤 엑셀 업로드 모달 -->
@@ -3466,6 +4423,188 @@
         </div>
     </div>
     
+    <!-- 📝 비고 수정 모달 -->
+    <div id="remarksModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 12px; padding: 30px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="margin: 0; color: #1f2937; display: flex; align-items: center;">
+                    <span style="margin-right: 10px; font-size: 24px;">📝</span>
+                    비고 수정 (<span id="modalProgressText">1/1</span>)
+                </h3>
+                <button onclick="cancelAllProcessing()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #6b7280; padding: 0; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">×</button>
+            </div>
+            
+            <div style="margin-bottom: 20px; padding: 15px; background: #f0fdf4; border-radius: 8px; border-left: 4px solid #10b981;">
+                <h4 style="margin: 0 0 10px 0; color: #14532d; display: flex; align-items: center;">
+                    <span style="margin-right: 8px;">💡</span>
+                    현재 항목 개별 처리
+                </h4>
+                <ul style="margin: 0; padding-left: 20px; color: #374151;">
+                    <li><strong>현재 진행:</strong> <span id="selectedItemsCount">1/1</span> 번째 항목</li>
+                    <li><strong>저장될 내용:</strong> 물류확인 날짜 + 이 항목의 비고 내용</li>
+                    <li><strong>처리 방식:</strong> 각 항목마다 개별적으로 비고를 수정할 수 있습니다</li>
+                </ul>
+            </div>
+            
+            <!-- 🆕 현재 항목 정보 표시 -->
+            <div style="margin-bottom: 20px; padding: 15px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #3b82f6;">
+                <h4 style="margin: 0 0 15px 0; color: #1e40af; display: flex; align-items: center;">
+                    <span style="margin-right: 8px;">📋</span>
+                    현재 처리 항목 정보
+                </h4>
+                <div id="itemInfoContainer" style="color: #374151;">
+                    <!-- 항목 정보가 JavaScript로 동적 생성됩니다 -->
+                    <div style="text-align: center; color: #9ca3af; font-style: italic;">
+                        항목 정보 로딩 중...
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">📝 비고 내용</label>
+                <div id="currentRemarksInfo" style="margin-bottom: 10px; padding: 10px; background: #f1f5f9; border-radius: 6px; font-size: 13px; color: #475569;">
+                    <strong>현재 비고:</strong> <span id="currentRemarksText">로딩 중...</span>
+                </div>
+                <textarea id="remarksContent" 
+                          placeholder="물류확인과 관련된 비고 내용을 입력하세요..."
+                          style="width: 100%; height: 120px; padding: 12px; border: 2px solid #d1d5db; border-radius: 8px; resize: vertical; font-family: inherit; font-size: 14px; background: #f9fafb; transition: border-color 0.2s ease;"
+                          onFocus="this.style.borderColor='#3b82f6'; this.style.background='white';"
+                          onBlur="this.style.borderColor='#d1d5db'; this.style.background='#f9fafb';"></textarea>
+                <div style="font-size: 12px; color: #6b7280; margin-top: 5px;">
+                    최대 500자까지 입력 가능합니다. 빈 칸으로 저장하면 기존 비고가 유지됩니다.
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <button onclick="cancelAllProcessing()" 
+                        style="flex: 1; padding: 12px; background: #6b7280; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;"
+                        onMouseOver="this.style.background='#4b5563'"
+                        onMouseOut="this.style.background='#6b7280'">
+                    ❌ 전체 취소
+                </button>
+                <button onclick="saveWithRemarks()" 
+                        style="flex: 1; padding: 12px; background: #10b981; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;"
+                        onMouseOver="this.style.background='#059669'"
+                        onMouseOut="this.style.background='#10b981'">
+                    💾 저장하고 다음
+                </button>
+            </div>
+            
+            <div style="font-size: 12px; color: #6b7280; text-align: center; padding: 10px; background: #f1f5f9; border-radius: 6px;">
+                💡 <strong>팁:</strong> 각 항목마다 개별적으로 비고를 수정할 수 있습니다. 빈 칸으로 저장하면 기존 비고가 유지됩니다.
+            </div>
+        </div>
+    </div>
+    
+    <!-- 📷 이미지 원본 보기 모달 -->
+    <div id="imageModal" class="image-modal" style="display: none;">
+        <div class="image-modal-backdrop" onclick="closeImageModal()"></div>
+        <div class="image-modal-content">
+            <button class="image-modal-close" onclick="closeImageModal()">×</button>
+            <img id="modalImage" src="" alt="원본 이미지">
+        </div>
+    </div>
+
+    <!-- 🆕 이미지 첨부/수정 모달 -->
+    <div id="imageAttachModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10001;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 12px; padding: 30px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="margin: 0; color: #1f2937; display: flex; align-items: center;">
+                    <span style="margin-right: 10px; font-size: 24px;">📝</span>
+                    이미지/메모 수정
+                </h3>
+                <button onclick="closeImageAttachModal()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #6b7280; padding: 0; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">×</button>
+            </div>
+            
+            <div style="margin-bottom: 20px; padding: 15px; background: #f0fdf4; border-radius: 8px; border-left: 4px solid #10b981;">
+                <h4 style="margin: 0 0 10px 0; color: #14532d; display: flex; align-items: center;">
+                    <span style="margin-right: 8px;">💡</span>
+                    선택된 항목 정보
+                </h4>
+                <div id="selectedItemInfo" style="color: #374151;">
+                    <!-- 선택된 항목 정보가 JavaScript로 동적 생성됩니다 -->
+                    <div style="text-align: center; color: #9ca3af; font-style: italic;">
+                        선택된 항목 정보 로딩 중...
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 현재 이미지 미리보기 -->
+            <div id="currentImageContainer" style="margin-bottom: 20px; padding: 15px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #3b82f6;">
+                <h4 style="margin: 0 0 15px 0; color: #1e40af; display: flex; align-items: center;">
+                    <span style="margin-right: 8px;">🖼️</span>
+                    현재 첨부된 이미지
+                </h4>
+                <div id="currentImagePreview" style="text-align: center;">
+                    <div style="color: #9ca3af; font-style: italic;">현재 첨부된 이미지가 없습니다.</div>
+                </div>
+            </div>
+            
+            <!-- 불량상세 메모 편집 -->
+            <div style="margin-bottom: 20px; padding: 15px; background: #fef2f2; border-radius: 8px; border-left: 4px solid #ef4444;">
+                <h4 style="margin: 0 0 15px 0; color: #dc2626; display: flex; align-items: center;">
+                    <span style="margin-right: 8px;">📝</span>
+                    불량상세 메모
+                </h4>
+                <textarea id="defectDetailInput" 
+                          placeholder="불량 상태나 결함에 대한 상세한 설명을 입력하세요... (최대 500자)"
+                          style="width: 100%; min-height: 100px; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-family: inherit; font-size: 14px; resize: vertical;"
+                          maxlength="500"></textarea>
+                <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: #6b7280;">
+                    <span>💡 '불량' 사유인 경우 상세한 설명을 작성해주세요</span>
+                    <span id="defectDetailCounter">0/500자</span>
+                </div>
+            </div>
+            
+            <!-- 새 이미지 업로드 -->
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">📂 새 이미지 선택</label>
+                <input type="file" id="imageFileInput" accept="image/*" style="width: 100%; padding: 10px; border: 2px dashed #d1d5db; border-radius: 8px; background: #f9fafb;">
+                <div style="font-size: 12px; color: #6b7280; margin-top: 5px;">
+                    JPG, PNG, GIF 파일만 지원됩니다. 최대 10MB까지 업로드 가능합니다.
+                </div>
+            </div>
+            
+            <!-- 새 이미지 미리보기 -->
+            <div id="newImagePreview" style="display: none; margin-bottom: 20px; padding: 15px; background: #fef3c7; border-radius: 8px; border-left: 4px solid #f59e0b;">
+                <h4 style="margin: 0 0 15px 0; color: #92400e; display: flex; align-items: center;">
+                    <span style="margin-right: 8px;">👁️</span>
+                    새 이미지 미리보기
+                </h4>
+                <div style="text-align: center;">
+                    <img id="newImagePreviewImg" src="" alt="새 이미지 미리보기" style="max-width: 100%; max-height: 200px; border-radius: 8px; border: 1px solid #d1d5db;">
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <button onclick="closeImageAttachModal()" 
+                        style="flex: 1; padding: 12px; background: #6b7280; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;"
+                        onMouseOver="this.style.background='#4b5563'"
+                        onMouseOut="this.style.background='#6b7280'">
+                    ❌ 취소
+                </button>
+                <button onclick="deleteCurrentImage()" 
+                        id="deleteImageBtn"
+                        style="flex: 1; padding: 12px; background: #ef4444; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: none;"
+                        onMouseOver="this.style.background='#dc2626'"
+                        onMouseOut="this.style.background='#ef4444'">
+                    🗑️ 현재 이미지 삭제
+                </button>
+                <button onclick="saveImageAttachment()" 
+                        id="saveImageBtn"
+                        style="flex: 1; padding: 12px; background: #10b981; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;"
+                        onMouseOver="this.style.background='#059669'"
+                        onMouseOut="this.style.background='#10b981'">
+                    💾 저장
+                </button>
+            </div>
+            
+            <div style="font-size: 12px; color: #6b7280; text-align: center; padding: 10px; background: #f1f5f9; border-radius: 6px;">
+                💡 <strong>팁:</strong> 이미지는 원격 서버(175.119.224.45:8080)에 저장되며, 실시간으로 목록에 반영됩니다.
+            </div>
+        </div>
+    </div>
+    
     <!-- 애니메이션 스타일 -->
     <style>
         @keyframes slideInRight {
@@ -3479,6 +4618,112 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+        
+        /* 📷 이미지 관련 스타일 */
+        .image-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 40px;
+        }
+        
+        .thumbnail-image {
+            max-width: 50px;
+            max-height: 40px;
+            width: auto;
+            height: auto;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid var(--border);
+            object-fit: cover;
+        }
+        
+        .thumbnail-image:hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            border-color: var(--primary);
+        }
+        
+        .no-image {
+            width: 50px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+        
+        /* 📷 이미지 로드 실패 처리 */
+        .thumbnail-image[style*="display: none"] {
+            display: none !important;
+        }
+        
+        /* 📷 이미지 모달 스타일 */
+        .image-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .image-modal-backdrop {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            cursor: pointer;
+        }
+        
+        .image-modal-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .image-modal-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            z-index: 10002;
+        }
+        
+        .image-modal-close:hover {
+            background: white;
+            transform: scale(1.1);
+        }
+        
+        #modalImage {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
         
         /* 🎯 필터 버튼 스타일 */

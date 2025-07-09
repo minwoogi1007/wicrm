@@ -32,6 +32,8 @@ public class ReturnItemBulkDateUpdateDTO {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate refundDate;
     
+    private String remarks;  // 비고 (새로 추가)
+    
     private String updatedBy;
     
     // 변경된 필드들을 추적하기 위한 Set

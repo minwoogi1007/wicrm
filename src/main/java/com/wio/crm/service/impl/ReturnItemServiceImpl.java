@@ -26,6 +26,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -531,32 +532,39 @@ public class ReturnItemServiceImpl implements ReturnItemService {
                     // JavaScript에서 undefined !== undefined 체크로 변경된 필드만 전송하므로
                     // 모든 전송된 필드를 업데이트 (null 값 포함)
                     
-                    item.setCollectionCompletedDate(update.getCollectionCompletedDate());
+                        item.setCollectionCompletedDate(update.getCollectionCompletedDate());
                     item.setCollectionUpdatedBy(updatedBy);
                     item.setCollectionUpdatedDate(now);
                     hasChanges = true;
                     log.debug("회수완료일 업데이트: ID={}, 값={}", update.getId(), update.getCollectionCompletedDate());
                     
-                    item.setLogisticsConfirmedDate(update.getLogisticsConfirmedDate());
+                        item.setLogisticsConfirmedDate(update.getLogisticsConfirmedDate());
                     item.setLogisticsUpdatedBy(updatedBy);
                     item.setLogisticsUpdatedDate(now);
                     log.debug("물류확인일 업데이트: ID={}, 값={}", update.getId(), update.getLogisticsConfirmedDate());
                     
-                    item.setShippingDate(update.getShippingDate());
+                        item.setShippingDate(update.getShippingDate());
                     item.setShippingUpdatedBy(updatedBy);
                     item.setShippingUpdatedDate(now);
                     log.debug("출고일 업데이트: ID={}, 값={}", update.getId(), update.getShippingDate());
                     
-                    item.setRefundDate(update.getRefundDate());
+                        item.setRefundDate(update.getRefundDate());
                     item.setRefundUpdatedBy(updatedBy);
                     item.setRefundUpdatedDate(now);
                     log.debug("환불일 업데이트: ID={}, 값={}", update.getId(), update.getRefundDate());
                     
+                    // 🆕 비고 업데이트 로직 추가
+                    if (update.getRemarks() != null) {
+                        item.setRemarks(update.getRemarks());
+                        hasChanges = true;
+                        log.debug("비고 업데이트: ID={}, 값={}", update.getId(), update.getRemarks());
+                    }
+                    
                     // 변경사항이 있을 때만 저장
                     if (hasChanges) {
-                        returnItemRepository.save(item);
-                        updatedCount++;
-                        log.info("✅ 날짜 업데이트 성공: ID={}", update.getId());
+                    returnItemRepository.save(item);
+                    updatedCount++;
+                        log.info("✅ 날짜 및 비고 업데이트 성공: ID={}", update.getId());
                     }
                 } else {
                     log.warn("⚠️ 해당 ID의 아이템을 찾을 수 없음: {}", update.getId());
@@ -1308,6 +1316,18 @@ public class ReturnItemServiceImpl implements ReturnItemService {
         }
         if (searchDTO.getEndDate() != null) {
             params.put("endDate", searchDTO.getEndDate().toString());
+        }
+        // 물류확인일 검색 조건
+        if (searchDTO.getLogisticsStartDate() != null) {
+            params.put("logisticsStartDate", searchDTO.getLogisticsStartDate().toString());
+        }
+        if (searchDTO.getLogisticsEndDate() != null) {
+            params.put("logisticsEndDate", searchDTO.getLogisticsEndDate().toString());
+        }
+        
+        // 🎯 필터 조건 추가
+        if (StringUtils.hasText(searchDTO.getFilters())) {
+            params.put("filters", searchDTO.getFilters());
         }
         
         // 정렬 정보
@@ -2396,6 +2416,45 @@ public class ReturnItemServiceImpl implements ReturnItemService {
                 log.info("📊 검색 조건 없음 - 전체 데이터 조회 (페이징 없음)");
                 List<ReturnItem> allItems = returnItemRepository.findAll();
                 return convertToDTO(allItems);
+            } else if (StringUtils.hasText(searchDTO.getFilters())) {
+                // 🎯 필터 조건이 있는 경우 다중 필터 처리
+                log.info("📊 필터 조건 있음 - 다중 필터 처리로 데이터 조회");
+                String filters = searchDTO.getFilters();
+                List<String> filterList = Arrays.asList(filters.split(","));
+                
+                // 엑셀 다운로드용으로 전체 데이터 조회를 위해 임시로 큰 size 설정
+                ReturnItemSearchDTO excelSearchDTO = new ReturnItemSearchDTO();
+                excelSearchDTO.setKeyword(searchDTO.getKeyword());
+                excelSearchDTO.setStartDate(searchDTO.getStartDate());
+                excelSearchDTO.setEndDate(searchDTO.getEndDate());
+                excelSearchDTO.setLogisticsStartDate(searchDTO.getLogisticsStartDate());
+                excelSearchDTO.setLogisticsEndDate(searchDTO.getLogisticsEndDate());
+                excelSearchDTO.setReturnTypeCode(searchDTO.getReturnTypeCode());
+                excelSearchDTO.setReturnStatusCode(searchDTO.getReturnStatusCode());
+                excelSearchDTO.setSiteName(searchDTO.getSiteName());
+                excelSearchDTO.setPaymentStatus(searchDTO.getPaymentStatus());
+                excelSearchDTO.setBrandFilter(searchDTO.getBrandFilter());
+                excelSearchDTO.setFilters(searchDTO.getFilters());
+                excelSearchDTO.setPage(0);
+                excelSearchDTO.setSize(10000); // 엑셀 다운로드용 큰 사이즈
+                excelSearchDTO.setSortBy(searchDTO.getSortBy());
+                excelSearchDTO.setSortDir(searchDTO.getSortDir());
+                
+                // 다중 필터와 검색 조건을 함께 처리
+                if (StringUtils.hasText(excelSearchDTO.getKeyword()) || 
+                    excelSearchDTO.getStartDate() != null || 
+                    excelSearchDTO.getEndDate() != null ||
+                    excelSearchDTO.getLogisticsStartDate() != null ||
+                    excelSearchDTO.getLogisticsEndDate() != null) {
+                    
+                    log.info("📊 필터 + 검색 조건 함께 처리");
+                    Page<ReturnItemDTO> result = findByMultipleFiltersWithSearch(filterList, excelSearchDTO);
+                    return result.getContent();
+                } else {
+                    log.info("📊 필터만 처리");
+                    Page<ReturnItemDTO> result = findByMultipleFilters(filterList, excelSearchDTO);
+                    return result.getContent();
+                }
             } else {
                 // 검색 조건이 있으면 Mapper의 findBySearch 사용 (페이징 없음)
                 log.info("📊 검색 조건 있음 - 페이징 없는 검색 데이터 조회");
@@ -2543,9 +2602,20 @@ public class ReturnItemServiceImpl implements ReturnItemService {
             // DTO 변환
             List<ReturnItemDTO> dtoList = convertToDTO(entities);
             
-            // 정렬 처리
-            Sort sort = searchDTO.getSortDir().equalsIgnoreCase(Sort.Direction.ASC.name()) ? 
-                    Sort.by(searchDTO.getSortBy()).ascending() : Sort.by(searchDTO.getSortBy()).descending();
+            // 정렬 처리 (null 체크 추가)
+            String sortDir = searchDTO.getSortDir();
+            String sortBy = searchDTO.getSortBy();
+            
+            // 기본값 설정
+            if (sortDir == null || sortDir.trim().isEmpty()) {
+                sortDir = Sort.Direction.DESC.name();
+            }
+            if (sortBy == null || sortBy.trim().isEmpty()) {
+                sortBy = "id";
+            }
+            
+            Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? 
+                    Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
             Pageable pageable = PageRequest.of(searchDTO.getPage(), searchDTO.getSize(), sort);
             
             Page<ReturnItemDTO> result = new PageImpl<>(dtoList, pageable, totalElements);
@@ -2685,9 +2755,11 @@ public class ReturnItemServiceImpl implements ReturnItemService {
                 pagedData = new ArrayList<>();
             }
             
-            // 정렬 처리 (필요한 경우)
+            // 정렬 처리 (필요한 경우) - null 체크 추가
             if ("id".equals(searchDTO.getSortBy())) {
-                pagedData.sort((a, b) -> "ASC".equalsIgnoreCase(searchDTO.getSortDir()) ? 
+                String sortDir = searchDTO.getSortDir();
+                boolean isAsc = sortDir != null && "ASC".equalsIgnoreCase(sortDir);
+                pagedData.sort((a, b) -> isAsc ? 
                     Long.compare(a.getId(), b.getId()) : Long.compare(b.getId(), a.getId()));
             }
             
@@ -2799,6 +2871,70 @@ public class ReturnItemServiceImpl implements ReturnItemService {
             default:
                 log.warn("⚠️ 알 수 없는 필터 타입: {}", filterType);
                 return true; // 알 수 없는 필터는 모든 데이터 통과
+        }
+    }
+
+    // 🆕 이미지 관리 메소드 구현
+    
+    @Override
+    @Transactional
+    public void updateDefectPhotoUrl(Long itemId, String imageUrl) {
+        log.info("📷 이미지 URL 업데이트 - itemId: {}, imageUrl: {}", itemId, imageUrl);
+        
+        try {
+            // 데이터 존재 여부 확인
+            Optional<ReturnItem> itemOpt = returnItemRepository.findById(itemId);
+            if (!itemOpt.isPresent()) {
+                throw new RuntimeException("해당 항목을 찾을 수 없습니다: " + itemId);
+            }
+            
+            ReturnItem item = itemOpt.get();
+            String oldImageUrl = item.getDefectPhotoUrl();
+            
+            // 이미지 URL 업데이트
+            item.setDefectPhotoUrl(imageUrl);
+            item.setUpdateDate(LocalDateTime.now());
+            
+            // 저장
+            returnItemRepository.save(item);
+            
+            log.info("✅ 이미지 URL 업데이트 완료 - itemId: {}, 기존: {}, 신규: {}", 
+                itemId, oldImageUrl, imageUrl);
+            
+        } catch (Exception e) {
+            log.error("❌ 이미지 URL 업데이트 실패 - itemId: {}, 오류: {}", itemId, e.getMessage(), e);
+            throw new RuntimeException("이미지 URL 업데이트 실패: " + e.getMessage(), e);
+        }
+    }
+    
+    @Override
+    @Transactional
+    public void updateDefectDetail(Long itemId, String defectDetail) {
+        log.info("📝 불량상세 메모 업데이트 - itemId: {}, defectDetail: {}", itemId, defectDetail);
+        
+        try {
+            // 데이터 존재 여부 확인
+            Optional<ReturnItem> itemOpt = returnItemRepository.findById(itemId);
+            if (!itemOpt.isPresent()) {
+                throw new RuntimeException("해당 항목을 찾을 수 없습니다: " + itemId);
+            }
+            
+            ReturnItem item = itemOpt.get();
+            String oldDefectDetail = item.getDefectDetail();
+            
+            // 불량상세 메모 업데이트
+            item.setDefectDetail(defectDetail);
+            item.setUpdateDate(LocalDateTime.now());
+            
+            // 저장
+            returnItemRepository.save(item);
+            
+            log.info("✅ 불량상세 메모 업데이트 완료 - itemId: {}, 기존: {}, 신규: {}", 
+                itemId, oldDefectDetail, defectDetail);
+            
+        } catch (Exception e) {
+            log.error("❌ 불량상세 메모 업데이트 실패 - itemId: {}, 오류: {}", itemId, e.getMessage(), e);
+            throw new RuntimeException("불량상세 메모 업데이트 실패: " + e.getMessage(), e);
         }
     }
 
