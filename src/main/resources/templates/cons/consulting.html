@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{main}">
+      layout:decorate="~{layouts/main}">
 
 <div layout:fragment="content">
+
     <style>
         /* 테이블 셀 내부 여백을 추가하여 가독성 개선 */
         table td, table th {
@@ -13,7 +14,7 @@
         
         /* 컨테이너 스타일 추가 */
         .app-container {
-            padding: 1.5rem !important;
+            padding: 1rem !important;
         }
         
         /* 테이블 행 간격 및 호버 효과 개선 */
@@ -129,16 +130,14 @@
             font-size: 0.9rem;
         }
 
-        /* 테이블 헤더 디자인 개선 */
+        /* 테이블 헤더 디자인 - consulting/list.html과 동일하게 */
         thead th {
-            background-color: #f5f8fa;
-            color: #3f4254;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            letter-spacing: 0.5px;
-            border-bottom: 2px solid #e4e6ef;
-            padding: 1rem 1rem;
+            background-color: #F3F6F9 !important;
+            color: #3F4254 !important;
+            font-weight: 600 !important;
+            border-bottom: 2px solid #E4E6EF !important;
+            text-align: center;
+            font-size: 13px;
         }
 
         /* 테이블 행 간격 및 구분선 개선 */
@@ -280,6 +279,87 @@
             background-color: #f9f9f9;
         }
 
+        /* 헤더 정렬 스타일 - exchange/list.html과 동일하게 */
+        #kt_app_toolbar {
+            padding: 0.75rem 0 !important;
+            min-height: auto !important;
+        }
+        
+        #kt_app_toolbar_container {
+            padding-left: 1rem !important;
+            margin-left: 0 !important;
+        }
+        
+        .page-title {
+            margin: 0 !important;
+            padding: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .page-heading {
+            margin: 0 !important;
+        }
+        
+        .breadcrumb {
+            margin: 0 !important;
+            padding-top: 0.25rem !important;
+        }
+        
+        #kt_app_content {
+            padding-top: 2.5rem !important;
+            margin-top: 0 !important;
+        }
+        
+        /* 컨텐츠 영역 - exchange/list.html과 동일하게 */
+        #kt_app_content_container.app-container {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+        }
+        
+        .d-flex.flex-column.flex-column-fluid {
+            gap: 0 !important;
+        }
+        
+        /* 카드 통계 영역 - exchange/list.html과 동일하게 */
+        .stats-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            margin-top: 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+        
+        .stat-item:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #1e293b;
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
     </style>
     <script src="/assets/plugins/global/plugins.bundle.js"></script>
     <div class="app-main flex-column flex-row-fluid" id="kt_app_main">
@@ -321,7 +401,11 @@
                         <!--end::Breadcrumb-->
                     </div>
                     <!--end::Page title-->
-
+                    <!--begin::Actions-->
+                    <div class="d-flex align-items-center gap-2 gap-lg-3">
+                        <!-- 액션 버튼들을 검색 영역으로 이동 -->
+                    </div>
+                    <!--end::Actions-->
                 </div>
                 <!--end::Toolbar container-->
             </div>
@@ -330,6 +414,7 @@
             <div id="kt_app_content" class="app-content flex-column-fluid">
                 <!--begin::Content container-->
                 <div id="kt_app_content_container" class="app-container container-fluid px-2">
+
                     <!--begin::Form-->
 
                     <!--begin::Card-->

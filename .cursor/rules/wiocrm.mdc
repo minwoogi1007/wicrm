@@ -3,125 +3,249 @@ description:
 globs: 
 alwaysApply: true
 ---
+## 🎯 Cursor용 프로젝트 지침 (Shrimp Task Manager 기반)
 
-# Your rule content
+### 🧱 프로젝트 개요
 
+* Java Spring Boot 기반 웹서비스 개발
+* Oracle 11g 연동 포함
+* Cursor 에디터 + MCP 기반 AI 자동화 사용 중
 
-너는 MCP를 사용할 수 있어.
-다음 예시들을 살펴보고 적절히 활용해줘.
+### 🖥 사용 MCP 목록
 
-Node.js & Git
-{ "tool": "terminal", "parameters": { "cmd": "git clone https://github.com/user/repo.git" } }
+* shrimp-task-manager
+* playwright
+* googleSearch
+* context7
+* edit-file-lines
 
-스프링부트 개발 도구
-{ "tool": "terminal", "parameters": { "cmd": "java -version" } }
-{ "tool": "terminal", "parameters": { "cmd": "gradle -v" } }
-{ "tool": "terminal", "parameters": { "cmd": "gradle clean build" } }
-{ "tool": "terminal", "parameters": { "cmd": "gradle bootRun" } }
-{ "tool": "terminal", "parameters": { "cmd": "gradle test" } }
-{ "tool": "terminal", "parameters": { "cmd": "gradle compileJava" } }
-{ "tool": "terminal", "parameters": { "cmd": "gradle bootJar" } }
-{ "tool": "terminal", "parameters": { "cmd": "gradle dependencies" } }
-{ "tool": "terminal", "parameters": { "cmd": "gradle bootWar" } }
+### 🗂 프로젝트 루트 경로
 
-성능·부하 테스트 도구
-{ "tool": "terminal", "parameters": { "cmd": "ab -n 1000 -c 10 http://localhost:8080/" } }
-{ "tool": "terminal", "parameters": { "cmd": "wrk -t2 -c100 -d30s http://localhost:8080/" } }
-{ "tool": "terminal", "parameters": { "cmd": "siege -c25 -t1M http://localhost:8080/" } }
-{ "tool": "terminal", "parameters": { "cmd": "locust -f locustfile.py" } }
-{ "tool": "terminal", "parameters": { "cmd": "k6 run script.js" } }
-{ "tool": "terminal", "parameters": { "cmd": "hey -n1000 -c50 http://localhost:8080/" } }
-{ "tool": "terminal", "parameters": { "cmd": "jmeter -n -t test.jmx" } }
+```
+<PROJECT_ROOT> → 예시: C:\Users\twowin_1\IdeaProjects\wicrm
+```
 
-기타 유틸리티
-{ "tool": "terminal", "parameters": { "cmd": "curl https://api.example.com/data" } }
-{ "tool": "terminal", "parameters": { "cmd": "http GET https://api.example.com/data" } }
-{ "tool": "terminal", "parameters": { "cmd": "ls -la" } }
-{ "tool": "terminal", "parameters": { "cmd": "dir" } }
+### 주요 패키지 구조
 
-// Oracle 11g 예시 (terminal tool 사용)
-[
-  { "tool": "terminal",
-    "parameters": {
-      "cmd": "sqlplus twowincall/twowincall@211.110.44.40:1521/o"
+```
+src/main/java/com/wio/crm/
+├── controller/     - 화면 및 API 컨트롤러
+├── service/        - 비즈니스 로직
+├── mapper/         - MyBatis 매퍼 인터페이스
+├── model/          - 데이터 모델 클래스
+├── Entity/         - JPA 엔티티
+├── repository/     - 데이터 접근 계층
+├── dto/            - 데이터 전송 객체
+├── config/         - 설정 클래스
+└── exception/      - 예외 처리
+```
+
+#### 수정 시 참고사항
+
+* **코드 수정**: `AdminCodeController.java`에서 시스템 코드 관리
+* **메뉴 관리**: `menuMapper.xml`의 쿼리와 `sidebar.html`의 동적 메뉴 생성 부분 확인
+* **사용자 권한**: SecurityConfig 클래스와 `USER_MENUS` 세션 변수 사용 주의
+
+### 주요 테이블
+
+* **TSYS01**: 시스템 코드 관리 (ADM\_CODE, ADM\_GUBN, ADM\_SNAME)
+* **TBND01**: 상담 데이터 (CUST\_CODE, PROJECT\_CODE, CALL\_CODE 등)
+* **TBND01\_CUST**: 고객 상담 상세 정보
+* **TBND01\_MEMO**: 상담 메모 (댓글)
+* **TPRJ01**: 프로젝트 정보
+* **TPER01**: 담당자 정보
+* **TCNT01**: 직원 정보
+* **TCNT01\_POINT**: 직원 포인트 (EMPNO, POINT, ISSUE\_DATE, CALL\_CODE)
+* **TEMP01**: 직원 임시 정보 (EMPNO, EMP\_NAME)
+* **CALL\_LOG\_D**: 통화 로그 (CALLDATE, CLID, CUST\_CODE, PROJECT\_CODE, RESULT, CONTEXT)
+* **CONSULTING\_INQUIRY**: 상담 문의 (INQUIRY\_ID, 고객명, 전화번호, 유형, 내용, 상태, 이미지 URL 등)
+* **COMMON\_CODE**: 공통 코드 관리 (CODE\_ID, CODE\_GROUP, CODE, CODE\_NAME 등)
+* **BANNER**: 배너 관리 (id, name, image\_url, link\_url, position, active, display\_order, start\_date, end\_date)
+
+---
+
+## 📌 Rules 설정 지침 (Cursor)
+
+### 🧠 역할: TaskPlanner (계획 담당)
+
+```
+당신은 "TaskPlanner" 역할을 수행하는 AI입니다.
+- 사용자가 제시한 요구사항을 기반으로 "plan_task" 도구만 사용하여 작업 목록을 작성하세요.
+- 각 작업은 최대 1~2일 이내로 완료할 수 있어야 하며, 최대 10개 이하로 나누세요.
+- 각 작업에는 설명과 명확한 완료 기준(acceptance criteria)을 포함해야 합니다.
+- 절대로 코드 실행, 수정, 테스트는 하지 마세요.
+- pseudocode, 구현 가이드, 예시는 포함하지 마세요.
+- 필요 시 split_tasks 도구를 사용해 세부 분할 가능
+```
+
+### 🛠 역할: TaskExecutor (실행 담당)
+
+```
+당신은 "TaskExecutor" 역할의 AI입니다.
+- 이미 계획된 작업을 execute_task → verify_task → complete_task 순서로 실행하세요.
+- 절대 plan_task, analyze_task는 하지 마세요.
+- 파일 수정은 edit-file-lines MCP를 사용해 dryRun → approve 절차를 따르세요.
+- Playwright MCP로 localhost 또는 실제 도메인을 테스트하세요.
+- 테스트 후 결과는 간단히 보고하고, 실패 시만 상세 로그 남기세요.
+```
+
+---
+
+## 🧠 Shrimp Task Manager 사용 예시
+
+**프로젝트 규칙 초기화**
+
+```json
+{ "tool": "init_project_rules", "parameters": {} }
+```
+
+**기능 요청 기반 작업 목록 생성**
+
+```json
+{ "tool": "plan_task", "parameters": { "description": "댓글 기능 추가" } }
+```
+
+**작업 실행**
+
+```json
+{ "tool": "execute_task", "parameters": { "id": "TASK-2025-0001" } }
+```
+
+**작업 검증**
+
+```json
+{ "tool": "verify_task", "parameters": { "id": "TASK-2025-0001" } }
+```
+
+**작업 완료 처리**
+
+```json
+{ "tool": "complete_task", "parameters": { "id": "TASK-2025-0001" } }
+```
+
+---
+
+### 🧩 edit-file-lines MCP 사용법 예시
+
+**1. 한 줄 교체**
+
+```json
+{
+  "command": "edit_file_lines",
+  "p": "src/main/java/com/example/wicrm/controller/UserController.java",
+  "e": [
+    {
+      "startLine": 42,
+      "endLine": 42,
+      "content": "    System.out.println(\"로그인 시작\");",
+      "strMatch": "    // TODO: 로그인 시작"
     }
-  },
-  { "tool": "terminal",
-    "parameters": {
-      "cmd": "sqlplus system/password@localhost:1521/XE <<EOF
-SELECT table_name FROM user_tables;
-EOF"
+  ],
+  "dryRun": true
+}
+```
+
+**2. 여러 줄 추가**
+
+```json
+{
+  "command": "edit_file_lines",
+  "p": "src/main/java/com/example/wicrm/util/StringUtil.java",
+  "e": [
+    {
+      "startLine": 120,
+      "endLine": 120,
+      "content": "\n// 헬퍼 함수\n" +
+                 "public static String slugify(String text) {\n" +
+                 "    return text.toLowerCase().replace(\" \", \"-\");\n" +
+                 "}\n",
+      "strMatch": ""
     }
-  },
-  { "tool": "terminal",
-    "parameters": {
-      "cmd": "sqlplus system/password@localhost:1521/XE <<EOF
-SELECT * FROM employees WHERE ROWNUM <= 5;
-EOF"
+  ],
+  "dryRun": true
+}
+```
+
+**3. 여러 줄 교체**
+
+```json
+{
+  "command": "edit_file_lines",
+  "p": "src/main/resources/templates/login.html",
+  "e": [
+    {
+      "startLine": 10,
+      "endLine": 12,
+      "content": "    <!-- 로그인 폼 시작 -->\n" +
+                 "    <form method=\"post\" action=\"/login\">\n" +
+                 "      <input type=\"text\" name=\"username\">\n"
     }
-  },
-  { "tool": "terminal",
-    "parameters": {
-      "cmd": "sqlplus system/password@localhost:1521/XE <<EOF
-INSERT INTO employees (employee_id, first_name, last_name) VALUES (1001, '샘플', '테스트');
-EOF"
+  ],
+  "dryRun": false
+}
+```
+
+**4. 정규표현식 매칭**
+
+```json
+{
+  "command": "edit_file_lines",
+  "p": "src/main/java/com/example/wicrm/logger/LogUtil.java",
+  "e": [
+    {
+      "startLine": 1,
+      "endLine": 0,
+      "content": "// Removed TODO comments\n",
+      "regexMatch": "^.*TODO:.*$"
     }
-  },
-  { "tool": "terminal",
-    "parameters": {
-      "cmd": "sqlplus system/password@localhost:1521/XE <<EOF
-BEGIN
-  UPDATE employees SET salary = salary + 100 WHERE employee_id = 1001;
-  COMMIT;
-END;
-EOF"
-    }
-  }
-]
+  ],
+  "dryRun": true
+}
+```
 
-Playwright MCP Server 사용 예시
-페이지 열기
-{ "tool":"playwright","parameters":{"action":"goto","url":"http://localhost:8080"}} ,
-로그인 버튼 클릭
-{ "tool":"playwright","parameters":{"action":"click","selector":"#login-button"}} ,
-검색어 입력 후 엔터
-{ "tool":"playwright","parameters":{"action":"fill","selector":"input[name='q']","text":"MCP Server"}} ,
-{ "tool":"playwright","parameters":{"action":"press","selector":"input[name='q']","key":"Enter"}} ,
-페이지 스크린샷 저장
-{ "tool":"playwright","parameters":{"action":"screenshot","path":"search-results.png"}} ,
-콘솔 에러 로그 수집
-{ "tool":"playwright","parameters":{"action":"getConsoleLogs"}} ,
-네트워크 요청 내역 수집
-{ "tool":"playwright","parameters":{"action":"getNetworkRequests"}} ,
-JS 평가(페이지 타이틀 가져오기)
-{ "tool":"playwright","parameters":{"action":"evaluate","expression":"document.title"}} ,
-접근성 스냅샷(구조화된 DOM)
-{ "tool":"playwright","parameters":{"action":"accessibilitySnapshot"}}
+**5. 적용 순서 요약**
 
+* A. Dry-run 실행 후 stateId 확보
+* B. 실제 적용 (approve)
 
-다음 지침을 지켜줘.
+```json
+{ "command": "approve_edit", "stateId": "STATE-ID-HERE" }
+```
 
-1. 폴더 및 파일 생성 및 수정은 C:\wicrm 폴더에 대해 진행해줘.
-2. 작업이 진행될 때마다, 그에 맞게 docs/project_plan.md 파일을 업데이트해줘.
-3. wicrm 폴더에는 이미 생성된 파일들이 있어. 기존에 존재하는 파일들 확인하여 작업 진행해야 해. 
-4. 소스들이 많아 꼭 필요한 파일들만 읽은 후, 편집 또는 추가로 진행해줘. 긴 파일은 2개나 3개로 나누어서 작업해줘.
-5. 각 파일이 18kb를 초과하지 않도록 긴 내용은 미리 여러 개의 파일로 기획하여 진행해줘.
-6. docs 폴더에 파일을 업데이트하거나 생성할 때, 꼭 필요한 내용만 넣어서 용량을 줄여줘.
-7. project_plan.md 파일에는 프로젝트 중요 사항 및 완료된 일, 해야할 일이 기록되어야 해.
-8. 테스트 진행할 때는 MCP 도구를 이용해 진행해줘. localhost:8080으로 브라우저를 띄우고 각 메뉴도 클릭하고 하나씩 눌러보면서 진행해줘.
-9. 쿼리 실행 등 DB 연결을 위해 Oracle 11g 명령어 사용할 때는 다음처럼 해봐.
-{ "tool": "terminal", "parameters": { "cmd": "sqlplus twowincall/twowincall@211.110.44.40:1521/o<<EOF
-SELECT * FROM table_name;
-EOF" } }
+* C. 라인 확인
 
-10. C:\wicrm 폴더는 http://localhost:8080을 가리켜. 따라서 http://localhost:8080 접속시 스프링부트 애플리케이션이 실행돼. 
-11. 로그 정보가 C:\wicrm\logs 이곳에 쌓이도록 로깅 설정을 진행해야 해. 그리고 너는 logs 폴더의 내용을 통해 오류 확인해야 해.
-12. 자바스크립트 작성 시, 이벤트마다 콘솔에 로그를 남겨야 해. 그래야 에러 발생시 원인을 찾을 수 있어. 
-13. 디버깅 시, 콘솔의 로그를 찾아봐.
-14. (개발이 진행되어 필요한 경우) 테스트를 위해 다음 사용자 정보 사용해 로그인할 것
-아이디: mirotest
-비밀번호: alsdnrdl10
-15. 작업을 임의로 진행하지 말고, 작업 전에 반드시 동의를 받아야 해.
-16. 스프링부트 애플리케이션 설정은 application.properties 파일에서 관리해야 해.
-17. Oracle 11g 연결 정보는 다음과 같이 application.properties에 설정해야 해:
-18.기존 소스들은 절대 건들지 말고 새로 만드는 코드들은 기존 소스 방식에 맞춰서 코팅해
+```json
+{
+  "command": "get_file_lines",
+  "path": "src/main/java/com/example/wicrm/controller/UserController.java",
+  "lineNumbers": [42],
+  "context": 0
+}
+```
+
+---
+
+### 🧪 기타 터미널 MCP 예시
+
+**라인 편집 요청 형식**
+
+```json
+{ "tool": "terminal", "parameters": { "cmd": "edit src/main/resources/templates/index.html line 15" } }
+```
+
+**디렉토리 구조 목록 요청**
+
+```json
+{ "tool": "terminal", "parameters": { "cmd": "dir /S" } }
+```
+
+---
+
+## 📁 기타 주의사항
+
+* Playwright는 `npx playwright install` 완료되어 있어야 정상 동작
+* 프로젝트 폴더에 `SHRIMP` 폴더 필수 (`C:\...\SHRIMP`)
+* edit-file-lines는 항상 `dryRun → approve → verify` 순서
+* Git MCP는 사용하지 않음
+* DB 정보는 직접 삽입 (계정, 비밀번호, DB명 등)
+* `project_plan.md`에 작업 진행사항 매번 기록

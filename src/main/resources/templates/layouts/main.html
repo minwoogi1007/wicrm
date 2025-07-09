@@ -71,9 +71,66 @@
 			 text-overflow: ellipsis;
 		 }
 
+		/* 헤더 밑 공백 완전히 제거 - 강력한 스타일 */
+		#kt_app_toolbar.app-toolbar {
+			padding: 0 !important;
+			margin: 0 !important;
+			min-height: auto !important;
+		}
+		
+		.app-toolbar.py-3, 
+		.app-toolbar.py-lg-6 {
+			padding-top: 0 !important;
+			padding-bottom: 0 !important;
+		}
+		
+		#kt_app_content.app-content {
+			padding-top: 0 !important;
+			margin-top: 0 !important;
+		}
+		
+		.app-container.container-xxl,
+		.app-container.container-fluid {
+			padding-top: 0 !important;
+			padding-bottom: 0 !important;
+			margin-top: 0 !important;
+		}
+		
+		/* 페이지 타이틀 영역 최소화 */
+		.page-title {
+			margin: 0 !important;
+			padding: 0.5rem 0 !important;
+		}
+		
+		/* 브레드크럼 최소화 */
+		.breadcrumb {
+			margin: 0 !important;
+			padding: 0 !important;
+		}
+		
+		/* 모든 카드 상단 공백 제거 */
+		.card {
+			margin-top: 0 !important;
+		}
+		
+		/* 첫 번째 요소들 상단 공백 제거 */
+		.d-flex.flex-column.flex-column-fluid > *:first-child {
+			margin-top: 0 !important;
+			padding-top: 0 !important;
+		}
+		
+		/* 컨텐츠 컨테이너 공백 제거 */
+		#kt_app_content_container {
+			padding-top: 0 !important;
+			margin-top: 0 !important;
+		}
+
 	</style>
-	<meta name="_csrf" th:content="${_csrf.token}"/>
-	<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+	<meta name="_csrf" th:if="${_csrf}" th:content="${_csrf.token}"/>
+	<meta name="_csrf" th:unless="${_csrf}" content=""/>
+	<meta name="_csrf_header" th:if="${_csrf}" th:content="${_csrf.headerName}"/>
+	<meta name="_csrf_header" th:unless="${_csrf}" content="X-CSRF-TOKEN"/>
+
 
 </head>
 <!--end::Head-->
