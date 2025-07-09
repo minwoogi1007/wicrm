@@ -1,0 +1,3529 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+      layout:decorate="~{layouts/main}">
+<head>
+    <title>교환/반품 목록</title>
+    <meta name="_csrf" th:if="${_csrf}" th:content="${_csrf.token}"/>
+    <meta name="_csrf" th:unless="${_csrf}" content=""/>
+    <meta name="_csrf_header" th:if="${_csrf}" th:content="${_csrf.headerName}"/>
+    <meta name="_csrf_header" th:unless="${_csrf}" content="X-CSRF-TOKEN"/>
+    
+    <!-- 현대적인 CSS 스타일 -->
+    <style>
+        /* 🎨 CSS 변수 정의 */
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #dbeafe;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --info: #06b6d4;
+            --info-light: #cffafe;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --radius: 0.5rem;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --border: #e5e7eb;
+            --bg-card: #ffffff;
+            --bg-hover: #f9fafb;
+        }
+
+        /* 헤더 정렬 스타일 */
+        #kt_app_toolbar {
+            padding: 0.75rem 0 !important;
+            min-height: auto !important;
+        }
+        
+        #kt_app_toolbar_container {
+            padding-left: 1rem !important;
+            margin-left: 0 !important;
+        }
+        
+        .page-title {
+            margin: 0 !important;
+            padding: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .page-heading {
+            margin: 0 !important;
+        }
+        
+        .breadcrumb {
+            margin: 0 !important;
+            padding-top: 0.25rem !important;
+        }
+        
+        #kt_app_content {
+            padding-top: 2.5rem !important;
+            margin-top: 0 !important;
+        }
+        
+        /* 컨텐츠 영역은 원래 패딩 유지 */
+        #kt_app_content_container.app-container {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+        }
+
+        /* 🎯 대시보드 카드 스타일 */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            box-shadow: var(--shadow);
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-box:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .stat-box.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .stat-box.success { border-left: 4px solid var(--success); }
+        .stat-box.primary { border-left: 4px solid var(--primary); }
+        .stat-box.warning { border-left: 4px solid var(--warning); }
+        .stat-box.danger { border-left: 4px solid var(--danger); }
+        .stat-box.info { border-left: 4px solid var(--info); }
+
+        .card-content h3 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin: 0 0 0.75rem 0;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .card-content .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .card-content .description {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .filter-link {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+        }
+
+        .filter-link:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        /* 🔍 검색 컨테이너 */
+        .search-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .search-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 0 1rem 0;
+        }
+
+        .search-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 1rem;
+            align-items: end;
+            flex-wrap: wrap;
+        }
+
+        .search-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .search-group label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .form-control {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid transparent;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn-search {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .btn-search:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .btn-reset {
+            background: var(--gray-100);
+            color: var(--text-secondary);
+            border-color: var(--border);
+        }
+
+        .btn-reset:hover {
+            background: var(--gray-200);
+        }
+
+        .btn-secondary {
+            background: var(--gray-500);
+            color: white;
+            border-color: var(--gray-500);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-600);
+            border-color: var(--gray-600);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            border-color: #059669;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+            border-color: var(--warning);
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+            border-color: #d97706;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        /* 📊 통계 요약 */
+        .simple-stats {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .stats-toggle {
+            display: none;
+        }
+
+        .stats-header {
+            display: block;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .stats-header:hover {
+            background: var(--bg-hover);
+        }
+
+        .stats-header::after {
+            content: '▼';
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: transform 0.2s ease;
+        }
+
+        .stats-toggle:checked + .stats-header::after {
+            transform: translateY(-50%) rotate(180deg);
+        }
+
+        .stats-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .stats-toggle:checked ~ .stats-content {
+            max-height: 1000px;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            padding: 1.5rem;
+        }
+
+        .stats-group h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin: 0 0 0.75rem 0;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stats-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .stats-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .stats-list li:last-child {
+            border-bottom: none;
+        }
+
+        .stats-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .stats-value {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+        }
+
+        .stats-value.primary { background: var(--primary-light); color: var(--primary-dark); }
+        .stats-value.success { background: var(--success-light); color: #065f46; }
+        .stats-value.warning { background: var(--warning-light); color: #92400e; }
+        .stats-value.danger { background: var(--danger-light); color: #991b1b; }
+
+        /* 🗂️ 테이블 스타일 */
+        .table-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--gray-50);
+        }
+
+        .table-header h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .table-meta {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 1.1rem; /* 기본 글씨 크기 더욱 증가 */
+            min-width: 2700px; /* 최소 너비 조정 (색상/사이즈/수량 컬럼 축소로 인한 조정) */
+        }
+
+        .data-table th {
+            background: #F3F6F9;
+            color: #3F4254;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em; /* 글자 간격 줄임 */
+            font-size: 1rem; /* 헤더 글씨 크기 더욱 증가 */
+            padding: 0.8rem 0.4rem; /* 패딩 줄여서 공백 감소 */
+            border: 1px solid #E4E6EF;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: 0.7rem 0.5rem; /* 패딩 약간 증가 */
+            border: 1px solid var(--border);
+            text-align: center;
+            vertical-align: middle;
+            font-size: 1rem; /* 헤더와 동일한 크기 */
+            line-height: 1.4;
+            font-weight: 600; /* 헤더와 동일한 두께 */
+            white-space: nowrap; /* 모든 셀에서 줄바꿈 방지 */
+        }
+
+        /* 컬럼별 최소 너비 설정 - 모든 컬럼 대폭 확대 */
+        .data-table th:nth-child(1), .data-table td:nth-child(1) { min-width: 50px; } /* 체크박스 */
+        .data-table th:nth-child(2), .data-table td:nth-child(2) { min-width: 100px; } /* 유형 */
+        .data-table th:nth-child(3), .data-table td:nth-child(3) { min-width: 120px; } /* 주문일 */
+        .data-table th:nth-child(4), .data-table td:nth-child(4) { min-width: 120px; } /* CS수신일 */
+        .data-table th:nth-child(5), .data-table td:nth-child(5) { min-width: 140px; } /* 사이트 */
+        .data-table th:nth-child(6), .data-table td:nth-child(6) { min-width: 180px; } /* 주문번호 */
+        .data-table th:nth-child(7), .data-table td:nth-child(7) { min-width: 80px; } /* 수량 */
+        .data-table th:nth-child(8), .data-table td:nth-child(8) { min-width: 100px; } /* 환불금액 */
+        .data-table th:nth-child(9), .data-table td:nth-child(9) { min-width: 100px; } /* 고객명 */
+        .data-table th:nth-child(10), .data-table td:nth-child(10) { 
+            min-width: 160px; 
+            white-space: nowrap; 
+        } /* 연락처 - 한줄 표시를 위해 대폭 확대 */
+        .data-table th:nth-child(11), .data-table td:nth-child(11) { min-width: 120px; } /* 진행상태 */
+        .data-table th:nth-child(12), .data-table td:nth-child(12) { min-width: 100px; } /* 사유 */
+        .data-table th:nth-child(13), .data-table td:nth-child(13) { min-width: 160px; } /* 운송장번호 */
+        .data-table th:nth-child(14), .data-table td:nth-child(14) { min-width: 200px; } /* 회수완료일 - 더욱 대폭 확대 */
+        .data-table th:nth-child(15), .data-table td:nth-child(15) { min-width: 100px; } /* 배송비 */
+        .data-table th:nth-child(16), .data-table td:nth-child(16) { min-width: 160px; } /* 운송장번호2 */
+        .data-table th:nth-child(17), .data-table td:nth-child(17) { min-width: 200px; } /* 물류확인일 - 더욱 대폭 확대 */
+        .data-table th:nth-child(18), .data-table td:nth-child(18) { min-width: 200px; } /* 출고일 - 더욱 대폭 확대 */
+        .data-table th:nth-child(19), .data-table td:nth-child(19) { min-width: 200px; } /* 환불일 - 더욱 대폭 확대 */
+        .data-table th:nth-child(20), .data-table td:nth-child(20) { 
+            min-width: 120px; 
+            white-space: nowrap;
+        } /* 비고 - 확대하여 전체 텍스트 표시 */
+        .data-table th:nth-child(21), .data-table td:nth-child(21) { min-width: 100px; } /* 관리 */
+
+        .data-table tbody tr:hover {
+            background: var(--bg-hover);
+        }
+
+        .data-table tbody tr.completed {
+            background: rgba(16, 185, 129, 0.05);
+            border-left: 4px solid var(--success);
+        }
+
+        .data-table tbody tr.date-changed {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid var(--warning);
+        }
+
+        .data-table tbody tr.completion-changed {
+            border-left: 4px solid var(--warning);
+        }
+
+        .text-left { text-align: left !important; }
+        .text-center { text-align: center !important; }
+
+        /* 🏷️ 배지 스타일 */
+        .type-badge {
+            display: inline-block;
+            padding: 0.3rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.85rem; /* 배지 글씨 크기 더 증가 */
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .type-badge.full-return { background: var(--danger-light); color: #991b1b; }
+        .type-badge.partial-return { background: var(--warning-light); color: #92400e; }
+        .type-badge.full-exchange { background: var(--primary-light); color: var(--primary-dark); }
+        .type-badge.partial-exchange { background: var(--info-light); color: #0c4a6e; }
+        .type-badge.exchange { background: var(--success-light); color: #065f46; }
+
+        .badge {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.375rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            min-width: 70px;
+            text-align: center;
+        }
+
+        .bg-success { background: var(--success); }
+        .bg-warning { background: var(--warning); }
+        .bg-danger { background: var(--danger); }
+        .bg-info { background: var(--info); }
+        .bg-secondary { background: var(--gray-500); }
+        .text-white { color: white; }
+        .text-dark { color: var(--gray-800); }
+
+        /* 📋 복사 가능한 요소들 */
+        .order-number-copy,
+        .customer-name-copy,
+        .customer-phone-copy,
+        .order-item-code-copy,
+        .tracking-number-copy {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-weight: 500;
+        }
+
+        .order-number-copy:hover,
+        .customer-name-copy:hover,
+        .customer-phone-copy:hover,
+        .order-item-code-copy:hover,
+        .tracking-number-copy:hover {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            transform: scale(1.02);
+        }
+
+        /* 💰 금액 정보 */
+        .money-info {
+            font-size: 1rem; /* 헤더와 동일한 크기 */
+            font-weight: 600;
+            color: var(--success);
+        }
+
+        .important-info {
+            font-size: 1rem; /* 헤더와 동일한 크기 */
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .contact-info {
+            font-family: 'Courier New', monospace;
+            font-size: 1rem; /* 헤더와 동일한 크기 */
+            font-weight: 600; /* 헤더와 동일한 두께 */
+        }
+
+        .order-info {
+            font-family: 'Courier New', monospace;
+            font-size: 1rem; /* 헤더와 동일한 크기 */
+            font-weight: 600; /* 헤더와 동일한 두께 */
+        }
+
+        /* 📅 날짜 입력 필드 */
+        .date-input {
+            font-size: 1.0rem !important; /* 헤더와 동일한 크기 */
+            font-weight: 600 !important; /* 헤더와 동일한 두께 */
+            padding: 0.5rem !important; /* 적절한 패딩 */
+            border: 1px solid var(--border);
+            border-radius: 0.25rem;
+            width: 140px !important; /* 적절한 너비 */
+            min-height: 38px !important; /* 테이블 행 높이와 조화 */
+        }
+
+        .date-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+
+        .btn-clear-date {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            padding: 0.2rem;
+            font-size: 0.7rem;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.25rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-clear-date:hover {
+            background: var(--danger-light);
+            color: #991b1b;
+        }
+
+        /* 🔗 액션 링크 */
+        .action-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 1rem; /* 헤더와 동일한 크기 */
+            font-weight: 600; /* 헤더와 동일한 두께 */
+            transition: color 0.2s ease;
+        }
+
+        .action-link:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        .action-link.danger {
+            color: var(--danger);
+        }
+
+        .action-link.danger:hover {
+            color: #991b1b;
+        }
+
+        /* 📄 페이지네이션 */
+        .pagination-container {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border);
+            background: var(--gray-50);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.25rem;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .pagination li {
+            display: inline-block;
+        }
+
+        .page-link {
+            display: block;
+            padding: 0.5rem 0.75rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border: 1px solid var(--border);
+            border-radius: 0.25rem;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+        }
+
+        .page-link:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .page-link.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* 📊 필터 상태 표시 */
+        .filter-status {
+            background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+        }
+
+        .filter-text {
+            font-weight: 600;
+        }
+
+        .clear-filter {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: background 0.2s ease;
+        }
+
+        .clear-filter:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* 🚫 데이터 없음 */
+        .no-data {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* 📱 반응형 디자인 */
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-row {
+                flex-direction: column;
+            }
+            
+            .search-group {
+                min-width: 100%;
+            }
+            
+            .button-group {
+                justify-content: center;
+            }
+            
+            .table-wrapper {
+                font-size: 0.65rem;
+            }
+            
+            .data-table th,
+            .data-table td {
+                padding: 0.25rem;
+            }
+        }
+
+        /* 🎨 애니메이션 */
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+        
+        /* 추가 스타일들 */
+        .customer-name {
+            font-size: 1rem; /* 헤더와 동일한 크기 */
+            font-weight: 600; /* 헤더와 동일한 두께 */
+            color: #1f2937;
+            margin-bottom: 0.125rem;
+        }
+        
+        .customer-phone {
+            font-size: 1rem; /* 헤더와 동일한 크기 */
+            font-weight: 600; /* 헤더와 동일한 두께 */
+            color: #6b7280;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+        }
+        
+        /* 금액 스타일 */
+        .amount-cell {
+            font-size: 1rem; /* 헤더와 동일한 크기 */
+            font-weight: 600;
+            color: #dc2626;
+        }
+        
+        /* 날짜 스타일 */
+        .date-cell {
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+            font-size: 1rem; /* 날짜 글씨 크기 더욱 증가 */
+            color: #6b7280;
+            font-weight: 600; /* 날짜 글씨 두께 증가 */
+        }
+        
+        /* 날짜 입력 필드 스타일 */
+        .data-table input[type="date"] {
+            width: 100%;
+            max-width: 180px; /* 날짜 입력 필드 너비 더욱 대폭 증가 */
+            font-size: 1.2rem; /* 입력 필드 글씨 크기 더욱 증가 */
+            font-weight: 600; /* 글씨 두께 증가 */
+            padding: 0.6rem;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            background: white;
+            min-height: 45px; /* 최소 높이 증가 */
+        }
+        
+        .data-table input[type="date"]:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+        
+        /* 상태 배지 */
+        .status-badge {
+            padding: 0.4rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.9rem; /* 상태 배지 글씨 크기 더 증가 */
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+        }
+        
+        .status-badge:before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+        
+        .status-pending { 
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+        .status-processing { 
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+        .status-shipping { 
+            background: #e0e7ff;
+            color: #3730a3;
+            border: 1px solid #c7d2fe;
+        }
+        .status-completed { 
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        .status-canceled { 
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+        
+        /* 타입 배지 */
+        .type-badge {
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .type-exchange { 
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+        
+        .type-return { 
+            background: #fef2f2;
+            color: #7f1d1d;
+            border: 1px solid #fecaca;
+        }
+        
+        .type-full-return { 
+            background: #fffbeb;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+        
+        .type-partial-return { 
+            background: #f0f9ff;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+        
+        /* 필터 버튼 */
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            background: white;
+            color: #6b7280;
+        }
+        
+        .filter-btn.active {
+            background: #4f46e5;
+            color: white;
+            border-color: #4f46e5;
+        }
+        
+        .filter-btn:not(.active):hover {
+            border-color: #9ca3af;
+            color: #374151;
+        }
+        
+        /* 액션 버튼 */
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem; /* 액션 버튼 글씨 크기 증가 */
+            font-weight: 500;
+            border: none;
+            transition: all 0.3s;
+            margin-right: 0.3rem;
+        }
+        
+        .btn-view {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        
+        .btn-edit {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+        }
+        
+        .btn-delete {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        /* 로딩 스피너 */
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            border-width: 0.3em;
+        }
+        
+        /* 반응형 디자인 */
+        @media (max-width: 768px) {
+            .exchange-container {
+                padding: 1rem !important;
+            }
+            
+            .stat-item {
+                margin-bottom: 1rem;
+            }
+            
+            .exchange-table {
+                font-size: 0.8rem;
+            }
+            
+            .exchange-table td,
+            .exchange-table th {
+                padding: 0.5rem 0.3rem;
+            }
+        }
+    </style>
+</head>
+
+<div layout:fragment="content">
+    <div class="app-main flex-column flex-row-fluid" id="kt_app_main">
+        <!--begin::Content wrapper-->
+        <div class="d-flex flex-column flex-column-fluid">
+            <!--begin::Toolbar-->
+            <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+                <!--begin::Toolbar container-->
+                <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                    <!--begin::Page title-->
+                    <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                        <!--begin::Title-->
+                        <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">교환/반품 관리</h1>
+                        <!--end::Title-->
+                        <!--begin::Breadcrumb-->
+                        <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                            <!--begin::Item-->
+                            <li class="breadcrumb-item text-muted">
+                                <a href="/main" class="text-muted text-hover-primary">Home</a>
+                            </li>
+                            <!--end::Item-->
+                            <!--begin::Item-->
+                            <li class="breadcrumb-item">
+                                <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                            </li>
+                            <!--end::Item-->
+                            <!--begin::Item-->
+                            <li class="breadcrumb-item text-muted">교환/반품 관리</li>
+                            <!--end::Item-->
+                            <!--begin::Item-->
+                            <li class="breadcrumb-item">
+                                <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                            </li>
+                            <!--end::Item-->
+                            <!--begin::Item-->
+                            <li class="breadcrumb-item text-muted">교환/반품</li>
+                            <!--end::Item-->
+                        </ul>
+                        <!--end::Breadcrumb-->
+                    </div>
+                    <!--end::Page title-->
+                    <!--begin::Actions-->
+                    <div class="d-flex align-items-center gap-2 gap-lg-3">
+                        <!-- 액션 버튼들을 검색 영역으로 이동 -->
+                    </div>
+                    <!--end::Actions-->
+                </div>
+                <!--end::Toolbar container-->
+            </div>
+            <!--end::Toolbar-->
+            <!--begin::Content-->
+            <div id="kt_app_content" class="app-content flex-column-fluid">
+                <!--begin::Content container-->
+                <div id="kt_app_content_container" class="app-container container-fluid px-2">
+
+            <!-- 🎯 현재 필터 상태 배너 (조건부 표시) -->
+            <div th:if="${currentFilter != null and currentFilter != ''}" 
+                 class="alert alert-info alert-dismissible fade show mb-4" role="alert">
+                <div class="d-flex align-items-center">
+                    <i class="ki-duotone ki-filter fs-2 me-3">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                    </i>
+                    <div>
+                        <h6 class="mb-0">현재 적용된 필터</h6>
+                        <span class="text-muted">
+                            <span th:text="${filterDisplayName != null ? filterDisplayName : '알 수 없는 필터'}"></span>
+                            조건으로 필터링 중입니다.
+                        </span>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" 
+                        onclick="clearAllFilters()"></button>
+            </div>
+
+            <!-- 🎯 다중 필터 상태 배너 (조건부 표시) -->
+            <div th:if="${currentFilters != null and currentFilters != ''}" 
+                 class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                <div class="d-flex align-items-center">
+                    <i class="ki-duotone ki-filter fs-2 me-3 text-success">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                    </i>
+                    <div>
+                        <h6 class="mb-0 text-success">🎯 다중 필터 적용됨</h6>
+                        <span class="text-muted">
+                            <span th:if="${activeFilterNames != null and !activeFilterNames.isEmpty()}">
+                                <span th:each="filterName, iter : ${activeFilterNames}">
+                                    <span th:text="${filterName}">필터명</span>
+                                    <span th:if="!${iter.last}">, </span>
+                                </span>
+                            </span>
+                            <span th:if="${activeFilterNames == null or activeFilterNames.isEmpty()}" th:text="${currentFilters}">필터</span>
+                            조건으로 필터링 중입니다.
+                        </span>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" 
+                        onclick="clearAllFilters()"></button>
+            </div>
+
+            <!-- 🎯 필터 선택 영역 제거 - 카드 클릭 방식으로 변경 -->
+
+            <!-- 🎯 상단 카드 대시보드 -->
+            <div class="dashboard">
+                <!-- ① 회수완료 카드 -->
+                <div class="stat-box success" data-card="collection">
+                    <div class="card-content">
+                        <h3>📦 회수완료</h3>
+                        <div class="value clickable">
+                            <span class="filter-link" data-filter="collection-completed" data-stat="collection-completed" th:text="${cardStats?.collectionCompleted ?: 0}">0</span>
+                            <span> / </span>
+                            <span class="filter-link" data-filter="collection-pending" data-stat="collection-pending" th:text="${cardStats?.collectionPending ?: 0}">0</span>
+                        </div>
+                        <div class="description">완료 / 미완료</div>
+                    </div>
+                </div>
+                
+                <!-- ② 물류확인 카드 -->
+                <div class="stat-box primary" data-card="logistics">
+                    <div class="card-content">
+                        <h3>🚛 물류확인</h3>
+                        <div class="value clickable">
+                            <span class="filter-link" data-filter="logistics-confirmed" data-stat="logistics-confirmed" th:text="${cardStats?.logisticsConfirmed ?: 0}">0</span>
+                            <span> / </span>
+                            <span class="filter-link" data-filter="logistics-pending" data-stat="logistics-pending" th:text="${cardStats?.logisticsPending ?: 0}">0</span>
+                        </div>
+                        <div class="description">확인 / 미확인</div>
+                    </div>
+                </div>
+                
+                <!-- ③ 교환 출고일자 카드 -->
+                <div class="stat-box warning" data-card="exchange">
+                    <div class="card-content">
+                        <h3>📤 교환 출고</h3>
+                        <div class="value clickable">
+                            <span class="filter-link" data-filter="shipping-completed" data-stat="exchange-shipped" th:text="${cardStats?.exchangeShipped ?: 0}">0</span>
+                            <span> / </span>
+                            <span class="filter-link" data-filter="shipping-pending" data-stat="exchange-not-shipped" th:text="${cardStats?.exchangeNotShipped ?: 0}">0</span>
+                        </div>
+                        <div class="description">출고완료 / 출고대기</div>
+                    </div>
+                </div>
+                
+                <!-- ④ 반품 환불일자 카드 (반품만) -->
+                <div class="stat-box danger" data-card="return">
+                    <div class="card-content">
+                        <h3>💰 반품 환불</h3>
+                        <div class="value clickable">
+                            <span class="filter-link" data-filter="refund-completed" data-stat="return-refunded" th:text="${cardStats?.returnRefunded ?: 0}">0</span>
+                            <span> / </span>
+                            <span class="filter-link" data-filter="refund-pending" data-stat="return-not-refunded" th:text="${cardStats?.returnNotRefunded ?: 0}">0</span>
+                        </div>
+                        <div class="description">환불완료 / 환불대기</div>
+                    </div>
+                </div>
+                
+                <!-- ⑤ 배송비입금 카드 (교환만) -->
+                <div class="stat-box warning" data-card="payment">
+                    <div class="card-content">
+                        <h3>💳 배송비입금</h3>
+                        <div class="value clickable">
+                            <span class="filter-link" data-filter="payment-pending" data-stat="payment-pending" th:text="${cardStats?.paymentPending ?: 0}">0</span>
+                            <span> / </span>
+                            <span class="filter-link" data-filter="payment-completed" data-stat="payment-completed" th:text="${cardStats?.paymentCompleted ?: 0}">0</span>
+                        </div>
+                        <div class="description">입금대기 / 입금완료</div>
+                    </div>
+                </div>
+                
+                <!-- ⑥ 전체완료 카드 -->
+                <div class="stat-box info" data-card="completion">
+                    <div class="card-content">
+                        <h3>✅ 전체완료</h3>
+                        <div class="value clickable">
+                            <span class="filter-link" data-filter="completed" data-stat="completed-count" th:text="${cardStats?.completedCount ?: 0}">0</span>
+                            <span> / </span>
+                            <span class="filter-link" data-filter="incompleted" data-stat="incomplete-count" th:text="${cardStats?.incompletedCount ?: 0}">0</span>
+                        </div>
+                        <div class="description">완료 / 미완료</div>
+                    </div>
+                </div>
+                
+                <!-- ⑦ 처리기간 임박 카드 (Sample 통합) -->
+                <div class="stat-box warning" data-card="overdue-ten-days">
+                    <div class="card-content">
+                        <h3>🚨 처리기간 임박</h3>
+                        <div class="value clickable">
+                            <span class="filter-link" data-filter="overdue-ten-days" data-stat="overdue-ten-days-count" th:text="${cardStats?.overdueTenDaysCount ?: 0}">0</span>
+                        </div>
+                        <div class="description">10일 이상 미완료</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 필터 상태 표시 -->
+            <div id="filterStatus" class="filter-status" style="display: none;">
+                <span class="filter-text"></span>
+                <button class="clear-filter" id="clearFilterBtn">✕ 필터 해제</button>
+            </div>
+            
+            <!-- 통계 요약
+            <div class="simple-stats">
+                <input type="checkbox" id="statsToggle" class="stats-toggle">
+                <label for="statsToggle" class="stats-header">📊 현황 요약</label>
+                <div class="stats-content">
+                    <div class="stats-row">
+                    <!-- 처리 상태
+                    <div class="stats-group">
+                        <h4>처리 상태</h4>
+                        <ul class="stats-list">
+                            <li>
+                                <span class="stats-label">전체 건수</span>
+                                <span class="stats-value primary" data-stat="total-count" th:text="${totalItems != null ? totalItems : 0}">0</span>
+                            </li>
+                            <li>
+                                <span class="stats-label">오늘 등록</span>
+                                <span class="stats-value success" data-stat="today-count" th:text="${todayCount != null ? todayCount : 0}">0</span>
+                            </li>
+                            <li>
+                                <span class="stats-label">완료율</span>
+                                <span class="stats-value info" data-stat="completion-rate">0%</span>
+                            </li>
+                            <li>
+                                <span class="stats-label">미완료</span>
+                                <span class="stats-value warning" data-stat="incomplete-count" th:text="${cardStats != null and cardStats['incompletedCount'] != null ? cardStats['incompletedCount'] : 0}">0</span>
+                            </li>
+                            <li>
+                                <span class="stats-label">완료</span>
+                                <span class="stats-value success" data-stat="completed-count" th:text="${cardStats != null and cardStats['completedCount'] != null ? cardStats['completedCount'] : 0}">0</span>
+                            </li>
+                        </ul>
+                    </div>
+
+
+                    <div class="stats-group">
+                        <h4>유형별 현황</h4>
+                        <ul class="stats-list">
+                            <li>
+                                <span class="stats-label">전체반품</span>
+                                <span class="stats-value danger" data-stat="type-full-return" th:text="${typeCounts != null and typeCounts['전체반품'] != null ? typeCounts['전체반품'] : 0}">0</span>
+                            </li>
+                            <li>
+                                <span class="stats-label">부분반품</span>
+                                <span class="stats-value warning" data-stat="type-partial-return" th:text="${typeCounts != null and typeCounts['부분반품'] != null ? typeCounts['부분반품'] : 0}">0</span>
+                            </li>
+                            <li>
+                                <span class="stats-label">전체교환</span>
+                                <span class="stats-value primary" data-stat="type-full-exchange" th:text="${typeCounts != null and typeCounts['전체교환'] != null ? typeCounts['전체교환'] : 0}">0</span>
+                            </li>
+                            <li>
+                                <span class="stats-label">부분교환</span>
+                                <span class="stats-value info" data-stat="type-partial-exchange" th:text="${typeCounts != null and typeCounts['부분교환'] != null ? typeCounts['부분교환'] : 0}">0</span>
+                            </li>
+                        </ul>
+                    </div>
+
+
+                    <div class="stats-group">
+                        <h4>금액 현황</h4>
+                        <ul class="stats-list">
+                            <li>
+                                <span class="stats-label">총 환불금액</span>
+                                <span class="stats-value primary" data-stat="total-refund-amount" th:text="${amountSummary != null and amountSummary['totalRefundAmount'] != null ? #numbers.formatInteger(amountSummary['totalRefundAmount'], 0, 'COMMA') + '원' : '0원'}">0원</span>
+                            </li>
+                            <li>
+                                <span class="stats-label">배송비 합계</span>
+                                <span class="stats-value warning" data-stat="total-shipping-fee" th:text="${amountSummary != null and amountSummary['totalShippingFee'] != null ? #numbers.formatInteger(amountSummary['totalShippingFee'], 0, 'COMMA') + '원' : '0원'}">0원</span>
+                            </li>
+                            <li>
+                                <span class="stats-label">평균 환불금액</span>
+                                <span class="stats-value info" data-stat="avg-refund-amount">0원</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+
+                <div class="stats-row" th:if="${(reasonCounts != null and !reasonCounts.isEmpty()) or (siteCounts != null and !siteCounts.isEmpty()) or (brandCounts != null and !brandCounts.isEmpty())}">
+
+                    <div class="stats-group" th:if="${reasonCounts != null and !reasonCounts.isEmpty()}">
+                        <h4>주요 사유</h4>
+                        <ul class="stats-list">
+                            <li th:each="reasonKey : ${reasonCounts.keySet()}">
+                                <span class="stats-label" th:text="${reasonKey}">고객변심</span>
+                                <span class="stats-value" th:text="${reasonCounts.get(reasonKey)}">4</span>
+                            </li>
+                        </ul>
+                    </div>
+
+
+                    <div class="stats-group" th:if="${siteCounts != null and !siteCounts.isEmpty()}">
+                        <h4>주요 사이트</h4>
+                        <ul class="stats-list">
+                            <li th:each="siteKey : ${siteCounts.keySet()}">
+                                <span class="stats-label" th:text="${siteKey}">자사몰-레노마</span>
+                                <span class="stats-value" th:text="${siteCounts.get(siteKey)}">4</span>
+                            </li>
+                        </ul>
+                    </div>
+
+
+                    <div class="stats-group" th:if="${brandCounts != null and !brandCounts.isEmpty()}">
+                        <h4>브랜드별 현황</h4>
+                        <ul class="stats-list">
+                            <li>
+                                <span class="stats-label">레노마</span>
+                                <span class="stats-value primary" th:text="${brandCounts != null and brandCounts['레노마'] != null ? brandCounts['레노마'] : 0}">0</span>
+                            </li>
+                            <li>
+                                <span class="stats-label">코랄리크</span>
+                                <span class="stats-value success" th:text="${brandCounts != null and brandCounts['코랄리크'] != null ? brandCounts['코랄리크'] : 0}">0</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                </div>
+            </div>-->
+
+            <!-- 통합 검색 -->
+            <div class="search-container">
+                <h3 class="search-title">🔍 통합 검색</h3>
+                <form id="searchForm" action="/exchange/list" method="get" class="search-form" th:object="${searchDTO}">
+                    <!-- 🎯 필터 정보 히든 필드 -->
+                    <input type="hidden" id="filtersInput" name="filters" th:value="${filters}">
+                    
+                    <div class="search-row">
+                        <div class="search-group" style="flex: 2;">
+                            <label for="keyword">통합검색</label>
+                            <input type="text" id="keyword" name="keyword" class="form-control" 
+                                   placeholder="주문번호, 고객명, 연락처, 사이트, 품번, 색상, 사이즈, 운송장번호, 유형, 사유 등 검색" 
+                                   th:field="*{keyword}">
+                        </div>
+                        <div class="search-group">
+                            <label for="startDate">CS접수 시작일</label>
+                            <input type="date" id="startDate" name="startDate" class="form-control" th:field="*{startDate}">
+                        </div>
+                        <div class="search-group">
+                            <label for="endDate">CS접수 종료일</label>
+                            <input type="date" id="endDate" name="endDate" class="form-control" th:field="*{endDate}">
+                        </div>
+                        <div class="search-group">
+                            <label>&nbsp;</label>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button type="submit" class="btn btn-search">🔍 검색</button>
+                                <button type="button" class="btn btn-reset" onclick="window.location.href='/exchange/list'">🔄 초기화</button>
+                            </div>
+                        </div>
+                        <div class="search-group">
+                            <label>&nbsp;</label>
+                            <div class="button-group">
+                                <!-- 📥 엑셀 다운로드 버튼 -->
+                                <button type="button" class="btn btn-primary" style="font-size: 1.1rem; padding: 0.75rem 1.5rem;" onclick="downloadExcel()">📥 엑셀다운</button>
+                                
+                                <!-- 📤 엑셀 업로드 버튼
+                                <button type="button" class="btn btn-success" style="font-size: 1.1rem; padding: 0.75rem 1.5rem;" onclick="openExcelUploadModal()">📤 엑셀업로드</button>
+                                
+                               📄 템플릿 다운로드 버튼
+                                <button type="button" class="btn btn-secondary" style="font-size: 1.1rem; padding: 0.75rem 1.5rem;" onclick="downloadTemplate()">📄 템플릿</button>
+                                -->
+                                <button type="button" id="bulkSaveBtn" class="btn btn-success" style="font-size: 1.1rem; padding: 0.75rem 1.5rem; min-width: 180px; white-space: nowrap;" onclick="saveBulkDateChanges()" disabled>💾 날짜저장 (<span id="changeCount">0</span>건)</button>
+                                <!-- 완료처리 버튼 주석 처리
+                                <button type="button" id="bulkCompleteBtn" class="btn btn-warning" onclick="saveBulkCompletionChanges()" disabled style="min-width: 160px; white-space: nowrap;">✅ 완료처리 (<span id="completeCount">0</span>건)</button>
+                                -->
+                                <!-- 등록 버튼 주석 처리
+                                <a href="/exchange/create" class="btn btn-primary">➕ 등록</a>
+                                -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 검색 도움말 -->
+                    <div style="margin-top: 0.5rem; padding: 0.5rem; background-color: var(--primary-light); border-radius: var(--radius); font-size: 0.7rem; color: var(--text-muted);">
+                        💡 <strong>검색 팁:</strong> 주문번호, 고객명, 연락처, 사이트명, 품번, 색상, 사이즈, 운송장번호, 유형, 반품사유, 처리자, 비고 등 모든 정보를 하나의 검색창에서 찾을 수 있습니다.<br/>
+                        🎯 <strong>완료 상태 검색:</strong> "완료" 또는 "전체완료" → 완료된 건만 조회 | "미완료" 또는 "진행중" → 미완료 건만 조회 | "Y" → 완료 | "N" → 미완료
+                    </div>
+                </form>
+            </div>
+
+            <!-- 데이터 테이블 -->
+            <div class="table-container">
+                <div class="table-header">
+                    <h3>교환/반품 목록</h3>
+                    <div class="table-meta">
+                        <span th:text="${returnItems != null ? '총 ' + returnItems.totalElements + '건' : '총 0건'}">총 0건</span>
+                    </div>
+                </div>
+                
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 35px;"><input type="checkbox" id="selectAll"></th>
+                                <th style="width: 50px;">유형</th>
+                                <th style="width: 60px;">주문일</th>
+                                <th style="width: 60px;">CS접수일</th>
+                                <th style="width: 80px;">사이트</th>
+                                <th style="width: 100px;">주문번호</th>
+                                <th style="width: 60px;">환불금액</th>
+                                <th style="width: 60px;">수취인</th>
+                                <th style="width: 85px;">연락처</th>
+                                <th style="width: 70px;">물류확인</th>
+                                <th style="width: 80px;">주문품번</th>
+                                <th style="width: 30px;">색상</th>
+                                <th style="width: 30px;">사이즈</th>
+                                <th style="width: 25px;">수량</th>
+                                <th style="width: 55px;">배송비</th>
+                                <th style="width: 100px;">🎯 입금상태</th>
+                                <th style="width: 60px;">사유</th>
+                                <th style="width: 80px;">운송장번호</th>
+                                <th style="width: 70px;">회수완료</th>
+                                <th style="width: 70px;">출고일자</th>
+                                <th style="width: 70px;">환불일자</th>
+                                <th style="width: 40px;">완료</th>
+                                <th style="width: 80px;">비고</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="item, iterStat : ${returnItems}" th:if="${returnItems != null and !returnItems.empty}">
+                                <td><input type="checkbox" name="selected" th:value="${item.id}"></td>
+                                <td>
+                                    <span class="type-badge" 
+                                          th:classappend="${item.returnTypeCode == 'FULL_RETURN' ? 'full-return' : 
+                                                          item.returnTypeCode == 'PARTIAL_RETURN' ? 'partial-return' : 
+                                                          item.returnTypeCode == 'FULL_EXCHANGE' ? 'full-exchange' :
+                                                          item.returnTypeCode == 'PARTIAL_EXCHANGE' ? 'partial-exchange' :
+                                                          item.returnTypeCode == 'EXCHANGE' ? 'exchange' : 'partial-return'}"
+                                          th:text="${item.returnTypeCode == 'FULL_RETURN' ? '전체반품' : 
+                                                    item.returnTypeCode == 'PARTIAL_RETURN' ? '부분반품' : 
+                                                    item.returnTypeCode == 'FULL_EXCHANGE' ? '전체교환' :
+                                                    item.returnTypeCode == 'PARTIAL_EXCHANGE' ? '부분교환' :
+                                                    item.returnTypeCode == 'EXCHANGE' ? '교환' : item.returnTypeCode}">부분반품</span>
+                                </td>
+                                <td th:text="${item.orderDate != null ? #temporals.format(item.orderDate, 'MM-dd') : ''}">04-26</td>
+                                <td th:text="${item.csReceivedDate != null ? #temporals.format(item.csReceivedDate, 'MM-dd') : ''}">05-03</td>
+                                <td class="text-left" th:text="${item.siteName}">자사몰-레노마</td>
+                                <td class="order-info">
+                                    <span class="order-number-copy" 
+                                          th:text="${item.orderNumber}" 
+                                          th:data-order-number="${item.orderNumber}"
+                                          onclick="copyOrderNumber(this)"
+                                          title="클릭하면 주문번호가 복사됩니다">20250426-0001236-03</span>
+                                </td>
+                                <td class="money-info" th:text="${item.refundAmount != null ? #numbers.formatInteger(item.refundAmount, 0, 'COMMA') : ''}">39,200</td>
+                                <td class="important-info">
+                                    <span class="customer-name-copy" 
+                                          th:text="${item.customerName}" 
+                                          th:data-customer-name="${item.customerName}"
+                                          onclick="copyCustomerName(this)"
+                                          title="클릭하면 고객명이 복사됩니다">김민지</span>
+                                </td>
+                                <td class="contact-info">
+                                    <span class="customer-phone-copy" 
+                                          th:text="${item.customerPhone}" 
+                                          th:data-customer-phone="${item.customerPhone}"
+                                          onclick="copyCustomerPhone(this)"
+                                          title="클릭하면 연락처가 복사됩니다">010-7409-5050</span>
+                                </td>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 0.25rem;">
+                                        <input type="date" 
+                                               class="form-control date-input" 
+                                               data-field="logisticsConfirmedDate"
+                                               th:data-id="${item.id}"
+                                               th:value="${item.logisticsConfirmedDate}"
+                                               onchange="markDateAsChanged(this)"
+                                               style="width: 140px; font-size: 1.2rem; padding: 0.6rem; min-height: 45px; font-weight: 600;">
+                                        <button type="button" 
+                                                class="btn-clear-date" 
+                                                th:data-id="${item.id}"
+                                                data-field="logisticsConfirmedDate"
+                                                onclick="clearDateField(this)"
+                                                title="날짜 초기화"
+                                                style="background: none; border: none; color: #dc3545; cursor: pointer; padding: 0.2rem; font-size: 0.7rem; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center;">✕</button>
+                                    </div>
+                                </td>
+                                <td class="order-info">
+                                    <span class="order-item-code-copy" 
+                                          th:text="${item.orderItemCode}" 
+                                          th:data-order-item-code="${item.orderItemCode}"
+                                          onclick="copyOrderItemCode(this)"
+                                          title="클릭하면 주문품번이 복사됩니다">RN-GSZD962</span>
+                                </td>
+                                <td th:text="${item.productColor}">PK</td>
+                                <td th:text="${item.productSize}">75</td>
+                                <td th:text="${item.quantity}">1</td>
+                                <td class="text-center">
+                                    <span th:if="${item.shippingFee != null and item.shippingFee == '입금필요'}" 
+                                          class="badge bg-danger text-white">입금필요</span>
+                                    <span th:if="${item.shippingFee != null and item.shippingFee == '입금대기'}" 
+                                          class="badge bg-warning text-dark">입금대기</span>
+                                    <span th:if="${item.shippingFee != null and item.shippingFee != '입금필요' and item.shippingFee != '입금대기'}" 
+                                          class="money-info" 
+                                          th:text="${item.shippingFee matches '[0-9]+' ? #numbers.formatInteger(T(java.lang.Integer).parseInt(item.shippingFee), 0, 'COMMA') : item.shippingFee}">3,000</span>
+                                </td>
+                                <td class="text-center">
+                                    <span th:if="${item.paymentStatus == 'COMPLETED'}" 
+                                          class="badge bg-success text-white" 
+                                          th:text="${item.paymentStatusText}">입금완료</span>
+                                    <span th:if="${item.paymentStatus == 'PENDING'}" 
+                                          class="badge bg-warning text-dark" 
+                                          th:text="${item.paymentStatusText}">입금대기</span>
+                                    <span th:if="${item.paymentStatus == 'NOT_REQUIRED'}" 
+                                          class="badge bg-info text-white" 
+                                          th:text="${item.paymentStatusText}">입금불필요</span>
+                                    <span th:if="${item.paymentStatus != 'COMPLETED' and item.paymentStatus != 'PENDING' and item.paymentStatus != 'NOT_REQUIRED'}" 
+                                          class="badge bg-secondary text-white" 
+                                          th:text="${item.paymentStatusText}">기타</span>
+                                </td>
+                                <td class="text-left" th:text="${item.returnReason}">고객변심</td>
+                                <td class="order-info">
+                                    <span class="tracking-number-copy" 
+                                          th:text="${item.trackingNumber}" 
+                                          th:data-tracking-number="${item.trackingNumber}"
+                                          onclick="copyTrackingNumber(this)"
+                                          title="클릭하면 운송장번호가 복사됩니다">5738757014</span>
+                                </td>
+                                <td class="date-cell" th:text="${item.collectionCompletedDate != null ? #temporals.format(item.collectionCompletedDate, 'yyyy-MM-dd') : ''}">2025-01-10</td>
+                                <td class="date-cell" th:text="${item.shippingDate != null ? #temporals.format(item.shippingDate, 'yyyy-MM-dd') : ''}">2025-01-12</td>
+                                <td class="date-cell" th:text="${item.refundDate != null ? #temporals.format(item.refundDate, 'yyyy-MM-dd') : ''}">2025-01-14</td>
+                                <td>
+                                    <input type="checkbox" 
+                                           th:checked="${item.isCompleted}" 
+                                           th:data-id="${item.id}"
+                                           onchange="markCompletionAsChanged(this)"
+                                           style="transform: scale(1.2);">
+                                </td>
+                                <td class="text-left" th:text="${item.remarks}"></td>
+                                <!--<td>
+                                    <a th:href="@{'/exchange/view/' + ${item.id}}" class="action-link" style="font-size: 1.0rem; font-weight: 600;">보기</a>
+                                     수정, 삭제 버튼 주석 처리
+                                     |
+                                    <a th:href="@{'/exchange/edit/' + ${item.id}}" class="action-link">수정</a> |
+                                    <a href="#" th:onclick="'if(confirm(&quot;정말 삭제하시겠습니까?&quot;)) { 
+                                        fetch(&quot;/exchange/api/&quot; + ' + ${item.id} + ', { 
+                                            method: &quot;DELETE&quot;, 
+                                            headers: { &quot;Content-Type&quot;: &quot;application/json&quot; } 
+                                        }).then(response => { 
+                                            if(response.ok) { 
+                                                alert(&quot;삭제되었습니다.&quot;); 
+                                                location.reload(); 
+                                            } else { 
+                                                alert(&quot;삭제 중 오류가 발생했습니다.&quot;); 
+                                            } 
+                                        }).catch(error => { 
+                                            alert(&quot;삭제 중 오류가 발생했습니다.&quot;); 
+                                        }); 
+                                    }'" class="action-link danger">삭제</a>
+
+                                </td>-->
+                            </tr>
+                            <tr th:if="${returnItems == null or returnItems.empty}">
+                                <td colspan="24" class="no-data">등록된 교환/반품 내역이 없습니다.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- 페이지네이션 -->
+                <div class="pagination-container" th:if="${returnItems != null and returnItems.totalPages > 1}">
+                    <ul class="pagination">
+                        <!-- 첫 페이지 -->
+                        <li th:if="${currentPage > 0}">
+                            <a class="page-link" th:href="@{${currentFilters != null and currentFilters != '' ? '/exchange/list/filters' : '/exchange/list'}(
+                                page=0, 
+                                size=${returnItems.size},
+                                keyword=${searchDTO != null ? searchDTO.keyword : ''},
+                                startDate=${searchDTO != null ? searchDTO.startDate : ''},
+                                endDate=${searchDTO != null ? searchDTO.endDate : ''},
+                                filters=${currentFilters != null ? currentFilters : ''}
+                            )}">&laquo;</a>
+                        </li>
+                        <!-- 이전 페이지 -->
+                        <li th:if="${currentPage > 0}">
+                            <a class="page-link" th:href="@{${currentFilters != null and currentFilters != '' ? '/exchange/list/filters' : '/exchange/list'}(
+                                page=${currentPage - 1}, 
+                                size=${returnItems.size},
+                                keyword=${searchDTO != null ? searchDTO.keyword : ''},
+                                startDate=${searchDTO != null ? searchDTO.startDate : ''},
+                                endDate=${searchDTO != null ? searchDTO.endDate : ''},
+                                filters=${currentFilters != null ? currentFilters : ''}
+                            )}">&lt;</a>
+                        </li>
+                        
+                        <!-- 페이지 번호들 -->
+                        <li th:each="i : ${#numbers.sequence(T(java.lang.Math).max(0, currentPage - 2), T(java.lang.Math).min(returnItems.totalPages - 1, currentPage + 2))}">
+                            <a class="page-link" 
+                               th:href="@{${currentFilters != null and currentFilters != '' ? '/exchange/list/filters' : '/exchange/list'}(
+                                   page=${i}, 
+                                   size=${returnItems.size},
+                                   keyword=${searchDTO != null ? searchDTO.keyword : ''},
+                                   startDate=${searchDTO != null ? searchDTO.startDate : ''},
+                                   endDate=${searchDTO != null ? searchDTO.endDate : ''},
+                                   filters=${currentFilters != null ? currentFilters : ''}
+                               )}"
+                               th:text="${i + 1}"
+                               th:classappend="${i == currentPage ? 'active' : ''}">1</a>
+                        </li>
+                        
+                        <!-- 다음 페이지 -->
+                        <li th:if="${currentPage < returnItems.totalPages - 1}">
+                            <a class="page-link" th:href="@{${currentFilters != null and currentFilters != '' ? '/exchange/list/filters' : '/exchange/list'}(
+                                page=${currentPage + 1}, 
+                                size=${returnItems.size},
+                                keyword=${searchDTO != null ? searchDTO.keyword : ''},
+                                startDate=${searchDTO != null ? searchDTO.startDate : ''},
+                                endDate=${searchDTO != null ? searchDTO.endDate : ''},
+                                filters=${currentFilters != null ? currentFilters : ''}
+                            )}">&gt;</a>
+                        </li>
+                        <!-- 마지막 페이지 -->
+                        <li th:if="${currentPage < returnItems.totalPages - 1}">
+                            <a class="page-link" th:href="@{${currentFilters != null and currentFilters != '' ? '/exchange/list/filters' : '/exchange/list'}(
+                                page=${returnItems.totalPages - 1}, 
+                                size=${returnItems.size},
+                                keyword=${searchDTO != null ? searchDTO.keyword : ''},
+                                startDate=${searchDTO != null ? searchDTO.startDate : ''},
+                                endDate=${searchDTO != null ? searchDTO.endDate : ''},
+                                filters=${currentFilters != null ? currentFilters : ''}
+                            )}">&raquo;</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+                </div>
+                <!--end::Content container-->
+            </div>
+            <!--end::Content-->
+        </div>
+        <!--end::Content wrapper-->
+    </div>
+    <!--end::App main-->
+
+    <!-- JavaScript -->
+    <script th:inline="javascript">
+        console.log('🔥 서버 기반 필터링 시스템 로딩...');
+        
+        // CSRF 토큰을 전역 변수로 설정
+        window.csrfToken = /*[[${_csrf != null ? _csrf.token : ''}]]*/ '';
+        window.csrfHeader = /*[[${_csrf != null ? _csrf.headerName : 'X-CSRF-TOKEN'}]]*/ 'X-CSRF-TOKEN';
+        
+        // 🎯 선택된 필터들을 저장하는 Set
+        let selectedFilters = new Set();
+        
+        // 🎯 페이지 로드 시 현재 적용된 필터들을 selectedFilters에 추가
+        const currentFilters = /*[[${currentFilters}]]*/ '';
+        if (currentFilters && currentFilters.trim() !== '') {
+            const filtersArray = currentFilters.split(',');
+            filtersArray.forEach(filter => {
+                selectedFilters.add(filter.trim());
+            });
+            
+            // 해당 필터 버튼들을 활성화 상태로 표시
+            selectedFilters.forEach(filter => {
+                const button = document.querySelector(`button[data-filter="${filter}"]`);
+                if (button) {
+                    button.classList.add('active');
+                }
+            });
+        }
+        
+        // 🎯 필터 토글 함수 (다중 선택 가능)
+        function toggleFilter(button) {
+            const filterType = button.getAttribute('data-filter');
+            
+            if (selectedFilters.has(filterType)) {
+                // 이미 선택된 필터면 제거
+                selectedFilters.delete(filterType);
+                button.classList.remove('active');
+                console.log('❌ 필터 제거:', filterType);
+                    } else {
+                // 새로운 필터 추가
+                selectedFilters.add(filterType);
+                button.classList.add('active');
+                console.log('✅ 필터 추가:', filterType);
+            }
+            
+            console.log('🎯 현재 선택된 필터들:', Array.from(selectedFilters));
+        }
+        
+        // 🎯 선택한 필터들 적용
+        function applySelectedFilters() {
+            if (selectedFilters.size === 0) {
+                alert('선택된 필터가 없습니다. 최소 1개 이상의 필터를 선택해주세요.');
+                    return;
+                }
+                
+            console.log('🎯 필터 적용:', Array.from(selectedFilters));
+            
+            // 현재 검색 조건들 가져오기
+            const keyword = document.getElementById('keyword').value || '';
+            const startDate = document.getElementById('startDate').value || '';
+            const endDate = document.getElementById('endDate').value || '';
+            
+            // 선택된 필터들을 쉼표로 구분된 문자열로 변환
+            const filtersString = Array.from(selectedFilters).join(',');
+            
+            // 서버로 이동
+            const url = new URL('/exchange/list/filters', window.location.origin);
+            url.searchParams.set('filters', filtersString);
+            url.searchParams.set('page', '0');
+            url.searchParams.set('size', '20');
+            
+            if (keyword.trim()) url.searchParams.set('keyword', keyword.trim());
+            if (startDate.trim()) url.searchParams.set('startDate', startDate.trim());
+            if (endDate.trim()) url.searchParams.set('endDate', endDate.trim());
+            
+            console.log('🚀 서버로 이동:', url.toString());
+            window.location.href = url.toString();
+        }
+        
+        // 🔄 모든 필터 해제
+        function clearAllFilters() {
+            console.log('🔄 모든 필터 해제');
+            
+            // 선택된 필터들 초기화
+            selectedFilters.clear();
+            
+            // 모든 필터 버튼 비활성화
+            document.querySelectorAll('.filter-btn').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // 기본 목록 페이지로 이동 (검색 조건은 유지)
+            const keyword = document.getElementById('keyword').value || '';
+            const startDate = document.getElementById('startDate').value || '';
+            const endDate = document.getElementById('endDate').value || '';
+            
+            const url = new URL('/exchange/list', window.location.origin);
+            url.searchParams.set('page', '0');
+            url.searchParams.set('size', '20');
+            
+            if (keyword.trim()) url.searchParams.set('keyword', keyword.trim());
+            if (startDate.trim()) url.searchParams.set('startDate', startDate.trim());
+            if (endDate.trim()) url.searchParams.set('endDate', endDate.trim());
+            
+            console.log('🚀 기본 목록으로 이동:', url.toString());
+            window.location.href = url.toString();
+        }
+        
+        // 🚀 테이블 데이터 업데이트 (AJAX 결과로)
+        function updateTableWithFilteredData(data, filterType) {
+            console.log('🔍 테이블 업데이트 시작 - data:', data, 'filterType:', filterType);
+            
+            const tbody = document.querySelector('.data-table tbody');
+            if (!tbody) {
+                console.error('❌ 테이블 본문을 찾을 수 없습니다');
+                return;
+            }
+            
+            // 📋 안전한 데이터 처리 (null/undefined 체크)
+            if (!data || !Array.isArray(data)) {
+                console.warn('⚠️ 데이터가 배열이 아니거나 null입니다:', data);
+                data = [];  // 빈 배열로 초기화
+            }
+            
+            // 테이블 내용 교체
+            tbody.innerHTML = '';
+            
+            if (data.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="20" style="text-align: center; padding: 2rem; color: #666;">
+                            해당 조건에 맞는 데이터가 없습니다.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            data.forEach((item, index) => {
+                const row = createTableRow(item, index);
+                tbody.appendChild(row);
+            });
+            
+            console.log('✅ 테이블 업데이트 완료:', data.length, '건');
+            
+            // 체크박스 이벤트 다시 등록
+            reattachCheckboxEvents();
+        }
+        
+        // 🚀 체크박스 이벤트 다시 등록
+        function reattachCheckboxEvents() {
+            // 헤더 체크박스 초기화
+            const selectAllCheckbox = document.getElementById('selectAll');
+            if (selectAllCheckbox) {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = false;
+            }
+            
+            // 개별 체크박스 이벤트 재등록
+            const rowCheckboxes = document.querySelectorAll('input[name="selected"]');
+            rowCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateSelectAllState);
+            });
+            
+            console.log('✅ 체크박스 이벤트 재등록 완료:', rowCheckboxes.length, '개');
+        }
+        
+        // 테이블 행 생성
+        function createTableRow(item, index) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="text-center">
+                    <input type="checkbox" name="selected" value="${item.returnId}">
+                </td>
+                <td class="text-center">${index + 1}</td>
+                <td class="text-center">${item.returnTypeCode || '-'}</td>
+                <td class="text-center">${item.orderDate || '-'}</td>
+                <td class="text-center">${item.csReceivedDate || '-'}</td>
+                <td class="text-left">${item.siteName || '-'}</td>
+                <td class="order-info">
+                    <span class="order-number-copy" data-order-number="${item.orderNumber}" onclick="copyOrderNumber(this)" title="클릭하면 주문번호가 복사됩니다">
+                        ${item.orderNumber || '-'}
+                        </span>
+                </td>
+                <td class="text-right">${item.refundAmount ? Number(item.refundAmount).toLocaleString() + '원' : '-'}</td>
+                <td class="text-left">${item.customerName || '-'}</td>
+                <td class="text-left">${item.customerPhone || '-'}</td>
+                <td class="text-left">${item.orderItemCode || '-'}</td>
+                <td class="text-left">${item.productColor || '-'}</td>
+                <td class="text-left">${item.productSize || '-'}</td>
+                <td class="text-center">${item.quantity || '-'}</td>
+                <td class="text-center">${item.shippingFee || '-'}</td>
+                <td class="text-center">
+                    <span class="badge ${getPaymentStatusClass(item.paymentStatus)}">
+                        ${getPaymentStatusText(item)}
+                        </span>
+                </td>
+                <td class="text-left">${item.returnReason || '-'}</td>
+                <td class="order-info">
+                    <span class="tracking-number-copy" data-tracking-number="${item.trackingNumber}" onclick="copyTrackingNumber(this)" title="클릭하면 운송장번호가 복사됩니다">
+                        ${item.trackingNumber || '-'}
+                    </span>
+                </td>
+                <td class="text-center date-editable">
+                    <input type="date" value="${item.collectionCompletedDate || ''}" data-id="${item.returnId}" data-field="collectionCompletedDate" onchange="markDateAsChanged(this)" style="width: 100%; border: none; background: transparent;">
+                </td>
+                <td class="text-center date-editable">
+                    <input type="date" value="${item.logisticsConfirmedDate || ''}" data-id="${item.returnId}" data-field="logisticsConfirmedDate" onchange="markDateAsChanged(this)" style="width: 100%; border: none; background: transparent;">
+                </td>
+                <td class="text-center date-editable">
+                    <input type="date" value="${item.shippingDate || ''}" data-id="${item.returnId}" data-field="shippingDate" onchange="markDateAsChanged(this)" style="width: 100%; border: none; background: transparent;">
+                </td>
+                <td class="text-center date-editable">
+                    <input type="date" value="${item.refundDate || ''}" data-id="${item.returnId}" data-field="refundDate" onchange="markDateAsChanged(this)" style="width: 100%; border: none; background: transparent;">
+                </td>
+                <td class="text-center">
+                    <span class="badge ${item.isCompleted ? 'bg-success' : 'bg-warning'}">
+                        ${item.isCompleted ? '완료' : '미완료'}
+                    </span>
+                </td>
+            `;
+            return row;
+        }
+        
+        // 결제 상태 클래스 반환
+        function getPaymentStatusClass(status) {
+            switch(status) {
+                case 'COMPLETED': return 'bg-success text-white';
+                case 'PENDING': return 'bg-warning text-dark';
+                case 'NOT_REQUIRED': return 'bg-info text-white';
+                default: return 'bg-secondary text-white';
+            }
+        }
+        
+        // 결제 상태 텍스트 반환
+        function getPaymentStatusText(item) {
+            if (item.shippingFee === '입금필요' || item.shippingFee === '입금대기') {
+                return '입금필요';
+            }
+            
+            switch(item.paymentStatus) {
+                case 'PENDING': return '입금필요';
+                case 'COMPLETED': return '입금완료';
+                case 'NOT_REQUIRED': return '입금불필요';
+                default: return item.paymentStatus || '기타';
+            }
+        }
+        
+        // 🚀 필터 배너 표시
+        function showFilterBanner(filterType, totalCount) {
+            // 기존 배너 제거
+            const existingBanner = document.querySelector('.filter-banner');
+            if (existingBanner) {
+                existingBanner.remove();
+            }
+            
+            const filterNames = {
+                'collection-completed': '📦 회수완료',
+                'collection-pending': '📦 회수미완료',
+                'logistics-confirmed': '🚛 물류확인완료',
+                'logistics-pending': '🚛 물류확인미완료',
+                'shipping-completed': '📤 출고완료',
+                'shipping-pending': '📤 출고대기',
+                'refund-completed': '💰 환불완료',
+                'refund-pending': '💰 환불대기',
+                'payment-pending': '💳 입금대기',
+                'payment-completed': '💳 입금완료',
+                'completed': '✅ 전체완료',
+                'incompleted': '❌ 미완료'
+            };
+            
+            const filterName = filterNames[filterType] || filterType;
+            
+            const banner = document.createElement('div');
+            banner.className = 'filter-banner';
+            banner.innerHTML = `
+                <div style="background: linear-gradient(90deg, #28a745, #20c997); color: white; padding: 0.75rem 1.5rem; border-radius: 0.5rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);">
+                    <span>🎯 <strong>필터 적용:</strong> ${filterName} - ${totalCount}건 표시</span>
+                    <button onclick="clearFilterFast()" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 0.25rem 0.75rem; border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem;">✕ 필터 해제</button>
+                </div>
+            `;
+            
+            const tableContainer = document.querySelector('.table-container');
+            tableContainer.parentNode.insertBefore(banner, tableContainer);
+        }
+        
+        // 🚀 빠른 필터 해제 (AJAX 방식)
+        function clearFilterFast() {
+            console.log('🚀 빠른 필터 해제');
+            
+            // 필터 배너 제거
+            const existingBanner = document.querySelector('.filter-banner');
+            if (existingBanner) {
+                existingBanner.remove();
+            }
+            
+            // 활성화된 카드 스타일 제거
+            document.querySelectorAll('.stat-box').forEach(box => {
+                box.classList.remove('active');
+            });
+            
+            // 페이지 새로고침으로 원래 데이터 복원
+            window.location.href = '/exchange/list';
+        }
+        
+        // 전체 목록으로 돌아가기 (기존 호환성 유지)
+        function clearFilter() {
+            clearFilterFast();
+        }
+        
+        // 현재 필터 상태 표시 (서버에서 전달받은 경우)
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentFilter = /*[[${currentFilter}]]*/ '';
+            if (currentFilter && currentFilter !== 'null' && currentFilter !== '') {
+                console.log('🎯 현재 적용된 필터:', currentFilter);
+                
+                // 해당 카드를 활성화
+                const filterElement = document.querySelector(`[data-filter="${currentFilter}"]`);
+                if (filterElement) {
+                    const parentCard = filterElement.closest('.stat-box');
+                    if (parentCard) {
+                        parentCard.classList.add('active');
+                    }
+                }
+                
+                // 필터 배너 표시 (서버에서 전달하므로 주석 처리)
+                // showCurrentFilterBanner(currentFilter);
+            }
+        });
+        
+        // 현재 필터 배너 표시
+        function showCurrentFilterBanner(filterType) {
+            const filterNames = {
+                'collection-completed': '📦 회수완료',
+                'collection-pending': '📦 회수미완료',
+                'logistics-confirmed': '🚛 물류확인완료',
+                'logistics-pending': '🚛 물류확인미완료',
+                'shipping-completed': '📤 출고완료',
+                'shipping-pending': '📤 출고대기',
+                'refund-completed': '💰 환불완료',
+                'refund-pending': '💰 환불대기',
+                'payment-pending': '💳 입금대기',
+                'payment-completed': '💳 입금완료',
+                'completed': '✅ 전체완료',
+                'incompleted': '❌ 미완료'
+            };
+            
+            const filterName = filterNames[filterType] || filterType;
+            const totalItems = /*[[${totalItems}]]*/ '0';
+            
+            const banner = document.createElement('div');
+            banner.className = 'filter-banner';
+            banner.innerHTML = `
+                <div style="background: linear-gradient(90deg, #4361ee, #3f37c9); color: white; padding: 0.75rem 1.5rem; border-radius: 0.5rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(67, 97, 238, 0.3);">
+                    <span>🔍 <strong>필터 적용됨:</strong> ${filterName} - ${totalItems}건 표시</span>
+                    <button onclick="clearFilter()" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 0.25rem 0.75rem; border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem;">✕ 필터 해제</button>
+                </div>
+            `;
+            
+            const tableContainer = document.querySelector('.table-container');
+            tableContainer.parentNode.insertBefore(banner, tableContainer);
+        }
+        
+        // DOM 로드 완료 후 실행
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎯 DOM 로드 완료 - 카드 이벤트 등록 시작');
+            
+            // 🎯 선택된 필터들을 관리하는 Set
+            let selectedFilters = new Set();
+            
+            // 🎯 현재 검색 조건을 읽어오는 함수 (filters 제외)
+            function getCurrentSearchParams() {
+                const searchForm = document.getElementById('searchForm');
+                const formData = new FormData(searchForm);
+                const params = new URLSearchParams();
+                
+                // 검색 조건들을 파라미터로 추가 (filters는 제외)
+                for (const [key, value] of formData.entries()) {
+                    if (key !== 'filters' && value && value.trim() !== '') {
+                        params.append(key, value);
+                    }
+                }
+                
+                return params;
+            }
+            
+            // 🎯 모든 조건(검색 + 필터 + 페이지)을 포함한 URL 생성 함수
+            function getFullParamsUrl() {
+                const params = new URLSearchParams();
+                
+                // 검색 조건 추가
+                const keyword = document.getElementById('keyword').value.trim();
+                if (keyword) {
+                    params.append('keyword', keyword);
+                }
+                
+                const startDate = document.getElementById('startDate').value;
+                if (startDate) {
+                    params.append('startDate', startDate);
+                }
+                
+                const endDate = document.getElementById('endDate').value;
+                if (endDate) {
+                    params.append('endDate', endDate);
+                }
+                
+                // 필터 정보 추가
+                if (selectedFilters.size > 0) {
+                    const filtersArray = Array.from(selectedFilters);
+                    params.append('filters', filtersArray.join(','));
+                }
+                
+                // 현재 페이지 정보 추가
+                const currentPage = new URLSearchParams(window.location.search).get('page') || '0';
+                params.append('page', currentPage);
+                
+                return params.toString();
+            }
+            
+            // 🎯 필터 토글 함수 (다중 선택 가능)
+            function toggleFilter(filterType) {
+                if (selectedFilters.has(filterType)) {
+                    selectedFilters.delete(filterType);
+                } else {
+                    selectedFilters.add(filterType);
+                }
+                
+                console.log('🎯 필터 토글:', filterType, '현재 선택된 필터:', Array.from(selectedFilters));
+            }
+            
+            // 🎯 선택한 필터들 적용 (서버 방식)
+            function applySelectedFilters() {
+                const searchParams = getCurrentSearchParams();
+                searchParams.set('page', '0');
+                
+                if (selectedFilters.size > 0) {
+                    const filterParams = Array.from(selectedFilters).join(',');
+                    searchParams.append('filters', filterParams);
+                }
+                
+                const urlWithParams = `/exchange/list/filters${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
+                window.location.href = urlWithParams;
+            }
+            
+            // 🎯 모든 필터 해제
+            function clearAllFilters() {
+                selectedFilters.clear();
+                
+                // 검색 조건이 있으면 검색 조건만으로 조회, 없으면 전체 목록
+                const searchForm = document.getElementById('searchForm');
+                const formData = new FormData(searchForm);
+                const hasSearchCondition = (formData.get('keyword') && formData.get('keyword').trim() !== '') ||
+                                          formData.get('startDate') || formData.get('endDate');
+                
+                if (hasSearchCondition) {
+                    searchForm.submit();
+                } else {
+                    window.location.href = '/exchange/list';
+                }
+            }
+            
+            // 🎯 체크박스 이벤트 등록
+            setTimeout(function() {
+                // 헤더 체크박스 이벤트
+                const selectAllCheckbox = document.getElementById('selectAll');
+                if (selectAllCheckbox) {
+                    selectAllCheckbox.addEventListener('change', toggleSelectAll);
+                    console.log('✅ 헤더 체크박스 이벤트 등록 완료');
+                }
+                
+                // 개별 체크박스 이벤트
+                const rowCheckboxes = document.querySelectorAll('input[name="selected"]');
+                rowCheckboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', updateSelectAllState);
+                });
+                console.log('✅ 개별 체크박스 이벤트 등록 완료:', rowCheckboxes.length, '개');
+                
+                // 🚀 카드 클릭 이벤트 등록 (sample/list.html 방식)
+                const cardMappings = [
+                    { selector: '[data-filter="collection-completed"]', filterType: 'collection-completed' },
+                    { selector: '[data-filter="collection-pending"]', filterType: 'collection-pending' },
+                    { selector: '[data-filter="logistics-confirmed"]', filterType: 'logistics-confirmed' },
+                    { selector: '[data-filter="logistics-pending"]', filterType: 'logistics-pending' },
+                    { selector: '[data-filter="shipping-completed"]', filterType: 'shipping-completed' },
+                    { selector: '[data-filter="shipping-pending"]', filterType: 'shipping-pending' },
+                    { selector: '[data-filter="refund-completed"]', filterType: 'refund-completed' },
+                    { selector: '[data-filter="refund-pending"]', filterType: 'refund-pending' },
+                    { selector: '[data-filter="payment-pending"]', filterType: 'payment-pending' },
+                    { selector: '[data-filter="payment-completed"]', filterType: 'payment-completed' },
+                    { selector: '[data-filter="completed"]', filterType: 'completed' },
+                    { selector: '[data-filter="incompleted"]', filterType: 'incompleted' },
+                    { selector: '[data-filter="overdue-ten-days"]', filterType: 'overdue-ten-days' }
+                ];
+                
+                cardMappings.forEach(mapping => {
+                    const elements = document.querySelectorAll(mapping.selector);
+                    console.log(`🔗 ${mapping.selector} 요소 개수:`, elements.length);
+                    
+                    elements.forEach(element => {
+                        element.style.cursor = 'pointer';
+                        element.style.transition = 'all 0.2s ease';
+                        
+                        element.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            console.log('🎯 카드 클릭 (서버 방식):', mapping.filterType);
+                            
+                            // 🎯 개별 카드 활성 상태 토글
+                            const parentCard = this.closest('.stat-box');
+                            if (parentCard) {
+                                if (selectedFilters.has(mapping.filterType)) {
+                                    // 이미 활성화된 필터면 비활성화
+                                    parentCard.classList.remove('active');
+                                    selectedFilters.delete(mapping.filterType);
+                                } else {
+                                    // 비활성화된 필터면 활성화
+                                parentCard.classList.add('active');
+                                    selectedFilters.add(mapping.filterType);
+                                }
+                            }
+                            
+                            // 🚀 바로 서버로 이동
+                            applySelectedFilters();
+                        });
+                        
+                        // 호버 효과
+                        element.addEventListener('mouseenter', function() {
+                            this.style.transform = 'scale(1.1)';
+                            this.style.textShadow = '0 2px 4px rgba(0,0,0,0.3)';
+                        });
+                        
+                        element.addEventListener('mouseleave', function() {
+                            this.style.transform = 'scale(1)';
+                            this.style.textShadow = 'none';
+                        });
+                    });
+                });
+                
+                console.log('✅ 모든 카드 이벤트 등록 완료 - 서버 방식 적용');
+            }, 500);
+            
+            // 🎯 페이지 로드 시 URL 파라미터에서 필터 상태 복원
+            function syncFiltersFromUrl() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const urlFilters = urlParams.get('filters');
+                
+                if (urlFilters) {
+                    const filters = urlFilters.split(',').map(f => f.trim()).filter(f => f);
+                    filters.forEach(filter => {
+                        selectedFilters.add(filter);
+                        
+                        // 해당 필터 카드들을 활성 상태로 표시
+                        const filterElement = document.querySelector(`[data-filter="${filter}"]`);
+                        if (filterElement) {
+                            const parentCard = filterElement.closest('.stat-box');
+                            if (parentCard) {
+                                parentCard.classList.add('active');
+                            }
+                        }
+                    });
+                    
+                    // 필터 배너 표시
+                    if (filters.length > 0) {
+                        showCurrentFilterBanner(filters);
+                    }
+                }
+            }
+            
+            // 🎯 다중 필터 배너 표시
+            function showCurrentFilterBanner(filters) {
+                const filterNames = {
+                    'collection-completed': '회수완료',
+                    'collection-pending': '회수미완료',
+                    'logistics-confirmed': '물류확인완료',
+                    'logistics-pending': '물류확인미완료',
+                    'shipping-completed': '출고완료',
+                    'shipping-pending': '출고대기',
+                    'refund-completed': '환불완료',
+                    'refund-pending': '환불대기',
+                    'payment-pending': '입금대기',
+                    'payment-completed': '입금완료',
+                    'completed': '전체완료',
+                    'incompleted': '미완료',
+                    'overdue-ten-days': '처리기간 임박'
+                };
+                
+                const filterArray = Array.isArray(filters) ? filters : [filters];
+                const totalItems = /*[[${totalItems}]]*/ '0';
+                
+                // 개별 필터 배지 생성
+                const filterBadges = filterArray.map(filter => {
+                    const displayName = filterNames[filter] || filter;
+                    return `<span class="filter-badge" style="background: rgba(255,255,255,0.2); padding: 0.25rem 0.5rem; border-radius: 1rem; font-size: 0.75rem; margin-right: 0.5rem; display: inline-flex; align-items: center; gap: 0.25rem;">
+                        ${displayName}
+                        <button onclick="removeFilter('${filter}')" style="background: rgba(255,255,255,0.3); border: none; color: white; border-radius: 50%; width: 1rem; height: 1rem; font-size: 0.6rem; cursor: pointer; display: flex; align-items: center; justify-content: center;" title="이 필터 제거">×</button>
+                    </span>`;
+                }).join('');
+                
+                const banner = document.createElement('div');
+                banner.className = 'filter-banner';
+                banner.innerHTML = `
+                    <div style="background: linear-gradient(90deg, #4361ee, #3f37c9); color: white; padding: 0.75rem 1.5rem; border-radius: 0.5rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(67, 97, 238, 0.3);">
+                        <div style="flex: 1;">
+                            <div style="margin-bottom: 0.25rem;">🔍 <strong>필터 적용됨:</strong> ${totalItems}건 표시 <small>(${filterArray.length}개 필터 활성)</small></div>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.25rem;">
+                                ${filterBadges}
+                            </div>
+                        </div>
+                        <div>
+                            <button onclick="clearAllFilters()" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 0.25rem 0.75rem; border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem; margin-left: 0.5rem;">✕ 모든 필터 해제</button>
+                        </div>
+                    </div>
+                `;
+                
+                const tableContainer = document.querySelector('.table-container');
+                if (tableContainer) {
+                    tableContainer.parentNode.insertBefore(banner, tableContainer);
+                }
+            }
+            
+            // 🎯 개별 필터 제거 함수
+            window.removeFilter = function(filterType) {
+                selectedFilters.delete(filterType);
+                
+                // 해당 카드의 활성 상태 제거
+                const filterElement = document.querySelector(`[data-filter="${filterType}"]`);
+                if (filterElement) {
+                    const parentCard = filterElement.closest('.stat-box');
+                    if (parentCard) {
+                        parentCard.classList.remove('active');
+                    }
+                }
+                
+                // 서버로 이동
+                applySelectedFilters();
+            };
+            
+            // 🎯 전역 함수로 등록
+            window.clearAllFilters = clearAllFilters;
+            
+            // 🎯 페이지 로드 시 필터 상태 복원
+            syncFiltersFromUrl();
+        });
+        
+        // 🎯 전체 선택/해제 기능
+        function toggleSelectAll() {
+            const selectAllCheckbox = document.getElementById('selectAll');
+            const rowCheckboxes = document.querySelectorAll('input[name="selected"]');
+            
+            console.log('🔄 전체 선택 토글:', selectAllCheckbox.checked);
+            console.log('📝 대상 체크박스 개수:', rowCheckboxes.length);
+            
+            // 모든 행 체크박스를 헤더 체크박스 상태에 맞춤
+            rowCheckboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+            
+            // 선택된 개수 업데이트
+            updateSelectedCount();
+        }
+        
+        // 개별 체크박스 클릭 시 헤더 체크박스 상태 업데이트
+        function updateSelectAllState() {
+            const selectAllCheckbox = document.getElementById('selectAll');
+            const rowCheckboxes = document.querySelectorAll('input[name="selected"]');
+            const checkedCount = document.querySelectorAll('input[name="selected"]:checked').length;
+            
+            console.log('📊 체크박스 상태 업데이트:', checkedCount, '/', rowCheckboxes.length);
+            
+            if (checkedCount === 0) {
+                // 아무것도 선택되지 않음
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = false;
+            } else if (checkedCount === rowCheckboxes.length) {
+                // 모두 선택됨
+                selectAllCheckbox.checked = true;
+                selectAllCheckbox.indeterminate = false;
+            } else {
+                // 일부만 선택됨 (중간 상태)
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = true;
+            }
+            
+            updateSelectedCount();
+        }
+        
+        // 선택된 항목 개수 표시 업데이트
+        function updateSelectedCount() {
+            const checkedCount = document.querySelectorAll('input[name="selected"]:checked').length;
+            
+            // 기존 카운터 제거
+            const existingCounter = document.querySelector('.selection-counter');
+            if (existingCounter) {
+                existingCounter.remove();
+            }
+            
+            // 선택된 항목이 있을 때만 카운터 표시
+            if (checkedCount > 0) {
+                const counter = document.createElement('div');
+                counter.className = 'selection-counter';
+                counter.innerHTML = `
+                    <div style="background: linear-gradient(90deg, #35b27f, #2d8659); color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; margin-bottom: 0.5rem; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; box-shadow: 0 2px 4px rgba(53, 178, 127, 0.3);">
+                        <span>✅ <strong>${checkedCount}개 항목</strong>이 선택되었습니다</span>
+                        <button onclick="clearAllSelections()" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 0.125rem 0.5rem; border-radius: 0.25rem; cursor: pointer; font-size: 0.75rem;">✕ 선택해제</button>
+                    </div>
+                `;
+                
+                const tableContainer = document.querySelector('.table-container');
+                tableContainer.parentNode.insertBefore(counter, tableContainer);
+            }
+        }
+        
+        // 모든 선택 해제
+        function clearAllSelections() {
+            const selectAllCheckbox = document.getElementById('selectAll');
+            const rowCheckboxes = document.querySelectorAll('input[name="selected"]');
+            
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+            
+            rowCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            updateSelectedCount();
+        }
+        
+        // 🎯 대표님 요청: 날짜 일괄 수정 기능
+        let dateChanges = new Map(); // 변경된 날짜들을 저장
+        
+        // 🎯 대표님 요청: 완료 상태 일괄 수정 기능
+        let completionChanges = new Map(); // 변경된 완료 상태들을 저장
+        
+        // 날짜 변경 시 호출되는 함수
+        function markDateAsChanged(input) {
+            const id = input.getAttribute('data-id');
+            const field = input.getAttribute('data-field');
+            const value = input.value;
+            
+            console.log('📅 날짜 변경:', id, field, value);
+            
+            // 변경사항 저장
+            if (!dateChanges.has(id)) {
+                dateChanges.set(id, {});
+            }
+            
+            const itemChanges = dateChanges.get(id);
+            itemChanges[field] = value || null;
+            
+            // 시각적 피드백 - 변경된 행 배경색 변경
+            const row = input.closest('tr');
+            if (row) {
+                row.style.backgroundColor = '#fff3cd'; // 연한 노란색
+                row.classList.add('date-changed');
+            }
+            
+            // 변경 카운트 업데이트
+            updateDateChangeCount();
+        }
+        
+        // 변경 카운트 업데이트
+        function updateDateChangeCount() {
+            const changeCount = dateChanges.size;
+            const changeCountElement = document.getElementById('changeCount');
+            
+            // null 체크 추가
+            if (changeCountElement) {
+                changeCountElement.textContent = changeCount;
+            }
+            
+            const saveBtn = document.getElementById('bulkSaveBtn');
+            if (saveBtn) {
+                if (changeCount > 0) {
+                    saveBtn.disabled = false;
+                    saveBtn.style.backgroundColor = '#28a745';
+                } else {
+                    saveBtn.disabled = true;
+                    saveBtn.style.backgroundColor = '#6c757d';
+                }
+            }
+        }
+        
+        // 일괄 날짜 저장 함수
+        function saveBulkDateChanges() {
+            if (dateChanges.size === 0) {
+                alert('변경된 날짜가 없습니다.');
+                return;
+            }
+            
+            console.log('💾 일괄 날짜 저장 시작:', dateChanges);
+            
+            // 저장 버튼 비활성화
+            const saveBtn = document.getElementById('bulkSaveBtn');
+            if (saveBtn) {
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '💾 저장중...';
+            }
+            
+            // 서버로 전송할 데이터 준비 (null 값도 포함)
+            const updates = [];
+            dateChanges.forEach((changes, id) => {
+                const updateData = { id: parseInt(id) };
+                
+                // undefined가 아닌 경우 모두 전송 (null 포함)
+                if (changes.collectionCompletedDate !== undefined) {
+                    updateData.collectionCompletedDate = changes.collectionCompletedDate;
+                }
+                if (changes.logisticsConfirmedDate !== undefined) {
+                    updateData.logisticsConfirmedDate = changes.logisticsConfirmedDate;
+                }
+                if (changes.shippingDate !== undefined) {
+                    updateData.shippingDate = changes.shippingDate;
+                }
+                if (changes.refundDate !== undefined) {
+                    updateData.refundDate = changes.refundDate;
+                }
+                
+                updates.push(updateData);
+            });
+            
+            console.log('📤 서버 전송 데이터:', updates);
+            
+            // 서버로 AJAX 요청
+            fetch('/exchange/api/bulk-update-dates', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [window.csrfHeader]: window.csrfToken
+                },
+                body: JSON.stringify(updates)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('📥 서버 응답:', data);
+                
+                if (data.success) {
+                    alert(`✅ 성공적으로 저장되었습니다!\n업데이트된 건수: ${data.updatedCount}/${data.totalCount}건`);
+                    
+                    // 변경사항 초기화
+                    dateChanges.clear();
+                    
+                    // 변경된 행 배경색 원복
+                    document.querySelectorAll('.date-changed').forEach(row => {
+                        row.style.backgroundColor = '';
+                        row.classList.remove('date-changed');
+                    });
+                    
+                    // 버튼 상태 초기화
+                    updateDateChangeCount();
+                    
+                    // 🎯 실시간 카드 통계 업데이트
+                    setTimeout(() => {
+                        refreshCardStats();
+                    }, 500);
+                    
+                } else {
+                    alert(`❌ 저장 실패: ${data.message}`);
+                }
+            })
+            .catch(error => {
+                console.error('❌ 저장 오류:', error);
+                alert('저장 중 오류가 발생했습니다. 다시 시도해주세요.');
+            })
+            .finally(() => {
+                // 버튼 상태 복원
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '💾 날짜저장 (<span id="changeCount">0</span>건)';
+                }
+            });
+        }
+        
+        // 완료 상태 변경 시 호출되는 함수
+        function markCompletionAsChanged(checkbox) {
+            const id = checkbox.getAttribute('data-id');
+            const isCompleted = checkbox.checked;
+            
+            console.log('✅ 완료 상태 변경:', id, isCompleted);
+            
+            // 변경사항 저장
+            completionChanges.set(id, isCompleted);
+            
+            // 시각적 피드백 - 변경된 행 배경색 변경
+            const row = checkbox.closest('tr');
+            if (row) {
+                row.style.borderLeft = '4px solid #ffc107'; // 노란색 왼쪽 테두리
+                row.classList.add('completion-changed');
+            }
+            
+            // 완료 변경 카운트 업데이트
+            updateCompletionChangeCount();
+            
+            // 🎯 실시간 카드 통계 업데이트 (약간의 지연 후)
+            setTimeout(() => {
+                refreshCardStats();
+            }, 300);
+        }
+        
+        // 완료 변경 카운트 업데이트
+        function updateCompletionChangeCount() {
+            const changeCount = completionChanges.size;
+            const changeCountElement = document.getElementById('completeCount');
+            
+            // null 체크 추가
+            if (changeCountElement) {
+                changeCountElement.textContent = changeCount;
+            }
+            
+            const completeBtn = document.getElementById('bulkCompleteBtn');
+            if (completeBtn) {
+                if (changeCount > 0) {
+                    completeBtn.disabled = false;
+                    completeBtn.style.backgroundColor = '#ffc107';
+                } else {
+                    completeBtn.disabled = true;
+                    completeBtn.style.backgroundColor = '#6c757d';
+                }
+            }
+        }
+        
+        // 일괄 완료 상태 저장 함수
+        function saveBulkCompletionChanges() {
+            if (completionChanges.size === 0) {
+                alert('변경된 완료 상태가 없습니다.');
+                return;
+            }
+            
+            console.log('✅ 일괄 완료 상태 저장 시작:', completionChanges);
+            
+            // 저장 버튼 비활성화
+            const completeBtn = document.getElementById('bulkCompleteBtn');
+            if (completeBtn) {
+                completeBtn.disabled = true;
+                completeBtn.innerHTML = '✅ 처리중...';
+            }
+            
+            // 서버로 전송할 데이터 준비
+            const updates = [];
+            completionChanges.forEach((isCompleted, id) => {
+                updates.push({
+                    id: parseInt(id),
+                    isCompleted: isCompleted
+                });
+            });
+            
+            console.log('📤 완료 상태 서버 전송 데이터:', updates);
+            
+            // 각 항목을 개별적으로 처리
+            let processedCount = 0;
+            let successCount = 0;
+            
+            updates.forEach(update => {
+                fetch('/exchange/api/update-completion', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        [window.csrfHeader]: window.csrfToken
+                    },
+                    body: JSON.stringify(update)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    processedCount++;
+                    if (data.success) {
+                        successCount++;
+                    }
+                    
+                    // 모든 요청이 완료되면
+                    if (processedCount === updates.length) {
+                        if (successCount === updates.length) {
+                            alert(`✅ 완료 상태가 성공적으로 변경되었습니다!\n처리된 건수: ${successCount}/${updates.length}건`);
+                            
+                            // 변경사항 초기화
+                            completionChanges.clear();
+                            
+                            // 변경된 행 스타일 원복
+                            document.querySelectorAll('.completion-changed').forEach(row => {
+                                row.style.borderLeft = '';
+                                row.classList.remove('completion-changed');
+                            });
+                            
+                            // 완료된 항목들에 completed 클래스 적용
+                            updates.forEach(update => {
+                                const checkbox = document.querySelector(`input[data-id="${update.id}"]`);
+                                if (checkbox) {
+                                    const row = checkbox.closest('tr');
+                                    if (update.isCompleted) {
+                                        row.classList.add('completed');
+                                    } else {
+                                        row.classList.remove('completed');
+                                    }
+                                }
+                            });
+                            
+                            // 버튼 상태 초기화
+                            updateCompletionChangeCount();
+                            
+                            // 🎯 실시간 카드 통계 업데이트
+                            setTimeout(() => {
+                                refreshCardStats();
+                            }, 500);
+                            
+                        } else {
+                           alert(`⚠️ 일부 항목 처리 실패\n성공: ${successCount}건, 실패: ${updates.length - successCount}건`);
+                       }
+                       
+                       // 버튼 상태 복원
+                       if (completeBtn) {
+                           completeBtn.disabled = false;
+                           completeBtn.innerHTML = '✅ 완료처리 (<span id="completeCount">0</span>건)';
+                       }
+                   }
+               })
+               .catch(error => {
+                   console.error('❌ 완료 상태 저장 오류:', error);
+                   processedCount++;
+                   
+                   if (processedCount === updates.length) {
+                       alert('완료 상태 변경 중 오류가 발생했습니다. 다시 시도해주세요.');
+                       
+                       // 버튼 상태 복원
+                       if (completeBtn) {
+                           completeBtn.disabled = false;
+                           completeBtn.innerHTML = '✅ 완료처리 (<span id="completeCount">0</span>건)';
+                       }
+                   }
+               });
+           });
+       }
+       
+       // 날짜 필드 초기화 함수
+       function clearDateField(button) {
+           const itemId = button.getAttribute('data-id');
+           const fieldName = button.getAttribute('data-field');
+           
+           // 해당 날짜 입력 필드 찾기
+           const dateInput = document.querySelector(`input[data-id="${itemId}"][data-field="${fieldName}"]`);
+           
+           if (dateInput) {
+               // 날짜 필드 초기화
+               dateInput.value = '';
+               
+               // 변경사항 추가 (null로 설정)
+               if (!dateChanges.has(itemId)) {
+                   dateChanges.set(itemId, {});
+               }
+               
+               const changes = dateChanges.get(itemId);
+               changes[fieldName] = null; // null로 설정하여 DB에서 NULL로 업데이트
+               
+               // 행 스타일 변경 (변경된 것으로 표시)
+               const row = dateInput.closest('tr');
+               if (row) {
+                   row.classList.add('date-changed');
+                   row.style.backgroundColor = '#fff3cd'; // 연한 노란색 배경
+               }
+               
+               // 변경 카운트 업데이트
+               updateDateChangeCount();
+               
+               console.log(`날짜 초기화: ID=${itemId}, 필드=${fieldName}`);
+               
+               // 🎯 실시간 카드 통계 업데이트 (약간의 지연 후)
+               setTimeout(() => {
+                   refreshCardStats();
+               }, 300);
+           }
+       }
+       
+       // 🎯 주문번호 복사 기능
+       function copyOrderNumber(element) {
+           const orderNumber = element.getAttribute('data-order-number');
+           
+           // 클립보드에 복사
+           navigator.clipboard.writeText(orderNumber).then(function() {
+               console.log('📋 주문번호 복사 성공:', orderNumber);
+               
+               // 시각적 피드백
+               const originalText = element.textContent;
+               const originalColor = element.style.color;
+               const originalBg = element.style.backgroundColor;
+               
+               // 복사 완료 표시
+               element.style.backgroundColor = '#28a745';
+               element.style.color = 'white';
+               element.style.transform = 'scale(1.05)';
+               element.textContent = '✅ 복사완료!';
+               
+               // 1초 후 원래 상태로 복원
+               setTimeout(() => {
+                   element.style.backgroundColor = originalBg;
+                   element.style.color = originalColor;
+                   element.style.transform = 'scale(1)';
+                   element.textContent = originalText;
+               }, 1000);
+               
+               // 토스트 메시지 표시
+               showCopyToast(orderNumber, '📋 주문번호');
+               
+           }).catch(function(err) {
+               console.error('❌ 주문번호 복사 실패:', err);
+               handleCopyError(element, orderNumber, '주문번호');
+           });
+       }
+       
+       // 복사 완료 토스트 메시지 표시
+       function showCopyToast(value, type) {
+           // 기존 토스트 제거
+           const existingToast = document.querySelector('.copy-toast');
+           if (existingToast) {
+               existingToast.remove();
+           }
+           
+           // 새 토스트 생성
+           const toast = document.createElement('div');
+           toast.className = 'copy-toast';
+           toast.innerHTML = `
+               <div style="
+                   position: fixed;
+                   top: 20px;
+                   right: 20px;
+                   background: linear-gradient(135deg, #28a745, #20c997);
+                   color: white;
+                   padding: 1rem 1.5rem;
+                   border-radius: 0.5rem;
+                   box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+                   z-index: 9999;
+                   display: flex;
+                   align-items: center;
+                   gap: 0.5rem;
+                   font-size: 0.9rem;
+                   font-weight: 500;
+                   animation: slideInRight 0.3s ease-out;
+               ">
+                   <span>${type.split(' ')[0]}</span>
+                   <span><strong>${type} 복사완료!</strong><br/><small>${value}</small></span>
+               </div>
+           `;
+           
+           document.body.appendChild(toast);
+           
+           // 3초 후 자동 제거
+           setTimeout(() => {
+               if (toast.parentNode) {
+                   toast.style.animation = 'slideOutRight 0.3s ease-out';
+                   setTimeout(() => {
+                       if (toast.parentNode) {
+                           toast.remove();
+                       }
+                   }, 300);
+               }
+           }, 3000);
+       }
+       
+       // 🎯 고객명 복사 기능
+       function copyCustomerName(element) {
+           const customerName = element.getAttribute('data-customer-name');
+           
+           // 클립보드에 복사
+           navigator.clipboard.writeText(customerName).then(function() {
+               console.log('👤 고객명 복사 성공:', customerName);
+               
+               // 시각적 피드백
+               const originalText = element.textContent;
+               const originalColor = element.style.color;
+               const originalBg = element.style.backgroundColor;
+               
+               // 복사 완료 표시
+               element.style.backgroundColor = '#28a745';
+               element.style.color = 'white';
+               element.style.transform = 'scale(1.05)';
+               element.textContent = '✅ 복사완료!';
+               
+               // 1초 후 원래 상태로 복원
+               setTimeout(() => {
+                   element.style.backgroundColor = originalBg;
+                   element.style.color = originalColor;
+                   element.style.transform = 'scale(1)';
+                   element.textContent = originalText;
+               }, 1000);
+               
+               // 토스트 메시지 표시
+               showCopyToast(customerName, '👤 고객명');
+               
+           }).catch(function(err) {
+               console.error('❌ 고객명 복사 실패:', err);
+               handleCopyError(element, customerName, '고객명');
+           });
+       }
+       
+       // 🎯 연락처 복사 기능
+       function copyCustomerPhone(element) {
+           const customerPhone = element.getAttribute('data-customer-phone');
+           
+           // 클립보드에 복사
+           navigator.clipboard.writeText(customerPhone).then(function() {
+               console.log('📞 연락처 복사 성공:', customerPhone);
+               
+               // 시각적 피드백
+               const originalText = element.textContent;
+               const originalColor = element.style.color;
+               const originalBg = element.style.backgroundColor;
+               
+               // 복사 완료 표시
+               element.style.backgroundColor = '#28a745';
+               element.style.color = 'white';
+               element.style.transform = 'scale(1.05)';
+               element.textContent = '✅ 복사완료!';
+               
+               // 1초 후 원래 상태로 복원
+               setTimeout(() => {
+                   element.style.backgroundColor = originalBg;
+                   element.style.color = originalColor;
+                   element.style.transform = 'scale(1)';
+                   element.textContent = originalText;
+               }, 1000);
+               
+               // 토스트 메시지 표시
+               showCopyToast(customerPhone, '📞 연락처');
+               
+           }).catch(function(err) {
+               console.error('❌ 연락처 복사 실패:', err);
+               handleCopyError(element, customerPhone, '연락처');
+           });
+       }
+       
+       // 복사 실패 처리 공통 함수
+       function handleCopyError(element, value, type) {
+           // 실패 시 대체 방법 (텍스트 선택)
+           const range = document.createRange();
+           range.selectNodeContents(element);
+           const selection = window.getSelection();
+           selection.removeAllRanges();
+           selection.addRange(range);
+           
+           // 실패 피드백
+           element.style.backgroundColor = '#dc3545';
+           element.style.color = 'white';
+           element.textContent = '❌ 복사실패';
+           
+           setTimeout(() => {
+               element.style.backgroundColor = '';
+               element.style.color = '';
+               element.textContent = value;
+               selection.removeAllRanges();
+           }, 1500);
+           
+           alert(`${type} 복사에 실패했습니다. 텍스트가 선택되었으니 Ctrl+C로 복사해주세요.`);
+       }
+       
+       // 🎯 주문품번 복사 기능
+       function copyOrderItemCode(element) {
+           const orderItemCode = element.getAttribute('data-order-item-code');
+           
+           // 클립보드에 복사
+           navigator.clipboard.writeText(orderItemCode).then(function() {
+               console.log('🏷️ 주문품번 복사 성공:', orderItemCode);
+               
+               // 시각적 피드백
+               const originalText = element.textContent;
+               const originalColor = element.style.color;
+               const originalBg = element.style.backgroundColor;
+               
+               // 복사 완료 표시
+               element.style.backgroundColor = '#28a745';
+               element.style.color = 'white';
+               element.style.transform = 'scale(1.05)';
+               element.textContent = '✅ 복사완료!';
+               
+               // 1초 후 원래 상태로 복원
+               setTimeout(() => {
+                   element.style.backgroundColor = originalBg;
+                   element.style.color = originalColor;
+                   element.style.transform = 'scale(1)';
+                   element.textContent = originalText;
+               }, 1000);
+               
+               // 토스트 메시지 표시
+               showCopyToast(orderItemCode, '🏷️ 주문품번');
+               
+           }).catch(function(err) {
+               console.error('❌ 주문품번 복사 실패:', err);
+               handleCopyError(element, orderItemCode, '주문품번');
+           });
+       }
+       
+       // 🎯 운송장번호 복사 기능
+       function copyTrackingNumber(element) {
+           const trackingNumber = element.getAttribute('data-tracking-number');
+           
+           // 클립보드에 복사
+           navigator.clipboard.writeText(trackingNumber).then(function() {
+               console.log('🚚 운송장번호 복사 성공:', trackingNumber);
+               
+               // 시각적 피드백
+               const originalText = element.textContent;
+               const originalColor = element.style.color;
+               const originalBg = element.style.backgroundColor;
+               
+               // 복사 완료 표시
+               element.style.backgroundColor = '#28a745';
+               element.style.color = 'white';
+               element.style.transform = 'scale(1.05)';
+               element.textContent = '✅ 복사완료!';
+               
+               // 1초 후 원래 상태로 복원
+               setTimeout(() => {
+                   element.style.backgroundColor = originalBg;
+                   element.style.color = originalColor;
+                   element.style.transform = 'scale(1)';
+                   element.textContent = originalText;
+               }, 1000);
+               
+               // 토스트 메시지 표시
+               showCopyToast(trackingNumber, '🚚 운송장번호');
+               
+           }).catch(function(err) {
+               console.error('❌ 운송장번호 복사 실패:', err);
+               handleCopyError(element, trackingNumber, '운송장번호');
+           });
+       }
+
+       // 🎯 대표님 요청: 실시간 카드 통계 업데이트 함수
+       function refreshCardStats() {
+           console.log('📊 카드 통계 실시간 업데이트 시작...');
+           
+           // 현재 검색 조건 가져오기
+           const searchForm = document.getElementById('searchForm');
+           const formData = new FormData(searchForm);
+           const searchParams = new URLSearchParams(formData);
+           
+           // 카드 통계 API 호출
+           fetch(`/exchange/api/card-stats?${searchParams.toString()}`)
+               .then(response => {
+                   console.log('🌐 API 응답 상태:', response.status);
+                   return response.json();
+               })
+               .then(data => {
+                   console.log('📊 전체 응답 데이터:', data);
+                   console.log('📊 응답 데이터 타입:', typeof data);
+                   console.log('📊 data.data 내용:', data.data);
+                   console.log('📊 data.data 타입:', typeof data.data);
+                   
+                   if (!data || (!data.data && !data.success)) {
+                       console.warn('⚠️ 카드 통계 데이터가 없습니다:', data);
+                       return;
+                   }
+                   
+                   // API 응답 구조에 따라 유연하게 처리
+                   const statsData = data.data || data || {};
+                   console.log('📊 실제 사용할 통계 데이터:', statsData);
+                   console.log('📊 통계 데이터의 모든 키:', Object.keys(statsData));
+                   
+                   // 📊 API 응답 키 이름에 맞게 카드 업데이트
+                   updateCardValue('collectionCompleted', statsData.collectionCompleted);
+                   updateCardValue('collectionPending', statsData.collectionPending);
+                   updateCardValue('logisticsConfirmed', statsData.logisticsConfirmed);
+                   updateCardValue('logisticsPending', statsData.logisticsPending);
+                   updateCardValue('exchangeShipped', statsData.exchangeShipped);
+                   updateCardValue('exchangeNotShipped', statsData.exchangeNotShipped);
+                   updateCardValue('returnRefunded', statsData.returnRefunded);
+                   updateCardValue('returnNotRefunded', statsData.returnNotRefunded);
+                   updateCardValue('paymentCompleted', statsData.paymentCompleted);
+                   updateCardValue('paymentPending', statsData.paymentPending);
+                   updateCardValue('completedCount', statsData.completedCount);
+                   updateCardValue('incompletedCount', statsData.incompletedCount);
+                   updateCardValue('overdueTenDaysCount', statsData.overdueTenDaysCount);
+                   
+                   // 통계 요약 부분의 todayCount 업데이트
+                   updateStatsValue('todayCount', statsData.todayCount);
+                   
+                   console.log('✅ 카드 통계 업데이트 완료');
+               })
+               .catch(error => {
+                   console.error('❌ 카드 통계 업데이트 오류:', error);
+               });
+       }
+       
+       // 카드 값 업데이트 함수 (애니메이션 효과 포함)
+       function updateCardValue(cardId, newValue) {
+           console.log(`🔍 카드 업데이트 시도: ${cardId} = ${newValue}`);
+           
+           // 카드 ID에 따른 실제 data-filter 속성 매핑
+           const filterMapping = {
+               'todayCount': 'today',  // 임시로 today 필터 사용
+               'collectionCompleted': 'collection-completed',
+               'collectionPending': 'collection-pending', 
+               'logisticsConfirmed': 'logistics-confirmed',
+               'logisticsPending': 'logistics-pending',
+               'exchangeShipped': 'shipping-completed',
+               'exchangeNotShipped': 'shipping-pending',
+               'returnRefunded': 'refund-completed',
+               'returnNotRefunded': 'refund-pending',
+               'paymentCompleted': 'payment-completed',
+               'paymentPending': 'payment-pending',
+               'completedCount': 'completed',
+               'incompletedCount': 'incompleted',
+               'overdueTenDaysCount': 'overdue-ten-days'
+           };
+           
+           const filterName = filterMapping[cardId];
+           if (!filterName) {
+               console.warn(`⚠️ 매핑되지 않은 카드 ID: ${cardId}`);
+               return;
+           }
+           
+           console.log(`🎯 필터명 매핑: ${cardId} → ${filterName}`);
+           
+           // data-filter 속성으로 카드 요소 찾기
+           const cardElement = document.querySelector(`[data-filter="${filterName}"]`);
+           console.log(`🔍 요소 찾기 결과:`, cardElement);
+           
+           if (cardElement) {
+               const currentValue = parseInt(cardElement.textContent.replace(/,/g, '')) || 0;
+               const safeNewValue = newValue || 0;
+               
+               console.log(`📊 값 비교: ${currentValue} → ${safeNewValue}`);
+               
+               // 항상 업데이트 (값이 같아도 시각적 피드백 제공)
+               console.log(`✅ 카드 업데이트 실행: ${cardId} (${filterName}) ${currentValue} → ${safeNewValue}`);
+               
+               // 깜빡임 효과
+               cardElement.style.transition = 'all 0.3s ease';
+               cardElement.style.backgroundColor = '#fff3cd';
+               cardElement.style.transform = 'scale(1.05)';
+               cardElement.style.boxShadow = '0 4px 12px rgba(255, 193, 7, 0.4)';
+               
+               // 숫자 업데이트
+               setTimeout(() => {
+                   cardElement.textContent = (safeNewValue || 0).toLocaleString();
+                   console.log(`📝 텍스트 업데이트 완료: ${safeNewValue}`);
+                   
+                   // 원래 상태로 복원
+                   setTimeout(() => {
+                       cardElement.style.backgroundColor = '';
+                       cardElement.style.transform = '';
+                       cardElement.style.boxShadow = '';
+                   }, 300);
+               }, 150);
+           } else {
+               console.error(`❌ 카드 요소를 찾을 수 없음: ${cardId} (filter: ${filterName})`);
+               console.log(`🔍 현재 페이지의 모든 data-filter 요소:`, 
+                   Array.from(document.querySelectorAll('[data-filter]')).map(el => el.getAttribute('data-filter')));
+           }
+       }
+       
+       // 통계 요약 부분 업데이트 함수
+       function updateStatsValue(statId, newValue) {
+           // 통계 요약에서 todayCount 찾기 (Thymeleaf 조건에 따라 다른 방식으로 찾아야 함)
+           if (statId === 'todayCount') {
+               // "금일 등록" 라벨 다음의 값 찾기
+               const statsLabels = document.querySelectorAll('.stats-label');
+               for (let label of statsLabels) {
+                   if (label.textContent.includes('금일 등록')) {
+                       const valueElement = label.nextElementSibling;
+                       if (valueElement && valueElement.classList.contains('stats-value')) {
+                           const currentValue = parseInt(valueElement.textContent.replace(/[^0-9]/g, '')) || 0;
+                           const safeNewValue = newValue || 0;
+                           if (currentValue !== safeNewValue) {
+                               console.log(`📊 통계 업데이트: ${statId} ${currentValue} → ${safeNewValue}`);
+                               
+                               // 애니메이션 효과
+                               valueElement.style.transition = 'all 0.3s ease';
+                               valueElement.style.backgroundColor = '#fff3cd';
+                               valueElement.style.transform = 'scale(1.05)';
+                               
+                               // 값 업데이트
+                               setTimeout(() => {
+                                   valueElement.textContent = `${safeNewValue}건`;
+                                   
+                                   // 원래 상태로 복원
+                                   setTimeout(() => {
+                                       valueElement.style.backgroundColor = '';
+                                       valueElement.style.transform = '';
+                                   }, 300);
+                               }, 150);
+                           }
+                       }
+                       break;
+                   }
+               }
+           }
+       }
+       
+       // 페이지 로드 시 완료된 항목들에 스타일 적용
+       document.addEventListener('DOMContentLoaded', function() {
+           // 완료 체크박스들을 찾아서 체크된 항목들의 행에 completed 클래스 추가
+           const completionCheckboxes = document.querySelectorAll('input[type="checkbox"][data-id]');
+           completionCheckboxes.forEach(checkbox => {
+               if (checkbox.checked) {
+                   const row = checkbox.closest('tr');
+                   if (row) {
+                       row.classList.add('completed');
+                   }
+               }
+           });
+           
+           // 🎯 페이지 로드 시 카드 통계 테스트 (1초 후)
+           setTimeout(() => {
+               console.log('🧪 카드 통계 테스트 실행...');
+               refreshCardStats();
+           }, 1000);
+       });
+
+       // ============================================================================
+       // 📊 엑셀 다운로드/업로드 기능
+       // ============================================================================
+
+       /**
+        * 📥 엑셀 다운로드 (현재 검색 조건에 맞는 데이터)
+        */
+       function downloadExcel() {
+           console.log('📥 엑셀 다운로드 시작...');
+           
+           try {
+               // 현재 검색 폼의 데이터를 가져와서 POST로 전송
+               const searchForm = document.getElementById('searchForm');
+               const formData = new FormData(searchForm);
+               
+               // 새로운 폼 생성 (다운로드용)
+               const downloadForm = document.createElement('form');
+               downloadForm.method = 'POST';
+               downloadForm.action = '/exchange/download/excel';
+               downloadForm.style.display = 'none';
+               
+               // 검색 조건들을 hidden input으로 추가
+               for (let [key, value] of formData.entries()) {
+                   const input = document.createElement('input');
+                   input.type = 'hidden';
+                   input.name = key;
+                   input.value = value;
+                   downloadForm.appendChild(input);
+               }
+               
+               // CSRF 토큰 추가
+               const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+               const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+               const csrfInput = document.createElement('input');
+               csrfInput.type = 'hidden';
+               csrfInput.name = '_token';
+               csrfInput.value = csrfToken;
+               downloadForm.appendChild(csrfInput);
+               
+               // 폼 제출
+               document.body.appendChild(downloadForm);
+               downloadForm.submit();
+               document.body.removeChild(downloadForm);
+               
+               showToast('📥 엑셀 다운로드가 시작되었습니다.', 'success');
+               console.log('✅ 엑셀 다운로드 요청 완료');
+               
+           } catch (error) {
+               console.error('❌ 엑셀 다운로드 실패:', error);
+               showToast('❌ 엑셀 다운로드 중 오류가 발생했습니다.', 'error');
+           }
+       }
+
+       /**
+        * 📄 템플릿 다운로드
+        */
+       function downloadTemplate() {
+           console.log('📄 템플릿 다운로드 시작...');
+           
+           try {
+               // 템플릿 다운로드는 GET 요청으로 간단하게 처리
+               window.location.href = '/exchange/download/template';
+               showToast('📄 템플릿 다운로드가 시작되었습니다.', 'success');
+               console.log('✅ 템플릿 다운로드 요청 완료');
+               
+           } catch (error) {
+               console.error('❌ 템플릿 다운로드 실패:', error);
+               showToast('❌ 템플릿 다운로드 중 오류가 발생했습니다.', 'error');
+           }
+       }
+
+       /**
+        * 📤 엑셀 업로드 모달 열기
+        */
+       function openExcelUploadModal() {
+           console.log('📤 엑셀 업로드 모달 열기...');
+           document.getElementById('excelUploadModal').style.display = 'block';
+       }
+
+       /**
+        * 📤 엑셀 업로드 모달 닫기
+        */
+       function closeExcelUploadModal() {
+           document.getElementById('excelUploadModal').style.display = 'none';
+           // 파일 선택 초기화
+           document.getElementById('excelFile').value = '';
+           // 결과 영역 초기화
+           document.getElementById('uploadResult').innerHTML = '';
+           document.getElementById('uploadProgress').style.display = 'none';
+       }
+
+       /**
+        * 📤 엑셀 파일 업로드 실행
+        */
+       function uploadExcelFile() {
+           const fileInput = document.getElementById('excelFile');
+           const file = fileInput.files[0];
+           
+           if (!file) {
+               showToast('❌ 업로드할 파일을 선택해주세요.', 'error');
+               return;
+           }
+           
+           if (!file.name.toLowerCase().endsWith('.xlsx')) {
+               showToast('❌ Excel 파일(.xlsx)만 업로드 가능합니다.', 'error');
+               return;
+           }
+           
+           console.log('📤 엑셀 업로드 시작:', file.name, 'Size:', file.size);
+           
+           // 진행 상태 표시
+           document.getElementById('uploadProgress').style.display = 'block';
+           document.getElementById('uploadResult').innerHTML = '';
+           
+           // FormData 생성
+           const formData = new FormData();
+           formData.append('file', file);
+           
+           // CSRF 토큰 추가
+           const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+           
+           // 업로드 요청
+           fetch('/exchange/upload/excel', {
+               method: 'POST',
+               headers: {
+                   'X-CSRF-TOKEN': csrfToken
+               },
+               body: formData
+           })
+           .then(response => response.json())
+           .then(data => {
+               console.log('📊 업로드 결과:', data);
+               
+               // 진행 상태 숨기기
+               document.getElementById('uploadProgress').style.display = 'none';
+               
+               if (data.success) {
+                   showUploadResult(data);
+                   showToast(`✅ 업로드 완료: 성공 ${data.successCount}건, 실패 ${data.errorCount}건`, 'success');
+                   
+                   // 성공하면 페이지 새로고침 (새로 등록된 데이터 확인)
+                   if (data.successCount > 0) {
+                       setTimeout(() => {
+                           window.location.reload();
+                       }, 3000);
+                   }
+               } else {
+                   showToast(`❌ 업로드 실패: ${data.message}`, 'error');
+                   document.getElementById('uploadResult').innerHTML = `
+                       <div class="alert alert-danger">
+                           <strong>❌ 업로드 실패</strong><br>
+                           ${data.message}
+                       </div>
+                   `;
+               }
+           })
+           .catch(error => {
+               console.error('❌ 업로드 오류:', error);
+               document.getElementById('uploadProgress').style.display = 'none';
+               showToast('❌ 업로드 중 오류가 발생했습니다.', 'error');
+               document.getElementById('uploadResult').innerHTML = `
+                   <div class="alert alert-danger">
+                       <strong>❌ 업로드 오류</strong><br>
+                       네트워크 오류가 발생했습니다. 다시 시도해주세요.
+                   </div>
+               `;
+           });
+       }
+
+       /**
+        * 📊 업로드 결과 표시
+        */
+       function showUploadResult(data) {
+           let resultHtml = `
+               <div class="alert alert-success">
+                   <h4>✅ 업로드 완료</h4>
+                   <p>
+                       <strong>처리 결과:</strong> 
+                       성공 <span class="badge bg-success">${data.successCount}</span>건, 
+                       실패 <span class="badge bg-danger">${data.errorCount}</span>건
+                   </p>
+               </div>
+           `;
+           
+           // 성공 목록
+           if (data.successList && data.successList.length > 0) {
+               resultHtml += `
+                   <div class="mt-3">
+                       <h5>✅ 성공 목록 (${data.successList.length}건)</h5>
+                       <div class="success-list" style="max-height: 200px; overflow-y: auto;">
+                           <ul class="list-group">
+               `;
+               data.successList.forEach(item => {
+                   resultHtml += `<li class="list-group-item list-group-item-success">${item}</li>`;
+               });
+               resultHtml += `
+                           </ul>
+                       </div>
+                   </div>
+               `;
+           }
+           
+           // 실패 목록
+           if (data.errorList && data.errorList.length > 0) {
+               resultHtml += `
+                   <div class="mt-3">
+                       <h5>❌ 실패 목록 (${data.errorList.length}건)</h5>
+                       <div class="error-list" style="max-height: 200px; overflow-y: auto;">
+                           <ul class="list-group">
+               `;
+               data.errorList.forEach(item => {
+                   resultHtml += `<li class="list-group-item list-group-item-danger">${item}</li>`;
+               });
+               resultHtml += `
+                           </ul>
+                       </div>
+                   </div>
+               `;
+           }
+           
+           document.getElementById('uploadResult').innerHTML = resultHtml;
+       }
+
+       /**
+        * 🎯 토스트 메시지 표시
+        */
+       function showToast(message, type = 'info') {
+           // 기존 토스트 제거
+           const existingToast = document.querySelector('.toast-message');
+           if (existingToast) {
+               existingToast.remove();
+           }
+           
+           // 새 토스트 생성
+           const toast = document.createElement('div');
+           toast.className = `toast-message toast-${type}`;
+           toast.style.cssText = `
+               position: fixed;
+               top: 20px;
+               right: 20px;
+               padding: 15px 20px;
+               border-radius: 8px;
+               color: white;
+               font-weight: 600;
+               z-index: 10000;
+               max-width: 400px;
+               animation: slideInRight 0.3s ease;
+           `;
+           
+           // 타입별 배경색
+           switch (type) {
+               case 'success':
+                   toast.style.backgroundColor = '#10b981';
+                   break;
+               case 'error':
+                   toast.style.backgroundColor = '#ef4444';
+                   break;
+               case 'warning':
+                   toast.style.backgroundColor = '#f59e0b';
+                   break;
+               default:
+                   toast.style.backgroundColor = '#3b82f6';
+           }
+           
+           toast.textContent = message;
+           document.body.appendChild(toast);
+           
+           // 3초 후 제거
+           setTimeout(() => {
+               if (toast.parentNode) {
+                   toast.style.animation = 'slideOutRight 0.3s ease';
+                   setTimeout(() => toast.remove(), 300);
+               }
+           }, 3000);
+       }
+    </script>
+    
+    <!-- 📤 엑셀 업로드 모달 -->
+    <div id="excelUploadModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 12px; padding: 30px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="margin: 0; color: #1f2937;">📤 교환/반품 엑셀 업로드</h3>
+                <button onclick="closeExcelUploadModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #6b7280;">×</button>
+            </div>
+            
+            <div style="margin-bottom: 20px; padding: 15px; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #0ea5e9;">
+                <h4 style="margin: 0 0 10px 0; color: #0c4a6e;">📋 업로드 가이드</h4>
+                <ul style="margin: 0; padding-left: 20px; color: #374151;">
+                    <li><strong>템플릿 다운로드:</strong> 먼저 '📄 템플릿' 버튼을 클릭하여 양식을 다운로드하세요.</li>
+                    <li><strong>필수 항목:</strong> 유형*, 주문일*, CS접수일*, 사이트명*, 주문번호*, 고객명*, 고객연락처*</li>
+                    <li><strong>날짜 형식:</strong> YYYY-MM-DD (예: 2024-12-31)</li>
+                    <li><strong>파일 형식:</strong> .xlsx 파일만 지원</li>
+                </ul>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">📂 파일 선택</label>
+                <input type="file" id="excelFile" accept=".xlsx" style="width: 100%; padding: 10px; border: 2px dashed #d1d5db; border-radius: 8px; background: #f9fafb;">
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <button onclick="downloadTemplate()" style="flex: 1; padding: 12px; background: #6b7280; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">📄 템플릿 다운로드</button>
+                <button onclick="uploadExcelFile()" style="flex: 1; padding: 12px; background: #10b981; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">📤 업로드 시작</button>
+            </div>
+            
+            <!-- 진행 상태 -->
+            <div id="uploadProgress" style="display: none; text-align: center; padding: 20px;">
+                <div style="display: inline-block; width: 32px; height: 32px; border: 3px solid #f3f4f6; border-top: 3px solid #3b82f6; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                <p style="margin-top: 10px; color: #6b7280;">업로드 중...</p>
+            </div>
+            
+            <!-- 결과 표시 -->
+            <div id="uploadResult"></div>
+        </div>
+    </div>
+    
+    <!-- 애니메이션 스타일 -->
+    <style>
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOutRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* 🎯 필터 버튼 스타일 */
+        .filter-btn {
+            background: linear-gradient(90deg, #6c757d, #5a5f65);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.2rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .filter-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .filter-btn.active {
+            background: linear-gradient(90deg, #007bff, #0056b3);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        }
+        
+        .filter-btn.active:hover {
+            background: linear-gradient(90deg, #0056b3, #004085);
+        }
+        
+        .filter-selection-area {
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</div>
+</html> 

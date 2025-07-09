@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wio.crm.mapper.ShippingPaymentMapper">
+
+    <!-- 배송비 입금 등록 -->
+    <insert id="insertPayment" parameterType="com.wio.crm.dto.ShippingPaymentRegisterDTO">
+        <selectKey keyProperty="registerId" resultType="Long" order="BEFORE">
+            SELECT SEQ_SHIPPING_PAYMENT_REGISTER.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TB_SHIPPING_PAYMENT_REGISTER (
+            REGISTER_ID,
+            BRAND,
+            SITE_NAME,
+            BANK_NAME,
+            CUSTOMER_NAME,
+            CUSTOMER_PHONE,
+            AMOUNT,
+            REGISTER_DATE,
+            REGISTRAR,
+            MAPPING_STATUS,
+            RETURN_ITEM_ID,
+            NOTES,
+            PAYMENT_DATE,
+            MAPPED_DATE
+        ) VALUES (
+            #{registerId},
+            #{brand},
+            #{siteName},
+            #{bankName},
+            #{customerName},
+            #{customerPhone},
+            #{amount},
+            SYSDATE,
+            #{registrar, jdbcType=VARCHAR},
+            'PENDING',
+            #{returnItemId, jdbcType=NUMERIC},
+            #{notes, jdbcType=VARCHAR},
+            #{paymentDate},
+            #{mappedDate, jdbcType=TIMESTAMP}
+        )
+    </insert>
+
+    <!-- ID로 조회 -->
+    <select id="selectById" parameterType="Long" resultType="com.wio.crm.dto.ShippingPaymentRegisterDTO">
+        SELECT 
+            REGISTER_ID as registerId,
+            BRAND as brand,
+            SITE_NAME as siteName,
+            BANK_NAME as bankName,
+            CUSTOMER_NAME as customerName,
+            CUSTOMER_PHONE as customerPhone,
+            AMOUNT as amount,
+            REGISTER_DATE as registerDate,
+            REGISTRAR as registrar,
+            MAPPING_STATUS as mappingStatus,
+            RETURN_ITEM_ID as returnItemId,
+            NOTES as notes,
+            PAYMENT_DATE as paymentDate,
+            MAPPED_DATE as mappedDate
+        FROM TB_SHIPPING_PAYMENT_REGISTER
+        WHERE REGISTER_ID = #{registerId}
+    </select>
+
+    <!-- 오늘 등록된 입금 건수 조회 -->
+    <select id="selectTodayCount" parameterType="java.time.LocalDate" resultType="Long">
+        SELECT COUNT(*)
+        FROM TB_SHIPPING_PAYMENT_REGISTER
+        WHERE TRUNC(REGISTER_DATE) = TRUNC(#{today})
+    </select>
+
+    <!-- 최근 입금 내역 조회 -->
+    <select id="selectRecentPayments" parameterType="int" resultType="java.util.Map">
+        <![CDATA[
+        SELECT * FROM (
+            SELECT 
+                REGISTER_ID as registerId,
+                BRAND as brand,
+                SITE_NAME as siteName,
+                BANK_NAME as bankName,
+                CUSTOMER_NAME as customerName,
+                CUSTOMER_PHONE as customerPhone,
+                AMOUNT as amount,
+                TO_CHAR(REGISTER_DATE, 'YYYY-MM-DD HH24:MI:SS') as registerDate,
+                REGISTRAR as registrar,
+                MAPPING_STATUS as mappingStatus,
+                RETURN_ITEM_ID as returnItemId,
+                NOTES as notes,
+                TO_CHAR(PAYMENT_DATE, 'YYYY-MM-DD HH24:MI:SS') as paymentDate,
+                TO_CHAR(MAPPED_DATE, 'YYYY-MM-DD HH24:MI:SS') as mappedDate,
+                ROW_NUMBER() OVER (ORDER BY REGISTER_DATE DESC) as rn
+            FROM TB_SHIPPING_PAYMENT_REGISTER
+            WHERE TRUNC(REGISTER_DATE) = TRUNC(SYSDATE)
+        ) WHERE rn <= #{limit}
+        ]]>
+    </select>
+
+    <!-- 입금 내역 목록 조회 (페이징) -->
+    <select id="selectPaymentList" parameterType="java.util.Map" resultType="java.util.Map">
+        <![CDATA[
+        SELECT * FROM (
+            SELECT 
+                REGISTER_ID as registerId,
+                BRAND as brand,
+                SITE_NAME as siteName,
+                BANK_NAME as bankName,
+                CUSTOMER_NAME as customerName,
+                CUSTOMER_PHONE as customerPhone,
+                AMOUNT as amount,
+                TO_CHAR(REGISTER_DATE, 'YYYY-MM-DD HH24:MI:SS') as registerDate,
+                REGISTRAR as registrar,
+                MAPPING_STATUS as mappingStatus,
+                RETURN_ITEM_ID as returnItemId,
+                NOTES as notes,
+                TO_CHAR(PAYMENT_DATE, 'YYYY-MM-DD HH24:MI:SS') as paymentDate,
+                TO_CHAR(MAPPED_DATE, 'YYYY-MM-DD HH24:MI:SS') as mappedDate,
+                ROW_NUMBER() OVER (ORDER BY REGISTER_DATE DESC) as rn
+            FROM TB_SHIPPING_PAYMENT_REGISTER
+            WHERE 1=1
+        ]]>
+        <if test="searchParams.keyword != null and searchParams.keyword != ''">
+            AND (
+                UPPER(CUSTOMER_NAME) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
+                UPPER(BANK_NAME) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
+                UPPER(SITE_NAME) LIKE UPPER('%' || #{searchParams.keyword} || '%')
+            )
+        </if>
+        <if test="searchParams.startDate != null and searchParams.startDate != ''">
+            <![CDATA[
+            AND TRUNC(REGISTER_DATE) >= TO_DATE(#{searchParams.startDate}, 'YYYY-MM-DD')
+            ]]>
+        </if>
+        <if test="searchParams.endDate != null and searchParams.endDate != ''">
+            <![CDATA[
+            AND TRUNC(REGISTER_DATE) <= TO_DATE(#{searchParams.endDate}, 'YYYY-MM-DD')
+            ]]>
+        </if>
+        <if test="searchParams.brand != null and searchParams.brand != ''">
+            AND BRAND = #{searchParams.brand}
+        </if>
+        <if test="searchParams.mappingStatus != null and searchParams.mappingStatus != ''">
+            AND MAPPING_STATUS = #{searchParams.mappingStatus}
+        </if>
+        <![CDATA[
+        ) WHERE rn > #{searchParams.page} * #{searchParams.size} 
+                AND rn <= (#{searchParams.page} + 1) * #{searchParams.size}
+        ]]>
+    </select>
+
+    <!-- 입금 내역 총 개수 -->
+    <select id="selectPaymentCount" parameterType="java.util.Map" resultType="Long">
+        SELECT COUNT(*)
+        FROM TB_SHIPPING_PAYMENT_REGISTER
+        WHERE 1=1
+        <if test="searchParams.keyword != null and searchParams.keyword != ''">
+            AND (
+                UPPER(CUSTOMER_NAME) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
+                UPPER(BANK_NAME) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
+                UPPER(SITE_NAME) LIKE UPPER('%' || #{searchParams.keyword} || '%')
+            )
+        </if>
+        <if test="searchParams.startDate != null and searchParams.startDate != ''">
+            <![CDATA[
+            AND TRUNC(REGISTER_DATE) >= TO_DATE(#{searchParams.startDate}, 'YYYY-MM-DD')
+            ]]>
+        </if>
+        <if test="searchParams.endDate != null and searchParams.endDate != ''">
+            <![CDATA[
+            AND TRUNC(REGISTER_DATE) <= TO_DATE(#{searchParams.endDate}, 'YYYY-MM-DD')
+            ]]>
+        </if>
+        <if test="searchParams.brand != null and searchParams.brand != ''">
+            AND BRAND = #{searchParams.brand}
+        </if>
+        <if test="searchParams.mappingStatus != null and searchParams.mappingStatus != ''">
+            AND MAPPING_STATUS = #{searchParams.mappingStatus}
+        </if>
+    </select>
+
+    <!-- 입금 내역 삭제 -->
+    <delete id="deletePayment" parameterType="Long">
+        DELETE FROM TB_SHIPPING_PAYMENT_REGISTER
+        WHERE REGISTER_ID = #{registerId}
+    </delete>
+
+    <!-- 입금 내역 수정 -->
+    <update id="updatePayment" parameterType="com.wio.crm.dto.ShippingPaymentRegisterDTO">
+        UPDATE TB_SHIPPING_PAYMENT_REGISTER
+        SET 
+            BRAND = #{brand},
+            SITE_NAME = #{siteName},
+            BANK_NAME = #{bankName},
+            CUSTOMER_NAME = #{customerName},
+            CUSTOMER_PHONE = #{customerPhone},
+            AMOUNT = #{amount},
+            NOTES = #{notes, jdbcType=VARCHAR},
+            PAYMENT_DATE = #{paymentDate}
+        WHERE REGISTER_ID = #{registerId}
+    </update>
+
+    <!-- 교환 건과 매핑 -->
+    <update id="updateMapping">
+        UPDATE TB_SHIPPING_PAYMENT_REGISTER
+        SET 
+            RETURN_ITEM_ID = #{returnItemId},
+            MAPPING_STATUS = #{mappingStatus},
+            MAPPED_DATE = SYSDATE
+        WHERE REGISTER_ID = #{registerId}
+    </update>
+
+    <!-- 매핑 해제 -->
+    <update id="unmapPayment" parameterType="Long">
+        UPDATE TB_SHIPPING_PAYMENT_REGISTER
+        SET 
+            RETURN_ITEM_ID = NULL,
+            MAPPING_STATUS = 'PENDING',
+            MAPPED_DATE = NULL
+        WHERE REGISTER_ID = #{registerId}
+    </update>
+
+</mapper> 

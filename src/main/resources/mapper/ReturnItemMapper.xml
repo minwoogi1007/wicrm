@@ -1,0 +1,1379 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wio.crm.mapper.ReturnItemMapper">
+
+    <!-- 결과 매핑 -->
+    <resultMap id="ReturnItemResultMap" type="com.wio.crm.model.ReturnItem">
+        <id column="RETURN_ID" property="id"/>
+        <result column="RETURN_TYPE_CODE" property="returnTypeCode"/>
+        <result column="ORDER_DATE" property="orderDate"/>
+        <result column="CS_RECEIVED_DATE" property="csReceivedDate"/>
+        <result column="SITE_NAME" property="siteName"/>
+        <result column="ORDER_NUMBER" property="orderNumber"/>
+        <result column="REFUND_AMOUNT" property="refundAmount"/>
+        <result column="CUSTOMER_NAME" property="customerName"/>
+        <result column="CUSTOMER_PHONE" property="customerPhone"/>
+        <result column="ORDER_ITEM_CODE" property="orderItemCode"/>
+        <result column="PRODUCT_COLOR" property="productColor"/>
+        <result column="PRODUCT_SIZE" property="productSize"/>
+        <result column="QUANTITY" property="quantity"/>
+        <result column="SHIPPING_FEE" property="shippingFee"/>
+        <result column="RETURN_REASON" property="returnReason"/>
+        <result column="DEFECT_DETAIL" property="defectDetail"/>
+        <result column="DEFECT_PHOTO_URL" property="defectPhotoUrl"/>
+        <result column="TRACKING_NUMBER" property="trackingNumber"/>
+        <result column="COLLECTION_COMPLETED_DATE" property="collectionCompletedDate"/>
+        <result column="LOGISTICS_CONFIRMED_DATE" property="logisticsConfirmedDate"/>
+        <result column="SHIPPING_DATE" property="shippingDate"/>
+        <result column="REFUND_DATE" property="refundDate"/>
+        <result column="IS_COMPLETED" property="isCompleted"/>
+        <result column="REMARKS" property="remarks"/>
+        <result column="RETURN_STATUS_CODE" property="returnStatusCode"/>
+        <result column="PROCESSOR" property="processor"/>
+        <result column="CREATE_DATE" property="createDate"/>
+        <result column="UPDATE_DATE" property="updateDate"/>
+        <result column="CREATED_BY" property="createdBy"/>
+        <result column="UPDATED_BY" property="updatedBy"/>
+        <result column="PAYMENT_STATUS" property="paymentStatus"/>
+        <result column="PAYMENT_ID" property="paymentId"/>
+        <result column="COLLECTION_UPDATED_BY" property="collectionUpdatedBy"/>
+        <result column="LOGISTICS_UPDATED_BY" property="logisticsUpdatedBy"/>
+        <result column="SHIPPING_UPDATED_BY" property="shippingUpdatedBy"/>
+        <result column="REFUND_UPDATED_BY" property="refundUpdatedBy"/>
+        <result column="COLLECTION_UPDATED_DATE" property="collectionUpdatedDate"/>
+        <result column="LOGISTICS_UPDATED_DATE" property="logisticsUpdatedDate"/>
+        <result column="SHIPPING_UPDATED_DATE" property="shippingUpdatedDate"/>
+        <result column="REFUND_UPDATED_DATE" property="refundUpdatedDate"/>
+    </resultMap>
+
+    <!-- 공통 조건 SQL -->
+    <sql id="searchCondition">
+        <where>
+            <!-- 🔍 통합 키워드 검색 (여러 필드에서 검색) -->
+            <if test="searchParams.keyword != null and searchParams.keyword != ''">
+                AND (
+                    UPPER(ORDER_NUMBER) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
+                    UPPER(CUSTOMER_NAME) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
+                    UPPER(CUSTOMER_PHONE) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
+                    UPPER(SITE_NAME) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
+                    UPPER(ORDER_ITEM_CODE) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
+                    UPPER(PRODUCT_COLOR) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
+                    UPPER(PRODUCT_SIZE) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
+                    UPPER(TRACKING_NUMBER) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
+                    UPPER(RETURN_REASON) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
+                    UPPER(PROCESSOR) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
+                    UPPER(REMARKS) LIKE UPPER('%' || #{searchParams.keyword} || '%')
+                )
+            </if>
+            
+            <!-- 개별 필드 검색 조건들 -->
+            <if test="searchParams.orderNumber != null and searchParams.orderNumber != ''">
+                AND ORDER_NUMBER LIKE '%' || #{searchParams.orderNumber} || '%'
+            </if>
+            <if test="searchParams.customerName != null and searchParams.customerName != ''">
+                AND CUSTOMER_NAME LIKE '%' || #{searchParams.customerName} || '%'
+            </if>
+            <if test="searchParams.customerPhone != null and searchParams.customerPhone != ''">
+                AND CUSTOMER_PHONE LIKE '%' || #{searchParams.customerPhone} || '%'
+            </if>
+            <if test="searchParams.orderItemCode != null and searchParams.orderItemCode != ''">
+                AND ORDER_ITEM_CODE LIKE '%' || #{searchParams.orderItemCode} || '%'
+            </if>
+            <if test="searchParams.returnTypeCode != null and searchParams.returnTypeCode != ''">
+                AND RETURN_TYPE_CODE = #{searchParams.returnTypeCode}
+            </if>
+            <if test="searchParams.returnStatusCode != null and searchParams.returnStatusCode != ''">
+                AND RETURN_STATUS_CODE = #{searchParams.returnStatusCode}
+            </if>
+            <if test="searchParams.paymentStatus != null and searchParams.paymentStatus != ''">
+                AND PAYMENT_STATUS = #{searchParams.paymentStatus}
+            </if>
+            <if test="searchParams.startDate != null and searchParams.startDate != ''">
+                AND CS_RECEIVED_DATE >= TO_DATE(#{searchParams.startDate}, 'YYYY-MM-DD')
+            </if>
+            <if test="searchParams.endDate != null and searchParams.endDate != ''">
+                AND CS_RECEIVED_DATE &lt;= TO_DATE(#{searchParams.endDate}, 'YYYY-MM-DD')
+            </if>
+            <if test="searchParams.siteName != null and searchParams.siteName != ''">
+                AND SITE_NAME = #{searchParams.siteName}
+            </if>
+            <if test="searchParams.processor != null and searchParams.processor != ''">
+                AND PROCESSOR = #{searchParams.processor}
+            </if>
+            
+            <!-- 🎯 브랜드 필터링 조건 추가 -->
+            <if test="searchParams.brandFilter != null and searchParams.brandFilter != ''">
+                <choose>
+                    <when test="searchParams.brandFilter == 'RENOMA'">
+                        AND UPPER(SITE_NAME) LIKE UPPER('%레노마%')
+                    </when>
+                    <when test="searchParams.brandFilter == 'CORALIC'">
+                        AND UPPER(SITE_NAME) LIKE UPPER('%코랄리크%')
+                    </when>
+                    <when test="searchParams.brandFilter == 'OTHER'">
+                        AND UPPER(SITE_NAME) NOT LIKE UPPER('%레노마%') 
+                        AND UPPER(SITE_NAME) NOT LIKE UPPER('%코랄리크%')
+                    </when>
+                </choose>
+            </if>
+            
+            <!-- 🎯 카드 필터링 조건들 추가 (OGNL 타입 안전성 개선) -->
+            <if test="searchParams.collectionCompleted != null and 'Y'.equals(searchParams.collectionCompleted)">
+                AND COLLECTION_COMPLETED_DATE IS NOT NULL
+            </if>
+            <if test="searchParams.collectionPending != null and 'Y'.equals(searchParams.collectionPending)">
+                AND COLLECTION_COMPLETED_DATE IS NULL
+            </if>
+            <if test="searchParams.logisticsConfirmed != null and 'Y'.equals(searchParams.logisticsConfirmed)">
+                AND LOGISTICS_CONFIRMED_DATE IS NOT NULL
+            </if>
+            <if test="searchParams.logisticsPending != null and 'Y'.equals(searchParams.logisticsPending)">
+                AND LOGISTICS_CONFIRMED_DATE IS NULL
+            </if>
+            <if test="searchParams.shippingCompleted != null and 'Y'.equals(searchParams.shippingCompleted)">
+                AND RETURN_TYPE_CODE IN ('EXCHANGE', 'FULL_EXCHANGE', 'PARTIAL_EXCHANGE')
+                AND SHIPPING_DATE IS NOT NULL
+            </if>
+            <if test="searchParams.shippingPending != null and 'Y'.equals(searchParams.shippingPending)">
+                AND RETURN_TYPE_CODE IN ('EXCHANGE', 'FULL_EXCHANGE', 'PARTIAL_EXCHANGE')
+                AND SHIPPING_DATE IS NULL
+            </if>
+            <if test="searchParams.refundCompleted != null and 'Y'.equals(searchParams.refundCompleted)">
+                AND RETURN_TYPE_CODE IN ('RETURN', 'FULL_RETURN', 'PARTIAL_RETURN')
+                AND REFUND_DATE IS NOT NULL
+            </if>
+            <if test="searchParams.refundPending != null and 'Y'.equals(searchParams.refundPending)">
+                AND RETURN_TYPE_CODE IN ('RETURN', 'FULL_RETURN', 'PARTIAL_RETURN')
+                AND REFUND_DATE IS NULL
+            </if>
+            <if test="searchParams.paymentCompleted != null and 'Y'.equals(searchParams.paymentCompleted)">
+                AND PAYMENT_STATUS = 'COMPLETED'
+            </if>
+            <if test="searchParams.paymentPending != null and 'Y'.equals(searchParams.paymentPending)">
+                AND SHIPPING_FEE = '입금예정'
+            </if>
+            <if test="searchParams.completed != null and 'Y'.equals(searchParams.completed)">
+                AND IS_COMPLETED = 1
+            </if>
+            <if test="searchParams.incompleted != null and 'Y'.equals(searchParams.incompleted)">
+                AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL)
+            </if>
+        </where>
+    </sql>
+
+    <!-- 교환/반품 목록 조회 -->
+    <select id="selectReturnItemList" resultMap="ReturnItemResultMap">
+        SELECT * FROM (
+            SELECT ROWNUM AS RN, T.* FROM (
+                SELECT 
+                    RETURN_ID,
+                    RETURN_TYPE_CODE,
+                    ORDER_DATE,
+                    CS_RECEIVED_DATE,
+                    SITE_NAME,
+                    ORDER_NUMBER,
+                    REFUND_AMOUNT,
+                    CUSTOMER_NAME,
+                    CUSTOMER_PHONE,
+                    ORDER_ITEM_CODE,
+                    PRODUCT_COLOR,
+                    PRODUCT_SIZE,
+                    QUANTITY,
+                    SHIPPING_FEE,
+                    RETURN_REASON,
+                    DEFECT_DETAIL,
+                    DEFECT_PHOTO_URL,
+                    TRACKING_NUMBER,
+                    COLLECTION_COMPLETED_DATE,
+                    LOGISTICS_CONFIRMED_DATE,
+                    SHIPPING_DATE,
+                    REFUND_DATE,
+                    IS_COMPLETED,
+                    REMARKS,
+                    RETURN_STATUS_CODE,
+                    PROCESSOR,
+                    CREATE_DATE,
+                    UPDATE_DATE,
+                    CREATED_BY,
+                    UPDATED_BY,
+                    PAYMENT_STATUS,
+                    PAYMENT_ID,
+                    COLLECTION_UPDATED_BY,
+                    LOGISTICS_UPDATED_BY,
+                    SHIPPING_UPDATED_BY,
+                    REFUND_UPDATED_BY,
+                    COLLECTION_UPDATED_DATE,
+                    LOGISTICS_UPDATED_DATE,
+                    SHIPPING_UPDATED_DATE,
+                    REFUND_UPDATED_DATE
+                FROM TB_RETURN_ITEM
+                <include refid="searchCondition"/>
+                ORDER BY 
+                    <choose>
+                        <when test="searchParams.sortBy != null and searchParams.sortOrder != null">
+                            ${searchParams.sortBy} ${searchParams.sortOrder}
+                        </when>
+                        <otherwise>
+                            CREATE_DATE DESC
+                        </otherwise>
+                    </choose>
+            ) T
+            WHERE ROWNUM &lt;= #{searchParams.endRow}
+        )
+        WHERE RN > #{searchParams.startRow}
+    </select>
+
+    <!-- 교환/반품 목록 총 개수 -->
+    <select id="selectReturnItemCount" resultType="int">
+        SELECT COUNT(*)
+        FROM TB_RETURN_ITEM
+        <include refid="searchCondition"/>
+    </select>
+
+    <!-- 교환/반품 상세 조회 -->
+    <select id="selectReturnItemById" resultMap="ReturnItemResultMap">
+        SELECT 
+            RETURN_ID,
+            RETURN_TYPE_CODE,
+            ORDER_DATE,
+            CS_RECEIVED_DATE,
+            SITE_NAME,
+            ORDER_NUMBER,
+            REFUND_AMOUNT,
+            CUSTOMER_NAME,
+            CUSTOMER_PHONE,
+            ORDER_ITEM_CODE,
+            PRODUCT_COLOR,
+            PRODUCT_SIZE,
+            QUANTITY,
+            SHIPPING_FEE,
+            RETURN_REASON,
+            DEFECT_DETAIL,
+            DEFECT_PHOTO_URL,
+            TRACKING_NUMBER,
+            COLLECTION_COMPLETED_DATE,
+            LOGISTICS_CONFIRMED_DATE,
+            SHIPPING_DATE,
+            REFUND_DATE,
+            IS_COMPLETED,
+            REMARKS,
+            RETURN_STATUS_CODE,
+            PROCESSOR,
+            CREATE_DATE,
+            UPDATE_DATE,
+            CREATED_BY,
+            UPDATED_BY,
+            PAYMENT_STATUS,
+            PAYMENT_ID,
+            COLLECTION_UPDATED_BY,
+            LOGISTICS_UPDATED_BY,
+            SHIPPING_UPDATED_BY,
+            REFUND_UPDATED_BY,
+            COLLECTION_UPDATED_DATE,
+            LOGISTICS_UPDATED_DATE,
+            SHIPPING_UPDATED_DATE,
+            REFUND_UPDATED_DATE
+        FROM TB_RETURN_ITEM
+        WHERE RETURN_ID = #{returnId}
+    </select>
+
+    <!-- 교환/반품 상태 업데이트 -->
+    <update id="updateReturnItemStatus">
+        UPDATE TB_RETURN_ITEM
+        SET RETURN_STATUS_CODE = #{returnStatusCode},
+            UPDATED_BY = #{updatedBy},
+            UPDATE_DATE = SYSDATE
+        WHERE RETURN_ID = #{returnId}
+    </update>
+
+    <!-- 일괄 상태 업데이트 -->
+    <update id="updateReturnItemStatusBatch">
+        UPDATE TB_RETURN_ITEM
+        SET RETURN_STATUS_CODE = #{returnStatusCode},
+            UPDATED_BY = #{updatedBy},
+            UPDATE_DATE = SYSDATE
+        WHERE RETURN_ID IN
+        <foreach collection="returnIds" item="returnId" open="(" separator="," close=")">
+            #{returnId}
+        </foreach>
+    </update>
+
+    <!-- 통계 데이터 - 상태별 카운트 -->
+    <select id="selectReturnItemStatusStats" resultType="map">
+        SELECT 
+            RETURN_STATUS_CODE as statusCode,
+            COUNT(*) as count
+        FROM TB_RETURN_ITEM
+        GROUP BY RETURN_STATUS_CODE
+        ORDER BY RETURN_STATUS_CODE
+    </select>
+
+    <!-- 통계 데이터 - 월별 교환/반품 건수 -->
+    <select id="selectMonthlyReturnItemStats" resultType="map">
+        SELECT 
+            TO_CHAR(CS_RECEIVED_DATE, 'MM') as month,
+            COUNT(*) as count,
+            RETURN_TYPE_CODE as returnType
+        FROM TB_RETURN_ITEM
+        WHERE EXTRACT(YEAR FROM CS_RECEIVED_DATE) = #{year}
+        GROUP BY TO_CHAR(CS_RECEIVED_DATE, 'MM'), RETURN_TYPE_CODE
+        ORDER BY month, returnType
+    </select>
+
+    <!-- 교환/반품 타입별 통계 -->
+    <select id="selectReturnItemTypeStats" resultType="map">
+        SELECT 
+            RETURN_TYPE_CODE as returnType,
+            COUNT(*) as count,
+            NVL(SUM(REFUND_AMOUNT), 0) as totalAmount
+        FROM TB_RETURN_ITEM
+        WHERE CS_RECEIVED_DATE BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') 
+                                   AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+        GROUP BY RETURN_TYPE_CODE
+        ORDER BY count DESC
+    </select>
+
+    <!-- ==================== 카운트 쿼리들 ==================== -->
+    
+    <!-- 전체 건수 -->
+    <select id="getTotalCount" resultType="long">
+        SELECT COUNT(*) FROM TB_RETURN_ITEM
+    </select>
+    
+    <!-- 🎯 오늘 등록 건수 (실제 오늘 날짜 기준) -->
+    <select id="getTodayRegisteredCount" resultType="long">
+        SELECT COUNT(*) FROM TB_RETURN_ITEM 
+        WHERE TRUNC(CS_RECEIVED_DATE) = TRUNC(SYSDATE)
+    </select>
+    
+    <!-- 어제까지 등록 건수 -->
+    <select id="getUntilYesterdayCount" resultType="long">
+        SELECT COUNT(*) FROM TB_RETURN_ITEM 
+        WHERE CS_RECEIVED_DATE &lt; TRUNC(SYSDATE)
+    </select>
+    
+    <!-- 회수완료 건수 -->
+    <select id="getCollectionCompletedCount" resultType="long">
+        SELECT COUNT(*) FROM TB_RETURN_ITEM 
+        WHERE COLLECTION_COMPLETED_DATE IS NOT NULL
+    </select>
+    
+    <!-- 회수미완료 건수 -->
+    <select id="getCollectionPendingCount" resultType="long">
+        SELECT COUNT(*) FROM TB_RETURN_ITEM 
+        WHERE COLLECTION_COMPLETED_DATE IS NULL
+    </select>
+    
+    <!-- 물류확인완료 건수 -->
+    <select id="getLogisticsConfirmedCount" resultType="long">
+        SELECT COUNT(*) FROM TB_RETURN_ITEM 
+        WHERE LOGISTICS_CONFIRMED_DATE IS NOT NULL
+    </select>
+    
+    <!-- 물류확인미완료 건수 -->
+    <select id="getLogisticsPendingCount" resultType="long">
+        SELECT COUNT(*) FROM TB_RETURN_ITEM 
+        WHERE LOGISTICS_CONFIRMED_DATE IS NULL
+    </select>
+    
+    <!-- 교환 출고완료 건수 -->
+    <select id="getExchangeShippedCount" resultType="long">
+        SELECT COUNT(*) FROM TB_RETURN_ITEM 
+        WHERE RETURN_TYPE_CODE IN ('EXCHANGE', 'FULL_EXCHANGE', 'PARTIAL_EXCHANGE')
+        AND SHIPPING_DATE IS NOT NULL
+    </select>
+    
+    <!-- 교환 출고미완료 건수 -->
+    <select id="getExchangeNotShippedCount" resultType="long">
+        SELECT COUNT(*) FROM TB_RETURN_ITEM 
+        WHERE RETURN_TYPE_CODE IN ('EXCHANGE', 'FULL_EXCHANGE', 'PARTIAL_EXCHANGE')
+        AND SHIPPING_DATE IS NULL
+    </select>
+    
+    <!-- 반품 환불완료 건수 -->
+    <select id="getReturnRefundedCount" resultType="long">
+        SELECT COUNT(*) FROM TB_RETURN_ITEM 
+        WHERE RETURN_TYPE_CODE IN ('RETURN', 'FULL_RETURN', 'PARTIAL_RETURN')
+        AND REFUND_DATE IS NOT NULL
+    </select>
+    
+    <!-- 반품 환불미완료 건수 -->
+    <select id="getReturnNotRefundedCount" resultType="long">
+        SELECT COUNT(*) FROM TB_RETURN_ITEM 
+        WHERE RETURN_TYPE_CODE IN ('RETURN', 'FULL_RETURN', 'PARTIAL_RETURN')
+        AND REFUND_DATE IS NULL
+    </select>
+    
+    <!-- 배송비 입금완료 건수 -->
+    <select id="getPaymentCompletedCount" resultType="long">
+        SELECT COUNT(*) FROM TB_RETURN_ITEM 
+        WHERE PAYMENT_STATUS = 'COMPLETED'
+    </select>
+    
+    <!-- 배송비 입금미완료 건수 (SHIPPING_FEE = '입금예정') -->
+    <select id="getPaymentPendingCount" resultType="long">
+        SELECT COUNT(*) FROM TB_RETURN_ITEM 
+        WHERE SHIPPING_FEE = '입금예정'
+    </select>
+    
+    <!-- 완료 건수 -->
+    <select id="getCompletedCount" resultType="long">
+        SELECT COUNT(*) FROM TB_RETURN_ITEM 
+        WHERE IS_COMPLETED = 1
+    </select>
+    
+    <!-- 미완료 건수 -->
+    <select id="getIncompletedCount" resultType="long">
+        SELECT COUNT(*) FROM TB_RETURN_ITEM 
+        WHERE IS_COMPLETED = 0 OR IS_COMPLETED IS NULL
+    </select>
+    
+    <!-- ==================== 실시간 통계 쿼리들 ==================== -->
+    
+    <!-- 🎯 사유별 통계 -->
+    <select id="getReasonCounts" resultType="map">
+        SELECT 
+            RETURN_REASON as reason,
+            COUNT(*) as count
+        FROM TB_RETURN_ITEM 
+        WHERE RETURN_REASON IS NOT NULL
+        GROUP BY RETURN_REASON
+        ORDER BY COUNT(*) DESC
+    </select>
+    
+    <!-- 🎯 사이트별 통계 -->
+    <select id="getSiteCounts" resultType="map">
+        SELECT 
+            SITE_NAME as siteName,
+            COUNT(*) as count
+        FROM TB_RETURN_ITEM 
+        WHERE SITE_NAME IS NOT NULL
+        GROUP BY SITE_NAME
+        ORDER BY COUNT(*) DESC
+    </select>
+    
+    <!-- 🎯 금액 요약 통계 (평균금액 제거) -->
+    <select id="getAmountSummary" resultType="map">
+        SELECT 
+            COALESCE(SUM(REFUND_AMOUNT), 0) as totalRefundAmount,
+            COALESCE(MAX(REFUND_AMOUNT), 0) as maxRefundAmount,
+            COALESCE(MIN(REFUND_AMOUNT), 0) as minRefundAmount,
+            COALESCE(SUM(TO_NUMBER(REGEXP_REPLACE(SHIPPING_FEE, '[^0-9]', ''))), 0) as totalShippingFee
+        FROM TB_RETURN_ITEM 
+        WHERE REFUND_AMOUNT IS NOT NULL OR SHIPPING_FEE IS NOT NULL
+    </select>
+    
+    <!-- 🎯 브랜드별 통계 (배송비 결제 테이블에서) -->
+    <select id="getBrandCounts" resultType="map">
+        SELECT 
+            sp.BRAND as brand,
+            COUNT(DISTINCT ri.RETURN_ID) as count
+        FROM TB_RETURN_ITEM ri
+        LEFT JOIN TB_SHIPPING_PAYMENT_REGISTER sp ON ri.PAYMENT_ID = sp.REGISTER_ID
+        WHERE sp.BRAND IS NOT NULL
+        GROUP BY sp.BRAND
+        ORDER BY COUNT(DISTINCT ri.RETURN_ID) DESC
+    </select>
+    
+    <!-- 🎯 유형별 상세 통계 -->
+    <select id="getTypeCounts" resultType="map">
+        SELECT 
+            RETURN_TYPE_CODE as returnType,
+            COUNT(*) as count
+        FROM TB_RETURN_ITEM 
+        WHERE RETURN_TYPE_CODE IS NOT NULL
+        GROUP BY RETURN_TYPE_CODE
+        ORDER BY COUNT(*) DESC
+    </select>
+    
+    <!-- ==================== 필터링 검색 쿼리들 ==================== -->
+    
+    <!-- 🎯 필터링 포함 검색 조건 기반 조회 (Oracle ROWNUM 페이징) -->
+    <select id="findBySearchCriteria" resultMap="ReturnItemResultMap">
+        SELECT * FROM (
+            SELECT ROWNUM AS RN, T.* FROM (
+                SELECT 
+                    RETURN_ID,
+                    RETURN_TYPE_CODE,
+                    ORDER_DATE,
+                    CS_RECEIVED_DATE,
+                    SITE_NAME,
+                    ORDER_NUMBER,
+                    REFUND_AMOUNT,
+                    CUSTOMER_NAME,
+                    CUSTOMER_PHONE,
+                    ORDER_ITEM_CODE,
+                    PRODUCT_COLOR,
+                    PRODUCT_SIZE,
+                    QUANTITY,
+                    SHIPPING_FEE,
+                    RETURN_REASON,
+                    DEFECT_DETAIL,
+                    DEFECT_PHOTO_URL,
+                    TRACKING_NUMBER,
+                    COLLECTION_COMPLETED_DATE,
+                    LOGISTICS_CONFIRMED_DATE,
+                    SHIPPING_DATE,
+                    REFUND_DATE,
+                    IS_COMPLETED,
+                    REMARKS,
+                    RETURN_STATUS_CODE,
+                    PROCESSOR,
+                    CREATE_DATE,
+                    UPDATE_DATE,
+                    CREATED_BY,
+                    UPDATED_BY,
+                    PAYMENT_STATUS,
+                    PAYMENT_ID,
+                    COLLECTION_UPDATED_BY,
+                    LOGISTICS_UPDATED_BY,
+                    SHIPPING_UPDATED_BY,
+                    REFUND_UPDATED_BY,
+                    COLLECTION_UPDATED_DATE,
+                    LOGISTICS_UPDATED_DATE,
+                    SHIPPING_UPDATED_DATE,
+                    REFUND_UPDATED_DATE
+                FROM TB_RETURN_ITEM
+                <include refid="searchCondition"/>
+                ORDER BY RETURN_ID DESC
+            ) T
+            WHERE ROWNUM &lt;= #{searchParams.endRow}
+        )
+        WHERE RN >= #{searchParams.startRow}
+    </select>
+    
+    <!-- 🎯 필터링 포함 검색 조건 기반 총 개수 -->
+    <select id="countBySearchCriteria" resultType="long">
+        SELECT COUNT(*)
+        FROM TB_RETURN_ITEM
+        <include refid="searchCondition"/>
+    </select>
+
+    <!-- ==================== 성능 최적화된 조회 쿼리들 ==================== -->
+    
+    <!-- 🚀 성능 최적화된 메인 목록 조회 (기존 인덱스 IDX_RETURN_ITEM_ID_DESC 활용) -->
+    <select id="selectReturnItemListOptimized" resultMap="ReturnItemResultMap">
+        <![CDATA[
+        SELECT /*+ INDEX(TB_RETURN_ITEM IDX_RETURN_ITEM_ID_DESC) */ * FROM (
+            SELECT ROWNUM AS RN, T.* FROM (
+                SELECT 
+                    RETURN_ID, RETURN_TYPE_CODE, ORDER_DATE, CS_RECEIVED_DATE,
+                    SITE_NAME, ORDER_NUMBER, REFUND_AMOUNT, CUSTOMER_NAME, CUSTOMER_PHONE,
+                    ORDER_ITEM_CODE, PRODUCT_COLOR, PRODUCT_SIZE, QUANTITY, SHIPPING_FEE,
+                    RETURN_REASON, DEFECT_DETAIL, DEFECT_PHOTO_URL, TRACKING_NUMBER,
+                    COLLECTION_COMPLETED_DATE, LOGISTICS_CONFIRMED_DATE, SHIPPING_DATE, REFUND_DATE,
+                    IS_COMPLETED, REMARKS, RETURN_STATUS_CODE, PROCESSOR,
+                    CREATE_DATE, UPDATE_DATE, CREATED_BY, UPDATED_BY,
+                    PAYMENT_STATUS, PAYMENT_ID,
+                    COLLECTION_UPDATED_BY, LOGISTICS_UPDATED_BY, SHIPPING_UPDATED_BY, REFUND_UPDATED_BY,
+                    COLLECTION_UPDATED_DATE, LOGISTICS_UPDATED_DATE, SHIPPING_UPDATED_DATE, REFUND_UPDATED_DATE
+                FROM TB_RETURN_ITEM
+                ]]>
+                <include refid="optimizedSearchCondition"/>
+                ORDER BY RETURN_ID DESC
+            ) T
+            WHERE ROWNUM &lt;= #{searchParams.endRow}
+        )
+        WHERE RN > #{searchParams.startRow}
+    </select>
+
+    <!-- 🚀 성능 최적화된 검색 조건 (인덱스 힌트 포함) -->
+    <sql id="optimizedSearchCondition">
+        <where>
+            <!-- 🔍 통합 키워드 검색 (가장 중요한 검색 조건) -->
+            <if test="searchParams.keyword != null and searchParams.keyword != ''">
+                AND (
+                    UPPER(ORDER_NUMBER) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
+                    UPPER(CUSTOMER_NAME) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
+                    UPPER(CUSTOMER_PHONE) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
+                    UPPER(SITE_NAME) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
+                    UPPER(ORDER_ITEM_CODE) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
+                    UPPER(PRODUCT_COLOR) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
+                    UPPER(PRODUCT_SIZE) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
+                    UPPER(TRACKING_NUMBER) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
+                    UPPER(RETURN_REASON) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
+                    UPPER(PROCESSOR) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
+                    UPPER(REMARKS) LIKE UPPER('%' || #{searchParams.keyword} || '%')
+                )
+            </if>
+            <if test="searchParams.returnTypeCode != null and searchParams.returnTypeCode != ''">
+                AND RETURN_TYPE_CODE = #{searchParams.returnTypeCode}
+            </if>
+            <if test="searchParams.returnStatusCode != null and searchParams.returnStatusCode != ''">
+                AND RETURN_STATUS_CODE = #{searchParams.returnStatusCode}
+            </if>
+            <if test="searchParams.paymentStatus != null and searchParams.paymentStatus != ''">
+                AND PAYMENT_STATUS = #{searchParams.paymentStatus}
+            </if>
+            <if test="searchParams.startDate != null and searchParams.endDate != null">
+                AND CS_RECEIVED_DATE BETWEEN TO_DATE(#{searchParams.startDate}, 'YYYY-MM-DD') 
+                                         AND TO_DATE(#{searchParams.endDate}, 'YYYY-MM-DD') + 0.99999
+            </if>
+            <if test="searchParams.startDate != null and (searchParams.endDate == null or searchParams.endDate == '')">
+                AND CS_RECEIVED_DATE &gt;= TO_DATE(#{searchParams.startDate}, 'YYYY-MM-DD')
+            </if>
+            <if test="searchParams.endDate != null and (searchParams.startDate == null or searchParams.startDate == '')">
+                AND CS_RECEIVED_DATE &lt;= TO_DATE(#{searchParams.endDate}, 'YYYY-MM-DD') + 0.99999
+            </if>
+            <!-- 고객명 검색 (인덱스 IDX_RETURN_ITEM_CUSTOMER 활용) -->
+            <if test="searchParams.customerName != null and searchParams.customerName != ''">
+                AND CUSTOMER_NAME LIKE #{searchParams.customerName} || '%'
+            </if>
+            <!-- 전화번호 검색 (인덱스 IDX_RETURN_ITEM_PHONE 활용) -->
+            <if test="searchParams.customerPhone != null and searchParams.customerPhone != ''">
+                AND CUSTOMER_PHONE LIKE #{searchParams.customerPhone} || '%'
+            </if>
+            <!-- 주문번호 검색 (인덱스 IDX_RETURN_ITEM_ORDER_NUM 활용) -->
+            <if test="searchParams.orderNumber != null and searchParams.orderNumber != ''">
+                AND ORDER_NUMBER LIKE #{searchParams.orderNumber} || '%'
+            </if>
+            <!-- 품번 검색 (인덱스 IDX_RETURN_ITEM_ITEM_CODE 활용) -->
+            <if test="searchParams.orderItemCode != null and searchParams.orderItemCode != ''">
+                AND ORDER_ITEM_CODE LIKE #{searchParams.orderItemCode} || '%'
+            </if>
+            <!-- 운송장번호 검색 (인덱스 IDX_RETURN_ITEM_TRACKING 활용) -->
+            <if test="searchParams.trackingNumber != null and searchParams.trackingNumber != ''">
+                AND TRACKING_NUMBER LIKE #{searchParams.trackingNumber} || '%'
+            </if>
+            <!-- 사이트명 검색 (인덱스 IDX_RETURN_ITEM_SITE 활용) -->
+            <if test="searchParams.siteName != null and searchParams.siteName != ''">
+                AND SITE_NAME = #{searchParams.siteName}
+            </if>
+            <!-- 미완료 필터 (Oracle Boolean 처리) -->
+            <if test="searchParams.incompleted != null and searchParams.incompleted == 'Y'">
+                AND (IS_COMPLETED IS NULL OR IS_COMPLETED = 0)
+            </if>
+            <!-- 완료 필터 (Oracle Boolean 처리) -->
+            <if test="searchParams.completed != null and searchParams.completed == 'Y'">
+                AND IS_COMPLETED = 1
+            </if>
+        </where>
+    </sql>
+
+    <!-- 🚀 성능 최적화된 COUNT 쿼리 (인덱스 활용) -->
+    <select id="selectReturnItemCountOptimized" resultType="long">
+        SELECT /*+ INDEX_COMBINE(TB_RETURN_ITEM) */ COUNT(*)
+        FROM TB_RETURN_ITEM
+        <include refid="optimizedSearchCondition"/>
+    </select>
+
+    <!-- 📈 트렌드 차트용 경량 데이터 조회 (성능 최적화) -->
+    <select id="selectReturnItemListForTrend" resultType="map">
+        <![CDATA[
+        SELECT /*+ INDEX_FAST_FULL_SCAN(TB_RETURN_ITEM IDX_RETURN_ITEM_CS_DATE) FIRST_ROWS */ 
+            CS_RECEIVED_DATE as csReceivedDate, 
+            RETURN_TYPE_CODE as returnTypeCode,
+            RETURN_ID as returnId
+        FROM TB_RETURN_ITEM
+        ]]>
+        <where>
+            CS_RECEIVED_DATE IS NOT NULL
+            
+            <!-- 🔥 FIX: @Param("searchParams") 파라미터 접근 -->
+            <if test="searchParams.startDate != null and searchParams.endDate != null">
+                AND TO_CHAR(CS_RECEIVED_DATE, 'YYYY-MM-DD') BETWEEN #{searchParams.startDate} AND #{searchParams.endDate}
+            </if>
+            <if test="searchParams.startDate != null and (searchParams.endDate == null or searchParams.endDate == '')">
+                AND CS_RECEIVED_DATE &gt;= TO_DATE(#{searchParams.startDate}, 'YYYY-MM-DD')
+            </if>
+            <if test="searchParams.endDate != null and (searchParams.startDate == null or searchParams.startDate == '')">
+                AND CS_RECEIVED_DATE &lt;= TO_DATE(#{searchParams.endDate}, 'YYYY-MM-DD') + 0.99999
+            </if>
+            <if test="searchParams.returnTypeCode != null and searchParams.returnTypeCode != ''">
+                AND RETURN_TYPE_CODE = #{searchParams.returnTypeCode}
+            </if>
+            <if test="searchParams.returnStatusCode != null and searchParams.returnStatusCode != ''">
+                AND RETURN_STATUS_CODE = #{searchParams.returnStatusCode}
+            </if>
+            <if test="searchParams.paymentStatus != null and searchParams.paymentStatus != ''">
+                AND PAYMENT_STATUS = #{searchParams.paymentStatus}
+            </if>
+            <if test="searchParams.siteName != null and searchParams.siteName != ''">
+                AND SITE_NAME = #{searchParams.siteName}
+            </if>
+            <if test="searchParams.keyword != null and searchParams.keyword != ''">
+                AND (
+                    UPPER(ORDER_NUMBER) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
+                    UPPER(CUSTOMER_NAME) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
+                    UPPER(CUSTOMER_PHONE) LIKE UPPER('%' || #{searchParams.keyword} || '%')
+                )
+            </if>
+        </where>
+        ORDER BY CS_RECEIVED_DATE DESC
+    </select>
+
+    <sql id="trendSearchCondition">
+        <where>
+            CS_RECEIVED_DATE IS NOT NULL
+            
+            <if test="searchParams.startDate != null and searchParams.endDate != null">
+                AND CS_RECEIVED_DATE BETWEEN TO_DATE(#{searchParams.startDate}, 'YYYY-MM-DD') 
+                                         AND TO_DATE(#{searchParams.endDate}, 'YYYY-MM-DD') + 0.99999
+            </if>
+            <if test="searchParams.startDate != null and (searchParams.endDate == null or searchParams.endDate == '')">
+                AND CS_RECEIVED_DATE &gt;= TO_DATE(#{searchParams.startDate}, 'YYYY-MM-DD')
+            </if>
+            <if test="searchParams.endDate != null and (searchParams.startDate == null or searchParams.startDate == '')">
+                AND CS_RECEIVED_DATE &lt;= TO_DATE(#{searchParams.endDate}, 'YYYY-MM-DD') + 0.99999
+            </if>
+            <if test="searchParams.returnTypeCode != null and searchParams.returnTypeCode != ''">
+                AND RETURN_TYPE_CODE = #{searchParams.returnTypeCode}
+            </if>
+            <if test="searchParams.returnStatusCode != null and searchParams.returnStatusCode != ''">
+                AND RETURN_STATUS_CODE = #{searchParams.returnStatusCode}
+            </if>
+            <if test="searchParams.paymentStatus != null and searchParams.paymentStatus != ''">
+                AND PAYMENT_STATUS = #{searchParams.paymentStatus}
+            </if>
+            <if test="searchParams.siteName != null and searchParams.siteName != ''">
+                AND SITE_NAME = #{searchParams.siteName}
+            </if>
+            <if test="searchParams.keyword != null and searchParams.keyword != ''">
+                AND (
+                    UPPER(ORDER_NUMBER) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
+                    UPPER(CUSTOMER_NAME) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
+                    UPPER(CUSTOMER_PHONE) LIKE UPPER('%' || #{searchParams.keyword} || '%')
+                )
+            </if>
+        </where>
+    </sql>
+
+    <!-- 🚀 대시보드용 검색 조건 (페이징 제외) -->
+    <sql id="dashboardSearchCondition">
+        <where>
+            <if test="searchParams.returnTypeCode != null and searchParams.returnTypeCode != ''">
+                AND RETURN_TYPE_CODE = #{searchParams.returnTypeCode}
+            </if>
+            <if test="searchParams.returnStatusCode != null and searchParams.returnStatusCode != ''">
+                AND RETURN_STATUS_CODE = #{searchParams.returnStatusCode}
+            </if>
+            <if test="searchParams.paymentStatus != null and searchParams.paymentStatus != ''">
+                AND PAYMENT_STATUS = #{searchParams.paymentStatus}
+            </if>
+            <if test="searchParams.startDate != null and searchParams.endDate != null">
+                AND CS_RECEIVED_DATE BETWEEN TO_DATE(#{searchParams.startDate}, 'YYYY-MM-DD') 
+                                         AND TO_DATE(#{searchParams.endDate}, 'YYYY-MM-DD') + 0.99999
+            </if>
+            <if test="searchParams.siteName != null and searchParams.siteName != ''">
+                AND SITE_NAME = #{searchParams.siteName}
+            </if>
+            <if test="searchParams.keyword != null and searchParams.keyword != ''">
+                AND (CUSTOMER_NAME LIKE #{searchParams.keyword} || '%' 
+                     OR CUSTOMER_PHONE LIKE #{searchParams.keyword} || '%'
+                     OR ORDER_NUMBER LIKE #{searchParams.keyword} || '%'
+                     OR ORDER_ITEM_CODE LIKE #{searchParams.keyword} || '%'
+                     OR TRACKING_NUMBER LIKE #{searchParams.keyword} || '%')
+            </if>
+        </where>
+    </sql>
+
+    <!-- 🚀 [성능 최적화] 통합 대시보드 통계 쿼리 (기존 12개 쿼리 → 1개 쿼리) -->
+    <select id="getDashboardStatsUnified" resultType="map">
+        <![CDATA[
+        SELECT 
+            -- 📊 전체 기본 통계
+            COUNT(*) as totalCount,
+            COUNT(CASE WHEN TRUNC(CS_RECEIVED_DATE) = TRUNC(SYSDATE) THEN 1 END) as todayCount,
+            
+            -- 📦 회수 관련 통계 (전체완료 제외)
+            COUNT(CASE WHEN COLLECTION_COMPLETED_DATE IS NOT NULL 
+                       AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL) THEN 1 END) as COLLECTIONCOMPLETEDCOUNT,
+            COUNT(CASE WHEN COLLECTION_COMPLETED_DATE IS NULL 
+                       AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL) THEN 1 END) as COLLECTIONPENDINGCOUNT,
+            
+            -- 🚛 물류 관련 통계 (전체완료 제외)
+            COUNT(CASE WHEN LOGISTICS_CONFIRMED_DATE IS NOT NULL 
+                       AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL) THEN 1 END) as LOGISTICSCONFIRMEDCOUNT,
+            COUNT(CASE WHEN LOGISTICS_CONFIRMED_DATE IS NULL 
+                       AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL) THEN 1 END) as LOGISTICSPENDINGCOUNT,
+            
+            -- 📤 교환 출고 관련 통계 (전체완료 제외, 교환건만)
+            COUNT(CASE WHEN RETURN_TYPE_CODE IN ('FULL_EXCHANGE', 'PARTIAL_EXCHANGE', 'EXCHANGE') 
+                       AND SHIPPING_DATE IS NOT NULL 
+                       AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL) THEN 1 END) as EXCHANGESHIPPEDCOUNT,
+            COUNT(CASE WHEN RETURN_TYPE_CODE IN ('FULL_EXCHANGE', 'PARTIAL_EXCHANGE', 'EXCHANGE') 
+                       AND SHIPPING_DATE IS NULL 
+                       AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL) THEN 1 END) as EXCHANGENOTSHIPPEDCOUNT,
+            
+            -- 💰 반품 환불 관련 통계 (전체완료 제외, 반품건만)
+            COUNT(CASE WHEN RETURN_TYPE_CODE IN ('FULL_RETURN', 'PARTIAL_RETURN') 
+                       AND REFUND_DATE IS NOT NULL 
+                       AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL) THEN 1 END) as RETURNREFUNDEDCOUNT,
+            COUNT(CASE WHEN RETURN_TYPE_CODE IN ('FULL_RETURN', 'PARTIAL_RETURN') 
+                       AND REFUND_DATE IS NULL 
+                       AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL) THEN 1 END) as RETURNNOTREFUNDEDCOUNT,
+            
+            -- 💳 배송비 입금 관련 통계 (전체완료 제외, 모든 교환/반품)
+            COUNT(CASE WHEN RETURN_TYPE_CODE IN ('FULL_EXCHANGE', 'PARTIAL_EXCHANGE', 'EXCHANGE', 'FULL_RETURN', 'PARTIAL_RETURN') 
+                       AND PAYMENT_STATUS = 'COMPLETED' 
+                       AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL) THEN 1 END) as PAYMENTCOMPLETEDCOUNT,
+            COUNT(CASE WHEN RETURN_TYPE_CODE IN ('FULL_EXCHANGE', 'PARTIAL_EXCHANGE', 'EXCHANGE', 'FULL_RETURN', 'PARTIAL_RETURN') 
+                       AND (PAYMENT_STATUS = 'PENDING' OR SHIPPING_FEE = '입금예정') 
+                       AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL) THEN 1 END) as PAYMENTPENDINGCOUNT,
+            
+            -- ✅ 완료 상태 통계 (Oracle Boolean 처리)
+            COUNT(CASE WHEN IS_COMPLETED = 1 THEN 1 END) as COMPLETEDCOUNT,
+            COUNT(CASE WHEN IS_COMPLETED IS NULL OR IS_COMPLETED = 0 THEN 1 END) as INCOMPLETEDCOUNT,
+            
+            -- 📈 추가 분석 통계
+            COUNT(CASE WHEN (IS_COMPLETED IS NULL OR IS_COMPLETED = 0) 
+                       AND CS_RECEIVED_DATE <= SYSDATE - 7 THEN 1 END) as delayedCount,
+            -- 🚨 처리기간 임박 통계 (10일 이상 미완료)
+            COUNT(CASE WHEN (IS_COMPLETED IS NULL OR IS_COMPLETED = 0) 
+                       AND CS_RECEIVED_DATE <= SYSDATE - 10 THEN 1 END) as OVERDUETENDAYSCOUNT,
+            
+            -- 💰 금액 통계 (NULL 처리 포함)
+            COALESCE(SUM(REFUND_AMOUNT), 0) as totalRefundAmount,
+            COALESCE(ROUND(AVG(REFUND_AMOUNT), 0), 0) as avgRefundAmount,
+            
+            -- 🏷️ 유형별 통계
+            COUNT(CASE WHEN RETURN_TYPE_CODE = 'FULL_EXCHANGE' THEN 1 END) as fullExchangeCount,
+            COUNT(CASE WHEN RETURN_TYPE_CODE = 'PARTIAL_EXCHANGE' THEN 1 END) as partialExchangeCount,
+            COUNT(CASE WHEN RETURN_TYPE_CODE = 'FULL_RETURN' THEN 1 END) as fullReturnCount,
+            COUNT(CASE WHEN RETURN_TYPE_CODE = 'PARTIAL_RETURN' THEN 1 END) as partialReturnCount,
+            
+            -- 🌐 브랜드별 통계 (CASE WHEN으로 최적화)
+            COUNT(CASE WHEN UPPER(SITE_NAME) LIKE '%레노마%' THEN 1 END) as renomaCount,
+            COUNT(CASE WHEN UPPER(SITE_NAME) LIKE '%코랄리크%' THEN 1 END) as coralicCount
+            
+        FROM TB_RETURN_ITEM
+        ]]>
+        <if test="searchParams != null">
+            <include refid="dashboardSearchCondition"/>
+        </if>
+    </select>
+
+    <!-- 🚀 검색 조건별 통합 통계 쿼리 (검색 시 사용) -->
+    <select id="getDashboardStatsBySearch" resultType="map">
+        <![CDATA[
+        SELECT 
+            COUNT(*) as totalCount,
+            COUNT(CASE WHEN TRUNC(CS_RECEIVED_DATE) = TRUNC(SYSDATE) THEN 1 END) as todayCount,
+            COUNT(CASE WHEN COLLECTION_COMPLETED_DATE IS NOT NULL 
+                       AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL) THEN 1 END) as COLLECTIONCOMPLETEDCOUNT,
+            COUNT(CASE WHEN COLLECTION_COMPLETED_DATE IS NULL 
+                       AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL) THEN 1 END) as COLLECTIONPENDINGCOUNT,
+            COUNT(CASE WHEN LOGISTICS_CONFIRMED_DATE IS NOT NULL 
+                       AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL) THEN 1 END) as LOGISTICSCONFIRMEDCOUNT,
+            COUNT(CASE WHEN LOGISTICS_CONFIRMED_DATE IS NULL 
+                       AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL) THEN 1 END) as LOGISTICSPENDINGCOUNT,
+            COUNT(CASE WHEN RETURN_TYPE_CODE IN ('FULL_EXCHANGE', 'PARTIAL_EXCHANGE', 'EXCHANGE') 
+                       AND SHIPPING_DATE IS NOT NULL 
+                       AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL) THEN 1 END) as EXCHANGESHIPPEDCOUNT,
+            COUNT(CASE WHEN RETURN_TYPE_CODE IN ('FULL_EXCHANGE', 'PARTIAL_EXCHANGE', 'EXCHANGE') 
+                       AND SHIPPING_DATE IS NULL 
+                       AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL) THEN 1 END) as EXCHANGENOTSHIPPEDCOUNT,
+            COUNT(CASE WHEN RETURN_TYPE_CODE IN ('FULL_RETURN', 'PARTIAL_RETURN') 
+                       AND REFUND_DATE IS NOT NULL 
+                       AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL) THEN 1 END) as RETURNREFUNDEDCOUNT,
+            COUNT(CASE WHEN RETURN_TYPE_CODE IN ('FULL_RETURN', 'PARTIAL_RETURN') 
+                       AND REFUND_DATE IS NULL 
+                       AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL) THEN 1 END) as RETURNNOTREFUNDEDCOUNT,
+            COUNT(CASE WHEN RETURN_TYPE_CODE IN ('FULL_EXCHANGE', 'PARTIAL_EXCHANGE', 'EXCHANGE', 'FULL_RETURN', 'PARTIAL_RETURN') 
+                       AND PAYMENT_STATUS = 'COMPLETED' 
+                       AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL) THEN 1 END) as PAYMENTCOMPLETEDCOUNT,
+            COUNT(CASE WHEN RETURN_TYPE_CODE IN ('FULL_EXCHANGE', 'PARTIAL_EXCHANGE', 'EXCHANGE', 'FULL_RETURN', 'PARTIAL_RETURN') 
+                       AND (PAYMENT_STATUS = 'PENDING' OR SHIPPING_FEE = '입금예정') 
+                       AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL) THEN 1 END) as PAYMENTPENDINGCOUNT,
+            COUNT(CASE WHEN IS_COMPLETED = 1 THEN 1 END) as COMPLETEDCOUNT,
+            COUNT(CASE WHEN IS_COMPLETED IS NULL OR IS_COMPLETED = 0 THEN 1 END) as INCOMPLETEDCOUNT,
+            -- 🚨 처리기간 임박 통계 (10일 이상 미완료)
+            COUNT(CASE WHEN (IS_COMPLETED IS NULL OR IS_COMPLETED = 0) 
+                       AND CS_RECEIVED_DATE <= SYSDATE - 10 THEN 1 END) as OVERDUETENDAYSCOUNT,
+            COALESCE(SUM(REFUND_AMOUNT), 0) as totalRefundAmount,
+            COALESCE(ROUND(AVG(REFUND_AMOUNT), 0), 0) as avgRefundAmount
+        FROM TB_RETURN_ITEM
+        ]]>
+        <include refid="searchCondition"/>
+    </select>
+
+    <!-- 🚀 상태별 조회 최적화 (복합 인덱스 IDX_RETURN_ITEM_STATUS_DATE 활용) -->
+    <select id="selectByStatusOptimized" resultMap="ReturnItemResultMap">
+        <![CDATA[
+        SELECT /*+ INDEX(TB_RETURN_ITEM IDX_RETURN_ITEM_STATUS_DATE) */ * FROM (
+            SELECT ROWNUM AS RN, T.* FROM (
+                SELECT * FROM TB_RETURN_ITEM
+                WHERE RETURN_STATUS_CODE = #{status}
+        ]]>
+                <if test="startDate != null and endDate != null">
+                    AND CS_RECEIVED_DATE BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') 
+                                             AND TO_DATE(#{endDate}, 'YYYY-MM-DD') + 0.99999
+                </if>
+                ORDER BY CS_RECEIVED_DATE DESC, RETURN_ID DESC
+            ) T
+            WHERE ROWNUM &lt;= #{endRow}
+        )
+        WHERE RN > #{startRow}
+    </select>
+
+    <!-- 🚀 타입별 조회 최적화 (복합 인덱스 IDX_RETURN_ITEM_TYPE_DATE 활용) -->
+    <select id="selectByTypeOptimized" resultMap="ReturnItemResultMap">
+        <![CDATA[
+        SELECT /*+ INDEX(TB_RETURN_ITEM IDX_RETURN_ITEM_TYPE_DATE) */ * FROM (
+            SELECT ROWNUM AS RN, T.* FROM (
+                SELECT * FROM TB_RETURN_ITEM
+                WHERE RETURN_TYPE_CODE = #{type}
+        ]]>
+                <if test="startDate != null and endDate != null">
+                    AND CS_RECEIVED_DATE BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') 
+                                             AND TO_DATE(#{endDate}, 'YYYY-MM-DD') + 0.99999
+                </if>
+                ORDER BY CS_RECEIVED_DATE DESC, RETURN_ID DESC
+            ) T
+            WHERE ROWNUM &lt;= #{endRow}
+        )
+        WHERE RN > #{startRow}
+    </select>
+
+    <!-- 🚀 처리 지연 건 조회 (14일 이상 미완료) -->
+    <select id="selectDelayedItems" resultMap="ReturnItemResultMap">
+        <![CDATA[
+        SELECT /*+ INDEX(TB_RETURN_ITEM IDX_RETURN_ITEM_CS_DATE) */ * FROM (
+            SELECT ROWNUM AS RN, T.* FROM (
+                SELECT * FROM TB_RETURN_ITEM
+                WHERE (IS_COMPLETED IS NULL OR IS_COMPLETED = 0)
+                AND CS_RECEIVED_DATE <= SYSDATE - 14
+                ORDER BY CS_RECEIVED_DATE ASC, RETURN_ID DESC
+            ) T
+            WHERE ROWNUM <= #{endRow}
+        )
+        WHERE RN > #{startRow}
+        ]]>
+    </select>
+
+    <!-- 🚀 고객정보 기반 자동 매핑 조회 (복합 인덱스 IDX_RETURN_ITEM_CUSTOMER_PAY 활용) -->
+    <select id="selectByCustomerForMapping" resultMap="ReturnItemResultMap">
+        <![CDATA[
+        SELECT /*+ INDEX(TB_RETURN_ITEM IDX_RETURN_ITEM_CUSTOMER_PAY) */ 
+            RETURN_ID, CUSTOMER_NAME, CUSTOMER_PHONE, REFUND_AMOUNT, SHIPPING_FEE,
+            RETURN_TYPE_CODE, PAYMENT_STATUS, CS_RECEIVED_DATE
+        FROM TB_RETURN_ITEM
+        WHERE CUSTOMER_NAME = #{customerName}
+        AND PAYMENT_STATUS = 'PENDING'
+        ORDER BY CS_RECEIVED_DATE DESC
+        ]]>
+    </select>
+    
+    <!-- 🎯 통계 API용 개별 카운트 쿼리들 -->
+    
+    <!-- 회수완료 건수 (검색 조건 적용) -->
+    <select id="getCollectionCompletedCountBySearch" resultType="long">
+        SELECT COUNT(*)
+        FROM TB_RETURN_ITEM
+        <where>
+            COLLECTION_COMPLETED_DATE IS NOT NULL
+            <if test="startDate != null and startDate != ''">
+                AND CS_RECEIVED_DATE >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND CS_RECEIVED_DATE &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD')
+            </if>
+            <if test="returnTypeCode != null and returnTypeCode != ''">
+                AND RETURN_TYPE_CODE = #{returnTypeCode}
+            </if>
+            <if test="brandFilter != null and brandFilter != ''">
+                <choose>
+                    <when test="brandFilter == 'RENOMA'">
+                        AND UPPER(SITE_NAME) LIKE UPPER('%레노마%')
+                    </when>
+                    <when test="brandFilter == 'CORALIC'">
+                        AND UPPER(SITE_NAME) LIKE UPPER('%코랄리크%')
+                    </when>
+                </choose>
+            </if>
+        </where>
+    </select>
+    
+    <!-- 물류확인 건수 (검색 조건 적용) -->
+    <select id="getLogisticsConfirmedCountBySearch" resultType="long">
+        SELECT COUNT(*)
+        FROM TB_RETURN_ITEM
+        <where>
+            LOGISTICS_CONFIRMED_DATE IS NOT NULL
+            <if test="startDate != null and startDate != ''">
+                AND CS_RECEIVED_DATE >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND CS_RECEIVED_DATE &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD')
+            </if>
+            <if test="returnTypeCode != null and returnTypeCode != ''">
+                AND RETURN_TYPE_CODE = #{returnTypeCode}
+            </if>
+            <if test="brandFilter != null and brandFilter != ''">
+                <choose>
+                    <when test="brandFilter == 'RENOMA'">
+                        AND UPPER(SITE_NAME) LIKE UPPER('%레노마%')
+                    </when>
+                    <when test="brandFilter == 'CORALIC'">
+                        AND UPPER(SITE_NAME) LIKE UPPER('%코랄리크%')
+                    </when>
+                </choose>
+            </if>
+        </where>
+    </select>
+    
+    <!-- 교환 출고완료 건수 (검색 조건 적용) -->
+    <select id="getExchangeShippedCountBySearch" resultType="long">
+        SELECT COUNT(*)
+        FROM TB_RETURN_ITEM
+        <where>
+            RETURN_TYPE_CODE IN ('FULL_EXCHANGE', 'PARTIAL_EXCHANGE')
+            AND SHIPPING_DATE IS NOT NULL
+            <if test="startDate != null and startDate != ''">
+                AND CS_RECEIVED_DATE >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND CS_RECEIVED_DATE &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD')
+            </if>
+            <if test="returnTypeCode != null and returnTypeCode != ''">
+                AND RETURN_TYPE_CODE = #{returnTypeCode}
+            </if>
+            <if test="brandFilter != null and brandFilter != ''">
+                <choose>
+                    <when test="brandFilter == 'RENOMA'">
+                        AND UPPER(SITE_NAME) LIKE UPPER('%레노마%')
+                    </when>
+                    <when test="brandFilter == 'CORALIC'">
+                        AND UPPER(SITE_NAME) LIKE UPPER('%코랄리크%')
+                    </when>
+                </choose>
+            </if>
+        </where>
+    </select>
+    
+    <!-- 반품 환불완료 건수 (검색 조건 적용) -->
+    <select id="getReturnRefundedCountBySearch" resultType="long">
+        SELECT COUNT(*)
+        FROM TB_RETURN_ITEM
+        <where>
+            RETURN_TYPE_CODE IN ('FULL_RETURN', 'PARTIAL_RETURN')
+            AND REFUND_DATE IS NOT NULL
+            <if test="startDate != null and startDate != ''">
+                AND CS_RECEIVED_DATE >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND CS_RECEIVED_DATE &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD')
+            </if>
+            <if test="returnTypeCode != null and returnTypeCode != ''">
+                AND RETURN_TYPE_CODE = #{returnTypeCode}
+            </if>
+            <if test="brandFilter != null and brandFilter != ''">
+                <choose>
+                    <when test="brandFilter == 'RENOMA'">
+                        AND UPPER(SITE_NAME) LIKE UPPER('%레노마%')
+                    </when>
+                    <when test="brandFilter == 'CORALIC'">
+                        AND UPPER(SITE_NAME) LIKE UPPER('%코랄리크%')
+                    </when>
+                </choose>
+            </if>
+        </where>
+    </select>
+    
+    <!-- 배송비 입금완료 건수 (검색 조건 적용) -->
+    <select id="getPaymentCompletedCountBySearch" resultType="long">
+        SELECT COUNT(*)
+        FROM TB_RETURN_ITEM
+        <where>
+            PAYMENT_STATUS = 'COMPLETED'
+            <if test="startDate != null and startDate != ''">
+                AND CS_RECEIVED_DATE >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND CS_RECEIVED_DATE &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD')
+            </if>
+            <if test="returnTypeCode != null and returnTypeCode != ''">
+                AND RETURN_TYPE_CODE = #{returnTypeCode}
+            </if>
+            <if test="brandFilter != null and brandFilter != ''">
+                <choose>
+                    <when test="brandFilter == 'RENOMA'">
+                        AND UPPER(SITE_NAME) LIKE UPPER('%레노마%')
+                    </when>
+                    <when test="brandFilter == 'CORALIC'">
+                        AND UPPER(SITE_NAME) LIKE UPPER('%코랄리크%')
+                    </when>
+                </choose>
+            </if>
+        </where>
+    </select>
+    
+    <!-- 전체완료 건수 (검색 조건 적용) - IS_COMPLETED = 1 -->
+    <select id="getCompletedCountBySearch" resultType="long">
+        SELECT COUNT(*)
+        FROM TB_RETURN_ITEM
+        <where>
+            IS_COMPLETED = 1
+            <if test="startDate != null and startDate != ''">
+                AND CS_RECEIVED_DATE >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND CS_RECEIVED_DATE &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD') + 0.99999
+            </if>
+            <if test="returnTypeCode != null and returnTypeCode != ''">
+                AND RETURN_TYPE_CODE = #{returnTypeCode}
+            </if>
+            <if test="brandFilter != null and brandFilter != ''">
+                <choose>
+                    <when test="brandFilter == 'RENOMA'">
+                        AND UPPER(SITE_NAME) LIKE UPPER('%레노마%')
+                    </when>
+                    <when test="brandFilter == 'CORALIC'">
+                        AND UPPER(SITE_NAME) LIKE UPPER('%코랄리크%')
+                    </when>
+                </choose>
+            </if>
+        </where>
+    </select>
+
+    <!-- 전체미완료 건수 (검색 조건 적용) - IS_COMPLETED = 0 OR NULL -->
+    <select id="getIncompletedCountBySearch" resultType="long">
+        SELECT COUNT(*)
+        FROM TB_RETURN_ITEM
+        <where>
+            (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL)
+            <if test="startDate != null and startDate != ''">
+                AND CS_RECEIVED_DATE >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND CS_RECEIVED_DATE &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD') + 0.99999
+            </if>
+            <if test="returnTypeCode != null and returnTypeCode != ''">
+                AND RETURN_TYPE_CODE = #{returnTypeCode}
+            </if>
+            <if test="brandFilter != null and brandFilter != ''">
+                <choose>
+                    <when test="brandFilter == 'RENOMA'">
+                        AND UPPER(SITE_NAME) LIKE UPPER('%레노마%')
+                    </when>
+                    <when test="brandFilter == 'CORALIC'">
+                        AND UPPER(SITE_NAME) LIKE UPPER('%코랄리크%')
+                    </when>
+                </choose>
+            </if>
+        </where>
+    </select>
+    
+    <!-- 전체 건수 (검색 조건 적용) -->
+    <select id="getTotalCountBySearch" resultType="long">
+        SELECT COUNT(*)
+        FROM TB_RETURN_ITEM
+        <where>
+            1=1
+            <if test="startDate != null and startDate != ''">
+                AND CS_RECEIVED_DATE >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND CS_RECEIVED_DATE &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD') + 0.99999
+            </if>
+            <if test="returnTypeCode != null and returnTypeCode != ''">
+                AND RETURN_TYPE_CODE = #{returnTypeCode}
+            </if>
+            <if test="brandFilter != null and brandFilter != ''">
+                <choose>
+                    <when test="brandFilter == 'RENOMA'">
+                        AND UPPER(SITE_NAME) LIKE UPPER('%레노마%')
+                    </when>
+                    <when test="brandFilter == 'CORALIC'">
+                        AND UPPER(SITE_NAME) LIKE UPPER('%코랄리크%')
+                    </when>
+                </choose>
+            </if>
+        </where>
+    </select>
+    
+    <!-- 교환 건수 (검색 조건 적용) -->
+    <select id="getExchangeCountBySearch" resultType="long">
+        SELECT COUNT(*)
+        FROM TB_RETURN_ITEM
+        <where>
+            RETURN_TYPE_CODE IN ('FULL_EXCHANGE', 'PARTIAL_EXCHANGE')
+            <include refid="searchCondition"/>
+        </where>
+    </select>
+    
+    <!-- 반품 건수 (검색 조건 적용) -->
+    <select id="getReturnCountBySearch" resultType="long">
+        SELECT COUNT(*)
+        FROM TB_RETURN_ITEM
+        <where>
+            RETURN_TYPE_CODE IN ('FULL_RETURN', 'PARTIAL_RETURN')
+            <include refid="searchCondition"/>
+        </where>
+    </select>
+    
+    <!-- 배송비 필요 건수 (검색 조건 적용) -->
+    <select id="getPaymentRequiredCountBySearch" resultType="long">
+        SELECT COUNT(*)
+        FROM TB_RETURN_ITEM
+        <where>
+            RETURN_TYPE_CODE IN ('FULL_EXCHANGE', 'PARTIAL_EXCHANGE')
+            <include refid="searchCondition"/>
+        </where>
+    </select>
+    
+    <!-- 유형별 건수 (검색 조건 적용) -->
+    <select id="getCountByTypeAndSearch" resultType="long">
+        SELECT COUNT(*)
+        FROM TB_RETURN_ITEM
+        <where>
+            RETURN_TYPE_CODE = #{returnType}
+            <if test="searchParams.startDate != null and searchParams.startDate != ''">
+                AND CS_RECEIVED_DATE >= TO_DATE(#{searchParams.startDate}, 'YYYY-MM-DD')
+            </if>
+            <if test="searchParams.endDate != null and searchParams.endDate != ''">
+                AND CS_RECEIVED_DATE &lt;= TO_DATE(#{searchParams.endDate}, 'YYYY-MM-DD')
+            </if>
+            <if test="searchParams.returnTypeCode != null and searchParams.returnTypeCode != ''">
+                AND RETURN_TYPE_CODE = #{searchParams.returnTypeCode}
+            </if>
+            <if test="searchParams.brandFilter != null and searchParams.brandFilter != ''">
+                <choose>
+                    <when test="searchParams.brandFilter == 'RENOMA'">
+                        AND UPPER(SITE_NAME) LIKE UPPER('%레노마%')
+                    </when>
+                    <when test="searchParams.brandFilter == 'CORALIC'">
+                        AND UPPER(SITE_NAME) LIKE UPPER('%코랄리크%')
+                    </when>
+                </choose>
+            </if>
+        </where>
+    </select>
+    
+    <!-- 검색 조건에 맞는 전체 데이터 (페이징 없이) -->
+    <select id="findBySearch" resultMap="ReturnItemResultMap">
+        SELECT 
+            RETURN_ID,
+            RETURN_TYPE_CODE,
+            ORDER_DATE,
+            CS_RECEIVED_DATE,
+            SITE_NAME,
+            ORDER_NUMBER,
+            REFUND_AMOUNT,
+            CUSTOMER_NAME,
+            CUSTOMER_PHONE,
+            ORDER_ITEM_CODE,
+            PRODUCT_COLOR,
+            PRODUCT_SIZE,
+            QUANTITY,
+            SHIPPING_FEE,
+            RETURN_REASON,
+            DEFECT_DETAIL,
+            DEFECT_PHOTO_URL,
+            TRACKING_NUMBER,
+            COLLECTION_COMPLETED_DATE,
+            LOGISTICS_CONFIRMED_DATE,
+            SHIPPING_DATE,
+            REFUND_DATE,
+            IS_COMPLETED,
+            REMARKS,
+            RETURN_STATUS_CODE,
+            PROCESSOR,
+            CREATE_DATE,
+            UPDATE_DATE,
+            CREATED_BY,
+            UPDATED_BY,
+            PAYMENT_STATUS,
+            PAYMENT_ID,
+            COLLECTION_UPDATED_BY,
+            LOGISTICS_UPDATED_BY,
+            SHIPPING_UPDATED_BY,
+            REFUND_UPDATED_BY,
+            COLLECTION_UPDATED_DATE,
+            LOGISTICS_UPDATED_DATE,
+            SHIPPING_UPDATED_DATE,
+            REFUND_UPDATED_DATE
+        FROM TB_RETURN_ITEM
+        <include refid="searchCondition"/>
+        ORDER BY CS_RECEIVED_DATE DESC, RETURN_ID DESC
+    </select>
+    
+    <!-- 페이징 없는 전체 데이터 -->
+    <select id="findAllItems" resultMap="ReturnItemResultMap">
+        SELECT 
+            RETURN_ID,
+            RETURN_TYPE_CODE,
+            ORDER_DATE,
+            CS_RECEIVED_DATE,
+            SITE_NAME,
+            ORDER_NUMBER,
+            REFUND_AMOUNT,
+            CUSTOMER_NAME,
+            CUSTOMER_PHONE,
+            ORDER_ITEM_CODE,
+            PRODUCT_COLOR,
+            PRODUCT_SIZE,
+            QUANTITY,
+            SHIPPING_FEE,
+            RETURN_REASON,
+            DEFECT_DETAIL,
+            DEFECT_PHOTO_URL,
+            TRACKING_NUMBER,
+            COLLECTION_COMPLETED_DATE,
+            LOGISTICS_CONFIRMED_DATE,
+            SHIPPING_DATE,
+            REFUND_DATE,
+            IS_COMPLETED,
+            REMARKS,
+            RETURN_STATUS_CODE,
+            PROCESSOR,
+            CREATE_DATE,
+            UPDATE_DATE,
+            CREATED_BY,
+            UPDATED_BY,
+            PAYMENT_STATUS,
+            PAYMENT_ID,
+            COLLECTION_UPDATED_BY,
+            LOGISTICS_UPDATED_BY,
+            SHIPPING_UPDATED_BY,
+            REFUND_UPDATED_BY,
+            COLLECTION_UPDATED_DATE,
+            LOGISTICS_UPDATED_DATE,
+            SHIPPING_UPDATED_DATE,
+            REFUND_UPDATED_DATE
+        FROM TB_RETURN_ITEM
+        ORDER BY CS_RECEIVED_DATE DESC, RETURN_ID DESC
+    </select>
+    
+    <!-- 💰 검색 조건 기반 금액 통계 (DB 직접 집계) -->
+    <select id="getAmountStatsBySearch" resultType="java.util.HashMap">
+        SELECT 
+            COUNT(*) AS TOTAL_COUNT,
+            NVL(SUM(CASE WHEN REFUND_AMOUNT > 0 THEN REFUND_AMOUNT ELSE 0 END), 0) AS TOTAL_REFUND_AMOUNT,
+            COUNT(CASE WHEN REFUND_AMOUNT > 0 THEN 1 END) AS REFUND_COUNT,
+            NVL(SUM(
+                CASE 
+                    WHEN SHIPPING_FEE IS NOT NULL 
+                         AND REGEXP_LIKE(SHIPPING_FEE, '^[0-9]+$') 
+                         AND TO_NUMBER(SHIPPING_FEE) > 0 
+                    THEN TO_NUMBER(SHIPPING_FEE) 
+                    ELSE 0 
+                END
+            ), 0) AS TOTAL_SHIPPING_FEE
+        FROM TB_RETURN_ITEM
+        <where>
+            1=1
+            <if test="searchParams.startDate != null and searchParams.startDate != ''">
+                AND CS_RECEIVED_DATE >= TO_DATE(#{searchParams.startDate}, 'YYYY-MM-DD')
+            </if>
+            <if test="searchParams.endDate != null and searchParams.endDate != ''">
+                AND CS_RECEIVED_DATE &lt;= TO_DATE(#{searchParams.endDate}, 'YYYY-MM-DD') + 0.99999
+            </if>
+            <if test="searchParams.returnTypeCode != null and searchParams.returnTypeCode != ''">
+                AND RETURN_TYPE_CODE = #{searchParams.returnTypeCode}
+            </if>
+            <if test="searchParams.brandFilter != null and searchParams.brandFilter != ''">
+                <choose>
+                    <when test="searchParams.brandFilter == 'RENOMA'">
+                        AND UPPER(SITE_NAME) LIKE UPPER('%레노마%')
+                    </when>
+                    <when test="searchParams.brandFilter == 'CORALIC'">
+                        AND UPPER(SITE_NAME) LIKE UPPER('%코랄리크%')
+                    </when>
+                </choose>
+            </if>
+        </where>
+    </select>
+
+</mapper> 
