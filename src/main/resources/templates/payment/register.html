@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+
+<div layout:fragment="content">
+    <style>
+        /* 헤더 정렬 스타일 - list.html과 동일하게 */
+        #kt_app_toolbar {
+            padding: 0.75rem 0 !important;
+            min-height: auto !important;
+        }
+        
+        #kt_app_toolbar_container {
+            padding-left: 1rem !important;
+            margin-left: 0 !important;
+        }
+        
+        .page-title {
+            margin: 0 !important;
+            padding: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .page-heading {
+            margin: 0 !important;
+        }
+        
+        .breadcrumb {
+            margin: 0 !important;
+            padding-top: 0.25rem !important;
+        }
+        
+        #kt_app_content {
+            padding-top: 2.5rem !important;
+            margin-top: 0 !important;
+        }
+        
+        /* 컨텐츠 영역은 원래 패딩 유지 */
+        #kt_app_content_container.app-container {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+        }
+
+        /* 입금 등록 전용 스타일 */
+        .payment-container {
+            padding: 1.5rem !important;
+            width: 100%;
+        }
+        
+        /* 심플 헤더 */
+        .simple-header {
+            padding: 1rem 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        /* 폼 카드 */
+        .form-card {
+            background: white;
+            border: 1px solid #eff2f5;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        
+        .form-card-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 1.5rem;
+            border-bottom: 2px solid #e3e6f0;
+        }
+        
+        .form-card-body {
+            padding: 2rem;
+        }
+        
+        /* 입력 필드 스타일 */
+        .form-label {
+            font-weight: 600;
+            color: #3f4254;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .form-control,
+        .form-select {
+            border: 2px solid #e4e6ef;
+            border-radius: 8px;
+            padding: 0.8rem 1rem;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            transform: translateY(-1px);
+        }
+        
+        /* 필수 필드 표시 */
+        .required::after {
+            content: ' *';
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        /* 브랜드 선택 버튼 - 심플 스타일 */
+        .brand-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .brand-btn {
+            flex: 1;
+            padding: 0.7rem 1rem;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .brand-btn:hover {
+            border-color: #007bff;
+            background: #f8f9fa;
+        }
+        
+        .brand-btn.active {
+            border-color: #007bff;
+            background: #007bff;
+            color: white;
+        }
+        
+        .brand-btn .brand-name {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        /* 입력 그룹 스타일 */
+        .input-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            z-index: 3;
+        }
+        
+        .input-group .form-control,
+        .input-group .form-select {
+            padding-left: 3rem;
+        }
+        
+        /* 금액 입력 스타일 */
+        .amount-input {
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-align: right;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+        
+        /* 날짜/시간 입력 스타일 */
+        .datetime-inputs {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .datetime-inputs .form-control {
+            flex: 1;
+        }
+        
+        /* 버튼 스타일 */
+        .btn-register {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 10px;
+            color: white;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+        }
+        
+        .btn-register::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-register:hover::before {
+            left: 100%;
+        }
+        
+        .btn-reset {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 10px;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-reset:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(108, 117, 125, 0.4);
+        }
+        
+        /* 최근 입금 내역 카드 */
+        .recent-payments {
+            background: white;
+            border: 1px solid #eff2f5;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        .recent-payments-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 1.5rem;
+            border-bottom: 2px solid #e3e6f0;
+        }
+        
+        .recent-payments-body {
+            padding: 1.5rem;
+        }
+        
+        .payment-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 18px;
+            border: 1px solid #e1e5e9;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            background: white;
+            transition: all 0.2s ease;
+        }
+        
+        .payment-item:hover {
+            border-color: #009ef7;
+            box-shadow: 0 3px 12px rgba(0, 158, 247, 0.15);
+            transform: translateY(-1px);
+        }
+        
+        .payment-info {
+            flex: 1;
+        }
+        
+        .payment-brand-customer {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        
+        .brand-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .brand-badge.renoma {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .brand-badge.coralique {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        
+        .customer-name {
+            font-weight: 600;
+            color: #181c32;
+            font-size: 14px;
+        }
+        
+        .payment-customer {
+            font-weight: 600;
+            color: #3f4254;
+            margin-bottom: 0.2rem;
+        }
+        
+        .payment-details {
+            font-size: 13px;
+            color: #7e8299;
+        }
+        
+        .payment-bank-time {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+        
+        .payment-date {
+            display: flex;
+            align-items: center;
+        }
+        
+        .payment-amount {
+            font-weight: 700;
+            font-size: 16px;
+            color: #181c32;
+            text-align: right;
+            margin-bottom: 6px;
+        }
+        
+        .payment-status {
+            font-size: 11px;
+            padding: 3px 10px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        
+        .status-pending {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+            color: #2d3436;
+        }
+        
+        .status-mapped {
+            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+            color: white;
+        }
+        
+        /* 도움말 툴팁 */
+        .help-tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 0.5rem;
+            cursor: help;
+        }
+        
+        .help-tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background: #333;
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+            padding: 0.5rem;
+            position: absolute;
+            z-index: 1000;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8rem;
+        }
+        
+        .help-tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        /* 반응형 디자인 */
+        @media (max-width: 768px) {
+            .payment-container {
+                padding: 1rem !important;
+            }
+            
+            .brand-selector {
+                flex-direction: column;
+            }
+            
+            .datetime-inputs {
+                flex-direction: column;
+            }
+            
+            .d-flex.gap-3 {
+                flex-direction: column;
+                gap: 1rem !important;
+            }
+            
+            .btn-register,
+            .btn-reset {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+        }
+        
+        /* 애니메이션 */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .form-card,
+        .recent-payments {
+            animation: slideInUp 0.6s ease-out;
+        }
+        
+        .recent-payments {
+            animation-delay: 0.1s;
+        }
+        
+        /* 로딩 스피너 */
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .spinner-border {
+            width: 2rem;
+            height: 2rem;
+            border-width: 0.2em;
+        }
+
+        /* 검색 필터 스타일 */
+        .search-filters {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 1px solid #e3e6f0;
+            border-radius: 10px;
+            padding: 1rem;
+        }
+        
+        .search-filters .form-control,
+        .search-filters .form-select {
+            border: 1px solid #d1d3e2;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            padding: 0.4rem 0.6rem;
+        }
+        
+        .search-filters .form-control:focus,
+        .search-filters .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.1rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .search-filters .btn {
+            font-size: 0.8rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+        }
+        
+        /* 검색 통계 */
+        .search-stats {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 0.5rem 0.8rem;
+            text-align: center;
+        }
+        
+        /* 페이징 스타일 */
+        .pagination-container {
+            border-top: 1px solid #e9ecef;
+            padding-top: 1rem;
+        }
+        
+        .pagination-sm .page-link {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+        
+        .pagination-sm .page-item.active .page-link {
+            background-color: #667eea;
+            border-color: #667eea;
+        }
+        
+        .pagination-sm .page-link:hover {
+            background-color: #f8f9fa;
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
+        /* 입금 내역 리스트 개선 */
+        #paymentList {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+        }
+        
+        #paymentList .payment-item {
+            margin-bottom: 8px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+        
+        #paymentList .payment-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        /* 사이트명과 비고 스타일 */
+        .payment-site,
+        .payment-notes {
+            font-size: 0.75rem;
+            color: #6c757d;
+            margin-top: 2px;
+        }
+        
+        .payment-notes {
+            font-style: italic;
+        }
+        
+        /* 빈 상태 스타일 */
+        .empty-state {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: #6c757d;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        /* 반응형 검색 필터 */
+        @media (max-width: 768px) {
+            .search-filters .col-6 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+            
+            .search-filters .btn {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+        }
+    </style>
+
+    <div class="app-main flex-column flex-row-fluid" id="kt_app_main">
+        <!--begin::Content wrapper-->
+        <div class="d-flex flex-column flex-column-fluid">
+            <!--begin::Toolbar-->
+            <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+                <!--begin::Toolbar container-->
+                <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                    <!--begin::Page title-->
+                    <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                        <!--begin::Title-->
+                        <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">배송비 입금 등록</h1>
+                        <!--end::Title-->
+                        <!--begin::Breadcrumb-->
+                        <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                            <!--begin::Item-->
+                            <li class="breadcrumb-item text-muted">
+                                <a href="/main" class="text-muted text-hover-primary">Home</a>
+                            </li>
+                            <!--end::Item-->
+                            <!--begin::Item-->
+                            <li class="breadcrumb-item">
+                                <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                            </li>
+                            <!--end::Item-->
+                            <!--begin::Item-->
+                            <li class="breadcrumb-item text-muted">입금 관리</li>
+                            <!--end::Item-->
+                            <!--begin::Item-->
+                            <li class="breadcrumb-item">
+                                <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                            </li>
+                            <!--end::Item-->
+                            <!--begin::Item-->
+                            <li class="breadcrumb-item text-muted">배송비 입금 등록</li>
+                            <!--end::Item-->
+                        </ul>
+                        <!--end::Breadcrumb-->
+                    </div>
+                    <!--end::Page title-->
+                    <!--begin::Actions-->
+                    <div class="d-flex align-items-center gap-2 gap-lg-3">
+                        <!-- 액션 버튼들 -->
+                    </div>
+                    <!--end::Actions-->
+                </div>
+                <!--end::Toolbar container-->
+            </div>
+            <!--end::Toolbar-->
+            <!--begin::Content-->
+            <div id="kt_app_content" class="app-content flex-column-fluid">
+                <!--begin::Content container-->
+                <div id="kt_app_content_container" class="app-container container-fluid px-2">
+
+                    <div class="payment-container">
+                        <!-- 페이지 헤더 - 심플 버전 -->
+                        <div class="simple-header mb-4">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h2 class="text-dark fw-bold mb-0">💳 배송비 입금 등록</h2>
+                                <div class="text-end">
+                                    <small class="text-muted">오늘 등록</small>
+                                    <h4 class="text-primary fw-bold mb-0" id="todayCount" th:text="${todayCount != null ? todayCount + '건' : '0건'}">0건</h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- 입금 등록 폼 -->
+                            <div class="col-lg-6">
+                                <div class="form-card">
+                                    <div class="form-card-header">
+                                        <h4 class="mb-0">
+                                            <i class="ki-duotone ki-bill fs-2 me-2"></i>
+                                            입금 정보 등록
+                                        </h4>
+                                        <p class="text-muted mb-0 mt-1">모든 필수 항목을 정확히 입력해주세요.</p>
+                                    </div>
+                                    <div class="form-card-body">
+                                        <form id="paymentRegisterForm">
+                                            <!-- 브랜드 선택 -->
+                                            <div class="mb-4">
+                                                <label class="form-label required">브랜드</label>
+                                                <div class="brand-selector">
+                                                    <div class="brand-btn active" data-brand="RENOMA" onclick="selectBrand('RENOMA')">
+                                                        <span class="brand-name">RENOMA</span>
+                                                    </div>
+                                                    <div class="brand-btn" data-brand="CORALIQUE" onclick="selectBrand('CORALIQUE')">
+                                                        <span class="brand-name">CORALIQUE</span>
+                                                    </div>
+                                                </div>
+                                                <input type="hidden" name="brand" id="selectedBrand" value="RENOMA" required>
+                                            </div>
+
+                                            <div class="row">
+                                                <!-- 사이트명 -->
+                                                <div class="col-md-6">
+                                                    <div class="input-group">
+                                                        <label class="form-label">사이트명</label>
+                                                        <i class="ki-duotone ki-shop input-icon fs-4"></i>
+                                                        <select name="siteName" class="form-select" id="siteName">
+                                                            <option value="">선택하세요</option>
+                                                            <!-- 레노마 사이트들 -->
+                                                            <option value="29CM-레노마">29CM-레노마</option>
+                                                            <option value="롯데온-레노마">롯데온-레노마</option>
+                                                            <option value="무신사-레노마">무신사-레노마</option>
+                                                            <option value="스토어팜-레노마">스토어팜-레노마</option>
+                                                            <option value="자사몰-레노마">자사몰-레노마</option>
+                                                            <option value="지그재그-레노마">지그재그-레노마</option>
+                                                            <option value="브랜디-레노마">브랜디-레노마</option>
+                                                            <option value="패션모아-레노마">패션모아-레노마</option>
+                                                            <option value="하플글림-레노마">하플글림-레노마</option>
+                                                            <option value="SSG-레노마">SSG-레노마</option>
+                                                            <option value="W컨셉-레노마">W컨셉-레노마</option>
+                                                            <!-- 코랄리크 사이트들 -->
+                                                            <option value="29CM-코랄리크">29CM-코랄리크</option>
+                                                            <option value="무신사-코랄리크">무신사-코랄리크</option>
+                                                            <option value="자사몰-코랄리크">자사몰-코랄리크</option>
+                                                            <option value="지그재그-코랄리크">지그재그-코랄리크</option>
+                                                            <option value="CJ오쇼핑-코랄리크">CJ오쇼핑-코랄리크</option>
+                                                            <option value="SSG-코랄리크">SSG-코랄리크</option>
+                                                            <option value="W컨셉-코랄리크">W컨셉-코랄리크</option>
+                                                            <option value="EQL-코랄리크">EQL-코랄리크</option>
+                                                            <option value="LF몰-코랄리크">LF몰-코랄리크</option>
+                                                            <option value="스토어팜-코랄리크">스토어팜-코랄리크</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <!-- 은행명 -->
+                                                <div class="col-md-6">
+                                                    <div class="input-group">
+                                                        <label class="form-label required">은행명</label>
+                                                        <i class="ki-duotone ki-bank input-icon fs-4"></i>
+                                                        <select name="bankName" class="form-select" id="bankName" required>
+                                                            <option value="">선택하세요</option>
+                                                            <option value="우리은행">우리은행</option>
+                                                            <option value="하나은행">하나은행</option>
+                                                            <option value="국민은행">국민은행</option>
+                                                            <option value="신한은행">신한은행</option>
+                                                            <option value="농협은행">농협은행</option>
+                                                            <option value="기업은행">기업은행</option>
+                                                            <option value="신협">신협</option>
+                                                            <option value="우체국">우체국</option>
+                                                            <option value="새마을금고">새마을금고</option>
+                                                            <option value="경남은행">경남은행</option>
+                                                            <option value="부산은행">부산은행</option>
+                                                            <option value="대구은행">대구은행</option>
+                                                            <option value="광주은행">광주은행</option>
+                                                            <option value="전북은행">전북은행</option>
+                                                            <option value="제주은행">제주은행</option>
+                                                            <option value="수협은행">수협은행</option>
+                                                            <option value="산업은행">산업은행</option>
+                                                            <option value="기타">기타</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- 고객명과 입금 금액을 한 줄로 -->
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="input-group">
+                                                        <label class="form-label required">고객명</label>
+                                                        <i class="ki-duotone ki-user input-icon fs-4"></i>
+                                                        <input type="text" name="customerName" class="form-control" placeholder="입금자명을 입력하세요" required>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="col-md-6">
+                                                    <div class="input-group">
+                                                        <label class="form-label required">입금 금액</label>
+                                                        <i class="ki-duotone ki-dollar input-icon fs-4"></i>
+                                                        <input type="number" name="amount" class="form-control amount-input" placeholder="0" min="0" step="1000" required>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- 입금 일시 -->
+                                            <div class="mb-3">
+                                                <label class="form-label required">입금 일시</label>
+                                                <div class="datetime-inputs">
+                                                    <input type="date" name="paymentDate" class="form-control" required>
+                                                    <input type="time" name="paymentTime" class="form-control" required>
+                                                </div>
+                                            </div>
+
+                                            <!-- 등록자 정보 -->
+                                            <div class="input-group">
+                                                <label class="form-label">등록자</label>
+                                                <i class="ki-duotone ki-profile-user input-icon fs-4"></i>
+                                                <input type="text" class="form-control" 
+                                                       th:value="${currentUser}" 
+                                                       readonly 
+                                                       style="background-color: #f8f9fa; cursor: default;"
+                                                       placeholder="로그인이 필요합니다">
+                                            </div>
+
+                                            <!-- 비고 -->
+                                            <div class="input-group">
+                                                <label class="form-label">비고</label>
+                                                <i class="ki-duotone ki-notepad input-icon fs-4"></i>
+                                                <textarea name="notes" class="form-control" rows="3" placeholder="추가 정보나 특이사항을 입력하세요"></textarea>
+                                            </div>
+
+                                            <!-- 버튼 그룹 -->
+                                            <div class="d-flex justify-content-end gap-3 mt-4">
+                                                <button type="button" class="btn btn-reset" onclick="resetForm()">
+                                                    <i class="ki-duotone ki-arrow-clockwise fs-4 me-2"></i>
+                                                    초기화
+                                                </button>
+                                                <button type="submit" class="btn btn-register">
+                                                    <i class="ki-duotone ki-check fs-4 me-2"></i>
+                                                    등록하기
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 입금 내역 조회 - 확장된 버전 -->
+                            <div class="col-lg-6">
+                                <div class="recent-payments">
+                                    <div class="recent-payments-header">
+                                        <h5 class="mb-0">
+                                            <i class="ki-duotone ki-search-list fs-2 me-2"></i>
+                                            입금 내역 조회
+                                        </h5>
+                                        <p class="text-muted mb-0 mt-1">검색 및 최신 입금 내역</p>
+                                    </div>
+                                    <div class="recent-payments-body">
+                                        <!-- 검색 필터 -->
+                                        <div class="search-filters mb-3">
+                                            <div class="row g-2">
+                                                <div class="col-12">
+                                                    <input type="text" id="searchKeyword" class="form-control form-control-sm" placeholder="고객명, 은행명 검색...">
+                                                </div>
+                                                <div class="col-6">
+                                                    <select id="searchBrand" class="form-select form-select-sm">
+                                                        <option value="">전체 브랜드</option>
+                                                        <option value="RENOMA">레노마</option>
+                                                        <option value="CORALIQUE">코랄리크</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-6">
+                                                    <select id="searchStatus" class="form-select form-select-sm">
+                                                        <option value="">전체 상태</option>
+                                                        <option value="PENDING">미매핑</option>
+                                                        <option value="MAPPED">매핑완료</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-6">
+                                                    <input type="date" id="searchStartDate" class="form-control form-control-sm">
+                                                </div>
+                                                <div class="col-6">
+                                                    <input type="date" id="searchEndDate" class="form-control form-control-sm">
+                                                </div>
+                                                <div class="col-12 text-center">
+                                                    <button type="button" class="btn btn-primary btn-sm me-2" onclick="searchPayments()">
+                                                        <i class="ki-duotone ki-magnifier fs-6 me-1"></i>검색
+                                                    </button>
+                                                    <button type="button" class="btn btn-secondary btn-sm" onclick="resetSearch()">
+                                                        <i class="ki-duotone ki-arrow-clockwise fs-6 me-1"></i>초기화
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- 결과 통계 -->
+                                        <div class="search-stats mb-2">
+                                            <small class="text-muted">
+                                                <span id="totalCount">0</span>건 중 
+                                                <span id="currentRange">0</span> 표시
+                                            </small>
+                                        </div>
+
+                                        <!-- 입금 내역 리스트 -->
+                                        <div id="paymentList" style="max-height: 500px; overflow-y: auto;">
+                                            <!-- 동적으로 생성되는 리스트 -->
+                                        </div>
+                                        
+                                        <!-- 로딩 스피너 -->
+                                        <div id="loadingSpinner" class="loading-spinner">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">로딩 중...</span>
+                                            </div>
+                                            <p class="mt-2 text-muted">입금 내역을 불러오는 중...</p>
+                                        </div>
+
+                                        <!-- 페이징 -->
+                                        <div class="pagination-container mt-3">
+                                            <nav aria-label="입금 내역 페이징">
+                                                <ul class="pagination pagination-sm justify-content-center" id="paginationList">
+                                                    <!-- 동적으로 생성되는 페이징 -->
+                                                </ul>
+                                            </nav>
+                                        </div>
+
+                                        <!-- 전체 내역 보기 링크 -->
+                                        <!--
+                                        <div class="text-center mt-3">
+                                            <a href="/payment/list" class="btn btn-light btn-sm">
+                                                전체 내역 관리
+                                                <i class="ki-duotone ki-arrow-right fs-6 ms-1"></i>
+                                            </a>
+                                        </div>
+                                        -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!--end::Content container-->
+            </div>
+            <!--end::Content-->
+        </div>
+        <!--end::Content wrapper-->
+    </div>
+    <!--end::App main-->
+
+    <!-- JavaScript -->
+    <script th:inline="javascript">
+        // CSRF 토큰 설정
+        window.csrfToken = /*[[${_csrf != null ? _csrf.token : ''}]]*/ '';
+        window.csrfHeader = /*[[${_csrf != null ? _csrf.headerName : 'X-CSRF-TOKEN'}]]*/ 'X-CSRF-TOKEN';
+        
+        // 전역 변수
+        let currentPage = 0;
+        let pageSize = 10;
+        let totalPages = 0;
+        let totalElements = 0;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // 현재 날짜/시간 설정
+            setCurrentDateTime();
+            
+            // 브랜드 변경 시 기본 은행 설정
+            selectBrand('RENOMA');
+            
+            // 폼 제출 이벤트
+            document.getElementById('paymentRegisterForm').addEventListener('submit', handleFormSubmit);
+            
+            // 검색 필터 이벤트 설정
+            setupSearchEvents();
+            
+            // 초기 데이터 로드
+            loadPaymentList();
+        });
+
+        // 검색 이벤트 설정
+        function setupSearchEvents() {
+            // 엔터키로 검색
+            document.getElementById('searchKeyword').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchPayments();
+                }
+            });
+            
+            // 날짜 필드 기본값 설정 (최근 1개월)
+            const endDate = new Date();
+            const startDate = new Date();
+            startDate.setMonth(startDate.getMonth() - 1);
+            
+            document.getElementById('searchEndDate').value = endDate.toISOString().split('T')[0];
+            document.getElementById('searchStartDate').value = startDate.toISOString().split('T')[0];
+        }
+
+        // 브랜드 선택 (입금 등록 폼 전용)
+        function selectBrand(brand) {
+            // 버튼 스타일 업데이트
+            document.querySelectorAll('.brand-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-brand="${brand}"]`).classList.add('active');
+            
+            // 히든 필드 업데이트
+            document.getElementById('selectedBrand').value = brand;
+            
+            // 기본 은행 설정
+            const defaultBanks = {
+                'RENOMA': '우리은행',
+                'CORALIQUE': '하나은행'
+            };
+            
+            document.getElementById('bankName').value = defaultBanks[brand] || '';
+            
+            // 사이트명 필터링
+            filterSiteOptions(brand);
+            
+            // 주의: 입금내역 조회에는 영향을 주지 않음
+        }
+
+        // 브랜드에 따른 사이트명 옵션 필터링
+        function filterSiteOptions(selectedBrand) {
+            const siteSelect = document.getElementById('siteName');
+            
+            // 모든 사이트 옵션 데이터 (한번만 정의)
+            const allSiteOptions = {
+                'RENOMA': [
+                    '29CM-레노마', '롯데온-레노마', '무신사-레노마', '스토어팜-레노마', 
+                    '자사몰-레노마', '지그재그-레노마', '브랜디-레노마', '패션모아-레노마', 
+                    '하플글림-레노마', 'SSG-레노마', 'W컨셉-레노마'
+                ],
+                'CORALIQUE': [
+                    '29CM-코랄리크', '무신사-코랄리크', '자사몰-코랄리크', '지그재그-코랄리크', 
+                    'CJ오쇼핑-코랄리크', 'SSG-코랄리크', 'W컨셉-코랄리크', 'EQL-코랄리크', 
+                    'LF몰-코랄리크', '스토어팜-코랄리크'
+                ]
+            };
+            
+            // 기존 옵션 모두 제거 (첫 번째 "선택하세요" 제외)
+            const options = siteSelect.querySelectorAll('option');
+            for (let i = options.length - 1; i > 0; i--) {
+                options[i].remove();
+            }
+            
+            // 선택된 브랜드의 사이트들만 추가
+            const sitesForBrand = allSiteOptions[selectedBrand] || [];
+            sitesForBrand.forEach(site => {
+                const option = document.createElement('option');
+                option.value = site;
+                option.textContent = site;
+                siteSelect.appendChild(option);
+            });
+            
+            // 사이트명 선택 초기화
+            siteSelect.value = '';
+        }
+
+        // 현재 날짜/시간 설정
+        function setCurrentDateTime() {
+            const now = new Date();
+            const date = now.toISOString().split('T')[0];
+            const time = now.toTimeString().slice(0, 5);
+            
+            document.querySelector('input[name="paymentDate"]').value = date;
+            document.querySelector('input[name="paymentTime"]').value = time;
+        }
+
+        // 폼 제출 처리
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            
+            // 로딩 표시
+            const submitBtn = document.querySelector('.btn-register');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="spinner-border spinner-border-sm me-2"></i>등록 중...';
+            submitBtn.disabled = true;
+            
+            // 폼 데이터 수집
+            const formData = new FormData(event.target);
+            
+            // 날짜와 시간을 합쳐서 timestamp로 변환
+            const paymentDate = formData.get('paymentDate');
+            const paymentTime = formData.get('paymentTime');
+            const paymentDateTime = `${paymentDate}T${paymentTime}:00`;
+            
+            // 서버로 전송할 데이터 준비
+            const submitData = {
+                brand: formData.get('brand'),
+                siteName: formData.get('siteName'),
+                bankName: formData.get('bankName'),
+                customerName: formData.get('customerName'),
+                amount: parseInt(formData.get('amount')),
+                paymentDate: paymentDateTime,
+                notes: formData.get('notes') || ''
+            };
+            
+            console.log('제출 데이터:', submitData);
+            
+            // API 호출
+            fetch('/payment/api/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [window.csrfHeader]: window.csrfToken
+                },
+                body: JSON.stringify(submitData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('서버 응답:', data);
+                
+                if (data.success) {
+                    // 성공 메시지
+                    showSuccessMessage('입금 정보가 성공적으로 등록되었습니다.');
+                    
+                    // 폼 초기화
+                    resetForm();
+                    
+                    // 최근 입금 내역 새로고침
+                    refreshRecentPayments();
+                    
+                    // 오늘 카운트 업데이트
+                    updateTodayCount();
+                } else {
+                    showErrorMessage(data.message || '등록 중 오류가 발생했습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('등록 오류:', error);
+                showErrorMessage('등록 중 오류가 발생했습니다. 다시 시도해주세요.');
+            })
+            .finally(() => {
+                // 버튼 복원
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            });
+        }
+
+        // 폼 초기화
+        function resetForm() {
+            document.getElementById('paymentRegisterForm').reset();
+            setCurrentDateTime();
+            selectBrand('RENOMA');
+        }
+
+        // 성공 메시지 표시
+        function showSuccessMessage(message) {
+            showToast(message, 'success', 'ki-check-circle');
+        }
+        
+        // 오류 메시지 표시
+        function showErrorMessage(message) {
+            showToast(message, 'error', 'ki-cross-circle');
+        }
+        
+        // 토스트 메시지 표시 공통 함수
+        function showToast(message, type, icon) {
+            const toastColor = type === 'success' ? '#28a745' : '#dc3545';
+            const toastBg = type === 'success' ? 'linear-gradient(135deg, #28a745, #20c997)' : 'linear-gradient(135deg, #dc3545, #c82333)';
+            
+            const alertHtml = `
+                <div class="alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed" 
+                     style="top: 20px; right: 20px; z-index: 9999; min-width: 300px; background: ${toastBg}; border: none; color: white;">
+                    <i class="ki-duotone ${icon} fs-2 me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', alertHtml);
+            
+            // 5초 후 자동 제거
+            setTimeout(() => {
+                const alert = document.querySelector('.alert:last-child');
+                if (alert) {
+                    alert.remove();
+                }
+            }, 5000);
+        }
+        
+        // 검색 실행
+        function searchPayments() {
+            currentPage = 0; // 검색 시 첫 페이지로 이동
+            loadPaymentList();
+        }
+
+        // 검색 초기화
+        function resetSearch() {
+            document.getElementById('searchKeyword').value = '';
+            document.getElementById('searchBrand').value = '';
+            document.getElementById('searchStatus').value = '';
+            
+            // 날짜 필드 초기화 (최근 1개월)
+            const endDate = new Date();
+            const startDate = new Date();
+            startDate.setMonth(startDate.getMonth() - 1);
+            
+            document.getElementById('searchEndDate').value = endDate.toISOString().split('T')[0];
+            document.getElementById('searchStartDate').value = startDate.toISOString().split('T')[0];
+            
+            currentPage = 0;
+            loadPaymentList();
+        }
+
+        // 입금 내역 목록 로드
+        function loadPaymentList() {
+            const spinner = document.getElementById('loadingSpinner');
+            const paymentList = document.getElementById('paymentList');
+            
+            if (spinner) {
+                spinner.style.display = 'block';
+            }
+
+            // 검색 파라미터 수집
+            const searchParams = {
+                page: currentPage,
+                size: pageSize,
+                keyword: document.getElementById('searchKeyword').value.trim(),
+                startDate: document.getElementById('searchStartDate').value,
+                endDate: document.getElementById('searchEndDate').value
+            };
+
+            // 브랜드 필터
+            const brand = document.getElementById('searchBrand').value;
+            if (brand) {
+                searchParams.brand = brand;
+            }
+
+            // 상태 필터
+            const status = document.getElementById('searchStatus').value;
+            if (status) {
+                searchParams.mappingStatus = status;
+            }
+
+            console.log('검색 파라미터:', searchParams);
+
+            // URL 파라미터 생성
+            const urlParams = new URLSearchParams();
+            Object.keys(searchParams).forEach(key => {
+                if (searchParams[key] !== '' && searchParams[key] !== null && searchParams[key] !== undefined) {
+                    urlParams.append(key, searchParams[key]);
+                }
+            });
+
+            fetch(`/payment/api/list?${urlParams.toString()}`)
+                .then(response => {
+                    console.log('HTTP 응답 상태:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('전체 API 응답:', data);
+                    console.log('success 값:', data.success);
+                    console.log('content 데이터:', data.content);
+                    console.log('totalElements 값:', data.totalElements);
+                    
+                    if (data.success) {
+                        // 페이징 정보 업데이트
+                        totalElements = data.totalElements || 0;
+                        totalPages = data.totalPages || 0;
+                        
+                        console.log('설정된 totalElements:', totalElements);
+                        console.log('설정된 totalPages:', totalPages);
+                        
+                        // 리스트 업데이트
+                        const contentData = data.content || [];
+                        console.log('업데이트할 컨텐츠:', contentData);
+                        updatePaymentList(contentData);
+                        
+                        // 통계 정보 업데이트
+                        updateSearchStats();
+                        
+                        // 페이징 UI 업데이트
+                        updatePagination();
+                    } else {
+                        console.error('API 실패:', data.message);
+                        showErrorMessage(data.message || '입금 내역 조회에 실패했습니다.');
+                        updatePaymentList([]);
+                    }
+                })
+                .catch(error => {
+                    console.error('입금 내역 로드 오류:', error);
+                    showErrorMessage('입금 내역을 불러오는 중 오류가 발생했습니다.');
+                    updatePaymentList([]);
+                })
+                .finally(() => {
+                    if (spinner) {
+                        spinner.style.display = 'none';
+                    }
+                });
+        }
+
+        // 최근 입금 내역 새로고침 (기존 함수명 유지, 새 구현)
+        function refreshRecentPayments() {
+            loadPaymentList();
+        }
+        
+        // 입금 내역 리스트 업데이트
+        function updatePaymentList(payments) {
+            console.log('updatePaymentList 호출됨. payments:', payments);
+            console.log('payments 타입:', typeof payments);
+            console.log('payments 길이:', payments ? payments.length : 'undefined');
+            
+            const listContainer = document.getElementById('paymentList');
+            
+            if (!payments || payments.length === 0) {
+                console.log('빈 상태 처리');
+                listContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="ki-duotone ki-information-2"></i>
+                        <p>검색 조건에 맞는 입금 내역이 없습니다.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const itemsHtml = payments.map(payment => {
+                // Oracle Map 키는 대문자로 반환됨
+                const customerName = payment.CUSTOMERNAME || payment.customerName || '';
+                const bankName = payment.BANKNAME || payment.bankName || '';
+                const siteName = payment.SITENAME || payment.siteName || '';
+                const brand = payment.BRAND || payment.brand || '';
+                const amount = payment.AMOUNT || payment.amount || 0;
+                const mappingStatus = payment.MAPPINGSTATUS || payment.mappingStatus || 'PENDING';
+                const registerDate = payment.REGISTERDATE || payment.registerDate || '';
+                const paymentDate = payment.PAYMENTDATE || payment.paymentDate || '';
+                const registerId = payment.REGISTERID || payment.registerId || '';
+                const notes = payment.NOTES || payment.notes || '';
+                
+                // 입금 시간 추출 (PAYMENT_DATE에서)
+                let paymentTimeStr = '';
+                if (paymentDate && typeof paymentDate === 'string' && paymentDate.length >= 16) {
+                    paymentTimeStr = paymentDate.substring(11, 16); // HH:mm 추출
+                } else if (paymentDate) {
+                    try {
+                        paymentTimeStr = new Date(paymentDate).toLocaleTimeString('ko-KR', {hour: '2-digit', minute: '2-digit'});
+                    } catch (e) {
+                        paymentTimeStr = '';
+                    }
+                }
+                
+                // 입금 날짜 추출 (PAYMENT_DATE에서)
+                let paymentDateStr = '';
+                if (paymentDate && typeof paymentDate === 'string' && paymentDate.length >= 10) {
+                    paymentDateStr = paymentDate.substring(0, 10); // YYYY-MM-DD 추출
+                } else if (paymentDate) {
+                    try {
+                        paymentDateStr = new Date(paymentDate).toLocaleDateString('ko-KR');
+                    } catch (e) {
+                        paymentDateStr = '';
+                    }
+                }
+                
+                // 브랜드 표시명 변환
+                const brandDisplayName = brand === 'RENOMA' ? '레노마' : brand === 'CORALIQUE' ? '코랄리크' : brand;
+                const brandClass = brand.toLowerCase() === 'renoma' ? 'renoma' : 'coralique';
+                
+                return `
+                    <div class="payment-item" data-id="${registerId}">
+                        <div class="payment-info">
+                            <div class="payment-brand-customer">
+                                <span class="brand-badge ${brandClass}">${brandDisplayName}</span>
+                                <span class="customer-name">${customerName}</span>
+                            </div>
+                            <div class="payment-details">
+                                <div class="payment-bank-time">
+                                    <i class="ki-duotone ki-bank fs-6 me-1"></i>
+                                    ${bankName} • ${paymentTimeStr}
+                                </div>
+                                <div class="payment-date">
+                                    <i class="ki-duotone ki-calendar fs-6 me-1"></i>
+                                    ${paymentDateStr}
+                                </div>
+                                ${siteName ? `<div class="payment-site"><i class="ki-duotone ki-shop fs-6 me-1"></i>${siteName}</div>` : ''}
+                                ${notes ? `<div class="payment-notes"><i class="ki-duotone ki-notepad fs-6 me-1"></i>${notes}</div>` : ''}
+                            </div>
+                        </div>
+                        <div>
+                            <div class="payment-amount">${Number(amount).toLocaleString()}원</div>
+                            <div class="payment-status ${mappingStatus === 'PENDING' ? 'status-pending' : 'status-mapped'}">
+                                ${mappingStatus === 'PENDING' ? '미매핑' : '매핑완료'}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            listContainer.innerHTML = itemsHtml;
+        }
+
+        // 검색 통계 정보 업데이트
+        function updateSearchStats() {
+            const totalCountEl = document.getElementById('totalCount');
+            const currentRangeEl = document.getElementById('currentRange');
+            
+            const startIndex = (currentPage * pageSize) + 1;
+            const endIndex = Math.min((currentPage + 1) * pageSize, totalElements);
+            
+            totalCountEl.textContent = totalElements.toLocaleString();
+            currentRangeEl.textContent = totalElements > 0 ? `${startIndex}-${endIndex}` : '0';
+        }
+
+        // 페이징 UI 업데이트
+        function updatePagination() {
+            const paginationList = document.getElementById('paginationList');
+            
+            if (totalPages <= 1) {
+                paginationList.innerHTML = '';
+                return;
+            }
+            
+            let paginationHtml = '';
+            
+            // 이전 버튼
+            paginationHtml += `
+                <li class="page-item ${currentPage === 0 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="goToPage(${currentPage - 1})" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            `;
+            
+            // 페이지 번호들
+            const startPage = Math.max(0, currentPage - 2);
+            const endPage = Math.min(totalPages - 1, currentPage + 2);
+            
+            if (startPage > 0) {
+                paginationHtml += `<li class="page-item"><a class="page-link" href="#" onclick="goToPage(0)">1</a></li>`;
+                if (startPage > 1) {
+                    paginationHtml += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+                }
+            }
+            
+            for (let i = startPage; i <= endPage; i++) {
+                paginationHtml += `
+                    <li class="page-item ${i === currentPage ? 'active' : ''}">
+                        <a class="page-link" href="#" onclick="goToPage(${i})">${i + 1}</a>
+                    </li>
+                `;
+            }
+            
+            if (endPage < totalPages - 1) {
+                if (endPage < totalPages - 2) {
+                    paginationHtml += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+                }
+                paginationHtml += `<li class="page-item"><a class="page-link" href="#" onclick="goToPage(${totalPages - 1})">${totalPages}</a></li>`;
+            }
+            
+            // 다음 버튼
+            paginationHtml += `
+                <li class="page-item ${currentPage === totalPages - 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="goToPage(${currentPage + 1})" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            `;
+            
+            paginationList.innerHTML = paginationHtml;
+        }
+
+        // 페이지 이동
+        function goToPage(page) {
+            if (page < 0 || page >= totalPages || page === currentPage) {
+                return;
+            }
+            
+            currentPage = page;
+            loadPaymentList();
+        }
+
+        // 최근 입금 내역 UI 업데이트 (기존 함수명 유지, 새 구현으로 리다이렉트)
+        function updateRecentPaymentsList(payments) {
+            updatePaymentList(payments);
+        }
+        
+        // 오늘 카운트 업데이트
+        function updateTodayCount() {
+            fetch('/payment/api/today-count')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const countElement = document.getElementById('todayCount');
+                        if (countElement) {
+                            countElement.textContent = `${data.count}건`;
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('오늘 카운트 업데이트 오류:', error);
+                });
+        }
+    </script>
+</div>
+</html> 
