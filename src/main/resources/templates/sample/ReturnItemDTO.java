@@ -62,10 +62,10 @@ public class ReturnItemDTO {
 
     // 배송비 입금 상태 텍스트 반환
     public String getPaymentStatusText() {
-        // 🔥 배송비가 "입금필요" 또는 "입금대기"인 경우 우선 처리
+        // 🔥 배송비가 "입금예정"인 경우 우선 처리
         if (shippingFee != null) {
-            if (shippingFee.equals("입금필요") || shippingFee.equals("입금대기")) {
-                return "입금필요";
+            if (shippingFee.equals("입금예정")) {
+                return "입금예정";
             }
         }
         
@@ -73,7 +73,7 @@ public class ReturnItemDTO {
         if (paymentStatus == null) return "입금불필요";
         
         switch (paymentStatus) {
-            case "PENDING": return "입금필요";
+            case "PENDING": return "입금예정";
             case "COMPLETED": return "입금완료";
             case "NOT_REQUIRED": return "입금불필요";
             default: return paymentStatus;
@@ -88,8 +88,8 @@ public class ReturnItemDTO {
             return false;
         }
         
-        // 🔥 배송비가 "입금필요" 또는 "입금대기"인 경우 입금 완료 확인 필요
-        if (shippingFee != null && (shippingFee.equals("입금필요") || shippingFee.equals("입금대기"))) {
+        // 🔥 배송비가 "입금예정"인 경우 입금 완료 확인 필요
+        if (shippingFee != null && shippingFee.equals("입금예정")) {
             return paymentStatus != null && paymentStatus.equals("COMPLETED");
         }
         

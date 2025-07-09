@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/default}">
+<head>
+    <title>배송비 입금 매핑 대시보드</title>
+    
+    <!-- JavaScript 실행 확인용 스크립트 -->
+    <script>
+        // console.log('🔥 HEAD 섹션에서 실행됨');
+    </script>
+
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --primary-light: #eef2ff;
+            --secondary-color: #3f37c9;
+            --accent-color: #4cc9f0;
+            --warning-color: #f72585;
+            --success-color: #35b27f;
+            --danger-color: #ff4d6d;
+            --info-color: #4a6fff;
+            --dark-color: #1e2a3b;
+            --text-color: #2d3748;
+            --text-muted: #718096;
+            --bg-color: #f8fafc;
+            --bg-card: #ffffff;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius-sm: 0.375rem;
+            --radius: 0.5rem;
+            --radius-lg: 0.75rem;
+            --transition: all 0.2s ease;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            line-height: 1.6;
+        }
+
+        .dashboard-container {
+            max-width: 100%;
+            margin: 0;
+            padding: 1rem;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            color: white;
+            margin-bottom: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 60%);
+            transform: rotate(30deg);
+        }
+
+        .dashboard-header h1 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+
+        .dashboard-header p {
+            margin: 0.25rem 0 0;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+            font-size: 0.8rem;
+        }
+
+        /* 통계 대시보드 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .stat-card h3 {
+            margin: 0 0 0.25rem 0;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-card .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--dark-color);
+        }
+
+        .stat-card.primary .value { color: var(--primary-color); }
+        .stat-card.success .value { color: var(--success-color); }
+        .stat-card.warning .value { color: var(--warning-color); }
+        .stat-card.info .value { color: var(--info-color); }
+
+        /* 메인 그리드 레이아웃 */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1rem;
+            align-items: start;
+        }
+
+        /* 입금 내역 섹션 */
+        .payments-section {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .section-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-header h2 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: var(--radius);
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #2a9d6f;
+            transform: translateY(-1px);
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background-color: #e91e63;
+            transform: translateY(-1px);
+        }
+
+        /* 입금 내역 테이블 */
+        .payments-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .payments-table th,
+        .payments-table td {
+            padding: 0.5rem 0.25rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.75rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .payments-table th {
+            background-color: var(--bg-color);
+            font-weight: 600;
+            color: var(--text-color);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .payments-table tbody tr {
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .payments-table tbody tr:hover {
+            background-color: var(--primary-light);
+        }
+
+        .payments-table tbody tr.selected {
+            background-color: var(--primary-light);
+            border-left: 3px solid var(--primary-color);
+        }
+
+        /* 후보 섹션 */
+        .candidates-section {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            position: sticky;
+            top: 1rem;
+        }
+
+        .candidate-card {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .candidate-card:hover {
+            background-color: var(--bg-color);
+        }
+
+        .candidate-card:last-child {
+            border-bottom: none;
+        }
+
+        .candidate-card.selected {
+            background-color: var(--primary-light);
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .candidate-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .candidate-name {
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .match-score {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .match-score.high {
+            background-color: rgba(53, 178, 127, 0.1);
+            color: var(--success-color);
+        }
+
+        .match-score.medium {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+        }
+
+        .match-score.low {
+            background-color: rgba(247, 37, 133, 0.1);
+            color: var(--warning-color);
+        }
+
+        .candidate-details {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            line-height: 1.3;
+        }
+
+        .candidate-details div {
+            margin-bottom: 0.15rem;
+        }
+
+        /* 매핑 액션 */
+        .mapping-actions {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--bg-color);
+            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+        }
+
+        .mapping-actions .btn {
+            width: 100%;
+            justify-content: center;
+            margin-bottom: 0.5rem;
+        }
+
+        /* 최근 매핑 내역 */
+        .recent-mappings {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            margin-top: 2rem;
+        }
+
+        .mapping-item {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mapping-item:last-child {
+            border-bottom: none;
+        }
+
+        .mapping-info {
+            flex: 1;
+        }
+
+        .mapping-customer {
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .mapping-details {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .mapping-status {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background-color: rgba(53, 178, 127, 0.1);
+            color: var(--success-color);
+        }
+
+        /* 로딩 상태 */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            color: var(--text-muted);
+        }
+
+        .loading::before {
+            content: '';
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid var(--border-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 버튼 호버 효과 */
+        .btn-success:hover {
+            background: #059669 !important;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-outline-danger:hover {
+            background: #ef4444 !important;
+            color: white !important;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+        }
+
+        /* 반응형 */
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .candidates-section {
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .dashboard-container {
+                padding: 0.5rem;
+            }
+            
+            .payments-table {
+                font-size: 0.75rem;
+            }
+            
+            .payments-table th,
+            .payments-table td {
+                padding: 0.75rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="dashboard-container">
+            <!-- 헤더 -->
+            <div class="dashboard-header">
+                <h1>🎯 배송비 입금 매핑 대시보드</h1>
+                <p>💡 통장 입금 내역 → 교환/반품 후보 확인 → 수동 매핑으로 간편하게 처리하세요<br/>
+                ⚠️ 자동 매핑은 현실적 제약으로 인해 불가능합니다 (동명이인, 대리입금, 연락처 부재 등)</p>
+            </div>
+            
+            <!-- 성공 메시지 -->
+            <div th:if="${successMessage}" class="alert alert-success" style="background: #d1fae5; color: #065f46; padding: 0.75rem; border-radius: 8px; margin-bottom: 0.75rem; border: 1px solid #a7f3d0; font-size: 0.9rem;">
+                <i class="fas fa-check-circle me-2"></i>
+                <span th:text="${successMessage}">성공 메시지</span>
+            </div>
+            
+            <!-- 통계 대시보드 -->
+            <div class="stats-grid">
+                <div class="stat-card primary">
+                    <h3>총 입금 내역</h3>
+                    <p class="value" th:text="${stats?.totalPayments ?: 0}">0</p>
+                </div>
+                <div class="stat-card warning">
+                    <h3>미매핑 건수</h3>
+                    <p class="value" th:text="${stats?.pendingPayments ?: 0}">0</p>
+                </div>
+                <div class="stat-card success">
+                    <h3>매핑 완료</h3>
+                    <p class="value" th:text="${stats?.mappedPayments ?: 0}">0</p>
+                </div>
+                <div class="stat-card info">
+                    <h3>오늘 매핑</h3>
+                    <p class="value" th:text="${stats?.todayMapped ?: 0}">0</p>
+                </div>
+            </div>
+            
+            <!-- 입금 내역 필터 섹션 -->
+            <div class="payments-section" style="margin-bottom: 1rem;">
+                <div class="section-header">
+                    <h2>🔍 입금 내역 필터</h2>
+                    <div>
+                        <a href="/shipping-payment/register" class="btn btn-primary">
+                            ➕ 입금 등록
+                        </a>
+                        <button class="btn btn-primary" id="refreshBtn">
+                            🔄 새로고침
+                        </button>
+                    </div>
+                </div>
+                
+                <div style="padding: 0.75rem 1rem;">
+                    <div class="filter-buttons" style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem; flex-wrap: wrap;">
+                        <button class="btn" id="filterAll" style="padding: 0.5rem 1rem; border: 2px solid var(--border-color); border-radius: 25px; background: var(--primary-color); color: white;">
+                            📋 전체
+                        </button>
+                        <button class="btn" id="filterUnmapped" style="padding: 0.5rem 1rem; border: 2px solid var(--border-color); border-radius: 25px; background: white; color: var(--text-muted);">
+                            ⏳ 미매핑
+                        </button>
+                        <button class="btn" id="filterMapped" style="padding: 0.5rem 1rem; border: 2px solid var(--border-color); border-radius: 25px; background: white; color: var(--text-muted);">
+                            ✅ 매핑완료
+                        </button>
+                        <button class="btn" id="filterRenoma" style="padding: 0.5rem 1rem; border: 2px solid var(--border-color); border-radius: 25px; background: white; color: var(--text-muted);">
+                            💎 레노마
+                        </button>
+                        <button class="btn" id="filterCoralik" style="padding: 0.5rem 1rem; border: 2px solid var(--border-color); border-radius: 25px; background: white; color: var(--text-muted);">
+                            💖 코랄리크
+                        </button>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <input type="text" id="searchCustomerName" class="form-control" placeholder="고객명 검색" style="padding: 0.5rem; border: 1px solid var(--border-color); border-radius: var(--radius);">
+                        <input type="number" id="searchAmount" class="form-control" placeholder="입금금액 검색" style="padding: 0.5rem; border: 1px solid var(--border-color); border-radius: var(--radius);">
+                        <input type="text" id="searchSiteName" class="form-control" placeholder="사이트명 검색" style="padding: 0.5rem; border: 1px solid var(--border-color); border-radius: var(--radius);">
+                        <button class="btn btn-primary" id="searchBtn" style="padding: 0.5rem 1rem;">
+                            🔍 검색
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 메인 그리드 -->
+            <div class="main-grid">
+                <!-- 입금 내역 섹션 -->
+                <div class="payments-section">
+                    <div class="section-header">
+                        <h2>💰 입금 내역</h2>
+                        <div>
+                            <button class="btn btn-success" disabled style="opacity: 0.5; cursor: not-allowed;" title="통장 입금 내역만으로는 정확한 자동 매핑이 불가능합니다" id="autoMappingBtn">
+                                🤖 자동 매핑 (비활성화)
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div style="max-height: 400px; overflow-y: auto;">
+                        <table class="payments-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 100px;">입금자명</th>
+                                    <th style="width: 60px;">연락처</th>
+                                    <th style="width: 80px;">금액</th>
+                                    <th style="width: 60px;">입금일</th>
+                                    <th style="width: 60px;">브랜드</th>
+                                    <th style="width: 120px;">사이트</th>
+                                    <th style="width: 60px;">상태</th>
+                                    <th style="width: 50px;">관리</th>
+                                </tr>
+                            </thead>
+                            <tbody id="paymentsTableBody">
+                                <tr th:each="payment : ${allPayments}" 
+                                    th:attr="data-payment-id=${payment.registerId},data-mapping-status=${payment.mappingStatus}"
+                                    style="cursor: pointer;">
+                                    <td class="candidate-name" th:text="${payment.customerName}">김민수</td>
+                                    <td th:text="${payment.customerPhone != null and payment.customerPhone.length() > 8 ? payment.customerPhone.substring(payment.customerPhone.length() - 4) : payment.customerPhone ?: ''}">5678</td>
+                                    <td style="text-align: right; font-weight: 600;" 
+                                        th:text="${payment.amount != null ? #numbers.formatInteger(payment.amount, 0, 'COMMA') + '원' : ''}">3,000원</td>
+                                    <td th:text="${payment.paymentDate != null ? #temporals.format(payment.paymentDate, 'MM-dd') : ''}">12-25</td>
+                                    <td>
+                                        <span style="padding: 0.25rem 0.5rem; border-radius: 15px; font-size: 0.75rem; font-weight: 600; color: white;"
+                                              th:style="${payment.brand == 'RENOMA'} ? 'background-color: #059669;' : 'background-color: #dc2626;'"
+                                              th:text="${payment.brand == 'RENOMA'} ? '레노마' : '코랄리크'">레노마</span>
+                                    </td>
+                                    <td th:text="${payment.siteName ?: ''}">자사몰-레노마</td>
+                                    <td>
+                                        <span style="padding: 0.25rem 0.5rem; border-radius: 15px; font-size: 0.75rem; font-weight: 600;"
+                                              th:style="${payment.mappingStatus == 'MAPPED'} ? 'background-color: #d1fae5; color: #065f46;' : 'background-color: #fef3c7; color: #92400e;'"
+                                              th:text="${payment.mappingStatus == 'MAPPED'} ? '매핑완료' : '미매핑'">미매핑</span>
+                                    </td>
+                                    <td>
+                                        <button th:if="${payment.mappingStatus == 'PENDING'}" 
+                                                class="btn btn-success" 
+                                                style="padding: 0.25rem 0.5rem; font-size: 0.75rem; background: #10b981; border: none; color: white; border-radius: 4px;"
+                                                th:onclick="'selectPayment(' + ${payment.registerId} + ')'"
+                                                onclick="event.stopPropagation();"
+                                                title="매핑 실행">
+                                            ✅ 매핑
+                                        </button>
+                                        <button th:if="${payment.mappingStatus == 'MAPPED'}" 
+                                                class="btn btn-outline-danger" 
+                                                style="padding: 0.25rem 0.5rem; font-size: 0.75rem; background: white; border: 1px solid #ef4444; color: #ef4444; border-radius: 4px;"
+                                                th:onclick="'cancelMapping(' + ${payment.registerId} + ')'"
+                                                onclick="event.stopPropagation();"
+                                                title="매핑 취소">
+                                            🗑️ 취소
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr th:if="${allPayments == null or allPayments.empty}">
+                                    <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                                        등록된 입금 내역이 없습니다.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- 후보 섹션 -->
+                <div class="candidates-section">
+                    <div class="section-header">
+                        <h2>🔍 교환/반품 후보</h2>
+                    </div>
+                    
+                    <!-- 후보 검색 -->
+                    <div id="candidatesSearchContainer" style="display: none; padding: 0.75rem 1rem; background: #f8fafc; border-bottom: 1px solid var(--border-color);">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 0.5rem; align-items: center;">
+                            <input type="text" id="candidateSearchName" class="form-control" placeholder="고객명 검색" 
+                                   style="padding: 0.5rem; border: 1px solid var(--border-color); border-radius: var(--radius); font-size: 0.9rem;">
+                            <input type="text" id="candidateSearchOrder" class="form-control" placeholder="주문번호 검색" 
+                                   style="padding: 0.5rem; border: 1px solid var(--border-color); border-radius: var(--radius); font-size: 0.9rem;">
+                            <button class="btn btn-primary" id="candidateSearchBtn" 
+                                    style="padding: 0.5rem 1rem; font-size: 0.9rem; white-space: nowrap;">
+                                🔍 검색
+                            </button>
+                        </div>
+                        <div style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-muted);">
+                            💡 후보가 많을 때 이름이나 주문번호로 필터링하세요
+                        </div>
+                    </div>
+                    
+                    <div id="candidatesContainer" style="max-height: 300px; overflow-y: auto;">
+                        <div class="loading" style="display: none;" id="candidatesLoading">
+                            후보를 검색하고 있습니다...
+                        </div>
+                        
+                        <div style="padding: 1rem; text-align: center; color: var(--text-muted); font-size: 0.8rem;" id="candidatesEmpty">
+                            입금 내역을 선택하면 매칭 가능한 교환/반품 후보가 표시됩니다.
+                        </div>
+                        
+                        <div id="candidatesList" style="display: none;">
+                            <!-- 후보 목록이 여기에 동적으로 추가됩니다 -->
+                        </div>
+                    </div>
+                    
+                    <div class="mapping-actions" id="mappingActions" style="display: none;">
+                        <button class="btn btn-primary" id="executeMappingBtn">
+                            ✅ 매핑 실행
+                        </button>
+                        <button class="btn btn-warning" id="cancelSelectionBtn">
+                            ❌ 선택 취소
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 최근 매핑 내역 (컴팩트) -->
+            <div class="recent-mappings" th:if="${recentMappings != null and !recentMappings.empty}" style="margin-top: 1rem;">
+                <div class="section-header" style="padding: 0.75rem 1rem;">
+                    <h2 style="font-size: 1rem; margin: 0;">📋 최근 매핑 내역</h2>
+                    <small style="color: var(--text-muted);">최근 3건</small>
+                </div>
+                
+                <div style="max-height: 150px; overflow-y: auto;">
+                    <div th:each="mapping, iterStat : ${recentMappings}" 
+                         th:if="${iterStat.index < 3}"
+                         class="mapping-item" 
+                         style="padding: 0.5rem 1rem; border-bottom: 1px solid var(--border-color);">
+                        <div class="mapping-info">
+                            <div class="mapping-customer" 
+                                 style="font-size: 0.8rem; font-weight: 600;"
+                                 th:text="${mapping.payment?.customerName + ' → ' + mapping.returnItem?.customerName}">
+                                김민수 → 김민수
+                            </div>
+                            <div class="mapping-details" style="font-size: 0.7rem; margin-top: 0.25rem;">
+                                <span th:text="${mapping.payment?.amount != null ? #numbers.formatInteger(mapping.payment.amount, 0, 'COMMA') + '원' : ''}">3,000원</span>
+                                <span th:text="' | ' + ${mapping.returnItem?.orderNumber}"> | 20250101-0001</span>
+                                <span th:if="${mapping.canShipExchange}" style="color: var(--success-color); font-weight: 600;"> | 🚚출고가능</span>
+                            </div>
+                        </div>
+                        <div class="mapping-status" style="font-size: 0.7rem; padding: 0.2rem 0.4rem;">완료</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <th:block layout:fragment="script">
+    <script>
+        // console.log('🔥 JavaScript 파일이 로드되었습니다!');
+        // console.log('🔥 현재 시간:', new Date());
+
+        // 전역 변수
+        let selectedPaymentId = null;
+        let selectedCandidateId = null;
+        let currentPaymentData = null;
+        let currentCandidates = [];
+        let originalCandidates = []; // 원본 후보 데이터 (검색용)
+        let allPaymentsData = []; // 전체 입금 데이터
+        let currentFilter = 'all'; // 현재 필터 상태
+        
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            // console.log('�� DOMContentLoaded 이벤트 발생!');
+            // console.log('매핑 대시보드 초기화');
+            // console.log('selectPayment 함수 정의됨:', typeof selectPayment);
+            
+            // 🚨 즉시 테스트용 로그
+            // console.log('🔥 DOM이 완전히 로드됨');
+            // console.log('🔥 현재 URL:', window.location.href);
+            
+            // 초기 데이터 수집
+            collectPaymentsData();
+            
+            // 테이블 행 클릭 이벤트 리스너 추가 - 안전성 검사 강화
+            const paymentTable = document.getElementById('paymentsTableBody');
+            // console.log('paymentTable 찾기:', paymentTable);
+            
+            if (paymentTable) {
+                // console.log('테이블 행 클릭 이벤트 리스너 등록됨');
+                paymentTable.addEventListener('click', function(e) {
+                    try {
+                        // 버튼 클릭은 행 선택으로 처리하지 않음
+                        if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+                            return;
+                        }
+                        
+                        // console.log('테이블 클릭 이벤트 발생:', e.target);
+                        const row = e.target.closest('tr');
+                        // console.log('가장 가까운 행:', row);
+                        // console.log('행의 data-payment-id:', row ? row.dataset.paymentId : 'null');
+                        
+                        if (row && row.dataset.paymentId && row.dataset.mappingStatus === 'PENDING') {
+                            // console.log('selectPayment 호출 시도:', row.dataset.paymentId);
+                            selectPayment(parseInt(row.dataset.paymentId));
+                        } else {
+                            // console.log('⚠️ 행이 없거나 이미 매핑된 상태임. mappingStatus:', row ? row.dataset.mappingStatus : 'null');
+                        }
+                    } catch (error) {
+                        // console.error('테이블 클릭 이벤트 오류:', error);
+                    }
+                });
+            } else {
+                // console.error('❌ paymentsTableBody를 찾을 수 없음');
+            }
+            
+            // 버튼 이벤트 리스너 추가 - 안전성 검사 강화
+            try {
+                const refreshBtn = document.getElementById('refreshBtn');
+                if (refreshBtn) {
+                    refreshBtn.addEventListener('click', refreshData);
+                    // console.log('✅ refreshBtn 이벤트 등록됨');
+                }
+                
+                const autoMappingBtn = document.getElementById('autoMappingBtn');
+                if (autoMappingBtn) {
+                    autoMappingBtn.addEventListener('click', executeAutoMapping);
+                    // console.log('✅ autoMappingBtn 이벤트 등록됨');
+                }
+                
+                const executeMappingBtn = document.getElementById('executeMappingBtn');
+                if (executeMappingBtn) {
+                    executeMappingBtn.addEventListener('click', executeMapping);
+                    // console.log('✅ executeMappingBtn 이벤트 등록됨');
+                }
+                
+                const cancelSelectionBtn = document.getElementById('cancelSelectionBtn');
+                if (cancelSelectionBtn) {
+                    cancelSelectionBtn.addEventListener('click', cancelSelection);
+                    // console.log('✅ cancelSelectionBtn 이벤트 등록됨');
+                }
+                
+                // 필터 버튼 이벤트 리스너
+                const filterButtons = ['filterAll', 'filterUnmapped', 'filterMapped', 'filterRenoma', 'filterCoralik'];
+                filterButtons.forEach(btnId => {
+                    const btn = document.getElementById(btnId);
+                    if (btn) {
+                        btn.addEventListener('click', () => applyFilter(btnId.replace('filter', '').toLowerCase()));
+                    }
+                });
+                
+                // 검색 버튼 이벤트 리스너
+                const searchBtn = document.getElementById('searchBtn');
+                if (searchBtn) {
+                    searchBtn.addEventListener('click', performSearch);
+                }
+                
+                // 엔터키로 검색
+                ['searchCustomerName', 'searchAmount', 'searchSiteName'].forEach(inputId => {
+                    const input = document.getElementById(inputId);
+                    if (input) {
+                        input.addEventListener('keypress', function(e) {
+                            if (e.key === 'Enter') {
+                                performSearch();
+                            }
+                        });
+                    }
+                });
+                
+                // 후보 검색 버튼 이벤트 리스너
+                const candidateSearchBtn = document.getElementById('candidateSearchBtn');
+                if (candidateSearchBtn) {
+                    candidateSearchBtn.addEventListener('click', performCandidateSearch);
+                }
+                
+                // 후보 검색 엔터키 이벤트
+                ['candidateSearchName', 'candidateSearchOrder'].forEach(inputId => {
+                    const input = document.getElementById(inputId);
+                    if (input) {
+                        input.addEventListener('keypress', function(e) {
+                            if (e.key === 'Enter') {
+                                performCandidateSearch();
+                            }
+                        });
+                    }
+                });
+                
+            } catch (error) {
+                // console.error('버튼 이벤트 리스너 등록 오류:', error);
+            }
+            
+            // 통계 새로고침 (5분마다)
+            setInterval(refreshStats, 5 * 60 * 1000);
+        });
+        
+        // 입금 내역 선택
+        function selectPayment(paymentId) {
+            // console.log('✅ selectPayment 함수 호출됨! paymentId:', paymentId);
+            
+            // 이전 선택 해제
+            const allRows = document.querySelectorAll('.payments-table tbody tr');
+            // console.log('기존 선택 해제할 행 개수:', allRows.length);
+            allRows.forEach(row => {
+                row.classList.remove('selected');
+            });
+            
+            // 새 선택 표시
+            const selectedRow = document.querySelector(`tr[data-payment-id="${paymentId}"]`);
+            // console.log('선택할 행 찾기:', selectedRow);
+            if (selectedRow) {
+                selectedRow.classList.add('selected');
+                // console.log('✅ 행 선택 표시 완료');
+            } else {
+                // console.error('❌ 선택할 행을 찾을 수 없음');
+            }
+            
+            selectedPaymentId = paymentId;
+            selectedCandidateId = null;
+            
+            // console.log('후보 조회 시작...');
+            loadCandidates(paymentId);
+        }
+        
+        // 후보 조회
+        async function loadCandidates(paymentId) {
+            // console.log('�� loadCandidates 함수 호출됨! paymentId:', paymentId);
+            
+            try {
+                const candidatesContainer = document.getElementById('candidatesContainer');
+                const candidatesLoading = document.getElementById('candidatesLoading');
+                const candidatesEmpty = document.getElementById('candidatesEmpty');
+                const candidatesList = document.getElementById('candidatesList');
+                const mappingActions = document.getElementById('mappingActions');
+                
+                // console.log('DOM 요소들 찾기:');
+                // console.log('- candidatesContainer:', candidatesContainer);
+                // console.log('- candidatesLoading:', candidatesLoading);
+                // console.log('- candidatesEmpty:', candidatesEmpty);
+                // console.log('- candidatesList:', candidatesList);
+                // console.log('- mappingActions:', mappingActions);
+                
+                // 필수 요소들이 없으면 오류 처리
+                if (!candidatesLoading || !candidatesEmpty || !candidatesList || !mappingActions) {
+                    // console.error('❌ 필수 DOM 요소를 찾을 수 없습니다.');
+                    return;
+                }
+            
+            // 로딩 상태 표시
+            // console.log('로딩 상태 표시...');
+            candidatesLoading.style.display = 'flex';
+            candidatesEmpty.style.display = 'none';
+            candidatesList.style.display = 'none';
+            mappingActions.style.display = 'none';
+            
+            try {
+                const url = `/shipping-payment/mapping/api/candidates/${paymentId}`;
+                // console.log('API 호출 URL:', url);
+                
+                const response = await fetch(url);
+                // console.log('응답 상태:', response.status, response.statusText);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    // console.error('API 오류 응답:', errorText);
+                    throw new Error(`후보 조회 실패: ${response.status} ${response.statusText}`);
+                }
+                
+                const candidates = await response.json();
+                currentCandidates = candidates;
+                originalCandidates = [...candidates]; // 원본 데이터 백업
+                
+                // console.log('후보 조회 완료:', candidates.length, '개');
+                // console.log('후보 데이터:', candidates);
+                
+                // 로딩 숨기기
+                candidatesLoading.style.display = 'none';
+                
+                if (candidates.length === 0) {
+                    candidatesEmpty.innerHTML = `
+                        <div style="padding: 2rem; text-align: center; color: var(--text-muted);">
+                            <p>💡 매칭 가능한 교환/반품 후보가 없습니다.</p>
+                            <p style="font-size: 0.8rem; margin-top: 1rem;">
+                                원인: PAYMENT_STATUS가 'PENDING'인 교환/반품 데이터가 없음<br/>
+                                해결: 교환/반품 등록 시 배송비를 "입금예정"으로 설정하세요
+                            </p>
+                        </div>
+                    `;
+                    candidatesEmpty.style.display = 'block';
+                    // 후보가 없으면 검색 컨테이너 숨김
+                    document.getElementById('candidatesSearchContainer').style.display = 'none';
+                } else {
+                    displayCandidates(candidates);
+                    candidatesList.style.display = 'block';
+                    // 후보가 있으면 검색 컨테이너 표시
+                    document.getElementById('candidatesSearchContainer').style.display = 'block';
+                    // 검색 입력란 초기화
+                    document.getElementById('candidateSearchName').value = '';
+                    document.getElementById('candidateSearchOrder').value = '';
+                }
+                
+            } catch (error) {
+                // console.error('후보 조회 오류:', error);
+                candidatesLoading.style.display = 'none';
+                candidatesEmpty.innerHTML = `
+                    <div style="padding: 2rem; text-align: center; color: var(--danger-color);">
+                        <p>❌ 후보 조회 중 오류가 발생했습니다.</p>
+                        <p style="font-size: 0.8rem; margin-top: 1rem;">
+                            오류: ${error.message}<br/>
+                            브라우저 개발자 도구(F12) → Console 탭에서 자세한 로그를 확인하세요
+                        </p>
+                    </div>
+                `;
+                candidatesEmpty.style.display = 'block';
+            }
+            } catch (error) {
+                // console.error('loadCandidates 함수 전체 오류:', error);
+            }
+        }
+        
+        // 후보 목록 표시
+        function displayCandidates(candidates) {
+            try {
+                const candidatesList = document.getElementById('candidatesList');
+                
+                if (!candidatesList) {
+                    // console.error('❌ candidatesList 요소를 찾을 수 없습니다.');
+                    return;
+                }
+                
+                candidatesList.innerHTML = candidates.map(candidate => {
+                    // 매핑 상태 확인
+                    const isAlreadyMapped = candidate.matchReason && candidate.matchReason.includes('이미 매핑됨');
+                    const isCompleted = candidate.paymentStatus === 'COMPLETED';
+                    const isPending = candidate.paymentStatus === 'PENDING';
+                    
+                    // 카드 스타일 결정
+                    let cardStyle = 'cursor: pointer;';
+                    let statusIcon = '';
+                    let statusText = '';
+                    
+                    if (isAlreadyMapped) {
+                        cardStyle += ' opacity: 0.7; border: 2px solid #fbbf24; background: #fef3c7;';
+                        statusIcon = '🔗';
+                        statusText = '이미 매핑됨';
+                    } else if (isCompleted) {
+                        cardStyle += ' border: 2px solid #10b981; background: #d1fae5;';
+                        statusIcon = '✅';
+                        statusText = '결제완료';
+                    } else if (isPending) {
+                        cardStyle += ' border: 2px solid #3b82f6; background: #dbeafe;';
+                        statusIcon = '⏳';
+                        statusText = '매핑 가능';
+                    }
+                    
+                    return `
+                    <div class="candidate-card" data-candidate-id="${candidate.returnItemId}" style="${cardStyle}">
+                        <div class="candidate-header">
+                            <span class="candidate-name">${candidate.customerName}</span>
+                            <span class="match-score ${candidate.matchLevel.toLowerCase()}">${candidate.matchScore}%</span>
+                        </div>
+                        <div class="candidate-details">
+                            <div><strong>주문:</strong> ${candidate.orderNumber || ''}</div>
+                            <div><strong>배송비:</strong> ${candidate.shippingFee ? candidate.shippingFee.toLocaleString() + '원' : candidate.paymentStatus || '입금예정'}</div>
+                            <div><strong>매칭:</strong> ${candidate.matchReason}</div>
+                            <div style="color: ${isAlreadyMapped ? '#f59e0b' : isCompleted ? '#059669' : '#3b82f6'}; font-weight: 600;">
+                                ${statusIcon} ${statusText}
+                            </div>
+                            ${candidate.canShipExchange ? '<div style="color: var(--success-color); font-weight: 600;">🚚 출고가능</div>' : ''}
+                        </div>
+                    </div>
+                    `;
+                }).join('');
+            
+            // 후보 카드 클릭 이벤트 리스너 추가
+            candidatesList.addEventListener('click', function(e) {
+                const card = e.target.closest('.candidate-card');
+                if (card && card.dataset.candidateId) {
+                    selectCandidate(parseInt(card.dataset.candidateId));
+                }
+            });
+            } catch (error) {
+                // console.error('displayCandidates 함수 오류:', error);
+            }
+        }
+        
+        // 후보 선택
+        function selectCandidate(candidateId) {
+            // console.log('후보 선택:', candidateId);
+            
+            // 선택된 카드 확인
+            const selectedCard = document.querySelector(`[data-candidate-id="${candidateId}"]`);
+            if (!selectedCard) {
+                // console.error('선택된 후보 카드를 찾을 수 없습니다.');
+                return;
+            }
+            
+            // 이미 매핑된 후보인지 확인
+            const isAlreadyMapped = selectedCard.style.opacity === '0.7' || 
+                                   selectedCard.innerHTML.includes('이미 매핑됨');
+            
+            if (isAlreadyMapped) {
+                alert('⚠️ 이미 다른 입금 내역과 매핑된 교환/반품입니다.\n\n참고용으로만 표시되며 새로운 매핑은 불가능합니다.');
+                return;
+            }
+            
+            // 이전 선택 해제
+            document.querySelectorAll('.candidate-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // 새 선택 표시
+            selectedCard.classList.add('selected');
+            
+            selectedCandidateId = candidateId;
+            
+            // 매핑 액션 버튼 표시
+            document.getElementById('mappingActions').style.display = 'block';
+        }
+        
+        // 매핑 실행
+        async function executeMapping() {
+            if (!selectedPaymentId || !selectedCandidateId) {
+                alert('입금 내역과 교환/반품을 모두 선택해주세요.');
+                return;
+            }
+            
+            const notes = prompt('매핑 메모를 입력하세요 (선택사항):');
+            
+            try {
+                const response = await fetch('/shipping-payment/mapping/api/execute', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        paymentId: selectedPaymentId,
+                        returnItemId: selectedCandidateId,
+                        mappedBy: '상담원', // 실제로는 로그인 사용자 정보
+                        notes: notes || ''
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('✅ ' + result.message);
+                    
+                    // 테이블 행 업데이트
+                    updatePaymentRowStatus(selectedPaymentId, 'MAPPED');
+                    
+                    // 통계 카드 업데이트
+                    updateStatsCards();
+                    
+                    // 선택 초기화
+                    cancelSelection();
+                } else {
+                    alert('❌ 매핑 실행 실패: ' + result.message);
+                }
+                
+            } catch (error) {
+                // console.error('매핑 실행 오류:', error);
+                alert('❌ 매핑 실행 중 오류가 발생했습니다.');
+            }
+        }
+        
+        // 선택 취소
+        function cancelSelection() {
+            selectedPaymentId = null;
+            selectedCandidateId = null;
+            
+            // 모든 선택 해제
+            document.querySelectorAll('.payments-table tbody tr, .candidate-card').forEach(element => {
+                element.classList.remove('selected');
+            });
+            
+            // 후보 섹션 초기화
+            document.getElementById('candidatesEmpty').style.display = 'block';
+            document.getElementById('candidatesList').style.display = 'none';
+            document.getElementById('mappingActions').style.display = 'none';
+            document.getElementById('candidatesSearchContainer').style.display = 'none'; // 검색 컨테이너 숨김
+            document.getElementById('candidatesEmpty').innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--text-muted);">입금 내역을 선택하면 매칭 가능한 교환/반품 후보가 표시됩니다.</div>';
+            
+            // 후보 데이터 초기화
+            originalCandidates = [];
+            currentCandidates = [];
+        }
+        
+        // 자동 매핑 실행 (비활성화됨)
+        async function executeAutoMapping() {
+            alert('❌ 자동 매핑은 현실적으로 불가능합니다.\n\n이유:\n• 통장 입금 내역에는 입금자명, 금액, 시간만 표시\n• 동명이인 문제 (김민수가 여러 명)\n• 입금자 ≠ 주문자 (가족이 대신 입금)\n• 연락처 정보 없음\n• 동일 금액 중복 문제\n\n👆 수동 매핑을 사용해주세요.');
+        }
+        
+        // 데이터 새로고침
+        function refreshData() {
+            window.location.reload();
+        }
+        
+        // 통계 새로고침
+        async function refreshStats() {
+            try {
+                const response = await fetch('/shipping-payment/mapping/api/stats');
+                const stats = await response.json();
+                
+                // 통계 업데이트 - 안전성 검사 추가
+                const primaryValue = document.querySelector('.stat-card.primary .value');
+                const warningValue = document.querySelector('.stat-card.warning .value');
+                const successValue = document.querySelector('.stat-card.success .value');
+                const infoValue = document.querySelector('.stat-card.info .value');
+                
+                if (primaryValue) primaryValue.textContent = stats.totalPayments || 0;
+                if (warningValue) warningValue.textContent = stats.pendingPayments || 0;
+                if (successValue) successValue.textContent = stats.mappedPayments || 0;
+                if (infoValue) infoValue.textContent = stats.todayMapped || 0;
+                
+            } catch (error) {
+                // console.error('통계 새로고침 오류:', error);
+            }
+        }
+        
+        // 초기 데이터 수집
+        function collectPaymentsData() {
+            try {
+                const rows = document.querySelectorAll('#paymentsTableBody tr[data-payment-id]');
+                allPaymentsData = Array.from(rows).map(row => ({
+                    id: row.dataset.paymentId,
+                    mappingStatus: row.dataset.mappingStatus,
+                    customerName: row.cells[0].textContent.trim(),
+                    customerPhone: row.cells[1].textContent.trim(),
+                    amount: row.cells[2].textContent.trim(),
+                    paymentDate: row.cells[3].textContent.trim(),
+                    brand: row.cells[4].querySelector('span') ? row.cells[4].querySelector('span').textContent.trim() : row.cells[4].textContent.trim(),
+                    siteName: row.cells[5].textContent.trim(),
+                    element: row
+                }));
+                // console.log('초기 데이터 수집 완료:', allPaymentsData.length, '개');
+            } catch (error) {
+                // console.error('데이터 수집 오류:', error);
+            }
+        }
+        
+        // 필터 적용
+        function applyFilter(filterType) {
+            // console.log('필터 적용:', filterType);
+            
+            currentFilter = filterType;
+            
+            // 필터 버튼 스타일 업데이트
+            document.querySelectorAll('[id^="filter"]').forEach(btn => {
+                btn.style.background = 'white';
+                btn.style.color = 'var(--text-muted)';
+            });
+            
+            const activeBtn = document.getElementById('filter' + filterType.charAt(0).toUpperCase() + filterType.slice(1));
+            if (activeBtn) {
+                activeBtn.style.background = 'var(--primary-color)';
+                activeBtn.style.color = 'white';
+            }
+            
+            // 테이블 행 필터링
+            allPaymentsData.forEach(payment => {
+                let shouldShow = true;
+                
+                switch (filterType) {
+                    case 'unmapped':
+                        shouldShow = payment.mappingStatus === 'PENDING';
+                        break;
+                    case 'mapped':
+                        shouldShow = payment.mappingStatus === 'MAPPED';
+                        break;
+                    case 'renoma':
+                        shouldShow = payment.brand.includes('레노마');
+                        break;
+                    case 'coralik':
+                        shouldShow = payment.brand.includes('코랄리크');
+                        break;
+                    case 'all':
+                    default:
+                        shouldShow = true;
+                        break;
+                }
+                
+                payment.element.style.display = shouldShow ? '' : 'none';
+            });
+        }
+        
+        // 검색 실행
+        function performSearch() {
+            const customerName = document.getElementById('searchCustomerName').value.toLowerCase().trim();
+            const searchAmount = parseFloat(document.getElementById('searchAmount').value) || 0;
+            const siteName = document.getElementById('searchSiteName').value.toLowerCase().trim();
+            
+            // console.log('검색 실행:', { customerName, searchAmount, siteName });
+            
+            allPaymentsData.forEach(payment => {
+                let shouldShow = true;
+                
+                // 고객명 검색
+                if (customerName && !payment.customerName.toLowerCase().includes(customerName)) {
+                    shouldShow = false;
+                }
+                
+                // 입금금액 검색 - 숫자 비교로 수정
+                if (searchAmount && searchAmount.trim() !== '') {
+                    // 검색어에서 숫자만 추출
+                    const searchAmountNum = parseInt(searchAmount.replace(/[,\s]/g, ''));
+                    // 입금금액에서 숫자만 추출 (예: "3,000원" → 3000)
+                    const paymentAmountNum = parseInt(payment.amount.replace(/[,원\s]/g, ''));
+                    
+                    if (!isNaN(searchAmountNum) && !isNaN(paymentAmountNum)) {
+                        // 정확한 금액 일치 검색
+                        if (paymentAmountNum !== searchAmountNum) {
+                            shouldShow = false;
+                        }
+                    } else {
+                        // 숫자 변환 실패 시 문자열 포함 검색으로 fallback
+                        if (!payment.amount.includes(searchAmount)) {
+                            shouldShow = false;
+                        }
+                    }
+                }
+                
+                // 사이트명 검색
+                if (siteName && !payment.siteName.toLowerCase().includes(siteName)) {
+                    shouldShow = false;
+                }
+                
+                payment.element.style.display = shouldShow ? '' : 'none';
+            });
+        }
+        
+        // 매핑 취소
+        async function cancelMapping(paymentId) {
+            if (!confirm('정말로 이 매핑을 취소하시겠습니까?')) {
+                return;
+            }
+            
+            // console.log('매핑 취소 요청:', paymentId);
+            
+            try {
+                const response = await fetch('/shipping-payment/mapping/api/cancel', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        paymentId: paymentId
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('✅ ' + result.message);
+                    
+                    // 테이블 행 업데이트
+                    updatePaymentRowStatus(paymentId, 'PENDING');
+                    
+                    // 통계 카드 업데이트
+                    updateStatsCards();
+                } else {
+                    alert('❌ 매핑 취소 실패: ' + result.message);
+                }
+                
+            } catch (error) {
+                // console.error('매핑 취소 오류:', error);
+                alert('❌ 매핑 취소 중 오류가 발생했습니다.');
+            }
+        }
+        
+        // 테이블 행 상태 업데이트
+        function updatePaymentRowStatus(paymentId, newStatus) {
+            try {
+                const row = document.querySelector(`tr[data-payment-id="${paymentId}"]`);
+                if (!row) {
+                    // console.error('행을 찾을 수 없음:', paymentId);
+                    return;
+                }
+                
+                // data-mapping-status 업데이트
+                row.dataset.mappingStatus = newStatus;
+                
+                // 상태 배지 업데이트
+                const statusCell = row.cells[6]; // 상태 컬럼
+                const statusSpan = statusCell.querySelector('span');
+                if (statusSpan) {
+                    if (newStatus === 'MAPPED') {
+                        statusSpan.style.backgroundColor = '#d1fae5';
+                        statusSpan.style.color = '#065f46';
+                        statusSpan.textContent = '매핑완료';
+                    } else {
+                        statusSpan.style.backgroundColor = '#fef3c7';
+                        statusSpan.style.color = '#92400e';
+                        statusSpan.textContent = '미매핑';
+                    }
+                }
+                
+                // 관리 버튼 업데이트
+                const actionCell = row.cells[7]; // 관리 컬럼
+                if (newStatus === 'MAPPED') {
+                    actionCell.innerHTML = `
+                        <button class="btn btn-outline-danger" 
+                                style="padding: 0.25rem 0.5rem; font-size: 0.75rem; background: white; border: 1px solid #ef4444; color: #ef4444; border-radius: 4px;"
+                                onclick="cancelMapping(${paymentId}); event.stopPropagation();"
+                                title="매핑 취소">
+                            🗑️ 취소
+                        </button>
+                    `;
+                } else {
+                    actionCell.innerHTML = `
+                        <button class="btn btn-success" 
+                                style="padding: 0.25rem 0.5rem; font-size: 0.75rem; background: #10b981; border: none; color: white; border-radius: 4px;"
+                                onclick="selectPayment(${paymentId}); event.stopPropagation();"
+                                title="매핑 실행">
+                            ✅ 매핑
+                        </button>
+                    `;
+                }
+                
+                // 데이터 배열도 업데이트
+                const paymentData = allPaymentsData.find(p => p.id == paymentId);
+                if (paymentData) {
+                    paymentData.mappingStatus = newStatus;
+                }
+                
+                // console.log('✅ 행 상태 업데이트 완료:', paymentId, '→', newStatus);
+                
+            } catch (error) {
+                // console.error('행 상태 업데이트 오류:', error);
+            }
+        }
+        
+        // 통계 카드 업데이트
+        async function updateStatsCards() {
+            // console.log('📊 통계 카드 업데이트 시작...');
+            
+            fetch('/shipping-payment/mapping/api/stats')
+                .then(response => response.json())
+                .then(stats => {
+                    // console.log('📊 새로운 통계 데이터:', stats);
+                    
+                    // 각 통계 카드 업데이트
+                    const totalPaymentsElement = document.querySelector('.stat-card.primary .value');
+                    if (totalPaymentsElement) {
+                        totalPaymentsElement.textContent = stats.totalPayments || 0;
+                        // console.log('📊 총 입금 내역 업데이트:', stats.totalPayments);
+                    }
+                    
+                    const pendingPaymentsElement = document.querySelector('.stat-card.warning .value');
+                    if (pendingPaymentsElement) {
+                        pendingPaymentsElement.textContent = stats.pendingPayments || 0;
+                        // console.log('📊 미매핑 건수 업데이트:', stats.pendingPayments);
+                    }
+                    
+                    const mappedPaymentsElement = document.querySelector('.stat-card.success .value');
+                    if (mappedPaymentsElement) {
+                        mappedPaymentsElement.textContent = stats.mappedPayments || 0;
+                        // console.log('📊 매핑 완료 업데이트:', stats.mappedPayments);
+                    }
+                    
+                    const todayMappedElement = document.querySelector('.stat-card.info .value');
+                    if (todayMappedElement) {
+                        todayMappedElement.textContent = stats.todayMapped || 0;
+                        // console.log('📊 오늘 매핑 업데이트:', stats.todayMapped);
+                    }
+                    
+                    // console.log('✅ 통계 카드 업데이트 완료');
+                })
+                .catch(error => {
+                    // console.error('❌ 통계 업데이트 오류:', error);
+                });
+        }
+        
+        // 후보 검색 실행
+        function performCandidateSearch() {
+            try {
+                const nameKeyword = document.getElementById('candidateSearchName').value.trim();
+                const orderKeyword = document.getElementById('candidateSearchOrder').value.trim();
+                
+                // console.log('후보 검색 실행:', { nameKeyword, orderKeyword });
+                
+                // 검색어가 없으면 전체 표시
+                if (!nameKeyword && !orderKeyword) {
+                    currentCandidates = [...originalCandidates];
+                } else {
+                    // 검색 조건에 맞는 후보 필터링
+                    currentCandidates = originalCandidates.filter(candidate => {
+                        let matches = true;
+                        
+                        // 고객명 검색
+                        if (nameKeyword) {
+                            const customerName = (candidate.customerName || '').toLowerCase();
+                            matches = matches && customerName.includes(nameKeyword);
+                        }
+                        
+                        // 주문번호 검색
+                        if (orderKeyword) {
+                            const orderNumber = (candidate.orderNumber || '').toLowerCase();
+                            matches = matches && orderNumber.includes(orderKeyword);
+                        }
+                        
+                        return matches;
+                    });
+                }
+                
+                // console.log(`검색 결과: ${currentCandidates.length}개 (전체 ${originalCandidates.length}개 중)`);
+                
+                // 검색 결과 표시
+                const candidatesEmpty = document.getElementById('candidatesEmpty');
+                const candidatesList = document.getElementById('candidatesList');
+                
+                if (currentCandidates.length === 0) {
+                    candidatesEmpty.innerHTML = `
+                        <div style="padding: 2rem; text-align: center; color: var(--text-muted);">
+                            <p>🔍 검색 조건에 맞는 후보가 없습니다.</p>
+                            <p style="font-size: 0.8rem; margin-top: 1rem;">
+                                검색어: ${nameKeyword ? `고객명 "${nameKeyword}"` : ''}${nameKeyword && orderKeyword ? ', ' : ''}${orderKeyword ? `주문번호 "${orderKeyword}"` : ''}<br/>
+                                전체 후보: ${originalCandidates.length}개
+                            </p>
+                            <button onclick="clearCandidateSearch()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer;">
+                                🔄 검색 초기화
+                            </button>
+                        </div>
+                    `;
+                    candidatesEmpty.style.display = 'block';
+                    candidatesList.style.display = 'none';
+                } else {
+                    displayCandidates(currentCandidates);
+                    candidatesEmpty.style.display = 'none';
+                    candidatesList.style.display = 'block';
+                }
+                
+            } catch (error) {
+                // console.error('후보 검색 오류:', error);
+                alert('❌ 검색 중 오류가 발생했습니다.');
+            }
+        }
+        
+        // 후보 검색 초기화
+        function clearCandidateSearch() {
+            document.getElementById('candidateSearchName').value = '';
+            document.getElementById('candidateSearchOrder').value = '';
+            searchCandidates(); // 전체 후보 다시 표시
+            
+            // console.log('후보 검색 초기화 완료');
+        }
+        
+        // 유틸리티 함수
+        function getReturnTypeText(code) {
+            const types = {
+                'FULL_RETURN': '전체반품',
+                'PARTIAL_RETURN': '부분반품',
+                'FULL_EXCHANGE': '전체교환',
+                'PARTIAL_EXCHANGE': '부분교환',
+                'EXCHANGE': '일반교환'
+            };
+            return types[code] || code;
+        }
+    </script>
+    </th:block>
+</body>
+</html> 

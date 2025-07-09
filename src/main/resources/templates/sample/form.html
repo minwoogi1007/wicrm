@@ -1,0 +1,1864 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/default}">
+<head>
+    <title th:text="${isEdit ? '교환/반품 수정' : '교환/반품 등록'}">교환/반품 등록</title>
+    <link rel="stylesheet" th:href="@{/css/exchange.css}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/browser-image-compression/2.0.0/browser-image-compression.min.js"></script>
+    
+    <!-- 🔥 이미지 붙여넣기 기능 (별도 파일) -->
+    <script src="/js/paste-image.js"></script>
+
+    <!-- 🔥🔥🔥 대표님 최종 해결: 완전 즉시 실행 시스템 -->
+    <script>
+        // console.log('🚨🚨🚨 대표님 최종 해결 - 완전 즉시 실행 시스템!');
+
+        // 🔥 페이지 로드 완료 즉시 실행 (지연 없음)
+        window.addEventListener('load', function() {
+            // console.log('🔥🔥🔥 대표님 페이지 완전 로드 완료!');
+
+            // 수정 모드 확인
+            const isEditMode = document.querySelector('input[name="id"]') !== null;
+            // console.log('🔧 수정 모드 확인:', isEditMode);
+
+            if (isEditMode) {
+                // console.log('🚨🔥 수정 모드 감지 - 즉시 처리 시작!');
+
+                // 🔥 100ms 후 즉시 실행 (DOM 안정화만 대기)
+                setTimeout(function() {
+                    // console.log('⚡ 대표님 즉시 실행!');
+
+                    // 레노마 버튼 즉시 클릭
+                    const renomaBtn = Array.from(document.querySelectorAll('.selection-btn')).find(btn =>
+                        btn.textContent.trim() === '레노마');
+
+                    if (renomaBtn) {
+                        // console.log('🔥 레노마 버튼 즉시 클릭!');
+                        renomaBtn.click();
+
+                        // 사이트 버튼 즉시 클릭 (200ms 후)
+                        setTimeout(function() {
+                            const siteBtn = Array.from(document.querySelectorAll('#siteButtons .selection-btn')).find(btn =>
+                                btn.textContent.includes('롯데온-레노마'));
+
+                            if (siteBtn) {
+                                // console.log('🔥 사이트 버튼 즉시 클릭!');
+                                siteBtn.click();
+                            }
+                        }, 200);
+
+                        // 유형 버튼 즉시 클릭 (400ms 후)
+                        setTimeout(function() {
+                            const allRows = document.querySelectorAll('.selection-row');
+                            const typeRow = allRows[2];
+                            if (typeRow) {
+                                // 🔥 대표님 수정: 서버에서 넘어온 실제 유형 코드 사용
+                                const serverReturnTypeCode = serverData.returnTypeCode;
+                                const typeDisplayMap = {
+                                    'FULL_RETURN': '전체반품',
+                                    'FULL_EXCHANGE': '전체교환',
+                                    'PARTIAL_RETURN': '부분반품',
+                                    'PARTIAL_EXCHANGE': '부분교환'
+                                };
+                                const expectedTypeText = typeDisplayMap[serverReturnTypeCode];
+                                
+                                // console.log('🔍 서버 유형 코드:', serverReturnTypeCode);
+                                // console.log('🔍 찾을 유형 텍스트:', expectedTypeText);
+                                
+                                const typeBtn = Array.from(typeRow.querySelectorAll('.selection-btn')).find(btn =>
+                                    btn.textContent.trim() === expectedTypeText);
+
+                                if (typeBtn) {
+                                    // console.log('🔥 유형 버튼 즉시 클릭:', expectedTypeText);
+                                    typeBtn.click();
+                                } else {
+                                    // console.log('❌ 유형 버튼을 찾을 수 없음:', expectedTypeText);
+                                }
+                            }
+                        }, 400);
+
+                        // 사유 버튼 즉시 클릭 (600ms 후)
+                        setTimeout(function() {
+                            const allRows = document.querySelectorAll('.selection-row');
+                            const reasonRow = allRows[3];
+                            if (reasonRow) {
+                                // 🔥 대표님 수정: 서버에서 넘어온 실제 사유 사용
+                                const serverReturnReason = serverData.returnReason;
+                                
+                                // console.log('🔍 서버 사유:', serverReturnReason);
+                                
+                                const reasonBtn = Array.from(reasonRow.querySelectorAll('.selection-btn')).find(btn =>
+                                    btn.textContent.trim() === serverReturnReason);
+
+                                if (reasonBtn) {
+                                    // console.log('🔥 사유 버튼 즉시 클릭:', serverReturnReason);
+                                    reasonBtn.click();
+                                } else {
+                                    // console.log('❌ 사유 버튼을 찾을 수 없음:', serverReturnReason);
+                                }
+                            }
+                        }, 600);
+
+                        // 🎨 색상 업데이트 즉시 실행 (800ms 후)
+                        setTimeout(function() {
+                            // console.log('🎨🔥 색상 업데이트 즉시 실행!');
+
+                            // 모든 입력 필드 색상 업데이트
+                            const allFields = document.querySelectorAll('input, select, textarea');
+                            allFields.forEach(field => {
+                                if (field.value && field.value.trim() !== '') {
+                                    // 원본 데이터는 녹색
+                                    field.style.backgroundColor = '#e8f5e8';
+                                    field.style.borderColor = '#4caf50';
+                                    field.style.color = '#2e7d32';
+                                    field.classList.add('original-data');
+                                    // console.log(`🎨 ${field.id || field.name} 녹색 적용`);
+                                }
+                            });
+                        }, 800);
+
+                    } else {
+                        // console.log('❌ 레노마 버튼 없음');
+                    }
+
+                }, 100); // 100ms만 대기
+
+            } else {
+                // console.log('🆕🔥 등록 모드 - CS 접수일 즉시 설정');
+
+                // CS 접수일 자동 설정
+                const csReceivedDateField = document.getElementById('csReceivedDate');
+                if (csReceivedDateField && (!csReceivedDateField.value || csReceivedDateField.value === '')) {
+                    const today = new Date();
+                    const todayString = today.getFullYear() + '-' +
+                        String(today.getMonth() + 1).padStart(2, '0') + '-' +
+                        String(today.getDate()).padStart(2, '0');
+                    csReceivedDateField.value = todayString;
+                    csReceivedDateField.style.backgroundColor = '#e3f2fd';
+                    csReceivedDateField.style.borderColor = '#2196f3';
+                    csReceivedDateField.style.color = '#1976d2';
+                    // console.log('📅🔥 CS 접수일 즉시 설정:', todayString);
+                }
+            }
+        });
+
+        // 🎨 대표님 요청: 완전 새로운 실시간 색상 감지 시스템
+        document.addEventListener('DOMContentLoaded', function() {
+            // console.log('🎨🔥 대표님 새로운 실시간 색상 감지 시작');
+
+            // 🔥 수정 모드 확인
+            const isEditMode = document.querySelector('input[name="id"]') !== null;
+            // console.log('🔧 색상 시스템 모드:', isEditMode ? '수정' : '등록');
+
+            // 모든 입력 필드에 이벤트 리스너 추가 (클릭 이벤트 제외)
+            const allFields = document.querySelectorAll('input, select, textarea');
+            allFields.forEach(field => {
+                // 🔥 대표님 요청: 클릭 이벤트 제거, input과 change만 사용
+                ['input', 'change'].forEach(eventType => {
+                    field.addEventListener(eventType, function() {
+                        // 🔥 약간의 지연을 두어 실제 값 변경 확인
+                        setTimeout(() => {
+                            const originalValue = this.dataset.originalValue || '';
+                            const currentValue = this.value || '';
+
+                            // console.log(`🔍 ${this.id || this.name} 값 체크:`, {
+                            //     original: originalValue,
+                            //     current: currentValue,
+                            //     changed: currentValue !== originalValue
+                            // });
+
+                            if (isEditMode) {
+                                // 수정 모드에서만 색상 변경
+                                if (currentValue !== originalValue && currentValue !== '') {
+                                    // 실제로 값이 변경된 경우만 빨간색
+                                    this.style.backgroundColor = '#ffebee';
+                                    this.style.borderColor = '#f44336';
+                                    this.style.color = '#d32f2f';
+                                    // console.log(`🔴 ${this.id || this.name} 빨간색 적용 (실제 수정됨)`);
+                                } else if (currentValue === originalValue && originalValue !== '') {
+                                    // 원본값과 같으면 녹색
+                                    this.style.backgroundColor = '#e8f5e8';
+                                    this.style.borderColor = '#4caf50';
+                                    this.style.color = '#2e7d32';
+                                    // console.log(`🟢 ${this.id || this.name} 녹색 적용 (원본값)`);
+                                }
+                            } else {
+                                // 등록 모드에서는 파란색
+                                if (currentValue !== '') {
+                                    this.style.backgroundColor = '#e3f2fd';
+                                    this.style.borderColor = '#2196f3';
+                                    this.style.color = '#1976d2';
+                                    // console.log(`🔵 ${this.id || this.name} 파란색 적용 (신규 입력)`);
+                                }
+                            }
+                        }, 100); // 100ms 지연
+                    });
+                });
+            });
+        });
+    </script>
+
+    <!-- 🚀 즉시 실행 선택 함수들 (헤드에서 먼저 정의) -->
+    <script th:inline="javascript">
+        // console.log('🔥 헤드에서 함수 정의 시작');
+
+        // 🎯 서버 데이터를 JavaScript 변수로 전달 (대표님 요청사항)
+        const serverData = {
+            isEdit: /*[[${isEdit}]]*/ false,
+            siteName: /*[[${returnItem?.siteName}]]*/ '',
+            returnTypeCode: /*[[${returnItem?.returnTypeCode}]]*/ '',
+            returnReason: /*[[${returnItem?.returnReason}]]*/ '',
+            // 대표님 요청으로 전체 데이터 추가
+            orderNumber: /*[[${returnItem?.orderNumber}]]*/ '',
+            orderItemCode: /*[[${returnItem?.orderItemCode}]]*/ '',
+            customerName: /*[[${returnItem?.customerName}]]*/ '',
+            customerPhone: /*[[${returnItem?.customerPhone}]]*/ '',
+            productColor: /*[[${returnItem?.productColor}]]*/ '',
+            productSize: /*[[${returnItem?.productSize}]]*/ '',
+            quantity: /*[[${returnItem?.quantity}]]*/ '',
+            refundAmount: /*[[${returnItem?.refundAmount}]]*/ '',
+            trackingNumber: /*[[${returnItem?.trackingNumber}]]*/ '',
+            returnStatusCode: /*[[${returnItem?.returnStatusCode}]]*/ '',
+            shippingFee: /*[[${returnItem?.shippingFee}]]*/ '',
+            processor: /*[[${returnItem?.processor}]]*/ '',
+            remarks: /*[[${returnItem?.remarks}]]*/ '',
+            // 🔥 대표님 요청: CS 접수일 정확한 형식으로 전달
+            csReceivedDate: /*[[${returnItem?.csReceivedDate != null ? returnItem.csReceivedDate.toString() : ''}]]*/ '',
+            orderDate: /*[[${returnItem?.orderDate != null ? returnItem.orderDate.toString() : ''}]]*/ '',
+            collectionCompletedDate: /*[[${returnItem?.collectionCompletedDate != null ? returnItem.collectionCompletedDate.toString() : ''}]]*/ '',
+            logisticsConfirmedDate: /*[[${returnItem?.logisticsConfirmedDate != null ? returnItem.logisticsConfirmedDate.toString() : ''}]]*/ '',
+            shippingDate: /*[[${returnItem?.shippingDate != null ? returnItem.shippingDate.toString() : ''}]]*/ '',
+            refundDate: /*[[${returnItem?.refundDate != null ? returnItem.refundDate.toString() : ''}]]*/ '',
+            isCompleted: /*[[${returnItem?.isCompleted}]]*/ '',
+            defectDetail: /*[[${returnItem?.defectDetail}]]*/ '',
+            defectPhotoUrl: /*[[${returnItem?.defectPhotoUrl}]]*/ '',
+            // 🔥 배송비 입금상태 추가
+            paymentStatus: /*[[${returnItem?.paymentStatus}]]*/ ''
+        };
+
+        // console.log('📊🔥 대표님 요청 - 서버에서 전달받은 전체 데이터:');
+        // console.log('='.repeat(80));
+        // Object.keys(serverData).forEach(key => {
+        //     console.log(`${key}: "${serverData[key]}"`);
+        // });
+        // console.log('='.repeat(80));
+
+        // 🔥 대표님 긴급 수정: 수정 모드일 때 즉시 원본값 설정
+        if (serverData.isEdit) {
+            // console.log('🔧🔥 수정 모드 감지 - 즉시 원본값 설정 시작');
+
+            // DOM이 준비되면 즉시 원본값 설정
+            const setOriginalValues = () => {
+                if (document.readyState === 'loading') {
+                    setTimeout(setOriginalValues, 50);
+                    return;
+                }
+
+                // console.log('⚡ 원본값 즉시 설정 시작');
+
+                // 모든 필드에 원본값 설정
+                Object.keys(serverData).forEach(key => {
+                    const field = document.getElementById(key);
+                    const value = serverData[key];
+
+                    if (field && value !== null && value !== undefined && value !== '') {
+                        field.dataset.originalValue = value;
+                        
+                        // 🔥🔥🔥 대표님 긴급 수정: 배송비 필드는 값도 직접 설정
+                        if (key === 'shippingFee') {
+                            field.value = value;
+                            field.style.backgroundColor = '#e8f5e8';
+                            field.style.borderColor = '#4caf50';
+                            field.style.color = '#2e7d32';
+                            // console.log(`🔥✅ ${key} 값과 원본값 모두 설정: "${value}"`);
+                        } else {
+                            // console.log(`🔧 ${key} 원본값 설정: "${value}"`);
+                        }
+                    }
+                });
+            };
+
+            setOriginalValues();
+        }
+
+        // 🎯 브랜드 추출 함수 (대표님 사이트 기준)
+        function extractBrandFromSite(siteName) {
+            // console.log('🔍 브랜드 추출 시도:', siteName);
+            if (!siteName) return null;
+
+            if (siteName.includes('레노마')) {
+                // console.log('✅ 레노마 브랜드 감지');
+                return '레노마';
+            }
+            if (siteName.includes('코랄리크')) {
+                // console.log('✅ 코랄리크 브랜드 감지');
+                return '코랄리크';
+            }
+
+            // console.log('❌ 알 수 없는 브랜드:', siteName);
+            return null;
+        }
+
+        // 🎯 브랜드 선택 함수 (Direct)
+        function selectBrandDirect(brand, element) {
+            // console.log('🏷️ 브랜드 선택 (Direct):', brand);
+
+            // 모든 브랜드 버튼 초기화
+            document.querySelectorAll('.selection-row:first-child .selection-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // 선택된 버튼 활성화
+            element.classList.add('active');
+
+            // 사이트 버튼 생성
+            const siteButtonsContainer = document.getElementById('siteButtons');
+            let siteButtons = '';
+
+            if (brand === '레노마') {
+                siteButtons = `
+                    <div class="selection-btn" onclick="selectSiteDirect('29CM-레노마', this)">29CM-레노마</div>
+                    <div class="selection-btn" onclick="selectSiteDirect('롯데온-레노마', this)">롯데온-레노마</div>
+                    <div class="selection-btn" onclick="selectSiteDirect('무신사-레노마', this)">무신사-레노마</div>
+                    <div class="selection-btn" onclick="selectSiteDirect('스토어팜-레노마', this)">스토어팜-레노마</div>
+                    <div class="selection-btn" onclick="selectSiteDirect('자사몰-레노마', this)">자사몰-레노마</div>
+                    <div class="selection-btn" onclick="selectSiteDirect('지그재그-레노마', this)">지그재그-레노마</div>
+                    <div class="selection-btn" onclick="selectSiteDirect('카카오-레노마', this)">카카오-레노마</div>
+                    <div class="selection-btn" onclick="selectSiteDirect('패션플러스-레노마', this)">패션플러스-레노마</div>
+                    <div class="selection-btn" onclick="selectSiteDirect('하프클럽-레노마', this)">하프클럽-레노마</div>
+                    <div class="selection-btn" onclick="selectSiteDirect('SSG-레노마', this)">SSG-레노마</div>
+                    <div class="selection-btn" onclick="selectSiteDirect('EQL-레노마', this)">EQL-레노마</div>
+                    <div class="selection-btn" onclick="selectSiteDirect('W컨셉-레노마', this)">W컨셉-레노마</div>
+                `;
+            } else if (brand === '코랄리크') {
+                siteButtons = `
+                    <div class="selection-btn" onclick="selectSiteDirect('29CM-코랄리크', this)">29CM-코랄리크</div>
+                    <div class="selection-btn" onclick="selectSiteDirect('무신사-코랄리크', this)">무신사-코랄리크</div>
+                    <div class="selection-btn" onclick="selectSiteDirect('자사몰-코랄리크', this)">자사몰-코랄리크</div>
+                    <div class="selection-btn" onclick="selectSiteDirect('지그재그-코랄리크', this)">지그재그-코랄리크</div>
+                    <div class="selection-btn" onclick="selectSiteDirect('CJ오쇼핑-코랄리크', this)">CJ오쇼핑-코랄리크</div>
+                    <div class="selection-btn" onclick="selectSiteDirect('SSG-코랄리크', this)">SSG-코랄리크</div>
+                    <div class="selection-btn" onclick="selectSiteDirect('EQL-코랄리크', this)">EQL-코랄리크</div>
+                    <div class="selection-btn" onclick="selectSiteDirect('LF몰-코랄리크', this)">LF몰-코랄리크</div>
+                    <div class="selection-btn" onclick="selectSiteDirect('스토어팜-코랄리크', this)">스토어팜-코랄리크</div>
+                `;
+            }
+
+            if (siteButtonsContainer) {
+                siteButtonsContainer.innerHTML = siteButtons;
+            }
+            updateSelectedInfoDirect();
+        }
+
+        // 🎯 사이트 선택 함수 (Direct)
+        function selectSiteDirect(site, element) {
+            // console.log('🌐 사이트 선택 (Direct):', site);
+
+            // 모든 사이트 버튼 초기화
+            document.querySelectorAll('#siteButtons .selection-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // 선택된 버튼 활성화
+            element.classList.add('active');
+
+            // 폼에 사이트 정보 설정
+            const siteNameField = document.getElementById('siteName');
+            if (siteNameField) {
+                siteNameField.value = site;
+                // 🎨 즉시 색상 업데이트
+                updateSingleFieldColor(siteNameField);
+            }
+
+            updateSelectedInfoDirect();
+        }
+
+        // 🎯 유형 코드 매핑 테이블 (대표님 시스템 기준)
+        const typeDisplayMap = {
+            'FULL_RETURN': '전체반품',
+            'FULL_EXCHANGE': '전체교환',
+            'PARTIAL_RETURN': '부분반품',
+            'PARTIAL_EXCHANGE': '부분교환'
+        };
+
+        // 🎯 역방향 매핑 (한글 → 코드)
+        const typeCodeMap = {
+            '전체반품': 'FULL_RETURN',
+            '전체교환': 'FULL_EXCHANGE',
+            '부분반품': 'PARTIAL_RETURN',
+            '부분교환': 'PARTIAL_EXCHANGE'
+        };
+
+        // 🎯 유형 선택 함수 (Direct)
+        function selectTypeDirect(type, element) {
+            // console.log('📋 유형 선택 (Direct):', type);
+
+            // 🔥 대표님 수정: 정확한 유형 버튼 선택자 사용
+            const allRows = document.querySelectorAll('.selection-row');
+            const typeRow = allRows[2]; // 세 번째 row가 유형
+            if (typeRow) {
+                typeRow.querySelectorAll('.selection-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+            }
+
+            // 선택된 버튼 활성화
+            element.classList.add('active');
+
+            // 폼에 유형 정보 설정
+            const returnTypeCodeField = document.getElementById('returnTypeCode');
+            if (returnTypeCodeField) {
+                returnTypeCodeField.value = type;
+            }
+
+            // 표시용 텍스트 설정
+            const returnTypeDisplayField = document.getElementById('returnTypeDisplay');
+            if (returnTypeDisplayField) {
+                returnTypeDisplayField.value = typeDisplayMap[type] || type;
+                // 🎨 즉시 색상 업데이트
+                updateSingleFieldColor(returnTypeDisplayField);
+            }
+
+            updateSelectedInfoDirect();
+        }
+
+        // 🎯 사유 선택 함수 (Direct)
+        function selectReasonDirect(reason, element) {
+            // console.log('📝 사유 선택 (Direct):', reason);
+
+            // 🔥 대표님 수정: 정확한 사유 버튼 선택자 사용
+            const allRowsReason = document.querySelectorAll('.selection-row');
+            const reasonRow = allRowsReason[3]; // 네 번째 row가 사유
+            if (reasonRow) {
+                reasonRow.querySelectorAll('.selection-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+            }
+
+            // 선택된 버튼 활성화
+            element.classList.add('active');
+
+            // 폼에 사유 정보 설정
+            const returnReasonField = document.getElementById('returnReason');
+            if (returnReasonField) {
+                returnReasonField.value = reason;
+                // 🎨 즉시 색상 업데이트
+                updateSingleFieldColor(returnReasonField);
+            }
+
+            updateSelectedInfoDirect();
+        }
+
+        // 🎯 선택 정보 업데이트 함수 (Direct)
+        function updateSelectedInfoDirect() {
+            const allRowsUpdate = document.querySelectorAll('.selection-row');
+            const selectedBrand = allRowsUpdate[0] ? allRowsUpdate[0].querySelector('.selection-btn.active')?.textContent || '' : '';
+            const selectedSite = document.querySelector('#siteButtons .selection-btn.active')?.textContent || '';
+            const selectedType = allRowsUpdate[2] ? allRowsUpdate[2].querySelector('.selection-btn.active')?.textContent || '' : '';
+            const selectedReason = allRowsUpdate[3] ? allRowsUpdate[3].querySelector('.selection-btn.active')?.textContent || '' : '';
+
+            let infoText = '';
+            if (selectedBrand) infoText += `브랜드: ${selectedBrand}`;
+            if (selectedSite) infoText += ` | 사이트: ${selectedSite}`;
+            if (selectedType) infoText += ` | 유형: ${selectedType}`;
+            if (selectedReason) infoText += ` | 사유: ${selectedReason}`;
+
+            if (!infoText) {
+                infoText = '브랜드, 사이트, 유형, 사유를 선택해주세요';
+            }
+
+            const selectedTextElement = document.getElementById('selectedText');
+            if (selectedTextElement) {
+                selectedTextElement.textContent = infoText;
+            }
+
+            const selectedInfoElement = document.getElementById('selectedInfo');
+            if (selectedInfoElement) {
+                selectedInfoElement.style.display = infoText !== '브랜드, 사이트, 유형, 사유를 선택해주세요' ? 'block' : 'none';
+            }
+        }
+
+        // 🎨 대표님 요청: 원본 데이터는 초록색, 수정된 데이터는 빨간색
+        function updateSingleFieldColor(field) {
+            if (!field) return;
+
+            const fieldId = field.id;
+            const currentValue = field.value ? field.value.trim() : '';
+            const originalValue = field.dataset.originalValue || '';
+
+            // 기존 클래스 제거
+            field.classList.remove('completed', 'modified', 'original-data');
+
+            if (currentValue !== '') {
+                // 수정 모드에서 원본 값과 비교
+                if (originalValue && currentValue !== originalValue) {
+                    // 🔴 수정된 데이터는 빨간색
+                    field.classList.add('modified');
+                    field.style.backgroundColor = '#ffebee'; // 연한 빨간색 배경
+                    field.style.borderColor = '#f44336'; // 빨간색 테두리
+                    field.style.color = '#d32f2f'; // 진한 빨간색 텍스트
+                    // console.log(`🔴 ${fieldId} 수정됨: "${originalValue}" → "${currentValue}"`);
+                } else if (originalValue) {
+                    // 🟢 원본 데이터는 초록색 (성공 색상)
+                    field.classList.add('original-data');
+                    field.style.backgroundColor = '#e8f5e8'; // 연한 초록색 배경
+                    field.style.borderColor = '#4caf50'; // 초록색 테두리
+                    field.style.color = '#2e7d32'; // 진한 초록색 텍스트
+                    // console.log(`🟢 ${fieldId} 원본 데이터 유지: "${currentValue}"`);
+                } else {
+                    // 새로 입력된 데이터는 기본 완료 색상
+                    field.classList.add('completed');
+                    field.style.backgroundColor = '#e3f2fd'; // 연한 파란색 배경
+                    field.style.borderColor = '#2196f3'; // 파란색 테두리
+                    field.style.color = '#1976d2'; // 진한 파란색 텍스트
+                    // console.log(`🔵 ${fieldId} 새로 입력: "${currentValue}"`);
+                }
+            } else {
+                // 빈 값은 기본 스타일로 복원
+                field.style.backgroundColor = '';
+                field.style.borderColor = '';
+                field.style.color = '';
+                // console.log(`⚪ ${fieldId} 빈 값`);
+            }
+        }
+
+        // 🗃️ 대표님 요청: 강화된 원본 데이터 저장 함수
+        function saveOriginalValues() {
+            // console.log('🗃️🔥 대표님 원본 데이터 저장 시작');
+
+            // 모든 입력 필드 대상으로 저장
+            const allFields = document.querySelectorAll('input, select, textarea');
+            let savedCount = 0;
+
+            allFields.forEach(field => {
+                if (field.value && field.value.trim() !== '') {
+                    field.dataset.originalValue = field.value.trim();
+                    // console.log(`💾🔥 ${field.id || field.name} 원본값 저장: "${field.value.trim()}"`);
+                    savedCount++;
+
+                    // 즉시 녹색으로 표시
+                    field.style.backgroundColor = '#e8f5e8'; // 연한 초록색 배경
+                    field.style.borderColor = '#4caf50'; // 초록색 테두리
+                    field.style.color = '#2e7d32'; // 진한 초록색 텍스트
+                    field.classList.add('original-data');
+                }
+            });
+
+            // console.log(`✅🔥 대표님 원본 데이터 저장 완료: ${savedCount}개 필드`);
+        }
+
+        // console.log('✅ 헤드에서 함수 정의 완료');
+    </script>
+    <style>
+        /* 컴팩트한 등록 폼을 위한 디자인 */
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --success-color: #35b27f;
+            --warning-color: #f72585;
+            --danger-color: #ff4d6d;
+            --bg-color: #f8fafc;
+            --bg-card: #ffffff;
+            --border-color: #e2e8f0;
+            --text-color: #2d3748;
+            --text-muted: #718096;
+            --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            --radius: 0.375rem;
+        }
+
+        /* 로딩 오버레이 */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loading-content {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--radius);
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        /* 성공 메시지 */
+        .success-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .success-content {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--radius);
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .success-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--success-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            font-size: 0.8rem;
+        }
+
+        .container {
+            max-width: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0.75rem;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1rem;
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow);
+        }
+
+        .header h2 {
+            margin: 0 0 0.25rem 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .header p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 0.75rem;
+        }
+
+        /* 상단 선택 버튼들 */
+        .top-selections {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .selection-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .selection-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .selection-label {
+            font-weight: 600;
+            color: var(--text-color);
+            font-size: 0.75rem;
+            min-width: 60px;
+            margin-right: 0.5rem;
+        }
+
+        .selection-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .selection-btn {
+            padding: 0.5rem 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-color);
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .selection-btn:hover {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .selection-btn.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        /* 선택된 정보 표시 */
+        .selected-info {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.75rem;
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+            font-size: 0.75rem;
+            display: none;
+        }
+        
+        .selected-info.show {
+            display: block;
+        }
+        
+        /* 폼 컨테이너 */
+        .form-container {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .form-content {
+            padding: 1rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-section-header {
+            grid-column: 1 / -1;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin: 1rem 0 0.5rem 0;
+            padding-bottom: 0.25rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .form-section-header:first-child {
+            margin-top: 0;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 0.25rem;
+            font-weight: 500;
+            color: var(--text-color);
+            font-size: 0.7rem;
+        }
+
+        .form-group label.required::after {
+            content: ' *';
+            color: var(--danger-color);
+        }
+
+        .form-control {
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.1);
+        }
+
+        .form-control.selected {
+            background-color: #e3f2fd;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .form-control.selected:focus {
+            background-color: #e3f2fd;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+        }
+
+        /* 🎨 완료된 필드 스타일 */
+        .form-control.completed {
+            background-color: #e8f5e8 !important;
+            border-color: var(--success-color) !important;
+            color: #2e7d32 !important;
+            font-weight: 600 !important;
+        }
+
+        .form-control.completed:focus {
+            background-color: #e8f5e8 !important;
+            border-color: var(--success-color) !important;
+            box-shadow: 0 0 0 2px rgba(53, 178, 127, 0.2) !important;
+        }
+
+        /* 완료된 필드의 라벨에 체크 표시 */
+        .form-group:has(.form-control.completed) label::before {
+            content: '✅ ';
+            color: var(--success-color);
+            font-weight: bold;
+        }
+
+        /* 🔥 대표님 요청: 노란색 제거 - 수정된 필드는 빨간색으로 */
+        .form-control.modified {
+            background-color: #ffebee !important;
+            border-color: #f44336 !important;
+            color: #d32f2f !important;
+            font-weight: 600 !important;
+        }
+
+        .form-control.modified:focus {
+            background-color: #ffebee !important;
+            border-color: #f44336 !important;
+            box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.2) !important;
+        }
+
+        /* 수정된 필드의 라벨에 수정 표시 */
+        .form-group:has(.form-control.modified) label::before {
+            content: '🔄 ';
+            color: #ffc107;
+            font-weight: bold;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--bg-color);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.2s ease;
+            font-size: 0.75rem;
+        }
+
+        .btn-secondary {
+            background: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary-color);
+        }
+
+        .progress-info {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        /* 이미지 붙여넣기 스타일 - register.html과 동일 */
+        .image-paste-container {
+            transition: all 0.3s ease;
+        }
+        
+        .image-paste-container:hover {
+            border-color: var(--primary-color) !important;
+            background-color: rgba(67, 97, 238, 0.05) !important;
+        }
+        
+        .image-paste-container.dragover {
+            border-color: var(--success-color) !important;
+            background-color: rgba(53, 178, 127, 0.1) !important;
+        }
+        
+        .pasted-preview-container {
+            transition: all 0.2s ease;
+        }
+        
+        .pasted-preview-container:hover {
+            transform: scale(1.02);
+        }
+
+        /* 추가 제품 등록 영역 스타일 */
+        #addProductArea {
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-check-input:checked {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+        }
+
+        #customOrderInput:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.1);
+        }
+
+        /* 복사된 필드 읽기 전용 스타일 */
+        .field-copied {
+            background-color: #e3f2fd !important;
+            border-color: #2196f3 !important;
+            color: #1976d2 !important;
+            font-weight: 500 !important;
+        }
+
+        .field-copied::before {
+            content: '📋 ';
+            color: #2196f3;
+        }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0.5rem;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .selection-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .selection-buttons {
+                width: 100%;
+            }
+            
+            .selection-btn {
+                flex: 1;
+                min-width: 70px;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: stretch;
+            }
+
+            #addProductArea .btn {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div layout:fragment="content">
+        <div class="container mt-4">
+            <div class="page-header">
+                <h2 th:text="${isEdit ? '교환/반품 수정' : '교환/반품 등록'}">교환/반품 등록</h2>
+                <p th:text="${isEdit ? '기존 정보를 수정하고 저장하세요' : '브랜드, 사이트, 유형을 선택한 후 정보를 입력하세요'}">브랜드, 사이트, 유형을 선택한 후 정보를 입력하세요</p>
+            </div>
+            
+            <!-- 상단 선택 버튼들 -->
+            <div class="top-selections">
+                <div class="selection-row">
+                    <div class="selection-label">브랜드:</div>
+                    <div class="selection-buttons">
+                    <div class="selection-btn" onclick="selectBrandDirect('레노마', this)">레노마</div>
+                    <div class="selection-btn" onclick="selectBrandDirect('코랄리크', this)">코랄리크</div>
+                    </div>
+                </div>
+
+                <div class="selection-row">
+                    <div class="selection-label">사이트:</div>
+                    <div class="selection-buttons" id="siteButtons">
+                        <!-- 사이트 버튼들이 동적으로 생성됩니다 -->
+                    </div>
+                </div>
+
+                <div class="selection-row">
+                    <div class="selection-label">유형:</div>
+                    <div class="selection-buttons">
+                    <div class="selection-btn" onclick="selectTypeDirect('FULL_RETURN', this)">전체반품</div>
+                    <div class="selection-btn" onclick="selectTypeDirect('FULL_EXCHANGE', this)">전체교환</div>
+                    <div class="selection-btn" onclick="selectTypeDirect('PARTIAL_RETURN', this)">부분반품</div>
+                    <div class="selection-btn" onclick="selectTypeDirect('PARTIAL_EXCHANGE', this)">부분교환</div>
+                    </div>
+                </div>
+                
+                <div class="selection-row">
+                    <div class="selection-label">사유:</div>
+                    <div class="selection-buttons">
+                    <div class="selection-btn" onclick="selectReasonDirect('고객변심', this)">고객변심</div>
+                    <div class="selection-btn" onclick="selectReasonDirect('불량', this)">불량</div>
+                    <div class="selection-btn" onclick="selectReasonDirect('오배송', this)">오배송</div>
+                    <div class="selection-btn" onclick="selectReasonDirect('기타', this)">기타</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 선택된 정보 표시 -->
+            <div class="selected-info" id="selectedInfo">
+                <span id="selectedText">브랜드, 사이트, 유형, 사유를 선택해주세요</span>
+            </div>
+
+            <!-- 폼 컨테이너 -->
+            <div class="form-container">
+                <form th:action="@{/exchange/save}" method="post" th:object="${returnItem}" enctype="multipart/form-data" onsubmit="return handleFormSubmit(event)">
+                    <!-- 수정 모드일 때 ID 전달 -->
+                    <input type="hidden" th:if="${isEdit}" th:field="*{id}">
+                    <!-- 🎯 목록 돌아가기 URL -->
+                    <input type="hidden" name="returnTo" th:value="${returnUrl}">
+
+                    <div class="form-content">
+                        <!-- 기본 정보 -->
+                        <div class="form-section-header">기본 정보</div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="returnTypeCode" class="required">교환/반품 유형 *</label>
+                                <input type="hidden" id="returnTypeCode" name="returnTypeCode" th:field="*{returnTypeCode}">
+                                <input type="text" id="returnTypeDisplay" name="returnTypeDisplay" class="form-control" placeholder="전체반품" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="returnReason" class="required">반품 사유 *</label>
+                                <input type="text" id="returnReason" name="returnReason" class="form-control" th:field="*{returnReason}" placeholder="고객변심" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="csReceivedDate" class="required">CS 접수일 *</label>
+                                <input type="date" id="csReceivedDate" name="csReceivedDate" class="form-control" 
+                                       th:field="*{csReceivedDate}" 
+                                       required>
+                                
+                                <!-- 🔥🔥🔥 대표님 긴급: CS 접수일 강제 설정 -->
+                                <script th:inline="javascript">
+                                    (function() {
+                                        // console.log('🔥🔥🔥 대표님 CS 접수일 강제 설정!');
+                                        
+                                        const csField = document.getElementById('csReceivedDate');
+                                        const isEditMode = /*[[${isEdit}]]*/ false;
+                                        const serverCsDate = /*[[${returnItem?.csReceivedDate}]]*/ null;
+                                        
+                                        // console.log('🔧 모드:', isEditMode);
+                                        // console.log('🔍 서버 CS 접수일:', serverCsDate);
+                                        // console.log('🔍 필드 현재값:', csField.value);
+                                        
+                                        if (isEditMode && serverCsDate) {
+                                            // 🔥 수정 모드: 서버 값 강제 설정
+                                            const dateStr = serverCsDate.toString();
+                                            csField.value = dateStr;
+                                            csField.dataset.originalValue = dateStr;
+                                            
+                                            // 🟢 녹색 표시
+                                            csField.style.backgroundColor = '#e8f5e8';
+                                            csField.style.borderColor = '#4caf50';
+                                            csField.style.color = '#2e7d32';
+                                            
+                                            // console.log('🔥✅ CS 접수일 강제 설정 완료:', dateStr);
+                                        } else if (!isEditMode) {
+                                            // 🆕 등록 모드: 오늘 날짜
+                                            const today = new Date();
+                                            const todayStr = today.getFullYear() + '-' + 
+                                                           String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                                                           String(today.getDate()).padStart(2, '0');
+                                            csField.value = todayStr;
+                                            csField.dataset.originalValue = todayStr;
+                                            
+                                            // 🔵 파란색 표시
+                                            csField.style.backgroundColor = '#e3f2fd';
+                                            csField.style.borderColor = '#2196f3';
+                                            csField.style.color = '#1976d2';
+                                            
+                                            // console.log('🔥✅ CS 접수일 오늘날짜 설정:', todayStr);
+                                        }
+                                    })();
+                                </script>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="returnStatusCode">처리 상태</label>
+                                <select id="returnStatusCode" name="returnStatusCode" class="form-control selected" 
+                                        th:field="*{returnStatusCode}"
+                                        style="background-color: #e3f2fd; border-color: #2196f3;">
+                                    <option value="">선택하세요</option>
+                                    <option value="PENDING">접수</option>
+                                    <option value="PROCESSING">처리중</option>
+                                    <option value="COMPLETED">완료</option>
+                                    <option value="CANCELLED">취소</option>
+                                </select>
+                                <script>
+                                    document.getElementById('returnStatusCode').value = 'PENDING';
+                                </script>
+                            </div>
+                        </div>
+
+                        <!-- 주문 정보 -->
+                        <div class="form-section-header">주문 정보</div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="siteName" class="required">주문 사이트 *</label>
+                                <input type="text" id="siteName" name="siteName" class="form-control" th:field="*{siteName}" placeholder="스토어팜-레노마" readonly required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="orderNumber" class="required">주문번호 *</label>
+                                <input type="text" id="orderNumber" name="orderNumber" class="form-control" th:field="*{orderNumber}" placeholder="20250412-0000868" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="orderDate">주문일</label>
+                                <input type="date" id="orderDate" name="orderDate" class="form-control" th:field="*{orderDate}">
+                            
+                            <!-- 🔥🔥🔥 대표님 긴급: 주문일 강제 설정 -->
+                            <script th:inline="javascript">
+                                (function() {
+                                    // console.log('🔥🔥🔥 대표님 주문일 강제 설정!');
+                                    
+                                    const orderField = document.getElementById('orderDate');
+                                    const isEditMode = /*[[${isEdit}]]*/ false;
+                                    const serverOrderDate = /*[[${returnItem?.orderDate}]]*/ null;
+                                    
+                                    // console.log('🔧 모드:', isEditMode);
+                                    // console.log('🔍 서버 주문일:', serverOrderDate);
+                                    // console.log('🔍 필드 현재값:', orderField.value);
+                                    
+                                    if (isEditMode && serverOrderDate) {
+                                        // 🔥 수정 모드: 서버 값 강제 설정
+                                        const dateStr = serverOrderDate.toString();
+                                        orderField.value = dateStr;
+                                        orderField.dataset.originalValue = dateStr;
+                                        
+                                        // 🟢 녹색 표시
+                                        orderField.style.backgroundColor = '#e8f5e8';
+                                        orderField.style.borderColor = '#4caf50';
+                                        orderField.style.color = '#2e7d32';
+                                        
+                                        // console.log('🔥✅ 주문일 강제 설정 완료:', dateStr);
+                                    }
+                                })();
+                            </script>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="orderItemCode" class="required">주문품번</label>
+                                <input type="text" id="orderItemCode" name="orderItemCode" class="form-control" th:field="*{orderItemCode}" placeholder="RN-GSZD962" required>
+                            </div>
+                
+                            <div class="form-group">
+                                <label for="productColor" class="required">색상</label>
+                                <input type="text" id="productColor" name="productColor" class="form-control" th:field="*{productColor}" placeholder="PK" required>
+                            </div>
+            
+                            <div class="form-group">
+                                <label for="productSize" class="required">사이즈</label>
+                                <input type="text" id="productSize" name="productSize" class="form-control" th:field="*{productSize}" placeholder="75" required>
+                            </div>
+                
+                            <div class="form-group">
+                                <label for="quantity" class="required">수량</label>
+                                <input type="number" id="quantity" name="quantity" class="form-control" th:field="*{quantity}" min="1" value="1" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="refundAmount">환불금액</label>
+                                <input type="number" id="refundAmount" name="refundAmount" class="form-control" th:field="*{refundAmount}" placeholder="39200">
+                            </div>
+                            
+                            <div class="form-group">
+                            <label for="shippingFee">배송비 
+                                <span th:if="${isEdit and returnItem.paymentStatus != null}" 
+                                      class="badge ms-2"
+                                      th:classappend="${returnItem.paymentStatus == 'COMPLETED'} ? 'bg-success' : (${returnItem.paymentStatus == 'NOT_REQUIRED'} ? 'bg-info' : 'bg-warning')"
+                                      th:text="${returnItem.paymentStatus}">입금상태</span>
+                            </label>
+                                <select id="shippingFee" name="shippingFee" class="form-control" th:field="*{shippingFee}">
+                                    <option value="">선택하세요</option>
+                                    <option value="6000" th:selected="${returnItem?.shippingFee == '6000'}">6000차감</option>
+                                    <option value="3000" th:selected="${returnItem?.shippingFee == '3000'}">3000차감</option>
+                                    <option value="0" th:selected="${returnItem?.shippingFee == '0'}">무상</option>
+                                    <option value="6350" th:selected="${returnItem?.shippingFee == '6350'}">6350차감</option>
+                                    <option value="3350" th:selected="${returnItem?.shippingFee == '3350'}">3350차감</option>
+                                                            <option value="입금예정" th:selected="${returnItem?.shippingFee == '입금예정'}">입금예정</option>
+                                    <option value="기타문의" th:selected="${returnItem?.shippingFee == '기타문의'}">기타문의</option>
+                                    <option value="합배송" th:selected="${returnItem?.shippingFee == '할배송'}">합배송</option>
+                                </select>
+                                
+                                <!-- 🔥 배송비 입금상태 hidden 필드 추가 -->
+                                <input type="hidden" id="paymentStatus" name="paymentStatus" th:field="*{paymentStatus}">
+                                
+                            <small class="form-text text-muted">
+                                💡 "입금예정" 선택 시 담당자가 입금 내역을 등록하면 자동으로 매핑됩니다.
+                                <span th:if="${isEdit and returnItem.returnTypeCode != null and returnItem.returnTypeCode.contains('EXCHANGE')}" class="text-success">
+                                    <i class="fas fa-shipping-fast"></i> 교환 출고 가능
+                                </span>
+                            </small>
+                            </div>
+                        </div>
+
+                        <!-- 고객 정보 -->
+                        <div class="form-section-header">고객 정보</div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="customerName" class="required">고객명 (수취인)</label>
+                                <input type="text" id="customerName" name="customerName" class="form-control" th:field="*{customerName}" placeholder="김민지" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="customerPhone" class="required">연락처</label>
+                                <input type="tel" id="customerPhone" name="customerPhone" class="form-control" th:field="*{customerPhone}" placeholder="010-1234-5678" required>
+                            </div>
+                        </div>
+            
+                        <!-- 처리 정보 -->
+                        <div class="form-section-header">처리 정보</div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="trackingNumber">운송장번호</label>
+                                <input type="text" id="trackingNumber" name="trackingNumber" class="form-control" th:field="*{trackingNumber}" placeholder="5738757014">
+                            </div>
+            
+                            <div class="form-group">
+                                <label for="collectionCompletedDate">회수완료일</label>
+                                <input type="date" id="collectionCompletedDate" name="collectionCompletedDate" class="form-control" th:field="*{collectionCompletedDate}">
+                                
+                                <!-- 🔥🔥🔥 대표님 긴급: 회수완료일 강제 설정 -->
+                                <script th:inline="javascript">
+                                    (function() {
+                                        const field = document.getElementById('collectionCompletedDate');
+                                        const isEditMode = /*[[${isEdit}]]*/ false;
+                                        const serverValue = /*[[${returnItem?.collectionCompletedDate}]]*/ null;
+                                        
+                                        if (isEditMode && serverValue) {
+                                            const dateStr = serverValue.toString();
+                                            field.value = dateStr;
+                                            field.dataset.originalValue = dateStr;
+                                            field.style.backgroundColor = '#e8f5e8';
+                                            field.style.borderColor = '#4caf50';
+                                            field.style.color = '#2e7d32';
+                                            // console.log('🔥✅ 회수완료일 강제 설정:', dateStr);
+                                        }
+                                    })();
+                                </script>
+                            </div>
+                
+                            <div class="form-group">
+                                <label for="logisticsConfirmedDate">물류확인일</label>
+                                <input type="date" id="logisticsConfirmedDate" name="logisticsConfirmedDate" class="form-control" th:field="*{logisticsConfirmedDate}">
+                                
+                                <!-- 🔥🔥🔥 대표님 긴급: 물류확인일 강제 설정 -->
+                                <script th:inline="javascript">
+                                    (function() {
+                                        const field = document.getElementById('logisticsConfirmedDate');
+                                        const isEditMode = /*[[${isEdit}]]*/ false;
+                                        const serverValue = /*[[${returnItem?.logisticsConfirmedDate}]]*/ null;
+                                        
+                                        if (isEditMode && serverValue) {
+                                            const dateStr = serverValue.toString();
+                                            field.value = dateStr;
+                                            field.dataset.originalValue = dateStr;
+                                            field.style.backgroundColor = '#e8f5e8';
+                                            field.style.borderColor = '#4caf50';
+                                            field.style.color = '#2e7d32';
+                                            // console.log('🔥✅ 물류확인일 강제 설정:', dateStr);
+                                        }
+                                    })();
+                                </script>
+                            </div>
+            
+                            <div class="form-group">
+                                <label for="shippingDate">출고일자</label>
+                                <input type="date" id="shippingDate" name="shippingDate" class="form-control" th:field="*{shippingDate}">
+                                
+                                <!-- 🔥🔥🔥 대표님 긴급: 출고일자 강제 설정 -->
+                                <script th:inline="javascript">
+                                    (function() {
+                                        const field = document.getElementById('shippingDate');
+                                        const isEditMode = /*[[${isEdit}]]*/ false;
+                                        const serverValue = /*[[${returnItem?.shippingDate}]]*/ null;
+                                        
+                                        if (isEditMode && serverValue) {
+                                            const dateStr = serverValue.toString();
+                                            field.value = dateStr;
+                                            field.dataset.originalValue = dateStr;
+                                            field.style.backgroundColor = '#e8f5e8';
+                                            field.style.borderColor = '#4caf50';
+                                            field.style.color = '#2e7d32';
+                                            // console.log('🔥✅ 출고일자 강제 설정:', dateStr);
+                                        }
+                                    })();
+                                </script>
+                            </div>
+                
+                            <div class="form-group">
+                                <label for="refundDate">환불일자</label>
+                                <input type="date" id="refundDate" name="refundDate" class="form-control" th:field="*{refundDate}">
+                                
+                                <!-- 🔥🔥🔥 대표님 긴급: 환불일자 강제 설정 -->
+                                <script th:inline="javascript">
+                                    (function() {
+                                        const field = document.getElementById('refundDate');
+                                        const isEditMode = /*[[${isEdit}]]*/ false;
+                                        const serverValue = /*[[${returnItem?.refundDate}]]*/ null;
+                                        
+                                        if (isEditMode && serverValue) {
+                                            const dateStr = serverValue.toString();
+                                            field.value = dateStr;
+                                            field.dataset.originalValue = dateStr;
+                                            field.style.backgroundColor = '#e8f5e8';
+                                            field.style.borderColor = '#4caf50';
+                                            field.style.color = '#2e7d32';
+                                            // console.log('🔥✅ 환불일자 강제 설정:', dateStr);
+                                        }
+                                    })();
+                                </script>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="isCompleted">완료 처리</label>
+                                <select id="isCompleted" name="isCompleted" class="form-control selected" 
+                                        th:field="*{isCompleted}"
+                                        style="background-color: #e3f2fd; border-color: #2196f3;">
+                                    <option value="">선택하세요</option>
+                                    <option value="1">완료</option>
+                                    <option value="0">미완료</option>
+                                </select>
+                                <script>
+                                    document.getElementById('isCompleted').value = '0';
+                                </script>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="processor">처리자</label>
+                                <input type="text" id="processor" name="processor" class="form-control" th:field="*{processor}" placeholder="담당자명">
+                            </div>
+                
+                            <div class="form-group">
+                                <label for="remarks">비고</label>
+                                <textarea id="remarks" name="remarks" class="form-control" th:field="*{remarks}" rows="2" placeholder="추가 메모사항"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- 이미지 첨부 섹션 -->
+                        <div id="imageSection" class="form-card" style="margin-top: 20px;">
+                            <div class="form-section-header">이미지 첨부</div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="attachmentDescription">첨부 설명 (선택사항)</label>
+                                    <textarea id="attachmentDescription" name="attachmentDescription" class="form-control" 
+                                             rows="2" placeholder="첨부 파일에 대한 설명을 입력하세요 (선택사항)"></textarea>
+                                </div>
+                
+                                <div class="form-group">
+                                    <label for="attachmentPhoto">이미지 첨부</label>
+                                    
+                                    <!-- 기존 이미지 표시 (수정 모드일 때) -->
+                                    <div th:if="${isEdit and returnItem.defectPhotoUrl != null and !#strings.isEmpty(returnItem.defectPhotoUrl)}" class="mt-2 mb-2">
+                                        <div style="border: 2px solid #007bff; padding: 10px; margin: 10px 0; border-radius: 5px; background: #f8f9ff;">
+                                            <h6 style="color: #007bff; margin: 0 0 10px 0;">현재 등록된 이미지</h6>
+                                            <img th:src="@{'/uploads/' + ${returnItem.defectPhotoUrl}}" style="max-width: 200px; max-height: 200px; border: 1px solid #ddd; border-radius: 3px;" alt="현재 이미지">
+                                            <br><small style="color: #666;">새 이미지를 업로드하면 기존 이미지가 교체됩니다.</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <input type="file" class="form-control-file" id="attachmentPhoto" name="attachmentPhoto" accept="image/*">
+                                    <small class="form-text text-muted">관련 이미지를 첨부해주세요.</small>
+                                    <div id="defectImagePreview" class="mt-2"></div>
+                                    
+                                    <!-- 이미지 붙여넣기 영역 -->
+                                    <div class="mt-2">
+                                        <label>이미지 붙여넣기</label>
+                                        <div class="image-paste-container" id="defectImagePasteArea" 
+                                             style="border: 2px dashed #ddd; padding: 20px; text-align: center; cursor: pointer; background-color: #f9f9f9;" 
+                                             tabindex="0" onclick="this.focus(); alert('이제 Ctrl+V를 눌러 이미지를 붙여넣으세요!');">
+                                            <i class="fas fa-paste"></i>
+                                            <span>이미지를 클립보드에서 붙여넣으세요 (Ctrl+V)</span>
+                                            <br><small style="color: #666; margin-top: 10px; display: block;">또는 이미지 파일을 여기로 드래그하세요</small>
+                                            <br><button type="button" id="selectImageBtn" style="margin-top: 10px; padding: 5px 10px; background: #28a745; color: white; border: none; border-radius: 3px; font-size: 12px;">파일 선택</button>
+                                        </div>
+                                        <div id="defectPastedImagePreview" class="mt-2"></div>
+                                    </div>
+            
+                                    <!-- Base64 이미지 데이터를 저장할 hidden 필드 -->
+                                    <input type="hidden" id="defectPastedImageData" name="attachmentImageData" />
+                                    
+                                    <!-- 첨부 이미지 URL 저장 필드 -->
+                                    <input type="hidden" id="attachmentPhotoUrl" name="attachmentPhotoUrl" />
+                                    
+                                    <!-- 등록자/수정자 정보 (서버에서 자동 설정) -->
+                                    <input type="hidden" id="createdBy" name="createdBy" th:field="*{createdBy}" />
+                                    <input type="hidden" id="updatedBy" name="updatedBy" th:field="*{updatedBy}" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <div class="form-actions">
+                        <div class="progress-info">
+                            <span th:text="${isEdit ? '정보를 수정한 후 저장하세요' : '모든 정보를 입력한 후 등록하세요'}">모든 정보를 입력한 후 등록하세요</span>
+                        </div>
+                        <div>
+                            <a th:href="${returnUrl != null ? returnUrl : '/exchange/list'}" class="btn btn-secondary">취소</a>
+                            <button type="submit" class="btn btn-primary" id="submitBtn" th:text="${isEdit ? '수정' : '등록'}">등록</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 🔥🔥🔥 추가 제품 등록 영역 (저장 성공 후에만 표시) -->
+            <div id="addProductArea" class="mt-4" style="display: none;">
+                <div class="card border-success">
+                    <div class="card-header bg-success text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="fas fa-plus-circle"></i> 같은 주문의 추가 제품 등록
+                            </h5>
+                            <span class="badge badge-light text-dark">스마트 감지</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- 🎯 기본 정보 표시 -->
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <p class="mb-1">
+                                    <strong>고객:</strong> <span id="displayCustomerName"></span> 
+                                    (<span id="displayCustomerPhone"></span>)
+                                </p>
+                                <p class="mb-1">
+                                    <strong>주문일:</strong> <span id="displayOrderDate"></span> |
+                                    <strong>사이트:</strong> <span id="displaySiteName"></span>
+                                </p>
+                                <p class="mb-0">
+                                    <strong>방금 등록:</strong> 
+                                    <span id="displayOrderNumber"></span> - 
+                                    <span id="displayOrderItemCode"></span>
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- 🔥 주문번호 옵션 선택 -->
+                        <div class="card border-info mb-3">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0">📝 추가 제품의 주문번호 선택</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="orderNumberOption" 
+                                           id="sameOrderNumber" value="same" checked>
+                                    <label class="form-check-label" for="sameOrderNumber">
+                                        <strong>같은 주문번호 사용</strong>
+                                        <code id="currentOrderNumber"></code>
+                                        <br><small class="text-muted">동일한 주문에서 다른 사이즈/옵션인 경우</small>
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="orderNumberOption" 
+                                           id="incrementOrderNumber" value="increment">
+                                    <label class="form-check-label" for="incrementOrderNumber">
+                                        <strong>순번 증가 주문번호</strong>
+                                        <code id="suggestedOrderNumber"></code>
+                                        <br><small class="text-muted">별도 주문번호가 부여되는 경우</small>
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="orderNumberOption" 
+                                           id="customOrderNumber" value="custom">
+                                    <label class="form-check-label" for="customOrderNumber">
+                                        <strong>직접 입력</strong>
+                                        <input type="text" id="customOrderInput" class="form-control form-control-sm mt-1" 
+                                               placeholder="주문번호 직접 입력" style="max-width: 300px;">
+                                        <br><small class="text-muted">특별한 패턴의 주문번호인 경우</small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 🎯 액션 버튼 -->
+                        <div class="text-center">
+                            <button type="button" class="btn btn-success btn-lg" onclick="proceedAddProduct()">
+                                <i class="fas fa-arrow-right"></i> 선택한 방식으로 추가 등록
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary ms-2" onclick="hideAddArea()">
+                                나중에 하기
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                
+            <!-- 로딩 오버레이 -->
+            <div class="loading-overlay" id="loadingOverlay">
+                <div class="loading-content">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text" th:text="${isEdit ? '수정 중입니다...' : '저장 중입니다...'}">저장 중입니다...</div>
+                </div>
+            </div>
+            
+            <!-- 성공 메시지 오버레이 -->
+            <div class="success-overlay" id="successOverlay">
+                <div class="success-content">
+                    <div class="success-icon">✓</div>
+                    <div class="loading-text" th:text="${isEdit ? '수정이 완료되었습니다!' : '저장이 완료되었습니다!'}">저장이 완료되었습니다!</div>
+        </div>
+    </div>
+
+                        <!-- 🔥🔥🔥 추가 제품 등록 JavaScript -->
+            <script>
+                // console.log('🚨 추가 제품 등록 기능 시작!');
+                
+                // 🔥 통합 페이지 로드 이벤트
+                window.addEventListener('load', function() {
+                    // console.log('📝 페이지 로드 완료 - 초기화 시작');
+                    
+                    // 1️⃣ URL 파라미터 복사 모드 확인
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const copyMode = urlParams.get('copyMode');
+                    
+                    if (copyMode === 'true') {
+                        // console.log('📋 복사 모드 감지!');
+                        
+                        // 🔥 브랜드/사이트 정보 가져오기
+                        const brand = urlParams.get('brand');
+                        const siteName = urlParams.get('siteName');
+                        
+                        // 고객 정보 자동 채우기
+                        const customerName = urlParams.get('customerName');
+                        const customerPhone = urlParams.get('customerPhone');
+                        const orderNumber = urlParams.get('orderNumber');
+                        const orderDate = urlParams.get('orderDate');
+                        const csReceivedDate = urlParams.get('csReceivedDate');
+                        const trackingNumber = urlParams.get('trackingNumber');
+                        
+                        // 필드 자동 채우기
+                        const fieldsToFill = [
+                            { param: 'customerName', id: 'customerName', readonly: true },
+                            { param: 'customerPhone', id: 'customerPhone', readonly: true },
+                            { param: 'orderNumber', id: 'orderNumber', readonly: false },
+                            { param: 'orderDate', id: 'orderDate', readonly: true },
+                            { param: 'csReceivedDate', id: 'csReceivedDate', readonly: true },
+                            { param: 'trackingNumber', id: 'trackingNumber', readonly: true },
+                            { param: 'siteName', id: 'siteName', readonly: true }
+                        ];
+                        
+                        fieldsToFill.forEach(fieldInfo => {
+                            const value = urlParams.get(fieldInfo.param);
+                            const field = document.getElementById(fieldInfo.id);
+                            
+                            if (value && field) {
+                                field.value = value;
+                                field.style.backgroundColor = '#e3f2fd';
+                                field.style.borderColor = '#2196f3';
+                                field.style.color = '#1976d2';
+                                if (fieldInfo.readonly) {
+                                    field.readOnly = true;
+                                }
+                            }
+                        });
+                        
+                        // 🔥 브랜드/사이트 자동 선택 (1초 후 실행)
+                        setTimeout(() => {
+                            if (brand) {
+                                // console.log('🏷️ 브랜드 자동 선택:', brand);
+                                
+                                // 브랜드 버튼 찾기
+                                const brandButtons = document.querySelectorAll('.selection-row:first-child .selection-btn');
+                                const brandButton = Array.from(brandButtons).find(btn => 
+                                    btn.textContent.trim() === brand
+                                );
+                                
+                                if (brandButton) {
+                                    // console.log('✅ 브랜드 버튼 찾음:', brand);
+                                    brandButton.click(); // 버튼 클릭 시뮬레이션
+                                    
+                                    // 사이트 선택 (브랜드 선택 후 800ms 대기)
+                                    setTimeout(() => {
+                                        if (siteName) {
+                                            // console.log('🌐 사이트 자동 선택:', siteName);
+                                            
+                                            // 사이트 버튼 찾기
+                                            const siteButtons = document.querySelectorAll('#siteButtons .selection-btn');
+                                            const siteButton = Array.from(siteButtons).find(btn => 
+                                                btn.textContent.trim() === siteName
+                                            );
+                                            
+                                            if (siteButton) {
+                                                // console.log('✅ 사이트 버튼 찾음:', siteName);
+                                                siteButton.click(); // 버튼 클릭 시뮬레이션
+                                            } else {
+                                                // console.log('❌ 사이트 버튼 못찾음:', siteName);
+                                            }
+                                        }
+                                    }, 800);
+                                } else {
+                                    // console.log('❌ 브랜드 버튼 못찾음:', brand);
+                                }
+                            }
+                        }, 1000);
+                        
+                        // 상단에 알림 표시
+                        const container = document.querySelector('.container');
+                        const alertHtml = `
+                            <div class="alert alert-info alert-dismissible fade show mt-3" role="alert">
+                                <h5>📋 추가 제품 등록 모드</h5>
+                                <p class="mb-0">기존 주문정보가 자동으로 채워졌습니다. <strong>제품 정보만 입력</strong>하세요.</p>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        `;
+                        container.insertAdjacentHTML('afterbegin', alertHtml);
+                    }
+                    
+                    // 2️⃣ 모드 확인만
+                    const isEditMode = document.querySelector('input[name="id"]') !== null;
+                    // console.log('🔧 현재 모드:', isEditMode ? '수정' : '등록');
+                });
+                
+                // 🎯 간단한 추가 등록 영역 표시
+                function showSimpleAddArea() {
+                    // console.log('📝 추가 등록 영역 표시');
+                    
+                    const addArea = document.getElementById('addProductArea');
+                    if (addArea) {
+                        // 저장된 정보 채우기
+                        const customerName = document.getElementById('customerName')?.value || '';
+                        const customerPhone = document.getElementById('customerPhone')?.value || '';
+                        const orderNumber = document.getElementById('orderNumber')?.value || '';
+                        const orderItemCode = document.getElementById('orderItemCode')?.value || '';
+                        
+                        document.getElementById('displayCustomerName').textContent = customerName;
+                        document.getElementById('displayCustomerPhone').textContent = customerPhone;
+                        document.getElementById('displayOrderNumber').textContent = orderNumber;
+                        document.getElementById('displayOrderItemCode').textContent = orderItemCode;
+                        document.getElementById('currentOrderNumber').textContent = orderNumber;
+                        
+                        // 자동 증가 주문번호 생성
+                        const suggested = generateOrderNumber(orderNumber);
+                        document.getElementById('suggestedOrderNumber').textContent = suggested;
+                        
+                        // 영역 표시
+                        addArea.style.display = 'block';
+                        
+                        // 스크롤
+                        setTimeout(() => {
+                            addArea.scrollIntoView({ behavior: 'smooth' });
+                        }, 300);
+                    }
+                }
+                
+                // 🎯 주문번호 자동 생성
+                function generateOrderNumber(baseNumber) {
+                    if (!baseNumber) return '';
+                    
+                    // -01 → -02 패턴
+                    if (baseNumber.match(/-\d+$/)) {
+                        const lastDash = baseNumber.lastIndexOf('-');
+                        const prefix = baseNumber.substring(0, lastDash + 1);
+                        const num = baseNumber.substring(lastDash + 1);
+                        const nextNum = String(parseInt(num) + 1).padStart(num.length, '0');
+                        return prefix + nextNum;
+                    }
+                    
+                    // 기본적으로 -02 추가
+                    return baseNumber + '-02';
+                }
+                
+                // 🎯 추가 등록 진행
+                function proceedAddProduct() {
+                    // console.log('🚀 추가 등록 진행');
+                    
+                    const selectedOption = document.querySelector('input[name="orderNumberOption"]:checked')?.value;
+                    let targetOrderNumber = '';
+                    
+                    if (selectedOption === 'same') {
+                        targetOrderNumber = document.getElementById('currentOrderNumber').textContent;
+                    } else if (selectedOption === 'increment') {
+                        targetOrderNumber = document.getElementById('suggestedOrderNumber').textContent;
+                    } else if (selectedOption === 'custom') {
+                        targetOrderNumber = document.getElementById('customOrderInput').value.trim();
+                        if (!targetOrderNumber) {
+                            alert('주문번호를 입력해주세요.');
+                            return;
+                        }
+                    }
+                    
+                    // 🔥 모든 필요한 정보를 URL 파라미터로 전달
+                    const selectedBrand = document.querySelector('.selection-row:first-child .selection-btn.active')?.textContent?.trim() || '';
+                    
+                    const params = new URLSearchParams({
+                        copyMode: 'true',
+                        customerName: document.getElementById('customerName')?.value || '',
+                        customerPhone: document.getElementById('customerPhone')?.value || '',
+                        orderNumber: targetOrderNumber,
+                        orderDate: document.getElementById('orderDate')?.value || '',
+                        csReceivedDate: document.getElementById('csReceivedDate')?.value || '',
+                        trackingNumber: document.getElementById('trackingNumber')?.value || '',
+                        siteName: document.getElementById('siteName')?.value || '',
+                        brand: selectedBrand
+                    });
+                    
+                    window.location.href = `/exchange/create?${params.toString()}`;
+                }
+                
+                // 🎯 영역 숨기기
+                function hideAddArea() {
+                    document.getElementById('addProductArea').style.display = 'none';
+                }
+                
+                // 🔥🔥🔥 폼 제출 처리 함수 (form 태그에서 직접 호출)
+                function handleFormSubmit(event) {
+                    // console.log('🚨 폼 제출 처리 시작');
+                    
+                    const isEditMode = document.querySelector('input[name="id"]') !== null;
+                    // console.log('🔧 모드 확인:', isEditMode ? '수정' : '등록');
+                    
+                    // 수정 모드는 기존대로 진행
+                    if (isEditMode) {
+                        // console.log('🔧 수정 모드 - 기존 제출 방식');
+                        return true; // 기본 form 제출 허용
+                    }
+                    
+                    // 등록 모드는 Ajax 처리
+                    // console.log('🆕 등록 모드 - Ajax 처리 시작');
+                    event.preventDefault(); // 기본 제출 방지
+                    
+                    const form = event.target;
+                    const formData = new FormData(form);
+                    
+                    // 로딩 표시
+                    const loadingOverlay = document.getElementById('loadingOverlay');
+                    if (loadingOverlay) {
+                        loadingOverlay.style.display = 'flex';
+                        // console.log('⏳ 로딩 표시');
+                    }
+                    
+                    // Ajax 제출
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => {
+                        // console.log('📡 서버 응답:', response.status);
+                        
+                        if (response.ok) {
+                            // 로딩 숨기기
+                            if (loadingOverlay) {
+                                loadingOverlay.style.display = 'none';
+                            }
+                            
+                            // 성공 메시지 표시
+                            const successOverlay = document.getElementById('successOverlay');
+                            if (successOverlay) {
+                                successOverlay.style.display = 'flex';
+                                // console.log('✅ 성공 메시지 표시');
+                            }
+                            
+                            // 1초 후 추가 등록 여부 확인
+                            setTimeout(() => {
+                                if (successOverlay) {
+                                    successOverlay.style.display = 'none';
+                                }
+                                
+                                // 추가 등록 여부 물어보기
+                                const result = confirm('✅ 등록이 완료되었습니다!\n\n같은 주문의 다른 제품도 추가로 등록하시겠습니까?');
+                                
+                                if (result) {
+                                    // console.log('👍 추가 등록 선택');
+                                    showSimpleAddArea();
+                                } else {
+                                                            // console.log('👎 목록으로 이동');
+                        // 🎯 returnUrl이 있으면 해당 URL로, 없으면 기본 목록으로
+                        const returnUrl = '[[${returnUrl}]]';
+                        window.location.href = returnUrl || '/exchange/list';
+                                }
+                            }, 1000);
+                            
+                        } else {
+                            throw new Error('서버 오류: ' + response.status);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('❌ 저장 오류:', error);
+                        
+                        if (loadingOverlay) {
+                            loadingOverlay.style.display = 'none';
+                        }
+                        
+                        alert('저장 중 오류가 발생했습니다.\n다시 시도해주세요.');
+                    });
+                    
+                    return false; // 기본 form 제출 방지
+                }
+</script>
+        </div>
+    </div>
+</body>
+</html>

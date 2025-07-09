@@ -17,6 +17,7 @@ import com.wio.repairsystem.model.ReturnStatus;
 import com.wio.repairsystem.model.ReturnType;
 import com.wio.repairsystem.service.ReturnItemService;
 import com.wio.repairsystem.service.AttachmentService;
+import com.wio.repairsystem.service.ReturnItemStatsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,12 +53,14 @@ public class ExchangeController {
 
     private final ReturnItemService returnItemService;
     private final AttachmentService attachmentService;
+    private final ReturnItemStatsService returnItemStatsService;
     
     @Value("${file.upload-dir:./uploads}")
     private String uploadBaseDir;
 
     /**
      * 교환/반품 목록 페이지 (exchange/list.html)
+     * 🎯 다중 필터 지원 추가
      */
     @GetMapping({"/list", ""})
     public String list(
@@ -66,11 +69,12 @@ public class ExchangeController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "DESC") String sortDir) {
+            @RequestParam(defaultValue = "DESC") String sortDir,
+            @RequestParam(required = false) String filters) {
         
-        log.info("교환/반품 목록 조회 - 검색조건: {}", searchDTO);
+        log.info("교환/반품 목록 조회 - 검색조건: {}, 필터: {}", searchDTO, filters);
         
-        // 검색 조건이 있으면 검색, 없으면 전체 조회
+        // 🎯 다중 필터 처리
         Page<ReturnItemDTO> returnItems;
         try {
             // 페이징 정보를 searchDTO에 설정
@@ -82,105 +86,112 @@ public class ExchangeController {
             searchDTO.setSortBy(sortBy);
             searchDTO.setSortDir(sortDir);
             
-            if (searchDTO.hasSearchCondition()) {
-                // 검색 조건이 있으면 검색 수행
+            // 🎯 필터와 검색 조건 함께 처리
+            boolean hasFilters = StringUtils.hasText(filters);
+            boolean hasSearchCondition = searchDTO.hasSearchCondition();
+            
+            if (hasFilters && hasSearchCondition) {
+                // 필터 + 검색 조건 둘 다 있는 경우
+                log.info("🔍 필터 + 검색 조건 함께 적용 - 필터: {}, 검색: {}", filters, searchDTO.getKeyword());
+                returnItems = applyMultipleFiltersWithSearch(filters, searchDTO);
+                log.info("✅ 필터 + 검색 조회 완료 - 결과 수: {}", returnItems.getTotalElements());
+            } else if (hasFilters) {
+                // 필터만 있는 경우
+                log.info("🔍 다중 필터만 적용: {}", filters);
+                returnItems = applyMultipleFilters(filters, searchDTO);
+                log.info("✅ 다중 필터 조회 완료 - 필터: {}, 결과 수: {}", filters, returnItems.getTotalElements());
+            } else if (hasSearchCondition) {
+                // 검색 조건만 있는 경우
                 returnItems = returnItemService.search(searchDTO);
-                log.info("검색 조건으로 조회 완료 - 결과 수: {}", returnItems.getTotalElements());
+                log.info("🔍 검색 조건으로 조회 완료 - 결과 수: {}", returnItems.getTotalElements());
             } else {
-                // 검색 조건이 없으면 전체 조회
+                // 필터도 검색 조건도 없는 경우
                 returnItems = returnItemService.findAll(page, size, sortBy, sortDir);
-                log.info("전체 조회 완료 - 결과 수: {}", returnItems.getTotalElements());
+                log.info("📋 전체 조회 완료 - 결과 수: {}", returnItems.getTotalElements());
             }
         } catch (Exception e) {
-            log.error("목록 조회 실패, 빈 페이지 반환: {}", e.getMessage(), e);
+            log.error("❌ 목록 조회 실패, 빈 페이지 반환: {}", e.getMessage(), e);
             returnItems = Page.empty(PageRequest.of(page, size));
         }
         
-        // 상태별 통계 (임시로 빈 Map 사용)
+        // 🚀 현황요약 비활성화 - 성능 최적화를 위해 통계 조회 건너뜀
+        log.info("📊 현황요약 비활성화됨 - 통계 조회 건너뜀으로 성능 향상");
+        
+        // 현황요약에 사용되는 통계 변수들을 빈 값으로 초기화
         Map<ReturnStatus, Long> statusCounts = new java.util.HashMap<>();
         Map<String, Long> siteCounts = new java.util.HashMap<>();
         Map<String, Long> typeCounts = new java.util.HashMap<>();
         Map<String, Long> reasonCounts = new java.util.HashMap<>();
         Map<String, Object> amountSummary = new java.util.HashMap<>();
         Map<String, Long> brandCounts = new java.util.HashMap<>();
-        
-        try {
-            statusCounts = returnItemService.getStatusCounts();
-            
-            // 사이트별 통계 - 상위 6개만 (내림차순 정렬)
-            Map<String, Long> allSiteCounts = returnItemService.getSiteCounts();
-            siteCounts = allSiteCounts.entrySet().stream()
-                    .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
-                    .limit(6)
-                    .collect(java.util.stream.Collectors.toMap(
-                            Map.Entry::getKey,
-                            Map.Entry::getValue,
-                            (e1, e2) -> e1,
-                            java.util.LinkedHashMap::new
-                    ));
-            
-            typeCounts = returnItemService.getTypeCounts();
-            
-            // 사유별 통계 - 상위 5개만 (내림차순 정렬)
-            Map<String, Long> allReasonCounts = returnItemService.getReasonCounts();
-            reasonCounts = allReasonCounts.entrySet().stream()
-                    .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
-                    .limit(5)
-                    .collect(java.util.stream.Collectors.toMap(
-                            Map.Entry::getKey,
-                            Map.Entry::getValue,
-                            (e1, e2) -> e1,
-                            java.util.LinkedHashMap::new
-                    ));
-            
-            amountSummary = returnItemService.getAmountSummary();
-            brandCounts = returnItemService.getBrandCounts();
-        } catch (Exception e) {
-            log.error("통계 조회 실패: {}", e.getMessage());
-            // 빈 맵으로 초기화
-            for (ReturnStatus status : ReturnStatus.values()) {
-                statusCounts.put(status, 0L);
-            }
-        }
-        
-        // 금일 등록 건수 계산
         Long todayCount = 0L;
-        try {
-            todayCount = returnItemService.getTodayCount();
-        } catch (Exception e) {
-            log.error("금일 등록 건수 조회 실패: {}", e.getMessage());
-            todayCount = 0L;
-        }
         
-        // 🎯 상단 카드 대시보드 통계 계산
+        // 상단 카드 통계는 유지 (필터링에 필요)
         Map<String, Long> cardStats = new java.util.HashMap<>();
+        
         try {
-            // ① 회수완료 카드
-            cardStats.put("collectionCompleted", returnItemService.getCollectionCompletedCount());
-            cardStats.put("collectionPending", returnItemService.getCollectionPendingCount());
+            log.info("🚀 상단 카드 통계만 조회 시작 (현황요약 제외)");
+            long startTime = System.currentTimeMillis();
             
-            // ② 물류확인 카드
-            cardStats.put("logisticsConfirmed", returnItemService.getLogisticsConfirmedCount());
-            cardStats.put("logisticsPending", returnItemService.getLogisticsPendingCount());
+            // 📊 상단 카드 통계만 조회 (필터링에 필요)
+            Map<String, Object> allStats = returnItemStatsService.getAllStats();
             
-            // ③ 교환 출고일자 카드
-            cardStats.put("exchangeShipped", returnItemService.getExchangeShippedCount());
-            cardStats.put("exchangeNotShipped", returnItemService.getExchangeNotShippedCount());
+            // 카드 통계 매핑 (필터링 기능에 필요)
+            cardStats.put("collectionCompleted", ((Number) allStats.get("COLLECTION_COMPLETED")).longValue());
+            cardStats.put("collectionPending", ((Number) allStats.get("COLLECTION_PENDING")).longValue());
+            cardStats.put("logisticsConfirmed", ((Number) allStats.get("LOGISTICS_CONFIRMED")).longValue());
+            cardStats.put("logisticsPending", ((Number) allStats.get("LOGISTICS_PENDING")).longValue());
+            cardStats.put("exchangeShipped", ((Number) allStats.get("EXCHANGE_SHIPPED")).longValue());
+            cardStats.put("exchangeNotShipped", ((Number) allStats.get("EXCHANGE_NOT_SHIPPED")).longValue());
+            cardStats.put("returnRefunded", ((Number) allStats.get("RETURN_REFUNDED")).longValue());
+            cardStats.put("returnNotRefunded", ((Number) allStats.get("RETURN_NOT_REFUNDED")).longValue());
+            cardStats.put("paymentCompleted", ((Number) allStats.get("PAYMENT_COMPLETED")).longValue());
+            cardStats.put("paymentPending", ((Number) allStats.get("PAYMENT_PENDING")).longValue());
+            cardStats.put("completedCount", ((Number) allStats.get("COMPLETED_COUNT")).longValue());
+            cardStats.put("incompletedCount", ((Number) allStats.get("INCOMPLETED_COUNT")).longValue());
+            cardStats.put("overdueTenDaysCount", ((Number) allStats.get("OVERDUE_TEN_DAYS")).longValue());
             
-            // ④ 반품 환불일자 카드
-            cardStats.put("returnRefunded", returnItemService.getReturnRefundedCount());
-            cardStats.put("returnNotRefunded", returnItemService.getReturnNotRefundedCount());
+            // 현황요약 통계는 조회하지 않음 (성능 향상)
+            /*
+            // 상태별 통계 매핑 - 현황요약 비활성화로 주석처리
+            statusCounts.put(ReturnStatus.PENDING, ((Number) allStats.get("STATUS_PENDING")).longValue());
+            statusCounts.put(ReturnStatus.PROCESSING, ((Number) allStats.get("STATUS_PROCESSING")).longValue());
+            statusCounts.put(ReturnStatus.SHIPPING, ((Number) allStats.get("STATUS_SHIPPING")).longValue());
+            statusCounts.put(ReturnStatus.COMPLETED, ((Number) allStats.get("STATUS_COMPLETED")).longValue());
             
-            // ⑤ 배송비입금 카드
-            cardStats.put("paymentCompleted", returnItemService.getPaymentCompletedCount());
-            cardStats.put("paymentPending", returnItemService.getPaymentPendingCount());
+            // 유형별 통계 매핑 - 현황요약 비활성화로 주석처리
+            typeCounts.put("FULL_RETURN", ((Number) allStats.get("TYPE_FULL_RETURN")).longValue());
+            typeCounts.put("PARTIAL_RETURN", ((Number) allStats.get("TYPE_PARTIAL_RETURN")).longValue());
+            typeCounts.put("FULL_EXCHANGE", ((Number) allStats.get("TYPE_FULL_EXCHANGE")).longValue());
+            typeCounts.put("PARTIAL_EXCHANGE", ((Number) allStats.get("TYPE_PARTIAL_EXCHANGE")).longValue());
+            typeCounts.put("EXCHANGE", ((Number) allStats.get("TYPE_EXCHANGE")).longValue());
             
-            // ⑥ 완료 상태 카드 통계 추가
-            cardStats.put("completedCount", returnItemService.getCompletedCount());
-            cardStats.put("incompletedCount", returnItemService.getIncompletedCount());
+            // 금액 통계 매핑 - 현황요약 비활성화로 주석처리
+            amountSummary.put("totalRefundAmount", allStats.get("TOTAL_REFUND_AMOUNT"));
+            amountSummary.put("totalShippingFee", allStats.get("TOTAL_SHIPPING_FEE"));
+            amountSummary.put("avgRefundAmount", allStats.get("AVG_REFUND_AMOUNT"));
+            
+            // 브랜드별 통계 매핑 - 현황요약 비활성화로 주석처리
+            brandCounts.put("레노마", ((Number) allStats.get("BRAND_RENOMA")).longValue());
+            brandCounts.put("코랄리크", ((Number) allStats.get("BRAND_CORALIK")).longValue());
+            brandCounts.put("기타", ((Number) allStats.get("BRAND_OTHERS")).longValue());
+            
+            // 금일 등록 건수 - 현황요약 비활성화로 주석처리
+            todayCount = ((Number) allStats.get("TODAY_COUNT")).longValue();
+            
+            // 📊 사이트별 통계 (DB 집계) - 현황요약 비활성화로 주석처리
+            siteCounts = returnItemStatsService.getSiteStats();
+            
+            // 📊 사유별 통계 (DB 집계) - 현황요약 비활성화로 주석처리
+            reasonCounts = returnItemStatsService.getReasonStats();
+            */
+            
+            long endTime = System.currentTimeMillis();
+            log.info("✅ 상단 카드 통계만 조회 완료 - 소요시간: {}ms (현황요약 제외로 더욱 빠름)", endTime - startTime);
             
         } catch (Exception e) {
-            log.error("상단 카드 통계 조회 실패: {}", e.getMessage());
+            log.error("❌ 카드 통계 조회 실패, 기본값 사용: {}", e.getMessage());
+            
             // 기본값으로 초기화
             cardStats.put("collectionCompleted", 0L);
             cardStats.put("collectionPending", 0L);
@@ -194,6 +205,7 @@ public class ExchangeController {
             cardStats.put("paymentPending", 0L);
             cardStats.put("completedCount", 0L);
             cardStats.put("incompletedCount", 0L);
+            cardStats.put("overdueTenDaysCount", 0L);
         }
         
         // searchDTO가 null이면 빈 객체 생성
@@ -219,6 +231,7 @@ public class ExchangeController {
         model.addAttribute("reverseSortDir", sortDir.equals("ASC") ? "DESC" : "ASC");
         model.addAttribute("returnStatuses", ReturnStatus.values());
         model.addAttribute("returnTypes", ReturnType.values());
+        model.addAttribute("filters", filters); // 🎯 다중 필터 정보 추가
         
         return "exchange/list";
     }
@@ -245,7 +258,9 @@ public class ExchangeController {
      * 교환/반품 수정 폼 페이지 (exchange/form.html)
      */
     @GetMapping("/edit/{id}")
-    public String editForm(@PathVariable Long id, Model model) {
+    public String editForm(@PathVariable Long id, 
+                          @RequestParam(required = false) String returnTo, 
+                          Model model) {
         log.info("교환/반품 수정 폼 페이지 접근 - ID: {}", id);
         
         try {
@@ -272,6 +287,14 @@ public class ExchangeController {
             model.addAttribute("returnTypes", ReturnType.values());
             model.addAttribute("isEdit", true);
             
+            // 🎯 목록 돌아가기 URL 추가
+            if (returnTo != null && !returnTo.isEmpty()) {
+                model.addAttribute("returnUrl", returnTo);
+                log.info("🎯 목록 돌아가기 URL 설정: {}", returnTo);
+            } else {
+                model.addAttribute("returnUrl", "/exchange/list");
+            }
+            
             return "exchange/form";
         } catch (Exception e) {
             log.error("교환/반품 수정 폼 로드 실패 - ID: {}, 오류: {}", id, e.getMessage());
@@ -283,7 +306,9 @@ public class ExchangeController {
      * 교환/반품 상세 보기 페이지 (exchange/view.html)
      */
     @GetMapping("/view/{id}")
-    public String view(@PathVariable Long id, Model model) {
+    public String view(@PathVariable Long id, 
+                       @RequestParam(required = false) String returnTo, 
+                       Model model) {
         log.info("교환/반품 상세 보기 - ID: {}", id);
         
         try {
@@ -291,6 +316,14 @@ public class ExchangeController {
             model.addAttribute("returnItem", returnItem);
             model.addAttribute("returnStatuses", ReturnStatus.values());
             model.addAttribute("returnTypes", ReturnType.values());
+            
+            // 🎯 목록 돌아가기 URL 추가
+            if (returnTo != null && !returnTo.isEmpty()) {
+                model.addAttribute("returnUrl", returnTo);
+                log.info("🎯 목록 돌아가기 URL 설정: {}", returnTo);
+            } else {
+                model.addAttribute("returnUrl", "/exchange/list");
+            }
             
             return "exchange/view";
         } catch (Exception e) {
@@ -307,6 +340,7 @@ public class ExchangeController {
                        @RequestParam Map<String, String> allParams,
                        @RequestParam(value = "attachmentPhoto", required = false) MultipartFile attachmentPhoto,
                        @RequestParam(value = "attachmentImageData", required = false) String attachmentImageData,
+                       @RequestParam(value = "returnTo", required = false) String returnTo,
                        RedirectAttributes redirectAttributes) {
         log.info("교환/반품 저장 - 데이터: {}", returnItemDTO);
         log.info("모든 파라미터: {}", allParams);
@@ -419,7 +453,14 @@ public class ExchangeController {
                 // 수정
                 returnItemService.updateReturnItem(returnItemDTO);
                 redirectAttributes.addFlashAttribute("success", "교환/반품 정보가 수정되었습니다.");
-                return "redirect:/exchange/list?success=update";
+                
+                // 🎯 returnTo URL이 있으면 해당 URL로, 없으면 기본 목록으로
+                if (returnTo != null && !returnTo.isEmpty()) {
+                    log.info("🎯 저장 후 돌아갈 URL: {}", returnTo);
+                    return "redirect:" + returnTo;
+                } else {
+                    return "redirect:/exchange/list?success=update";
+                }
             } else {
                 // 등록
                 ReturnItemDTO savedItem = returnItemService.createReturnItem(returnItemDTO);
@@ -431,7 +472,11 @@ public class ExchangeController {
             redirectAttributes.addFlashAttribute("error", "저장 중 오류가 발생했습니다: " + e.getMessage());
             
             if (returnItemDTO.getId() != null) {
-                return "redirect:/exchange/edit/" + returnItemDTO.getId() + "?error=true";
+                String errorUrl = "/exchange/edit/" + returnItemDTO.getId() + "?error=true";
+                if (returnTo != null && !returnTo.isEmpty()) {
+                    errorUrl += "&returnTo=" + java.net.URLEncoder.encode(returnTo, java.nio.charset.StandardCharsets.UTF_8);
+                }
+                return "redirect:" + errorUrl;
             } else {
                 return "redirect:/exchange/create?error=true";
             }
@@ -666,284 +711,149 @@ public class ExchangeController {
     }
 
     /**
-     * 카드 필터링 API - 조건에 맞는 데이터를 서버에서 조회
+     * 🎯 AJAX 필터링 - HTML 반환 (빠른 필터링)
      */
-    @GetMapping("/filter/{filterType}")
-    public String filterByCard(
-            @PathVariable String filterType,
-            Model model,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "DESC") String sortDir) {
-        
-        log.info("카드 필터링 요청 - filterType: {}", filterType);
-        
-        Page<ReturnItemDTO> returnItems;
-        ReturnItemSearchDTO searchDTO = new ReturnItemSearchDTO();
-        searchDTO.setPage(page);
-        searchDTO.setSize(size);
-        searchDTO.setSortBy(sortBy);
-        searchDTO.setSortDir(sortDir);
-        
+    @PostMapping("/api/filter-html")
+    @ResponseBody
+    public String filterByCardAjaxHtml(@RequestBody Map<String, Object> request, Model model) {
         try {
-            // 필터 타입에 따라 조건 설정
-            switch (filterType) {
-                case "collection-completed":
-                    returnItems = returnItemService.findByCollectionCompleted(searchDTO);
-                    break;
-                case "collection-pending":
-                    returnItems = returnItemService.findByCollectionPending(searchDTO);
-                    break;
-                case "logistics-confirmed":
-                    returnItems = returnItemService.findByLogisticsConfirmed(searchDTO);
-                    break;
-                case "logistics-pending":
-                    returnItems = returnItemService.findByLogisticsPending(searchDTO);
-                    break;
-                case "shipping-completed":
-                    returnItems = returnItemService.findByShippingCompleted(searchDTO);
-                    break;
-                case "shipping-pending":
-                    returnItems = returnItemService.findByShippingPending(searchDTO);
-                    break;
-                case "refund-completed":
-                    returnItems = returnItemService.findByRefundCompleted(searchDTO);
-                    break;
-                case "refund-pending":
-                    returnItems = returnItemService.findByRefundPending(searchDTO);
-                    break;
-                case "payment-completed":
-                    returnItems = returnItemService.findByPaymentCompleted(searchDTO);
-                    break;
-                case "payment-pending":
-                    returnItems = returnItemService.findByPaymentPending(searchDTO);
-                    break;
-                case "completed":
-                    log.info("🎯 완료 상태 필터링 요청");
-                    returnItems = returnItemService.findByCompleted(searchDTO);
-                    log.info("✅ 완료 상태 필터링 결과: {} 건", returnItems.getTotalElements());
-                    break;
-                case "incompleted":
-                    log.info("🎯 미완료 상태 필터링 요청");
-                    returnItems = returnItemService.findByIncompleted(searchDTO);
-                    log.info("❌ 미완료 상태 필터링 결과: {} 건", returnItems.getTotalElements());
-                    break;
-                default:
-                    log.warn("알 수 없는 필터 타입: {}", filterType);
-                    returnItems = returnItemService.findAll(page, size, sortBy, sortDir);
-                    break;
+            String filterType = (String) request.get("filterType");
+            Integer page = (Integer) request.getOrDefault("page", 0);
+            Integer size = (Integer) request.getOrDefault("size", 20);
+            
+            log.info("🚀 AJAX 필터링 요청 - 필터: {}, 페이지: {}", filterType, page);
+            
+            // 검색 조건 설정
+            ReturnItemSearchDTO searchDTO = new ReturnItemSearchDTO();
+            searchDTO.setPage(page);
+            searchDTO.setSize(size);
+            searchDTO.setSortBy("id");
+            searchDTO.setSortDir("DESC");
+            
+            // 기본 검색 조건이 있으면 추가
+            if (request.containsKey("keyword")) {
+                searchDTO.setKeyword((String) request.get("keyword"));
+            }
+            if (request.containsKey("startDate")) {
+                searchDTO.setStartDate(LocalDate.parse((String) request.get("startDate")));
+            }
+            if (request.containsKey("endDate")) {
+                searchDTO.setEndDate(LocalDate.parse((String) request.get("endDate")));
             }
             
-            log.info("필터링 조회 완료 - 결과 수: {}", returnItems.getTotalElements());
+            // 필터 적용
+            Page<ReturnItemDTO> returnItems = applySingleFilter(filterType, searchDTO);
             
-        } catch (Exception e) {
-            log.error("필터링 조회 실패: {}", e.getMessage(), e);
-            returnItems = Page.empty(PageRequest.of(page, size));
-        }
-        
-        // 기본 통계 정보도 함께 제공 (기존 list 메서드와 동일)
-        Map<ReturnStatus, Long> statusCounts = new java.util.HashMap<>();
-        Map<String, Long> siteCounts = new java.util.HashMap<>();
-        Map<String, Long> typeCounts = new java.util.HashMap<>();
-        Map<String, Long> reasonCounts = new java.util.HashMap<>();
-        Map<String, Object> amountSummary = new java.util.HashMap<>();
-        Map<String, Long> brandCounts = new java.util.HashMap<>();
-        
-        try {
-            statusCounts = returnItemService.getStatusCounts();
-            siteCounts = returnItemService.getSiteCounts();
-            typeCounts = returnItemService.getTypeCounts();
-            reasonCounts = returnItemService.getReasonCounts();
-            amountSummary = returnItemService.getAmountSummary();
-            brandCounts = returnItemService.getBrandCounts();
-        } catch (Exception e) {
-            log.error("통계 조회 실패: {}", e.getMessage());
-        }
-        
-        // 카드 통계 정보
-        Map<String, Long> cardStats = new java.util.HashMap<>();
-        try {
-            cardStats.put("collectionCompleted", returnItemService.getCollectionCompletedCount());
-            cardStats.put("collectionPending", returnItemService.getCollectionPendingCount());
-            cardStats.put("logisticsConfirmed", returnItemService.getLogisticsConfirmedCount());
-            cardStats.put("logisticsPending", returnItemService.getLogisticsPendingCount());
-            cardStats.put("exchangeShipped", returnItemService.getExchangeShippedCount());
-            cardStats.put("exchangeNotShipped", returnItemService.getExchangeNotShippedCount());
-            cardStats.put("returnRefunded", returnItemService.getReturnRefundedCount());
-            cardStats.put("returnNotRefunded", returnItemService.getReturnNotRefundedCount());
-            cardStats.put("paymentCompleted", returnItemService.getPaymentCompletedCount());
-            cardStats.put("paymentPending", returnItemService.getPaymentPendingCount());
-            cardStats.put("completedCount", returnItemService.getCompletedCount());
-            cardStats.put("incompletedCount", returnItemService.getIncompletedCount());
-        } catch (Exception e) {
-            log.error("카드 통계 조회 실패: {}", e.getMessage());
-        }
-        
-        Long todayCount = 0L;
-        try {
-            todayCount = returnItemService.getTodayCount();
-        } catch (Exception e) {
-            log.error("금일 등록 건수 조회 실패: {}", e.getMessage());
-        }
-        
-        // 모델에 데이터 추가
-        model.addAttribute("returnItems", returnItems);
-        model.addAttribute("statusCounts", statusCounts);
-        model.addAttribute("siteCounts", siteCounts);
-        model.addAttribute("typeCounts", typeCounts);
-        model.addAttribute("reasonCounts", reasonCounts);
-        model.addAttribute("amountSummary", amountSummary);
-        model.addAttribute("brandCounts", brandCounts);
-        model.addAttribute("cardStats", cardStats);
-        model.addAttribute("todayCount", todayCount);
-        model.addAttribute("totalItems", returnItems.getTotalElements());
-        model.addAttribute("currentPage", page);
-        model.addAttribute("searchDTO", searchDTO);
-        model.addAttribute("currentFilter", filterType); // 현재 적용된 필터
-        
-        return "exchange/list";
-    }
-
-    /**
-     * 🚀 성능 최적화된 목록 조회 (만 개 데이터 대응)
-     */
-    @GetMapping("/optimized")
-    public String listOptimized(@RequestParam(defaultValue = "0") int page,
-                               @RequestParam(defaultValue = "20") int size,
-                               @RequestParam(required = false) String keyword,
-                               @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                               @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-                               Model model) {
-        
-        long startTime = System.currentTimeMillis();
-        
-        try {
-            // 성능 최적화된 검색 사용
-            Page<ReturnItemDTO> returnItems = returnItemService.searchOptimized(keyword, startDate, endDate, page, size);
-            
-            // 카드 통계 (캐싱 고려)
-            Map<String, Long> cardStats = getCardStatistics();
-            
+            // 모델에 데이터 추가
             model.addAttribute("returnItems", returnItems);
-            model.addAttribute("cardStats", cardStats);
-            model.addAttribute("keyword", keyword);
-            model.addAttribute("startDate", startDate);
-            model.addAttribute("endDate", endDate);
             model.addAttribute("currentPage", page);
-            model.addAttribute("pageSize", size);
             
-            long endTime = System.currentTimeMillis();
-            model.addAttribute("queryTime", endTime - startTime);
+            log.info("✅ AJAX 필터링 완료 - 결과: {}건", returnItems.getTotalElements());
             
-            return "exchange/list";
+            // 테이블 섹션만 반환
+            return "exchange/table-section";
             
         } catch (Exception e) {
-            log.error("최적화된 목록 조회 중 오류 발생", e);
-            model.addAttribute("error", "데이터 조회 중 오류가 발생했습니다: " + e.getMessage());
-            return "exchange/list";
+            log.error("❌ AJAX 필터링 실패: {}", e.getMessage(), e);
+            model.addAttribute("returnItems", Page.empty(PageRequest.of(0, 20)));
+            model.addAttribute("currentPage", 0);
+            return "exchange/table-section";
         }
     }
 
     /**
-     * 🚀 성능 통계 API (성능 모니터링용)
+     * 🎯 실시간 통계 조회 (검색 조건 적용)
      */
-    @GetMapping("/api/performance-stats")
+    @GetMapping("/api/realtime-stats")
     @ResponseBody
-    public Map<String, Object> getPerformanceStats() {
-        long startTime = System.currentTimeMillis();
-        
-        Map<String, Object> stats = new HashMap<>();
+    public ResponseEntity<Map<String, Object>> getRealtimeStats(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         
         try {
-            // 기본 통계
-            stats.put("totalCount", returnItemService.getTodayCount());
+            log.info("📊 실시간 통계 조회 - 검색: {}, 시작일: {}, 종료일: {}", keyword, startDate, endDate);
             
-            // 카드 통계 (개별 측정)
-            long cardStartTime = System.currentTimeMillis();
-            Map<String, Long> cardStats = getCardStatistics();
-            long cardEndTime = System.currentTimeMillis();
+            // 검색 조건이 있으면 검색 통계, 없으면 전체 통계
+            Map<String, Object> stats = new HashMap<>();
             
-            stats.put("cardStats", cardStats);
-            stats.put("cardQueryTime", cardEndTime - cardStartTime);
+            if (StringUtils.hasText(keyword) || startDate != null || endDate != null) {
+                // 검색 조건이 있는 경우
+                ReturnItemSearchDTO searchDTO = new ReturnItemSearchDTO();
+                searchDTO.setKeyword(keyword);
+                searchDTO.setStartDate(startDate);
+                searchDTO.setEndDate(endDate);
+                
+                // 검색 통계 조회
+                Map<String, Object> searchStats = returnItemStatsService.getRealtimeStats(searchDTO);
+                stats.putAll(searchStats);
+            } else {
+                // 전체 통계 조회
+                Map<String, Object> allStats = returnItemStatsService.getAllStats();
+                stats.putAll(allStats);
+            }
             
-            long endTime = System.currentTimeMillis();
-            stats.put("totalQueryTime", endTime - startTime);
-            stats.put("timestamp", LocalDateTime.now());
+            // 카드 통계 형태로 변환
+            Map<String, Object> cardStats = new HashMap<>();
+            cardStats.put("collectionCompletedCount", getLongValue(stats, "COLLECTION_COMPLETED"));
+            cardStats.put("collectionPendingCount", getLongValue(stats, "COLLECTION_PENDING"));
+            cardStats.put("logisticsConfirmedCount", getLongValue(stats, "LOGISTICS_CONFIRMED"));
+            cardStats.put("logisticsPendingCount", getLongValue(stats, "LOGISTICS_PENDING"));
+            cardStats.put("exchangeShippedCount", getLongValue(stats, "EXCHANGE_SHIPPED"));
+            cardStats.put("exchangeNotShippedCount", getLongValue(stats, "EXCHANGE_NOT_SHIPPED"));
+            cardStats.put("returnRefundedCount", getLongValue(stats, "RETURN_REFUNDED"));
+            cardStats.put("returnNotRefundedCount", getLongValue(stats, "RETURN_NOT_REFUNDED"));
+            cardStats.put("paymentCompletedCount", getLongValue(stats, "PAYMENT_COMPLETED"));
+            cardStats.put("paymentPendingCount", getLongValue(stats, "PAYMENT_PENDING"));
+            cardStats.put("completedCount", getLongValue(stats, "COMPLETED_COUNT"));
+            cardStats.put("incompletedCount", getLongValue(stats, "INCOMPLETED_COUNT"));
+            cardStats.put("overdueTenDaysCount", getLongValue(stats, "OVERDUE_TEN_DAYS"));
+            cardStats.put("todayCount", getLongValue(stats, "TODAY_COUNT"));
+            
+            log.info("✅ 실시간 통계 조회 완료");
+            
+            return ResponseEntity.ok(cardStats);
             
         } catch (Exception e) {
-            stats.put("error", e.getMessage());
-            stats.put("timestamp", LocalDateTime.now());
+            log.error("❌ 실시간 통계 조회 실패: {}", e.getMessage(), e);
+            return ResponseEntity.ok(createDefaultStats());
         }
-        
-        return stats;
     }
 
     /**
-     * 🚀 성능 최적화된 검색 API
+     * 기본 통계 생성
      */
-    @GetMapping("/api/search-optimized")
-    @ResponseBody
-    public Map<String, Object> searchOptimizedApi(@RequestParam(defaultValue = "0") int page,
-                                                  @RequestParam(defaultValue = "20") int size,
-                                                  @RequestParam(required = false) String keyword,
-                                                  @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                                                  @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        
-        long startTime = System.currentTimeMillis();
-        Map<String, Object> result = new HashMap<>();
-        
-        try {
-            Page<ReturnItemDTO> returnItems = returnItemService.searchOptimized(keyword, startDate, endDate, page, size);
-            
-            result.put("data", returnItems.getContent());
-            result.put("totalElements", returnItems.getTotalElements());
-            result.put("totalPages", returnItems.getTotalPages());
-            result.put("currentPage", page);
-            result.put("pageSize", size);
-            
-            long endTime = System.currentTimeMillis();
-            result.put("queryTime", endTime - startTime);
-            result.put("optimized", true);
-            
-        } catch (Exception e) {
-            result.put("error", e.getMessage());
-            result.put("optimized", false);
-        }
-        
-        return result;
+    private Map<String, Object> createDefaultStats() {
+        Map<String, Object> defaultStats = new HashMap<>();
+        defaultStats.put("collectionCompletedCount", 0L);
+        defaultStats.put("collectionPendingCount", 0L);
+        defaultStats.put("logisticsConfirmedCount", 0L);
+        defaultStats.put("logisticsPendingCount", 0L);
+        defaultStats.put("exchangeShippedCount", 0L);
+        defaultStats.put("exchangeNotShippedCount", 0L);
+        defaultStats.put("returnRefundedCount", 0L);
+        defaultStats.put("returnNotRefundedCount", 0L);
+        defaultStats.put("paymentCompletedCount", 0L);
+        defaultStats.put("paymentPendingCount", 0L);
+        defaultStats.put("completedCount", 0L);
+        defaultStats.put("incompletedCount", 0L);
+        defaultStats.put("overdueTenDaysCount", 0L);
+        defaultStats.put("todayCount", 0L);
+        return defaultStats;
     }
 
-    /**
-     * 캐시된 카드 통계 조회 (성능 개선)
-     */
-    private Map<String, Long> getCardStatistics() {
-        // TODO: 실제 운영에서는 Redis 등을 활용한 캐싱 고려
-        Map<String, Long> cardStats = new HashMap<>();
-        
-        try {
-            cardStats.put("collectionCompleted", returnItemService.getCollectionCompletedCount());
-            cardStats.put("collectionPending", returnItemService.getCollectionPendingCount());
-            cardStats.put("logisticsConfirmed", returnItemService.getLogisticsConfirmedCount());
-            cardStats.put("logisticsPending", returnItemService.getLogisticsPendingCount());
-            cardStats.put("exchangeShipped", returnItemService.getExchangeShippedCount());
-            cardStats.put("exchangeNotShipped", returnItemService.getExchangeNotShippedCount());
-            cardStats.put("returnRefunded", returnItemService.getReturnRefundedCount());
-            cardStats.put("returnNotRefunded", returnItemService.getReturnNotRefundedCount());
-            cardStats.put("paymentCompleted", returnItemService.getPaymentCompletedCount());
-            cardStats.put("paymentPending", returnItemService.getPaymentPendingCount());
-            cardStats.put("completedCount", returnItemService.getCompletedCount());
-            cardStats.put("incompletedCount", returnItemService.getIncompletedCount());
-        } catch (Exception e) {
-            log.error("카드 통계 조회 중 오류", e);
-            // 오류 시 기본값 설정
-            cardStats.put("error", 1L);
-        }
-        
-        return cardStats;
-    }
-    
-    /**
+         /**
+      * 안전한 Long 값 추출
+      */
+     private Long getLongValue(Map<String, Object> map, String key) {
+         Object value = map.get(key);
+         if (value instanceof Number) {
+             return ((Number) value).longValue();
+         }
+         return 0L;
+     }
+     
+     /**
      * 🎯 대표님 요청: 리스트에서 직접 날짜 일괄 수정 API
      */
     @PostMapping("/api/bulk-update-dates")
@@ -1045,47 +955,116 @@ public class ExchangeController {
     }
     
     /**
-     * 🎯 대표님 요청: 실시간 카드 통계 업데이트 API
+     * 🎯 다중 필터 + 검색 조건 함께 적용 메서드
      */
-    @GetMapping("/api/card-stats")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> getCardStats(
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+    private Page<ReturnItemDTO> applyMultipleFiltersWithSearch(String filters, ReturnItemSearchDTO searchDTO) {
+        log.info("🔍 다중 필터 + 검색 처리 시작 - filters: {}, 검색조건: {}", filters, searchDTO.getKeyword());
         
-        Map<String, Object> response = new HashMap<>();
+        // 필터를 쉼표로 분리
+        String[] filterArray = filters.split(",");
+        List<String> filterList = Arrays.asList(filterArray);
+        
+        Page<ReturnItemDTO> result = null;
         
         try {
-            log.info("카드 통계 요청 - keyword: {}, startDate: {}, endDate: {}", keyword, startDate, endDate);
-            
-            // 10개 카드 통계 데이터 계산 (기존 로직 재사용)
-            Map<String, Object> cardStats = new HashMap<>();
-            
-            cardStats.put("todayCount", returnItemService.getTodayCount());
-            cardStats.put("collectionCompletedCount", returnItemService.getCollectionCompletedCount());
-            cardStats.put("collectionPendingCount", returnItemService.getCollectionPendingCount());
-            cardStats.put("logisticsConfirmedCount", returnItemService.getLogisticsConfirmedCount());
-            cardStats.put("logisticsPendingCount", returnItemService.getLogisticsPendingCount());
-            cardStats.put("exchangeShippedCount", returnItemService.getExchangeShippedCount());
-            cardStats.put("exchangeNotShippedCount", returnItemService.getExchangeNotShippedCount());
-            cardStats.put("returnRefundedCount", returnItemService.getReturnRefundedCount());
-            cardStats.put("returnNotRefundedCount", returnItemService.getReturnNotRefundedCount());
-            cardStats.put("paymentCompletedCount", returnItemService.getPaymentCompletedCount());
-            cardStats.put("paymentPendingCount", returnItemService.getPaymentPendingCount());
-            
-            // ⑥ 완료 상태 카드 통계 추가
-            cardStats.put("completedCount", returnItemService.getCompletedCount());
-            cardStats.put("incompletedCount", returnItemService.getIncompletedCount());
-            
-            log.info("카드 통계 응답 데이터: {}", cardStats);
-            
-            return ResponseEntity.ok(cardStats);
+            // 🎯 서비스에서 필터와 검색을 함께 처리
+            result = returnItemService.findByMultipleFiltersWithSearch(filterList, searchDTO);
+            log.info("✅ 다중 필터 + 검색 적용 완료 - 필터: {}, 검색: {}, 결과: {} 건", 
+                filterList, searchDTO.getKeyword(), result.getTotalElements());
             
         } catch (Exception e) {
-            log.error("카드 통계 조회 오류", e);
-            response.put("error", "카드 통계 조회 중 오류가 발생했습니다.");
-            return ResponseEntity.status(500).body(response);
+            log.error("❌ 다중 필터 + 검색 적용 중 오류 발생, fallback 처리", e);
+            
+            // fallback: 검색만 적용
+            result = returnItemService.search(searchDTO);
+            log.info("🔄 검색만 적용으로 fallback - 결과: {} 건", result.getTotalElements());
+        }
+        
+        return result;
+    }
+    
+    /**
+     * 🎯 다중 필터 적용 메서드
+     */
+    private Page<ReturnItemDTO> applyMultipleFilters(String filters, ReturnItemSearchDTO searchDTO) {
+        log.info("🔍 다중 필터 처리 시작 - filters: {}", filters);
+        
+        // 필터를 쉼표로 분리
+        String[] filterArray = filters.split(",");
+        List<String> filterList = Arrays.asList(filterArray);
+        
+        // 각 필터 타입별로 결과를 가져온 후 교집합 처리
+        // 하지만 교집합 처리는 복잡하므로, 우선 첫 번째 필터를 적용하고 
+        // 추가 필터는 서비스 레이어에서 처리하도록 함
+        
+        Page<ReturnItemDTO> result = null;
+        
+        try {
+            // 다중 필터를 서비스에 전달
+            result = returnItemService.findByMultipleFilters(filterList, searchDTO);
+            log.info("✅ 다중 필터 적용 완료 - 필터: {}, 결과: {} 건", filterList, result.getTotalElements());
+            
+        } catch (Exception e) {
+            log.error("❌ 다중 필터 적용 중 오류 발생, 개별 필터로 fallback 처리", e);
+            
+            // 서비스에서 다중 필터를 지원하지 않는 경우 첫 번째 필터만 적용
+            if (filterList.size() > 0) {
+                String firstFilter = filterList.get(0).trim();
+                log.info("🔄 첫 번째 필터로 fallback: {}", firstFilter);
+                result = applySingleFilter(firstFilter, searchDTO);
+            } else {
+                // 필터가 없으면 전체 조회
+                result = returnItemService.findAll(searchDTO.getPage(), searchDTO.getSize(), 
+                    searchDTO.getSortBy(), searchDTO.getSortDir());
+            }
+        }
+        
+        return result;
+    }
+    
+    /**
+     * 🎯 단일 필터 적용 메서드 (기존 로직 재사용)
+     */
+    private Page<ReturnItemDTO> applySingleFilter(String filterType, ReturnItemSearchDTO searchDTO) {
+        log.info("🔍 단일 필터 적용 - filterType: {}", filterType);
+        
+        try {
+            switch (filterType) {
+                case "collection-completed":
+                    return returnItemService.findByCollectionCompleted(searchDTO);
+                case "collection-pending":
+                    return returnItemService.findByCollectionPending(searchDTO);
+                case "logistics-confirmed":
+                    return returnItemService.findByLogisticsConfirmed(searchDTO);
+                case "logistics-pending":
+                    return returnItemService.findByLogisticsPending(searchDTO);
+                case "shipping-completed":
+                    return returnItemService.findByShippingCompleted(searchDTO);
+                case "shipping-pending":
+                    return returnItemService.findByShippingPending(searchDTO);
+                case "refund-completed":
+                    return returnItemService.findByRefundCompleted(searchDTO);
+                case "refund-pending":
+                    return returnItemService.findByRefundPending(searchDTO);
+                case "payment-completed":
+                    return returnItemService.findByPaymentCompleted(searchDTO);
+                case "payment-pending":
+                    return returnItemService.findByPaymentPending(searchDTO);
+                case "completed":
+                    return returnItemService.findByCompleted(searchDTO);
+                case "incompleted":
+                    return returnItemService.findByIncompleted(searchDTO);
+                case "overdue-ten-days":
+                    return returnItemService.findOverdueTenDays(searchDTO);
+                default:
+                    log.warn("⚠️ 알 수 없는 필터 타입: {}", filterType);
+                    return returnItemService.findAll(searchDTO.getPage(), searchDTO.getSize(), 
+                        searchDTO.getSortBy(), searchDTO.getSortDir());
+            }
+        } catch (Exception e) {
+            log.error("❌ 단일 필터 적용 중 오류 발생: {}", e.getMessage(), e);
+            return returnItemService.findAll(searchDTO.getPage(), searchDTO.getSize(), 
+                searchDTO.getSortBy(), searchDTO.getSortDir());
         }
     }
 } 

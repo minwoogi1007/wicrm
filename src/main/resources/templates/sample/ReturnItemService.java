@@ -136,6 +136,12 @@ public interface ReturnItemService {
     Page<ReturnItemDTO> findByCompleted(ReturnItemSearchDTO searchDTO);
     Page<ReturnItemDTO> findByIncompleted(ReturnItemSearchDTO searchDTO);
     
+    // 🎯 다중 필터 처리 메서드
+    Page<ReturnItemDTO> findByMultipleFilters(List<String> filters, ReturnItemSearchDTO searchDTO);
+    
+    // 🎯 다중 필터 + 검색 조건 함께 처리 메서드
+    Page<ReturnItemDTO> findByMultipleFiltersWithSearch(List<String> filters, ReturnItemSearchDTO searchDTO);
+    
     // 🎯 대표님 요청: 리스트에서 직접 날짜 일괄 수정 기능
     /**
      * 일괄 날짜 업데이트 (회수완료, 물류확인, 출고일자, 환불일자)
@@ -152,4 +158,18 @@ public interface ReturnItemService {
      * @return 업데이트 성공 여부
      */
     boolean updateCompletionStatus(Long id, Boolean isCompleted);
+    
+    // 🎯 대표님 요청: 처리기간 임박 필터 - 완료가 10일 이상 안된 데이터
+    /**
+     * 처리기간 임박 필터 - 완료가 10일 이상 안된 데이터 개수 조회
+     * @return 10일 이상 미완료 건수
+     */
+    Long getOverdueTenDaysCount();
+    
+    /**
+     * 처리기간 임박 필터 - 완료가 10일 이상 안된 데이터 조회
+     * @param searchDTO 검색 조건
+     * @return 10일 이상 미완료 데이터 목록
+     */
+    Page<ReturnItemDTO> findOverdueTenDays(ReturnItemSearchDTO searchDTO);
 } 

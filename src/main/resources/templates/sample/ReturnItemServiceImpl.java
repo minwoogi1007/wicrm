@@ -22,11 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 /**
@@ -473,8 +470,8 @@ public class ReturnItemServiceImpl implements ReturnItemService {
     @Transactional(readOnly = true)
     public Long getPaymentCompletedCount() {
         try {
-            // 교환인 경우 배송비가 입금대기가 아닌 경우 (입금완료)
-            return returnItemRepository.countExchangeByPaymentStatus("COMPLETED");
+            // 🔥 전체반품, 부분반품, 교환 모든 경우 배송비가 입금완료로 되어있는 경우 (정확한 조건 적용)
+            return returnItemRepository.countExchangeByPaymentCompleted();
         } catch (Exception e) {
             log.error("입금완료 건수 조회 실패: {}", e.getMessage());
             return 0L;
@@ -485,10 +482,11 @@ public class ReturnItemServiceImpl implements ReturnItemService {
     @Transactional(readOnly = true)
     public Long getPaymentPendingCount() {
         try {
-            // 교환인 경우 배송비가 입금대기로 되어있는 경우
-            return returnItemRepository.countExchangeByPaymentStatus("PENDING");
+            // 🔥 전체반품, 부분반품, 교환 모든 경우 배송비가 입금예정으로 되어있는 경우 (두 조건 모두 고려)
+            // 1. payment_status = 'PENDING' 또는 2. shipping_fee = '입금예정'
+            return returnItemRepository.countExchangeByPaymentPending();
         } catch (Exception e) {
-            log.error("입금대기 건수 조회 실패: {}", e.getMessage());
+            log.error("입금예정 건수 조회 실패: {}", e.getMessage());
             return 0L;
         }
     }
@@ -785,9 +783,9 @@ public class ReturnItemServiceImpl implements ReturnItemService {
             int startRow = searchDTO.getPage() * searchDTO.getSize();
             int endRow = startRow + searchDTO.getSize();
             
-            // 교환인 경우 배송비가 입금완료인 경우
-            List<ReturnItem> entities = returnItemRepository.findExchangeByPaymentStatus("COMPLETED", startRow, endRow);
-            long totalCount = returnItemRepository.countExchangeByPaymentStatus("COMPLETED");
+            // 🔥 전체반품, 부분반품, 교환 모든 경우 배송비가 입금완료인 경우 (정확한 조건 적용)
+            List<ReturnItem> entities = returnItemRepository.findExchangeByPaymentCompleted(startRow, endRow);
+            long totalCount = returnItemRepository.countExchangeByPaymentCompleted();
             
             Pageable pageable = PageRequest.of(searchDTO.getPage(), searchDTO.getSize());
             List<ReturnItemDTO> dtos = entities.stream().map(this::mapToDTO).collect(Collectors.toList());
@@ -806,16 +804,17 @@ public class ReturnItemServiceImpl implements ReturnItemService {
             int startRow = searchDTO.getPage() * searchDTO.getSize();
             int endRow = startRow + searchDTO.getSize();
             
-            // 교환인 경우 배송비가 입금대기인 경우
-            List<ReturnItem> entities = returnItemRepository.findExchangeByPaymentStatus("PENDING", startRow, endRow);
-            long totalCount = returnItemRepository.countExchangeByPaymentStatus("PENDING");
+            // 🔥 전체반품, 부분반품, 교환 모든 경우 배송비가 입금예정인 경우 (두 조건 모두 고려)
+            // 1. payment_status = 'PENDING' 또는 2. shipping_fee = '입금예정'
+            List<ReturnItem> entities = returnItemRepository.findExchangeByPaymentPending(startRow, endRow);
+            long totalCount = returnItemRepository.countExchangeByPaymentPending();
             
             Pageable pageable = PageRequest.of(searchDTO.getPage(), searchDTO.getSize());
             List<ReturnItemDTO> dtos = entities.stream().map(this::mapToDTO).collect(Collectors.toList());
             
             return new PageImpl<>(dtos, pageable, totalCount);
         } catch (Exception e) {
-            log.error("입금대기 필터링 조회 실패: {}", e.getMessage(), e);
+            log.error("입금예정 필터링 조회 실패: {}", e.getMessage(), e);
             return Page.empty(PageRequest.of(searchDTO.getPage(), searchDTO.getSize()));
         }
     }
@@ -1113,5 +1112,305 @@ public class ReturnItemServiceImpl implements ReturnItemService {
         Pageable pageable = PageRequest.of(searchDTO.getPage(), searchDTO.getSize(), sort);
         
         return new PageImpl<>(dtoList, pageable, totalElements);
+    }
+    
+    /**
+     * 🎯 다중 필터 처리 구현 (교집합 처리)
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ReturnItemDTO> findByMultipleFilters(List<String> filters, ReturnItemSearchDTO searchDTO) {
+        log.info("🔍 다중 필터 교집합 처리 시작 - 필터: {}", filters);
+        
+        if (filters == null || filters.isEmpty()) {
+            log.warn("⚠️ 필터 목록이 비어있음, 전체 조회로 fallback");
+            return findAll(searchDTO.getPage(), searchDTO.getSize(), searchDTO.getSortBy(), searchDTO.getSortDir());
+        }
+        
+        // 단일 필터인 경우 기존 로직 사용
+        if (filters.size() == 1) {
+            String singleFilter = filters.get(0).trim();
+            log.info("🎯 단일 필터 적용: {}", singleFilter);
+            return applySingleFilterForMultiple(singleFilter, searchDTO);
+        }
+        
+        // 🎯 다중 필터 교집합 처리
+        log.info("🔄 다중 필터 교집합 처리 시작 - 필터 개수: {}", filters.size());
+        
+        // 먼저 전체 데이터를 가져와서 메모리에서 필터링 (성능 이슈가 있을 수 있지만 정확성 우선)
+        // 페이징 없이 전체 데이터 조회
+        ReturnItemSearchDTO fullSearchDTO = new ReturnItemSearchDTO();
+        fullSearchDTO.setPage(0);
+        fullSearchDTO.setSize(Integer.MAX_VALUE); // 전체 데이터
+        fullSearchDTO.setSortBy(searchDTO.getSortBy());
+        fullSearchDTO.setSortDir(searchDTO.getSortDir());
+        
+        List<ReturnItemDTO> allData = findAll(0, Integer.MAX_VALUE, searchDTO.getSortBy(), searchDTO.getSortDir()).getContent();
+        log.info("📊 전체 데이터 조회 완료: {} 건", allData.size());
+        
+        // 각 필터 조건을 순차적으로 적용하여 교집합 생성
+        List<ReturnItemDTO> filteredData = new ArrayList<>(allData);
+        
+        for (String filter : filters) {
+            String filterType = filter.trim();
+            log.info("🔍 필터 적용 중: {} (현재 데이터: {} 건)", filterType, filteredData.size());
+            
+            // 현재 필터 조건에 맞는 데이터 필터링
+            filteredData = filteredData.stream()
+                .filter(item -> matchesFilter(item, filterType))
+                .collect(Collectors.toList());
+            
+            log.info("✅ 필터 적용 완료: {} -> {} 건", filterType, filteredData.size());
+        }
+        
+        log.info("🎯 최종 교집합 결과: {} 건", filteredData.size());
+        
+        // 페이징 처리
+        int start = searchDTO.getPage() * searchDTO.getSize();
+        int end = Math.min(start + searchDTO.getSize(), filteredData.size());
+        
+        List<ReturnItemDTO> pagedData = filteredData.subList(start, end);
+        
+        // 정렬 처리 (필요한 경우)
+        if ("id".equals(searchDTO.getSortBy())) {
+            pagedData.sort((a, b) -> "ASC".equalsIgnoreCase(searchDTO.getSortDir()) ? 
+                Long.compare(a.getId(), b.getId()) : Long.compare(b.getId(), a.getId()));
+        }
+        
+        Pageable pageable = PageRequest.of(searchDTO.getPage(), searchDTO.getSize());
+        Page<ReturnItemDTO> result = new PageImpl<>(pagedData, pageable, filteredData.size());
+        
+        log.info("✅ 다중 필터 교집합 처리 완료 - 최종 결과: {} 건 (페이지: {}/{})", 
+            result.getTotalElements(), searchDTO.getPage() + 1, result.getTotalPages());
+        
+        return result;
+    }
+    
+    /**
+     * 🎯 개별 필터 조건 확인 메서드
+     */
+    private boolean matchesFilter(ReturnItemDTO item, String filterType) {
+        switch (filterType) {
+            case "collection-completed":
+                return item.getCollectionCompletedDate() != null;
+            case "collection-pending":
+                return item.getCollectionCompletedDate() == null;
+            case "logistics-confirmed":
+                return item.getLogisticsConfirmedDate() != null;
+            case "logistics-pending":
+                return item.getLogisticsConfirmedDate() == null;
+            case "shipping-completed":
+                return item.getShippingDate() != null;
+            case "shipping-pending":
+                return item.getShippingDate() == null;
+            case "refund-completed":
+                return item.getRefundDate() != null;
+            case "refund-pending":
+                return item.getRefundDate() == null;
+            case "payment-completed":
+                return "입금완료".equals(item.getPaymentStatusText());
+            case "payment-pending":
+                return "입금예정".equals(item.getPaymentStatusText());
+            case "completed":
+                return item.getIsCompleted() != null && item.getIsCompleted() == 1;
+            case "incompleted":
+                return item.getIsCompleted() == null || item.getIsCompleted() != 1;
+            case "overdue-ten-days":
+                // 처리기간 임박 필터 - 접수일 기준 10일 이상 미완료 건
+                if (item.getCsReceivedDate() != null && 
+                    (item.getIsCompleted() == null || item.getIsCompleted() != 1)) {
+                    LocalDate tenDaysAgo = LocalDate.now().minusDays(10);
+                    return item.getCsReceivedDate().isBefore(tenDaysAgo);
+                }
+                return false;
+            default:
+                log.warn("⚠️ 알 수 없는 필터 타입: {}", filterType);
+                return true; // 알 수 없는 필터는 모든 데이터 통과
+        }
+    }
+    
+    /**
+     * 🎯 단일 필터 적용 메서드 (다중 필터용)
+     */
+    private Page<ReturnItemDTO> applySingleFilterForMultiple(String filterType, ReturnItemSearchDTO searchDTO) {
+        switch (filterType) {
+            case "collection-completed":
+                return findByCollectionCompleted(searchDTO);
+            case "collection-pending":
+                return findByCollectionPending(searchDTO);
+            case "logistics-confirmed":
+                return findByLogisticsConfirmed(searchDTO);
+            case "logistics-pending":
+                return findByLogisticsPending(searchDTO);
+            case "shipping-completed":
+                return findByShippingCompleted(searchDTO);
+            case "shipping-pending":
+                return findByShippingPending(searchDTO);
+            case "refund-completed":
+                return findByRefundCompleted(searchDTO);
+            case "refund-pending":
+                return findByRefundPending(searchDTO);
+            case "payment-completed":
+                return findByPaymentCompleted(searchDTO);
+            case "payment-pending":
+                return findByPaymentPending(searchDTO);
+            case "completed":
+                return findByCompleted(searchDTO);
+            case "incompleted":
+                return findByIncompleted(searchDTO);
+            case "overdue-ten-days":
+                return findOverdueTenDays(searchDTO);
+            default:
+                log.warn("⚠️ 알 수 없는 필터: {}", filterType);
+                return findAll(searchDTO.getPage(), searchDTO.getSize(), searchDTO.getSortBy(), searchDTO.getSortDir());
+        }
+    }
+    
+    /**
+     * 🎯 다중 필터 + 검색 조건 함께 처리 구현
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ReturnItemDTO> findByMultipleFiltersWithSearch(List<String> filters, ReturnItemSearchDTO searchDTO) {
+        log.info("🔍 다중 필터 + 검색 교집합 처리 시작 - 필터: {}, 검색: {}", filters, searchDTO.getKeyword());
+        
+        if (filters == null || filters.isEmpty()) {
+            log.warn("⚠️ 필터 목록이 비어있음, 검색만 적용");
+            return search(searchDTO);
+        }
+        
+        // 🎯 먼저 검색 조건으로 데이터 필터링
+        log.info("🔍 1단계: 검색 조건 적용");
+        
+        // 검색 조건이 있으면 먼저 검색하여 기본 데이터셋 구성
+        List<ReturnItemDTO> searchResults;
+        long totalSearchCount;
+        
+        if (searchDTO.hasSearchCondition()) {
+            // 검색 조건으로 전체 데이터 조회 (페이징 없이)
+            ReturnItemSearchDTO fullSearchDTO = new ReturnItemSearchDTO();
+            fullSearchDTO.setKeyword(searchDTO.getKeyword());
+            fullSearchDTO.setStartDate(searchDTO.getStartDate());
+            fullSearchDTO.setEndDate(searchDTO.getEndDate());
+            fullSearchDTO.setPage(0);
+            fullSearchDTO.setSize(Integer.MAX_VALUE);
+            fullSearchDTO.setSortBy(searchDTO.getSortBy());
+            fullSearchDTO.setSortDir(searchDTO.getSortDir());
+            
+            Page<ReturnItemDTO> searchPage = search(fullSearchDTO);
+            searchResults = searchPage.getContent();
+            totalSearchCount = searchPage.getTotalElements();
+            log.info("📊 검색 결과: {} 건", totalSearchCount);
+        } else {
+            // 검색 조건이 없으면 전체 데이터
+            searchResults = findAll(0, Integer.MAX_VALUE, searchDTO.getSortBy(), searchDTO.getSortDir()).getContent();
+            totalSearchCount = searchResults.size();
+            log.info("📊 전체 데이터: {} 건", totalSearchCount);
+        }
+        
+        // 🎯 2단계: 검색 결과에 필터 적용
+        log.info("🔍 2단계: 검색 결과에 필터 적용");
+        List<ReturnItemDTO> filteredData = new ArrayList<>(searchResults);
+        
+        for (String filter : filters) {
+            String filterType = filter.trim();
+            log.info("🔍 필터 적용 중: {} (현재 데이터: {} 건)", filterType, filteredData.size());
+            
+            // 현재 필터 조건에 맞는 데이터 필터링
+            filteredData = filteredData.stream()
+                .filter(item -> matchesFilter(item, filterType))
+                .collect(Collectors.toList());
+            
+            log.info("✅ 필터 적용 완료: {} -> {} 건", filterType, filteredData.size());
+        }
+        
+        log.info("🎯 최종 교집합 결과: {} 건", filteredData.size());
+        
+        // 🎯 3단계: 페이징 처리
+        int start = searchDTO.getPage() * searchDTO.getSize();
+        int end = Math.min(start + searchDTO.getSize(), filteredData.size());
+        
+        List<ReturnItemDTO> pagedData;
+        if (start < filteredData.size()) {
+            pagedData = filteredData.subList(start, end);
+        } else {
+            pagedData = new ArrayList<>();
+        }
+        
+        // 정렬 처리 (필요한 경우)
+        if ("id".equals(searchDTO.getSortBy())) {
+            pagedData.sort((a, b) -> "ASC".equalsIgnoreCase(searchDTO.getSortDir()) ? 
+                Long.compare(a.getId(), b.getId()) : Long.compare(b.getId(), a.getId()));
+        }
+        
+        Pageable pageable = PageRequest.of(searchDTO.getPage(), searchDTO.getSize());
+        Page<ReturnItemDTO> result = new PageImpl<>(pagedData, pageable, filteredData.size());
+        
+        log.info("✅ 다중 필터 + 검색 교집합 처리 완료 - 최종 결과: {} 건 (페이지: {}/{})", 
+            result.getTotalElements(), searchDTO.getPage() + 1, result.getTotalPages());
+        
+        return result;
+    }
+    
+    /**
+     * 🎯 처리기간 임박 필터 - 접수일 기준 10일 이상 미완료 데이터 개수 조회
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Long getOverdueTenDaysCount() {
+        log.info("🔍 처리기간 임박 카운트 조회 시작 - 접수일 기준 10일 이상 미완료 건");
+        
+        // 10일 전 날짜 계산
+        LocalDateTime tenDaysAgo = LocalDateTime.now().minusDays(10);
+        log.info("📅 기준 날짜: {} (10일 전)", tenDaysAgo);
+        
+        // 10일 전 이전에 접수되었으면서 아직 완료되지 않은 건 조회
+        long count = returnItemRepository.countOverdueTenDays(tenDaysAgo);
+        log.info("📊 접수일 기준 10일 이상 미완료 건수: {} 건", count);
+        
+        return count;
+    }
+    
+    /**
+     * 🎯 처리기간 임박 필터 - 접수일 기준 10일 이상 미완료 데이터 조회
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ReturnItemDTO> findOverdueTenDays(ReturnItemSearchDTO searchDTO) {
+        log.info("🔍 처리기간 임박 데이터 조회 시작 - 접수일 기준 10일 이상 미완료 건");
+        log.info("🔍 검색 조건: {}", searchDTO);
+        
+        // 10일 전 날짜 계산
+        LocalDateTime tenDaysAgo = LocalDateTime.now().minusDays(10);
+        log.info("📅 기준 날짜: {} (10일 전)", tenDaysAgo);
+        
+        // 페이징 처리
+        int startRow = searchDTO.getPage() * searchDTO.getSize();
+        int endRow = startRow + searchDTO.getSize();
+        
+        // 10일 전 이전에 접수되었으면서 아직 완료되지 않은 건 조회
+        List<ReturnItem> entities = returnItemRepository.findOverdueTenDays(tenDaysAgo, startRow, endRow);
+        log.info("📊 접수일 기준 10일 이상 미완료 데이터 조회 결과: {} 건", entities.size());
+        
+        // 전체 카운트 조회
+        long totalElements = returnItemRepository.countOverdueTenDays(tenDaysAgo);
+        log.info("📊 전체 접수일 기준 10일 이상 미완료 건수: {} 건", totalElements);
+        
+        // DTO 변환
+        List<ReturnItemDTO> dtoList = entities.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+        
+        // 정렬 처리
+        Sort sort = searchDTO.getSortDir().equalsIgnoreCase(Sort.Direction.ASC.name()) ? 
+                Sort.by(searchDTO.getSortBy()).ascending() : Sort.by(searchDTO.getSortBy()).descending();
+        Pageable pageable = PageRequest.of(searchDTO.getPage(), searchDTO.getSize(), sort);
+        
+        Page<ReturnItemDTO> result = new PageImpl<>(dtoList, pageable, totalElements);
+        
+        log.info("✅ 처리기간 임박 데이터 조회 완료 - 총 {} 건 (페이지: {}/{})", 
+            result.getTotalElements(), searchDTO.getPage() + 1, result.getTotalPages());
+        
+        return result;
     }
 } 

@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/default}">
+<head>
+    <title>배송비 입금 등록</title>
+    <style>
+        .page-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+        
+        .register-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .card-header h2 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        
+        .card-header p {
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+        
+        .form-section {
+            padding: 2rem;
+        }
+        
+        .section-title {
+            color: #374151;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .required {
+            color: #ef4444;
+        }
+        
+        .form-control, .form-select {
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 0.75rem;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        
+        .brand-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .brand-btn {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .brand-btn:hover {
+            border-color: #4f46e5;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15);
+        }
+        
+        .brand-btn.active {
+            border-color: #4f46e5;
+            background: #4f46e5;
+            color: white;
+        }
+        
+        .brand-btn.renoma.active {
+            background: #059669;
+            border-color: #059669;
+        }
+        
+        .brand-btn.coralik.active {
+            background: #dc2626;
+            border-color: #dc2626;
+        }
+        
+        .bank-info {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            padding: 2rem;
+            background: #f9fafb;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: #4b5563;
+            transform: translateY(-2px);
+        }
+        
+        .alert {
+            border-radius: 10px;
+            border: none;
+            margin-bottom: 1.5rem;
+        }
+        
+        .alert-success {
+            background: #ecfdf5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+        
+        .alert-danger {
+            background: #fef2f2;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+        
+        .phone-format-hint {
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+        
+        .auto-mapping-info {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #1e40af;
+        }
+        
+        .auto-mapping-info i {
+            color: #3b82f6;
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="page-container">
+            <div class="container">
+                <div class="register-card">
+                    <!-- 헤더 -->
+                    <div class="card-header">
+                        <h2><i class="fas fa-credit-card me-2"></i>배송비 입금 등록</h2>
+                        <p>고객으로부터 받은 배송비 입금 내역을 등록하고 교환/반품과 자동 매핑합니다</p>
+                    </div>
+                    
+                    <!-- 알림 메시지 -->
+                    <div th:if="${error}" class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <span th:text="${error}">오류 메시지</span>
+                    </div>
+                    
+                    <div th:if="${successMessage}" class="alert alert-success" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <span th:text="${successMessage}">성공 메시지</span>
+                    </div>
+                    
+                    <!-- 등록 폼 -->
+                    <form th:action="@{/shipping-payment/register}" method="post" th:object="${paymentDTO}">
+                        <div class="form-section">
+                            <!-- 브랜드 선택 -->
+                            <div class="section-title">
+                                <i class="fas fa-store"></i>
+                                브랜드 및 은행 정보
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">브랜드 선택 <span class="required">*</span></label>
+                                <div class="brand-buttons">
+                                    <div class="brand-btn renoma" onclick="selectBrand('RENOMA', this)">
+                                        <i class="fas fa-gem me-2"></i>
+                                        <div>레노마</div>
+                                        <small>우리은행</small>
+                                    </div>
+                                    <div class="brand-btn coralik" onclick="selectBrand('CORALIK', this)">
+                                        <i class="fas fa-heart me-2"></i>
+                                        <div>코랄리크</div>
+                                        <small>하나은행</small>
+                                    </div>
+                                </div>
+                                <input type="hidden" th:field="*{brand}" id="brandInput" required>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="siteName" class="form-label">사이트명</label>
+                                        <input type="text" class="form-control" th:field="*{siteName}" id="siteName" 
+                                               placeholder="예: 자사몰-레노마">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="bankName" class="form-label">은행명 <span class="required">*</span></label>
+                                        <input type="text" class="form-control" th:field="*{bankName}" id="bankName" 
+                                               readonly style="background-color: #f8fafc;">
+                                        <div class="bank-info">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            브랜드 선택 시 자동으로 설정됩니다
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-section">
+                            <!-- 고객 정보 -->
+                            <div class="section-title">
+                                <i class="fas fa-user"></i>
+                                고객 정보
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="customerName" class="form-label">고객명 <span class="required">*</span></label>
+                                        <input type="text" class="form-control" th:field="*{customerName}" id="customerName" 
+                                               placeholder="홍길동" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="customerPhone" class="form-label">연락처</label>
+                                        <input type="text" class="form-control" th:field="*{customerPhone}" id="customerPhone" 
+                                               placeholder="010-1234-5678">
+                                        <div class="phone-format-hint">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            하이픈(-) 포함하여 입력해주세요 (선택사항)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-section">
+                            <!-- 입금 정보 -->
+                            <div class="section-title">
+                                <i class="fas fa-money-bill-wave"></i>
+                                입금 정보
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="amount" class="form-label">입금 금액 <span class="required">*</span></label>
+                                        <input type="number" class="form-control" th:field="*{amount}" id="amount" 
+                                               placeholder="3000" min="0" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="paymentDate" class="form-label">입금일시 <span class="required">*</span></label>
+                                        <input type="datetime-local" class="form-control" th:field="*{paymentDate}" id="paymentDate" required>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="notes" class="form-label">비고</label>
+                                <textarea class="form-control" th:field="*{notes}" id="notes" rows="3" 
+                                          placeholder="추가 메모사항이 있으면 입력해주세요"></textarea>
+                            </div>
+                            
+                            <!-- 자동 매핑 안내 -->
+                            <div class="auto-mapping-info">
+                                <i class="fas fa-magic"></i>
+                                <strong>자동 매핑 기능</strong><br>
+                                고객명과 연락처를 기반으로 기존 교환/반품 내역과 자동으로 매핑을 시도합니다.<br>
+                                매핑이 성공하면 해당 교환/반품의 배송비 상태가 "입금완료"로 변경됩니다.
+                            </div>
+                        </div>
+                        
+                        <!-- 버튼 영역 -->
+                        <div class="action-buttons">
+                            <button type="button" class="btn btn-secondary" onclick="goBack()">
+                                <i class="fas fa-arrow-left me-2"></i>취소
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>등록하기
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- JavaScript를 layout:fragment로 분리 -->
+    <th:block layout:fragment="script">
+    <script>
+        // 페이지 로드 시 현재 날짜와 시간 설정
+        document.addEventListener('DOMContentLoaded', function() {
+            const now = new Date();
+            // datetime-local 형식으로 설정 (YYYY-MM-DDTHH:MM)
+            const dateTimeString = now.getFullYear() + '-' + 
+                String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                String(now.getDate()).padStart(2, '0') + 'T' + 
+                String(now.getHours()).padStart(2, '0') + ':' + 
+                String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('paymentDate').value = dateTimeString;
+            
+            // 전화번호 자동 포맷팅
+            const phoneInput = document.getElementById('customerPhone');
+            phoneInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/[^0-9]/g, '');
+                if (value.length >= 3 && value.length <= 7) {
+                    value = value.replace(/(\d{3})(\d{0,4})/, '$1-$2');
+                } else if (value.length > 7) {
+                    value = value.replace(/(\d{3})(\d{4})(\d{0,4})/, '$1-$2-$3');
+                }
+                e.target.value = value;
+            });
+        });
+        
+        // 브랜드 선택 함수
+        function selectBrand(brand, element) {
+            // 모든 브랜드 버튼에서 active 클래스 제거
+            document.querySelectorAll('.brand-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 선택된 버튼에 active 클래스 추가
+            element.classList.add('active');
+            
+            // 숨겨진 input에 브랜드 값 설정
+            document.getElementById('brandInput').value = brand;
+            
+            // 브랜드별 은행 자동 설정
+            const bankInput = document.getElementById('bankName');
+            if (brand === 'RENOMA') {
+                bankInput.value = '우리은행';
+            } else if (brand === 'CORALIK') {
+                bankInput.value = '하나은행';
+            }
+        }
+        
+        // 취소 버튼
+        function goBack() {
+            if (confirm('작성 중인 내용이 있습니다. 정말 취소하시겠습니까?')) {
+                window.location.href = '/shipping-payment/list';
+            }
+        }
+        
+        // 폼 유효성 검사
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const brand = document.getElementById('brandInput').value;
+            if (!brand) {
+                e.preventDefault();
+                alert('브랜드를 선택해주세요.');
+                return;
+            }
+            
+            const customerName = document.getElementById('customerName').value.trim();
+            const amount = document.getElementById('amount').value;
+            
+            if (!customerName || !amount) {
+                e.preventDefault();
+                alert('필수 항목(고객명, 입금금액)을 모두 입력해주세요.');
+                return;
+            }
+            
+            // 전화번호가 입력된 경우에만 형식 검증
+            const customerPhone = document.getElementById('customerPhone').value.trim();
+            if (customerPhone) {
+                const phonePattern = /^010-\d{4}-\d{4}$/;
+                if (!phonePattern.test(customerPhone)) {
+                    e.preventDefault();
+                    alert('연락처를 올바른 형식(010-1234-5678)으로 입력해주세요.');
+                    return;
+                }
+            }
+        });
+    </script>
+    </th:block>
+</body>
+</html>
