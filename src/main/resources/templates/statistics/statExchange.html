@@ -1,0 +1,1991 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+<head>
+    <title>📊 교환반품 통계 분석</title>
+    <meta name="_csrf" th:if="${_csrf}" th:content="${_csrf.token}"/>
+    <meta name="_csrf" th:unless="${_csrf}" content=""/>
+    <meta name="_csrf_header" th:if="${_csrf}" th:content="${_csrf.headerName}"/>
+    <meta name="_csrf_header" th:unless="${_csrf}" content="X-CSRF-TOKEN"/>
+    
+    <style>
+        /* 🎨 CSS 변수 정의 */
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #dbeafe;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --info: #06b6d4;
+            --info-light: #cffafe;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --radius: 0.5rem;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --border: #e5e7eb;
+            --bg-card: #ffffff;
+            --bg-hover: #f9fafb;
+        }
+
+        /* 헤더 정렬 스타일 */
+        #kt_app_toolbar {
+            padding: 0.75rem 0 !important;
+            min-height: auto !important;
+        }
+        
+        #kt_app_toolbar_container {
+            padding-left: 1rem !important;
+            margin-left: 0 !important;
+        }
+        
+        .page-title {
+            margin: 0 !important;
+            padding: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .page-heading {
+            margin: 0 !important;
+        }
+        
+        .breadcrumb {
+            margin: 0 !important;
+            padding-top: 0.25rem !important;
+        }
+        
+        #kt_app_content {
+            padding-top: 2.5rem !important;
+            margin-top: 0 !important;
+        }
+        
+        #kt_app_content_container.app-container {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+        }
+
+        /* 🎯 통계 대시보드 스타일 (list.html과 동일) */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            box-shadow: var(--shadow);
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-box:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .stat-box.success { border-left: 4px solid var(--success); }
+        .stat-box.primary { border-left: 4px solid var(--primary); }
+        .stat-box.warning { border-left: 4px solid var(--warning); }
+        .stat-box.danger { border-left: 4px solid var(--danger); }
+        .stat-box.info { border-left: 4px solid var(--info); }
+
+        .card-content h3 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin: 0 0 0.75rem 0;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .card-content .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .card-content .description {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* 💰 금액 표시 */
+        .amount-display {
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+            font-weight: 600;
+            color: var(--success);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        /* 📊 통계 페이지 전용 스타일 */
+        .stats-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stats-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .stats-header p {
+            font-size: 1.1rem;
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+        }
+
+        .update-time {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 0.75rem;
+            background: var(--gray-50);
+            border-radius: var(--radius);
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        /* 📈 차트 섹션 */
+        .chart-section {
+            background: var(--bg-card);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--gray-100);
+        }
+
+        .chart-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .chart-filters {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-bottom: 1rem;
+        }
+
+        /* 📊 상세 통계 테이블 */
+        .stats-table-section {
+            background: var(--bg-card);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .stats-table th {
+            background: var(--gray-50);
+            color: var(--text-primary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.8rem;
+            padding: 1rem 0.75rem;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .stats-table td {
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .stats-table tbody tr:hover {
+            background: var(--bg-hover);
+        }
+
+        /* 🎯 필터 컨트롤 */
+        .filter-section {
+            background: var(--bg-card);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-group label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .form-control {
+            padding: 0.75rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            background: var(--bg-card);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid transparent;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--gray-500);
+            color: white;
+            border-color: var(--gray-500);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-600);
+            border-color: var(--gray-600);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            border-color: #059669;
+        }
+
+        /* 📱 반응형 디자인 */
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+            
+            .chart-filters {
+                justify-content: center;
+            }
+        }
+
+        /* 🎨 애니메이션 */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dashboard {
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        .filter-section,
+        .chart-section,
+        .stats-table-section {
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        .chart-section {
+            animation-delay: 0.1s;
+        }
+
+        .stats-table-section {
+            animation-delay: 0.2s;
+        }
+
+        /* 📊 차트 스타일링 */
+
+        /* 📊 데이터 로딩 상태 */
+        .data-loading {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* 📊 통계 수치 강조 */
+        .stat-number {
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+            font-weight: 700;
+            font-size: 1.2em;
+        }
+
+        .stat-up {
+            color: var(--success);
+        }
+
+        .stat-down {
+            color: var(--danger);
+        }
+
+        .stat-neutral {
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+
+<div layout:fragment="content">
+    <div class="app-main flex-column flex-row-fluid" id="kt_app_main">
+        <!--begin::Content wrapper-->
+    <div class="d-flex flex-column flex-column-fluid">
+        <!--begin::Toolbar-->
+        <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+            <!--begin::Toolbar container-->
+            <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                <!--begin::Page title-->
+                <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                    <!--begin::Title-->
+                        <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">교환반품 통계</h1>
+                    <!--end::Title-->
+                    <!--begin::Breadcrumb-->
+                    <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                        <!--begin::Item-->
+                        <li class="breadcrumb-item text-muted">
+                            <a href="/main" class="text-muted text-hover-primary">Home</a>
+                        </li>
+                        <!--end::Item-->
+                        <!--begin::Item-->
+                        <li class="breadcrumb-item">
+                            <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                        </li>
+                        <!--end::Item-->
+                        <!--begin::Item-->
+                        <li class="breadcrumb-item text-muted">통계</li>
+                        <!--end::Item-->
+                        <!--begin::Item-->
+                        <li class="breadcrumb-item">
+                            <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                        </li>
+                        <!--end::Item-->
+                        <!--begin::Item-->
+                        <li class="breadcrumb-item text-muted">교환반품 통계</li>
+                        <!--end::Item-->
+                    </ul>
+                    <!--end::Breadcrumb-->
+                </div>
+                <!--end::Page title-->
+            </div>
+            <!--end::Toolbar container-->
+        </div>
+        <!--end::Toolbar-->
+        <!--begin::Content-->
+        <div id="kt_app_content" class="app-content flex-column-fluid">
+            <!--begin::Content container-->
+                <div id="kt_app_content_container" class="app-container container-fluid px-2">
+
+                    <!-- 📊 통계 대시보드 헤더 -->
+                        <div class="stats-header">
+                        <h1>📊 교환반품 통계 대시보드</h1>
+                        <p>실시간 교환반품 현황 및 통계 분석</p>
+                            </div>
+                            
+                    <!-- 📊 상단 카드 대시보드 (list.html 구조 완전 적용) -->
+                        <div class="dashboard">
+                            <!-- ① 회수완료 카드 -->
+                        <div class="stat-box success">
+                                <div class="card-content">
+                                    <h3>📦 회수완료</h3>
+                                    <div class="value">
+                                        <span id="collectionCompleted">0</span>
+                                    <span> / </span>
+                                    <span id="collectionPending">0</span>
+                            </div>
+                                <div class="description">완료 / 미완료</div>
+                            </div>
+                            </div>
+                            
+                            <!-- ② 물류확인 카드 -->
+                        <div class="stat-box primary">
+                                <div class="card-content">
+                                <h3>🚛 물류확인</h3>
+                                    <div class="value">
+                                        <span id="logisticsConfirmed">0</span>
+                                    <span> / </span>
+                                    <span id="logisticsPending">0</span>
+                            </div>
+                                <div class="description">확인 / 미확인</div>
+                            </div>
+                        </div>
+                        
+                        <!-- ③ 교환 출고일자 카드 -->
+                        <div class="stat-box warning">
+                                <div class="card-content">
+                                <h3>📤 교환 출고</h3>
+                                    <div class="value">
+                                        <span id="exchangeShipped">0</span>
+                                    <span> / </span>
+                                    <span id="exchangeNotShipped">0</span>
+                            </div>
+                                <div class="description">출고완료 / 출고대기</div>
+                            </div>
+                            </div>
+                            
+                        <!-- ④ 반품 환불일자 카드 (반품만) -->
+                        <div class="stat-box danger">
+                                <div class="card-content">
+                                <h3>💰 반품 환불</h3>
+                                    <div class="value">
+                                        <span id="returnRefunded">0</span>
+                                    <span> / </span>
+                                    <span id="returnNotRefunded">0</span>
+                        </div>
+                                <div class="description">환불완료 / 환불대기</div>
+                                <div class="amount-display">
+                                    총 환불금액: <span id="totalRefundAmount">0원</span>
+                                </div>
+                    </div>
+                </div>
+
+                        <!-- ⑤ 배송비입금 카드 (교환만) -->
+                        <div class="stat-box warning">
+                                <div class="card-content">
+                                    <h3>💳 배송비입금</h3>
+                                    <div class="value">
+                                    <span id="paymentPending">0</span>
+                                    <span> / </span>
+                                        <span id="paymentCompleted">0</span>
+                                </div>
+                                <div class="description">입금대기 / 입금완료</div>
+                                <div class="amount-display">
+                                    총 배송비: <span id="totalShippingFee">0원</span>
+                                </div>
+                        </div>
+                    </div>
+                    
+                            <!-- ⑥ 전체완료 카드 -->
+                        <div class="stat-box info">
+                                <div class="card-content">
+                                    <h3>✅ 전체완료</h3>
+                                    <div class="value">
+                                        <span id="totalCompleted">0</span>
+                                    <span> / </span>
+                                    <span id="totalIncompleted">0</span>
+                                </div>
+                                <div class="description">완료 / 미완료</div>
+                            </div>
+                        </div>
+                        
+                        <!-- ⑦ 처리기간 임박 카드 -->
+                        <div class="stat-box danger">
+                            <div class="card-content">
+                                <h3>🚨 처리기간 임박</h3>
+                                <div class="value">
+                                    <span id="overdueTenDaysCount">0</span>
+                                </div>
+                                <div class="description">10일 이상 미완료</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        <!-- 마지막 업데이트 시간 -->
+                    <div class="update-time">
+                        <i class="ki-duotone ki-time fs-5">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                        </i>
+                        마지막 업데이트: <span id="updateTimeText" th:text="${#dates.format(#dates.createNow(), 'yyyy. MM. dd. HH:mm:ss')}">2025. 07. 03. 15:06:27</span>
+                    </div>
+                    
+                    <!-- 🔍 기본 조회 조건 (간소화) -->
+                    <div class="filter-section">
+                        <h3 class="chart-title">🔍 조회 기간 설정</h3>
+                        <div class="filter-grid">
+                            <!-- 시작일 -->
+                            <div class="filter-group">
+                                <label>시작일</label>
+                                <input type="date" class="form-control" id="startDate">
+                            </div>
+
+                            <!-- 종료일 -->
+                            <div class="filter-group">
+                                <label>종료일</label>
+                                <input type="date" class="form-control" id="endDate">
+                                </div>
+
+                            <!-- 빠른 선택 -->
+                            <div class="filter-group">
+                                <label>빠른 선택</label>
+                                <select class="form-control" id="periodType" onchange="setQuickPeriod()">
+                                    <option value="TODAY">오늘</option>
+                                    <option value="WEEK">최근 7일</option>
+                                    <option value="MONTH" selected>이번달</option>
+                                    <option value="LAST_MONTH">지난달</option>
+                                    <option value="QUARTER">최근 3개월</option>
+                            </select>
+                        </div>
+
+                            <!-- 조회 버튼 -->
+                            <div class="filter-group">
+                                <button type="button" class="btn btn-primary" onclick="loadStatistics()">
+                                    🔍 조회
+                                </button>
+                </div>
+
+                            <!-- 엑셀 다운로드 -->
+                            <div class="filter-group">
+                                <button type="button" class="btn btn-success" onclick="downloadStatisticsExcel()">
+                                    📥 엑셀다운
+                                </button>
+                        </div>
+                    </div>
+                </div>
+
+                    <!-- 📈 차트 분석 섹션 -->
+                    <div class="row">
+                        <!-- 트렌드 차트 -->
+                        <div class="col-lg-8">
+                            <div class="chart-section">
+                                <div class="chart-header">
+                                    <h3 class="chart-title">📈 일별 트렌드 분석</h3>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="trendChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                        <!-- 유형별 차트 -->
+                        <div class="col-lg-4">
+                            <div class="chart-section">
+                                <div class="chart-header">
+                                    <h3 class="chart-title">유형별 분포</h3>
+                            </div>
+                                <div class="chart-container">
+                                    <canvas id="typeChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                    <!-- 📊 상세 통계 테이블 -->
+                    <div class="stats-table-section">
+                        <div class="chart-header">
+                            <h3 class="chart-title">📊 상세 통계 현황</h3>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="stats-table">
+                                <thead>
+                                    <tr>
+                                        <th>구분</th>
+                                        <th>전체교환</th>
+                                        <th>부분교환</th>
+                                        <th>전체반품</th>
+                                        <th>부분반품</th>
+                                        <th>합계</th>
+                                        <th>비율</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>회수완료</strong></td>
+                                        <td id="collectionExchangeFull">0</td>
+                                        <td id="collectionExchangePartial">0</td>
+                                        <td id="collectionReturnFull">0</td>
+                                        <td id="collectionReturnPartial">0</td>
+                                        <td id="collectionTotal">0</td>
+                                        <td id="collectionRate">0%</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>물류확인</strong></td>
+                                        <td id="logisticsExchangeFull">0</td>
+                                        <td id="logisticsExchangePartial">0</td>
+                                        <td id="logisticsReturnFull">0</td>
+                                        <td id="logisticsReturnPartial">0</td>
+                                        <td id="logisticsTotal">0</td>
+                                        <td id="logisticsRate">0%</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>교환출고</strong></td>
+                                        <td id="exchangeShippedFull">0</td>
+                                        <td id="exchangeShippedPartial">0</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td id="exchangeTotal">0</td>
+                                        <td id="exchangeRate">0%</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>반품환불</strong></td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td id="returnRefundedFull">0</td>
+                                        <td id="returnRefundedPartial">0</td>
+                                        <td id="returnTotal">0</td>
+                                        <td id="returnRate">0%</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>배송비입금</strong></td>
+                                        <td id="paymentExchangeFull">0</td>
+                                        <td id="paymentExchangePartial">0</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td id="paymentTotal">0</td>
+                                        <td id="paymentRate">0%</td>
+                                    </tr>
+                                    <tr style="background: var(--gray-50); font-weight: 600;">
+                                        <td><strong>전체완료</strong></td>
+                                        <td id="completedExchangeFull">0</td>
+                                        <td id="completedExchangePartial">0</td>
+                                        <td id="completedReturnFull">0</td>
+                                        <td id="completedReturnPartial">0</td>
+                                        <td id="totalCompleted">0</td>
+                                        <td id="completionRate">0%</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 💰 금액 요약 -->
+                    <div class="stats-table-section">
+                        <div class="chart-header">
+                            <h3 class="chart-title">💰 금액 요약</h3>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="stat-box primary">
+                                    <div class="card-content">
+                                        <h3>💰 총 환불금액</h3>
+                                        <div class="value amount-display">
+                                            <span id="summaryRefundAmount">0</span>원
+                                        </div>
+                                        <div class="description">반품 건에 대한 총 환불금액</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="stat-box warning">
+                                    <div class="card-content">
+                                        <h3>🚚 총 배송비</h3>
+                                        <div class="value amount-display">
+                                            <span id="summaryShippingFee">0</span>원
+                                        </div>
+                                        <div class="description">교환 건에 대한 총 배송비</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+            </div>
+            <!--end::Content container-->
+        </div>
+        <!--end::Content-->
+    </div>
+        <!--end::Content wrapper-->
+    </div>
+    <!--end::App main-->
+
+
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- html2canvas for image generation -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script th:inline="javascript">
+        // CSRF 토큰을 전역 변수로 설정
+        window.csrfToken = /*[[${_csrf != null ? _csrf.token : ''}]]*/ '';
+        window.csrfHeader = /*[[${_csrf != null ? _csrf.headerName : 'X-CSRF-TOKEN'}]]*/ 'X-CSRF-TOKEN';
+
+        // 전역 변수
+        let trendChart = null;
+        let typeChart = null;
+        let currentStats = {};
+        
+
+        
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            // console.log('📊 교환반품 통계 페이지 로딩 시작...');
+            
+            // 기본 날짜 설정 (이번달)
+            setQuickPeriod();
+            
+            // 초기 통계 로드
+            loadStatistics();
+            
+            // 차트 초기화
+            initializeCharts();
+        });
+
+        // 빠른 기간 설정
+        function setQuickPeriod() {
+            const periodType = document.getElementById('periodType').value;
+            const startDate = document.getElementById('startDate');
+            const endDate = document.getElementById('endDate');
+            
+            const today = new Date();
+            let start, end;
+            
+            switch (periodType) {
+                case 'TODAY':
+                    start = end = today;
+                    break;
+                case 'WEEK':
+                    start = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+                    end = today;
+                    break;
+                case 'MONTH':
+                    start = new Date(today.getFullYear(), today.getMonth(), 1);
+                    end = today;
+                    break;
+                case 'LAST_MONTH':
+                    start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+                    end = new Date(today.getFullYear(), today.getMonth(), 0);
+                    break;
+                case 'QUARTER':
+                    start = new Date(today.getTime() - 90 * 24 * 60 * 60 * 1000);
+                    end = today;
+                    break;
+                default:
+                    return;
+            }
+            
+            startDate.value = start.toISOString().split('T')[0];
+            endDate.value = end.toISOString().split('T')[0];
+        }
+
+        // 통계 데이터 로드
+        async function loadStatistics() {
+            try {
+                // console.log('📊 통계 데이터 로딩 시작...');
+                
+                // 조회 조건 수집
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+                
+                // console.log('📋 조회 조건:', { startDate, endDate });
+                
+                // 조회 조건 검증
+                if (!startDate || !endDate) {
+                    // console.warn('⚠️ 조회 조건이 없습니다. 기본값으로 설정합니다.');
+                    setQuickPeriod();
+                    return;
+                }
+                
+                // 백엔드 API 파라미터 구조에 맞춰 수정
+                const params = {
+                    startDate: startDate,  // YYYY-MM-DD 형식
+                    endDate: endDate,      // YYYY-MM-DD 형식
+                    dateFilterType: 'CS_RECEIVED',  // 기본 날짜 기준
+                    returnType: ''         // 전체 유형
+                };
+                
+                // console.log('📋 API 전송 파라미터:', params);
+                
+                // 🔧 CSRF 토큰 확인
+                if (!window.csrfToken) {
+                    // console.warn('⚠️ CSRF 토큰이 없습니다.');
+                }
+                
+                // API 호출 (POST 방식, JSON Body)
+                const response = await fetch('/exchange/api/statistics', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        [window.csrfHeader]: window.csrfToken
+                    },
+                    body: JSON.stringify(params)
+                });
+                
+                // console.log('📡 API 응답 상태:', response.status, response.statusText);
+                // console.log('📡 API 응답 헤더:', Object.fromEntries(response.headers));
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}\n응답 내용: ${errorText}`);
+                }
+                
+                const result = await response.json();
+                
+                // 🔍 API 응답 데이터 완전 분석
+                // console.log('🔍 ===== API 응답 완전 분석 =====');
+                // console.log('📊 전체 API 응답:', result);
+                // console.log('📊 success 여부:', result.success);
+                
+                if (result.processStats) {
+                    // console.log('📊 processStats 완전 분석:');
+                    // console.log('  - 타입:', typeof result.processStats);
+                    // console.log('  - 키들:', Object.keys(result.processStats));
+                    // console.log('  - 전체 내용:', result.processStats);
+                    
+                    // 각 통계 값 하나씩 확인
+                    Object.entries(result.processStats).forEach(([key, value]) => {
+                        // console.log(`  - ${key}: ${value} (타입: ${typeof value})`);
+                    });
+                } else {
+                    // console.error('❌ processStats가 없습니다!');
+                }
+                
+                if (result.typeStats) {
+                    // console.log('📊 typeStats 완전 분석:');
+                    // console.log('  - 타입:', typeof result.typeStats);
+                    // console.log('  - 키들:', Object.keys(result.typeStats));
+                    // console.log('  - 전체 내용:', result.typeStats);
+                    
+                    // 각 유형별 값 하나씩 확인
+                    Object.entries(result.typeStats).forEach(([key, value]) => {
+                        // console.log(`  - ${key}: ${value} (타입: ${typeof value})`);
+                    });
+                    
+                    // 총 건수 계산
+                    const totalTypeCount = Object.values(result.typeStats)
+                        .reduce((sum, value) => sum + (parseInt(value) || 0), 0);
+                    // console.log('  - 📊 typeStats 총 건수:', totalTypeCount);
+                } else {
+                    // console.error('❌ typeStats가 없습니다!');
+                }
+                
+                if (result.trendData) {
+                    // console.log('📊 trendData 완전 분석:');
+                    // console.log('  - 타입:', typeof result.trendData);
+                    // console.log('  - 키들:', Object.keys(result.trendData));
+                    // console.log('  - 전체 내용:', result.trendData);
+                    
+                    if (result.trendData.labels) {
+                        // console.log('  - labels 길이:', result.trendData.labels.length);
+                        // console.log('  - labels 내용:', result.trendData.labels);
+                    }
+                    if (result.trendData.exchange) {
+                        // console.log('  - exchange 길이:', result.trendData.exchange.length);
+                        // console.log('  - exchange 내용:', result.trendData.exchange);
+                        // console.log('  - exchange 합계:', result.trendData.exchange.reduce((a, b) => a + b, 0));
+                    }
+                    if (result.trendData.return) {
+                        // console.log('  - return 길이:', result.trendData.return.length);
+                        // console.log('  - return 내용:', result.trendData.return);
+                        // console.log('  - return 합계:', result.trendData.return.reduce((a, b) => a + b, 0));
+                    }
+                } else {
+                    // console.error('❌ trendData가 없습니다!');
+                }
+                
+                if (result.amountStats) {
+                    // console.log('📊 amountStats 완전 분석:');
+                    // console.log('  - 타입:', typeof result.amountStats);
+                    // console.log('  - 키들:', Object.keys(result.amountStats));
+                    // console.log('  - 전체 내용:', result.amountStats);
+                } else {
+                    // console.error('❌ amountStats가 없습니다!');
+                }
+                
+                // totalCount 확인
+                if (result.totalCount !== undefined) {
+                    // console.log('📊 totalCount:', result.totalCount, '(타입:', typeof result.totalCount, ')');
+                } else {
+                    // console.error('❌ totalCount가 없습니다!');
+                }
+                
+                // console.log('🔍 ===== API 응답 분석 완료 =====');
+                
+                if (result.success) {
+                    currentStats = result;
+                    updateStatisticsDisplay(result);
+                    updateChartsData(result);
+                    updateLastUpdateTime();
+                    // console.log('✅ 통계 업데이트 완료');
+                    // console.log('✅ 통계 업데이트 완료');
+                } else {
+                    throw new Error(result.message || '통계 조회 실패');
+                }
+                
+            } catch (error) {
+                // console.error('❌ 통계 로딩 실패:', error);
+                showErrorMessage('통계 데이터를 불러오는데 실패했습니다: ' + error.message);
+                initializeDefaultData();
+            }
+        }
+
+        // 🔄 실패 시 기본 데이터 초기화
+        function initializeDefaultData() {
+            // console.log('🔄 기본 데이터로 초기화 중...');
+            
+            // 기본 통계 데이터
+            const defaultStats = {
+                processStats: {
+                    totalCount: 0,
+                    avgProcessingTime: 0,
+                    completedToday: 0,
+                    pendingCount: 0
+                },
+                typeStats: {
+                    FULL_EXCHANGE: 0,
+                    PARTIAL_EXCHANGE: 0,
+                    FULL_RETURN: 0,
+                    PARTIAL_RETURN: 0
+                },
+                amountStats: {
+                    totalAmount: 0,
+                    avgAmount: 0,
+                    maxAmount: 0,
+                    minAmount: 0
+                },
+                trendData: {
+                    labels: ['최근 7일', '6일 전', '5일 전', '4일 전', '3일 전', '2일 전', '어제'],
+                    exchange: [0, 0, 0, 0, 0, 0, 0],
+                    return: [0, 0, 0, 0, 0, 0, 0]
+                }
+            };
+            
+            updateStatisticsDisplay(defaultStats);
+            updateChartsData(defaultStats);
+            updateLastUpdateTime();
+            
+            // console.log('✅ 기본 데이터 초기화 완료');
+        }
+
+        // 🔄 기본 차트 초기화
+        function initializeDefaultCharts() {
+            // console.log('🔄 기본 차트로 초기화 중...');
+            
+            try {
+                if (trendChart) {
+                    trendChart.data.labels = ['최근 7일', '6일 전', '5일 전', '4일 전', '3일 전', '2일 전', '어제'];
+                    trendChart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0];
+                    trendChart.data.datasets[1].data = [0, 0, 0, 0, 0, 0, 0];
+                    trendChart.update('none');
+                }
+                
+                if (typeChart) {
+                    typeChart.data.labels = ['데이터 없음 (0건)'];
+                    typeChart.data.datasets[0].data = [1];
+                    typeChart.data.datasets[0].backgroundColor = ['#95a5a6'];
+                    typeChart.data.datasets[0].borderColor = ['#95a5a680'];
+                    typeChart.update('none');
+                }
+                
+                // console.log('✅ 기본 차트 초기화 완료');
+            } catch (error) {
+                // console.error('❌ 기본 차트 초기화 실패:', error);
+            }
+        }
+
+        // 📊 차트 데이터 업데이트 (대폭 수정)
+        function updateChartsData(data) {
+            try {
+                // console.log('📊 차트 데이터 업데이트 시작...');
+                // console.log('📊 받은 데이터:', data);
+                
+                // 🚨 DEBUG: 트렌드 데이터 구조 완전 분석
+                // console.log('🚨 DEBUG: data.trendData 존재 여부:', !!data.trendData);
+                if (data.trendData) {
+                    // console.log('🚨 DEBUG: data.trendData 전체:', data.trendData);
+                    // console.log('🚨 DEBUG: data.trendData.labels:', data.trendData.labels);
+                    // console.log('🚨 DEBUG: data.trendData.exchange:', data.trendData.exchange);
+                    // console.log('🚨 DEBUG: data.trendData.return:', data.trendData.return);
+                    // console.log('🚨 DEBUG: labels 길이:', data.trendData.labels ? data.trendData.labels.length : 'undefined');
+                    // console.log('🚨 DEBUG: exchange 길이:', data.trendData.exchange ? data.trendData.exchange.length : 'undefined');
+                    // console.log('🚨 DEBUG: return 길이:', data.trendData.return ? data.trendData.return.length : 'undefined');
+                } else {
+                    // console.log('🚨 DEBUG: data.trendData가 없습니다!');
+                }
+                
+                // 🔥 강제 실행 확인
+                // console.log('🔥 트렌드 차트 객체 확인:', !!trendChart);
+                // console.log('🔥 유형별 차트 객체 확인:', !!typeChart);
+                
+                // 1. 🔍 트렌드 차트 업데이트 (강제 실행)
+                // console.log('📈 === 트렌드 차트 업데이트 시작 ===');
+                
+                if (trendChart) {
+                    // console.log('📈 트렌드 차트 객체 존재 ✅');
+                    
+                    let finalLabels = [];
+                    let finalExchange = [];
+                    let finalReturn = [];
+                    
+                    // 🚨 실제 트렌드 데이터가 있으면 그대로 사용 (가장 우선)
+                    if (data.trendData && data.trendData.labels && data.trendData.exchange && data.trendData.return) {
+                        // console.log('📈 🔥 실제 트렌드 데이터 발견! 그대로 사용합니다.');
+                        // console.log('📈 🔥 트렌드 라벨:', data.trendData.labels);
+                        // console.log('📈 🔥 트렌드 교환:', data.trendData.exchange);
+                        // console.log('📈 🔥 트렌드 반품:', data.trendData.return);
+                        
+                        finalLabels = [...data.trendData.labels];
+                        finalExchange = [...data.trendData.exchange];
+                        finalReturn = [...data.trendData.return];
+                        
+                    } else {
+                        // console.log('📈 ⚠️ 실제 트렌드 데이터가 없습니다. 기본 데이터를 설정합니다.');
+                        
+                        // 기본 7일 데이터
+                        finalLabels = ['06-01', '06-02', '06-03', '06-04', '06-05', '06-06', '06-07'];
+                        finalExchange = [0, 0, 0, 0, 0, 0, 0];
+                        finalReturn = [0, 0, 0, 0, 0, 0, 0];
+                    }
+                    
+                    // console.log('📈 🔥 최종 트렌드 데이터:');
+                    // console.log('  - 라벨:', finalLabels);
+                    // console.log('  - 교환 데이터:', finalExchange);
+                    // console.log('  - 반품 데이터:', finalReturn);
+                    // console.log('  - 교환 총합:', finalExchange.reduce((a, b) => a + b, 0));
+                    // console.log('  - 반품 총합:', finalReturn.reduce((a, b) => a + b, 0));
+                    
+                    // 🔥 강제 차트 업데이트
+                    // console.log('📈 🔥 차트 업데이트 강제 실행...');
+                    
+                    try {
+                        trendChart.data.labels = finalLabels;
+                        trendChart.data.datasets[0].data = finalExchange;
+                        trendChart.data.datasets[1].data = finalReturn;
+                        
+                        // 여러 방식으로 업데이트 시도
+                        trendChart.update('active');
+                        setTimeout(() => {
+                            trendChart.update('none');
+                        }, 100);
+                        
+                        // console.log('📈 🔥 차트 업데이트 완료!');
+                        // console.log('📈 🔥 업데이트된 라벨:', trendChart.data.labels);
+                        // console.log('📈 🔥 업데이트된 교환:', trendChart.data.datasets[0].data);
+                        // console.log('📈 🔥 업데이트된 반품:', trendChart.data.datasets[1].data);
+                        
+                    } catch (chartError) {
+                        // console.error('❌ 차트 업데이트 실패:', chartError);
+                    }
+                    
+                } else {
+                    // console.error('❌ 🔥 trendChart 객체가 없습니다!');
+                    // console.log('❌ 🔥 페이지를 새로고침해서 차트를 다시 초기화하세요.');
+                }
+                
+                // console.log('📈 === 트렌드 차트 업데이트 완료 ===');
+                
+                // 2. 🥧 유형별 분포 차트 업데이트 (개선된 버전)
+                if (typeChart) {
+                    // console.log('🥧 유형별 차트 업데이트 중...');
+                    
+                    if (data.typeStats) {
+                        // console.log('🥧 유형별 데이터 존재 확인 ✅');
+                        // console.log('🥧 유형별 통계 원본:', data.typeStats);
+                        
+                        const typeStats = data.typeStats;
+                        // console.log('🔍 typeStats 키들:', Object.keys(typeStats));
+                        
+                        // 🔧 개선된 한국어 라벨 매핑 및 그룹화
+                        const processedData = [];
+                        
+                        // 교환 데이터 그룹화
+                        const fullExchange = parseInt(typeStats.FULL_EXCHANGE) || 0;
+                        const partialExchange = parseInt(typeStats.PARTIAL_EXCHANGE) || 0;
+                        const totalExchange = fullExchange + partialExchange;
+                        
+                        // 반품 데이터 그룹화
+                        const fullReturn = parseInt(typeStats.FULL_RETURN) || 0;
+                        const partialReturn = parseInt(typeStats.PARTIAL_RETURN) || 0;
+                        const totalReturn = fullReturn + partialReturn;
+                        
+                        // console.log('🔍 유형별 집계:');
+                        // console.log(`  - 전체교환: ${fullExchange}건, 부분교환: ${partialExchange}건 → 교환 총계: ${totalExchange}건`);
+                        // console.log(`  - 전체반품: ${fullReturn}건, 부분반품: ${partialReturn}건 → 반품 총계: ${totalReturn}건`);
+                        
+                        // 📊 차트 데이터 구성 (단순 라벨 사용)
+                        const labels = [];
+                        const values = [];
+                        const colors = [];
+                        
+                        // 교환 데이터 추가
+                        if (totalExchange > 0) {
+                            labels.push('교환');
+                            values.push(totalExchange);
+                            colors.push('#3498db');
+                        }
+                        
+                        // 반품 데이터 추가
+                        if (totalReturn > 0) {
+                            labels.push('반품');
+                            values.push(totalReturn);
+                            colors.push('#e74c3c');
+                        }
+                        
+                        // 차트 업데이트
+                        if (labels.length > 0) {
+                            // console.log('🥧 최종 차트 데이터:');
+                            // console.log('  - labels:', labels);
+                            // console.log('  - values:', values);
+                            // console.log('  - colors:', colors);
+                            
+                            typeChart.data.labels = labels;
+                            typeChart.data.datasets[0].data = values;
+                            typeChart.data.datasets[0].backgroundColor = colors;
+                            typeChart.data.datasets[0].borderColor = colors.map(color => color + '80');
+                            typeChart.update('none');
+                            
+                            // console.log('✅ 유형별 차트 업데이트 완료');
+                        } else {
+                            // console.log('🥧 유형별 데이터가 모두 0. 기본 차트로 초기화...');
+                            typeChart.data.labels = ['데이터 없음'];
+                            typeChart.data.datasets[0].data = [1];
+                            typeChart.data.datasets[0].backgroundColor = ['#95a5a6'];
+                            typeChart.data.datasets[0].borderColor = ['#95a5a680'];
+                            typeChart.update('none');
+                        }
+                    } else {
+                        // console.error('❌ data.typeStats가 없습니다!');
+                        // console.log('🥧 기본 차트로 초기화...');
+                        typeChart.data.labels = ['데이터 없음'];
+                        typeChart.data.datasets[0].data = [1];
+                        typeChart.data.datasets[0].backgroundColor = ['#95a5a6'];
+                        typeChart.data.datasets[0].borderColor = ['#95a5a680'];
+                        typeChart.update('none');
+                    }
+                } else {
+                    // console.error('❌ typeChart가 없습니다!');
+                }
+                
+                // console.log('📊 차트 데이터 업데이트 완료');
+                
+            } catch (error) {
+                // console.error('❌ 차트 데이터 업데이트 실패:', error);
+                // console.error('❌ 오류 스택:', error.stack);
+                
+                // 차트 초기화로 대체
+                initializeDefaultCharts();
+            }
+        }
+
+        // 통계 화면 업데이트
+        function updateStatisticsDisplay(data) {
+            try {
+                // console.log('🎨 통계 화면 업데이트 시작');
+                // console.log('📊 업데이트 데이터:', data);
+                
+                // 데이터 구조 확인 및 기본값 설정
+                const processStats = data.processStats || {};
+                const amountStats = data.amountStats || {};
+                const totalCount = data.totalCount || 0;
+                
+                // API 응답 데이터를 그대로 표시 (화면에서 조작하지 않음)
+                // console.log('📊 API 응답 데이터 원본:', data);
+                // console.log('📊 processStats:', processStats);
+                // console.log('📊 amountStats:', amountStats);
+                // console.log('📊 totalCount:', totalCount);
+                
+                // ① 회수완료 카드 - 백엔드에서 계산된 정확한 값 사용
+                updateElement('collectionCompleted', processStats.collectionCompleted || 0);
+                updateElement('collectionPending', processStats.collectionPending || 0);
+                
+                // ② 물류확인 카드 - 백엔드에서 계산된 정확한 값 사용
+                updateElement('logisticsConfirmed', processStats.logisticsConfirmed || 0);
+                updateElement('logisticsPending', processStats.logisticsPending || 0);
+                
+                // ③ 교환출고 카드 - 백엔드에서 계산된 정확한 값 사용
+                updateElement('exchangeShipped', processStats.exchangeShipped || 0);
+                updateElement('exchangeNotShipped', processStats.exchangeNotShipped || 0);
+                
+                // ④ 반품환불 카드 - 백엔드에서 계산된 정확한 값 사용
+                updateElement('returnRefunded', processStats.returnRefunded || 0);
+                updateElement('returnNotRefunded', processStats.returnNotRefunded || 0);
+                updateElement('totalRefundAmount', (amountStats.totalRefundAmount || 0).toLocaleString() + '원');
+                
+                // ⑤ 배송비입금 카드 - 백엔드에서 계산된 정확한 값 사용
+                updateElement('paymentPending', processStats.paymentPending || 0);
+                updateElement('paymentCompleted', processStats.paymentCompleted || 0);
+                updateElement('totalShippingFee', (amountStats.totalShippingFee || 0).toLocaleString() + '원');
+                
+                // ⑥ 전체완료 카드 - 백엔드에서 계산된 정확한 값 사용
+                updateElement('totalCompleted', processStats.totalCompleted || 0);
+                updateElement('totalIncompleted', processStats.totalIncompleted || 0);
+                
+                // ⑦ 처리기간 임박 카드 - 백엔드에서 계산된 정확한 값 사용 (조회조건 무관)
+                updateElement('overdueTenDaysCount', processStats.overdueTenDaysCount || 0);
+                
+                // 📊 상세통계현황 테이블 업데이트
+                updateDetailStatsTable(data);
+                
+                // 💰 금액 요약 섹션 업데이트
+                updateAmountSummary(data);
+                
+                // console.log('✅ 통계 화면 업데이트 완료');
+                
+            } catch (error) {
+                // console.error('❌ 통계 화면 업데이트 실패:', error);
+            }
+        }
+
+        // 상세통계현황 테이블 업데이트 함수
+        function updateDetailStatsTable(data) {
+            try {
+                // console.log('📊 상세통계현황 테이블 업데이트 시작');
+                
+                const processStats = data.processStats || {};
+                const typeStats = data.typeStats || {};
+                const totalCount = data.totalCount || 0;
+                
+                // 유형별 비율 계산
+                const totalExchange = (typeStats.FULL_EXCHANGE || 0) + (typeStats.PARTIAL_EXCHANGE || 0);
+                const totalReturn = (typeStats.FULL_RETURN || 0) + (typeStats.PARTIAL_RETURN || 0);
+                const totalAllTypes = totalExchange + totalReturn;
+                
+                // 각 유형별 비율 (전체 건수 기준)
+                const fullExchangeRatio = totalAllTypes > 0 ? (typeStats.FULL_EXCHANGE || 0) / totalAllTypes : 0;
+                const partialExchangeRatio = totalAllTypes > 0 ? (typeStats.PARTIAL_EXCHANGE || 0) / totalAllTypes : 0;
+                const fullReturnRatio = totalAllTypes > 0 ? (typeStats.FULL_RETURN || 0) / totalAllTypes : 0;
+                const partialReturnRatio = totalAllTypes > 0 ? (typeStats.PARTIAL_RETURN || 0) / totalAllTypes : 0;
+                
+                // 1. 회수완료 상세통계
+                const collectionCompleted = processStats.collectionCompleted || 0;
+                const collectionPending = processStats.collectionPending || 0;
+                const collectionTotal = collectionCompleted + collectionPending;
+                
+                updateElement('collectionExchangeFull', Math.round(collectionCompleted * fullExchangeRatio));
+                updateElement('collectionExchangePartial', Math.round(collectionCompleted * partialExchangeRatio));
+                updateElement('collectionReturnFull', Math.round(collectionCompleted * fullReturnRatio));
+                updateElement('collectionReturnPartial', Math.round(collectionCompleted * partialReturnRatio));
+                updateElement('collectionTotal', collectionCompleted);
+                updateElement('collectionRate', collectionTotal > 0 ? Math.round((collectionCompleted / collectionTotal) * 100) + '%' : '0%');
+                
+                // 2. 물류확인 상세통계
+                const logisticsConfirmed = processStats.logisticsConfirmed || 0;
+                const logisticsPending = processStats.logisticsPending || 0;
+                const logisticsTotal = logisticsConfirmed + logisticsPending;
+                
+                updateElement('logisticsExchangeFull', Math.round(logisticsConfirmed * fullExchangeRatio));
+                updateElement('logisticsExchangePartial', Math.round(logisticsConfirmed * partialExchangeRatio));
+                updateElement('logisticsReturnFull', Math.round(logisticsConfirmed * fullReturnRatio));
+                updateElement('logisticsReturnPartial', Math.round(logisticsConfirmed * partialReturnRatio));
+                updateElement('logisticsTotal', logisticsConfirmed);
+                updateElement('logisticsRate', logisticsTotal > 0 ? Math.round((logisticsConfirmed / logisticsTotal) * 100) + '%' : '0%');
+                
+                // 3. 교환출고 상세통계 (교환만 해당)
+                const exchangeShipped = processStats.exchangeShipped || 0;
+                const exchangeNotShipped = processStats.exchangeNotShipped || 0;
+                const exchangeShippingTotal = exchangeShipped + exchangeNotShipped;
+                const exchangeFullRatio = totalExchange > 0 ? (typeStats.FULL_EXCHANGE || 0) / totalExchange : 0;
+                const exchangePartialRatio = totalExchange > 0 ? (typeStats.PARTIAL_EXCHANGE || 0) / totalExchange : 0;
+                
+                updateElement('exchangeShippedFull', Math.round(exchangeShipped * exchangeFullRatio));
+                updateElement('exchangeShippedPartial', Math.round(exchangeShipped * exchangePartialRatio));
+                updateElement('exchangeTotal', exchangeShipped);
+                updateElement('exchangeRate', exchangeShippingTotal > 0 ? Math.round((exchangeShipped / exchangeShippingTotal) * 100) + '%' : '0%');
+                
+                // 4. 반품환불 상세통계 (반품만 해당)
+                const returnRefunded = processStats.returnRefunded || 0;
+                const returnNotRefunded = processStats.returnNotRefunded || 0;
+                const returnRefundTotal = returnRefunded + returnNotRefunded;
+                const returnFullRatio = totalReturn > 0 ? (typeStats.FULL_RETURN || 0) / totalReturn : 0;
+                const returnPartialRatio = totalReturn > 0 ? (typeStats.PARTIAL_RETURN || 0) / totalReturn : 0;
+                
+                updateElement('returnRefundedFull', Math.round(returnRefunded * returnFullRatio));
+                updateElement('returnRefundedPartial', Math.round(returnRefunded * returnPartialRatio));
+                updateElement('returnTotal', returnRefunded);
+                updateElement('returnRate', returnRefundTotal > 0 ? Math.round((returnRefunded / returnRefundTotal) * 100) + '%' : '0%');
+                
+                // 5. 배송비입금 상세통계 (교환만 해당)
+                const paymentCompleted = processStats.paymentCompleted || 0;
+                const paymentPending = processStats.paymentPending || 0;
+                const paymentTotal = paymentCompleted + paymentPending;
+                
+                updateElement('paymentExchangeFull', Math.round(paymentCompleted * exchangeFullRatio));
+                updateElement('paymentExchangePartial', Math.round(paymentCompleted * exchangePartialRatio));
+                updateElement('paymentTotal', paymentCompleted);
+                updateElement('paymentRate', paymentTotal > 0 ? Math.round((paymentCompleted / paymentTotal) * 100) + '%' : '0%');
+                
+                // 6. 전체완료 상세통계 (IS_COMPLETED 기준)
+                const totalCompleted = processStats.totalCompleted || 0;
+                const totalIncompleted = processStats.totalIncompleted || 0;
+                const allTotal = totalCompleted + totalIncompleted;
+                
+                // 🔍 전체완료 관련 데이터 상세 로그
+                // console.log('📊 전체완료 상세 데이터:');
+                // console.log('  ✅ IS_COMPLETED = 1 (완료):', totalCompleted);
+                // console.log('  ❌ IS_COMPLETED = 0 (미완료):', totalIncompleted);
+                // console.log('  📊 전체 건수 (완료+미완료):', allTotal);
+                // console.log('  📊 API의 totalCount:', totalCount);
+                
+                // 🚨 전체완료가 0인 경우 경고 메시지
+                if (totalCompleted === 0 && totalIncompleted === 0) {
+                    // console.error('🚨 전체완료 데이터가 모두 0입니다!');
+                    // console.error('   - 백엔드에서 IS_COMPLETED 컬럼을 제대로 조회하지 못한 것 같습니다.');
+                    // console.error('   - 서버 로그를 확인해보세요.');
+                    // console.error('   - processStats 전체:', processStats);
+                    // console.error('   - API 원본 데이터:', data);
+                } else {
+                    // console.log('✅ 전체완료 데이터 정상:', {
+                    //     완료: totalCompleted,
+                    //     미완료: totalIncompleted,
+                    //     전체: allTotal,
+                    //     완료율: Math.round((totalCompleted / allTotal) * 100) + '%'
+                    // });
+                }
+                
+                // 상세통계현황 테이블의 전체완료 행 업데이트
+                const completedExchangeFull = Math.round(totalCompleted * fullExchangeRatio);
+                const completedExchangePartial = Math.round(totalCompleted * partialExchangeRatio);
+                const completedReturnFull = Math.round(totalCompleted * fullReturnRatio);
+                const completedReturnPartial = Math.round(totalCompleted * partialReturnRatio);
+                
+                // console.log('�� 전체완료 상세통계현황 계산:');
+                // console.log('  📊 IS_COMPLETED = 1 (실제값):', totalCompleted);
+                // console.log('  📊 전체교환 (추정):', completedExchangeFull, '(', totalCompleted, '*', fullExchangeRatio.toFixed(3), ')');
+                // console.log('  📊 부분교환 (추정):', completedExchangePartial, '(', totalCompleted, '*', partialExchangeRatio.toFixed(3), ')');
+                // console.log('  📊 전체반품 (추정):', completedReturnFull, '(', totalCompleted, '*', fullReturnRatio.toFixed(3), ')');
+                // console.log('  📊 부분반품 (추정):', completedReturnPartial, '(', totalCompleted, '*', partialReturnRatio.toFixed(3), ')');
+                
+                updateElement('completedExchangeFull', completedExchangeFull);
+                updateElement('completedExchangePartial', completedExchangePartial);
+                updateElement('completedReturnFull', completedReturnFull);
+                updateElement('completedReturnPartial', completedReturnPartial);
+                
+                // 전체완료 비율 계산 (IS_COMPLETED 기준)
+                let completionRate = '0%';
+                if (allTotal > 0) {
+                    completionRate = Math.round((totalCompleted / allTotal) * 100) + '%';
+                    // console.log('📊 정상적인 완료율 계산: ' + completionRate);
+                } else if (totalCount > 0) {
+                    // allTotal이 0인 경우 임시로 totalCount 기준으로 계산
+                    // console.warn('⚠️ IS_COMPLETED 데이터가 없어 totalCount 기준으로 계산');
+                    completionRate = Math.round((totalCompleted / totalCount) * 100) + '%';
+                    // console.warn('⚠️ 임시 완료율 계산: ' + completionRate);
+                } else {
+                    // console.error('🚨 완료율 계산 불가: 모든 데이터가 0');
+                }
+                
+                updateElement('completionRate', completionRate);
+                // console.log('📊 최종 전체완료율:', completionRate);
+                
+                // console.log('✅ 상세통계현황 테이블 업데이트 완료');
+                
+            } catch (error) {
+                // console.error('❌ 상세통계현황 테이블 업데이트 실패:', error);
+            }
+        }
+
+        // 💰 금액 요약 섹션 업데이트 함수
+        function updateAmountSummary(data) {
+            try {
+                // console.log('💰 금액 요약 섹션 업데이트 시작');
+                // console.log('💰 받은 전체 데이터:', data);
+                
+                const amountStats = data.amountStats || {};
+                // console.log('💰 amountStats 원본:', amountStats);
+                
+                // 금액 데이터 추출 및 로깅
+                const totalRefundAmount = amountStats.totalRefundAmount || 0;
+                const totalShippingFee = amountStats.totalShippingFee || 0;
+                const totalCount = amountStats.totalCount || 0;
+                
+                // console.log('💰 금액 요약 데이터 분석:');
+                // console.log(`  - 총 환불금액: ${totalRefundAmount.toLocaleString()}원`);
+                // console.log(`  - 총 배송비: ${totalShippingFee.toLocaleString()}원`);
+                // console.log(`  - 대상 건수: ${totalCount}건`);
+                
+                // 조회 조건 확인
+                const searchParams = data.searchParams || {};
+                // console.log('💰 현재 조회 조건:');
+                // console.log(`  - 시작날짜: ${searchParams.startDate || '없음'}`);
+                // console.log(`  - 종료날짜: ${searchParams.endDate || '없음'}`);
+                // console.log(`  - 반품유형: ${searchParams.returnType || '전체'}`);
+                
+                // 금액 요약 섹션 업데이트
+                updateElement('summaryRefundAmount', totalRefundAmount.toLocaleString());
+                updateElement('summaryShippingFee', totalShippingFee.toLocaleString());
+                
+                // console.log('✅ 금액 요약 섹션 업데이트 완료');
+                
+            } catch (error) {
+                // console.error('❌ 금액 요약 섹션 업데이트 실패:', error);
+                // console.error('❌ 오류 스택:', error.stack);
+            }
+        }
+
+        // 요소 업데이트 헬퍼 함수
+        function updateElement(id, value) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.textContent = typeof value === 'number' ? value.toLocaleString() : value;
+                
+                // 애니메이션 효과
+                element.style.transform = 'scale(1.1)';
+                element.style.transition = 'transform 0.3s ease';
+                setTimeout(() => {
+                    element.style.transform = 'scale(1)';
+                }, 300);
+            }
+        }
+
+        // 마지막 업데이트 시간 표시
+        function updateLastUpdateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleString('ko-KR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            
+            const element = document.getElementById('updateTimeText');
+            if (element) {
+                element.textContent = timeString;
+            }
+        }
+
+        // 차트 초기화 (개선된 버전)
+        function initializeCharts() {
+            try {
+                // console.log('📊 차트 초기화 시작...');
+                
+                // 트렌드 차트 초기화
+                const trendCtx = document.getElementById('trendChart');
+                if (trendCtx) {
+                    // console.log('📈 트렌드 차트 초기화 중...');
+                    
+                    // 기존 차트가 있으면 제거
+                    if (trendChart) {
+                        trendChart.destroy();
+                    }
+                    
+                    trendChart = new Chart(trendCtx, {
+                        type: 'line',
+                        data: {
+                            labels: ['최근 7일', '6일 전', '5일 전', '4일 전', '3일 전', '2일 전', '어제'],
+                            datasets: [{
+                                label: '교환',
+                                data: [0, 0, 0, 0, 0, 0, 0],
+                                borderColor: '#3b82f6',
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                borderWidth: 3,
+                                fill: true,
+                                tension: 0.4,
+                                pointBackgroundColor: '#3b82f6',
+                                pointBorderColor: '#ffffff',
+                                pointBorderWidth: 2,
+                                pointRadius: 6,
+                                pointHoverRadius: 8
+                            }, {
+                                label: '반품',
+                                data: [0, 0, 0, 0, 0, 0, 0],
+                                borderColor: '#ef4444',
+                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                borderWidth: 3,
+                                fill: true,
+                                tension: 0.4,
+                                pointBackgroundColor: '#ef4444',
+                                pointBorderColor: '#ffffff',
+                                pointBorderWidth: 2,
+                                pointRadius: 6,
+                                pointHoverRadius: 8
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            interaction: {
+                                intersect: false,
+                                mode: 'index'
+                            },
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: '일별 교환/반품 트렌드',
+                                    font: {
+                                        size: 16,
+                                        weight: 'bold'
+                                    },
+                                    padding: 20
+                                },
+                                legend: {
+                                    position: 'top',
+                                    labels: {
+                                        usePointStyle: true,
+                                        padding: 20,
+                                        font: {
+                                            size: 12,
+                                            weight: '600'
+                                        }
+                                    }
+                                },
+                                tooltip: {
+                                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                    titleFont: {
+                                        size: 14,
+                                        weight: 'bold'
+                                    },
+                                    bodyFont: {
+                                        size: 13
+                                    },
+                                    cornerRadius: 8,
+                                    displayColors: true,
+                                    callbacks: {
+                                        title: function(context) {
+                                            return context[0].label;
+                                        },
+                                        label: function(context) {
+                                            return context.dataset.label + ': ' + context.parsed.y + '건';
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    grid: {
+                                        display: true,
+                                        color: '#e5e7eb'
+                                    },
+                                    ticks: {
+                                        font: {
+                                            size: 12
+                                        },
+                                        color: '#6b7280'
+                                    }
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                    grid: {
+                                        display: true,
+                                        color: '#e5e7eb'
+                                    },
+                                    ticks: {
+                                        font: {
+                                            size: 12
+                                        },
+                                        color: '#6b7280',
+                                        callback: function(value) {
+                                            return value + '건';
+                                        }
+                                    }
+                                }
+                            },
+                            animation: {
+                                duration: 1500,
+                                easing: 'easeInOutQuart'
+                            }
+                        }
+                    });
+                    
+                    // console.log('✅ 트렌드 차트 초기화 완료');
+                } else {
+                    // console.error('❌ 트렌드 차트 캔버스를 찾을 수 없습니다');
+                }
+
+                // 유형별 차트 초기화
+                const typeCtx = document.getElementById('typeChart');
+                if (typeCtx) {
+                    // console.log('🍕 유형별 차트 초기화 중...');
+                    
+                    // 기존 차트가 있으면 제거
+                    if (typeChart) {
+                        typeChart.destroy();
+                    }
+                    
+                    typeChart = new Chart(typeCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['교환', '반품'],
+                            datasets: [{
+                                data: [0, 0],
+                                backgroundColor: [
+                                    '#3498db',  // 교환 - 파랑
+                                    '#e74c3c'   // 반품 - 빨강
+                                ],
+                                borderColor: [
+                                    '#2563eb',
+                                    '#dc2626'
+                                ],
+                                borderWidth: 2,
+                                hoverOffset: 15
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: '유형별 분포',
+                                    font: {
+                                        size: 16,
+                                        weight: 'bold'
+                                    },
+                                    padding: 20
+                                },
+                                legend: {
+                                    position: 'right',
+                                    labels: {
+                                        usePointStyle: true,
+                                        padding: 15,
+                                        font: {
+                                            size: 12,
+                                            weight: '600'
+                                        },
+                                        generateLabels: function(chart) {
+                                            const original = Chart.defaults.plugins.legend.labels.generateLabels;
+                                            const labels = original.call(this, chart);
+                                            
+                                            // 각 라벨에 건수 추가
+                                            labels.forEach((label, index) => {
+                                                const value = chart.data.datasets[0].data[index] || 0;
+                                                label.text = `${label.text} (${value}건)`;
+                                            });
+                                            
+                                            return labels;
+                                        }
+                                    }
+                                },
+                                tooltip: {
+                                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                    titleFont: {
+                                        size: 14,
+                                        weight: 'bold'
+                                    },
+                                    bodyFont: {
+                                        size: 13
+                                    },
+                                    cornerRadius: 8,
+                                    displayColors: true,
+                                    callbacks: {
+                                        label: function(context) {
+                                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                            const value = context.parsed;
+                                            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                            return `${context.label}: ${value}건 (${percentage}%)`;
+                                        }
+                                    }
+                                }
+                            },
+                            animation: {
+                                animateRotate: true,
+                                animateScale: true,
+                                duration: 1500,
+                                easing: 'easeInOutQuart'
+                            }
+                        }
+                    });
+                    
+                    // console.log('✅ 유형별 차트 초기화 완료');
+                } else {
+                    // console.error('❌ 유형별 차트 캔버스를 찾을 수 없습니다');
+                }
+                
+                // console.log('✅ 모든 차트 초기화 완료');
+                
+            } catch (error) {
+                // console.error('❌ 차트 초기화 실패:', error);
+                // console.error('❌ 오류 스택:', error.stack);
+                // showErrorMessage('차트 초기화 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 이미지가 포함된 엑셀 다운로드
+        function downloadStatisticsExcel() {
+            try {
+                // console.log('📥 이미지 포함 엑셀 다운로드 시작...');
+                // showInfoMessage('차트와 카드를 이미지로 변환 중입니다...');
+                
+                // 이미지 생성 및 다운로드 실행
+                generateImagesAndDownload();
+                
+            } catch (error) {
+                // console.error('❌ 엑셀 다운로드 실패:', error);
+                // showErrorMessage('엑셀 다운로드 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 이미지 생성 및 다운로드 실행
+        async function generateImagesAndDownload() {
+            try {
+                const images = {};
+                
+                // 카드 섹션 이미지 생성
+                const dashboardElement = document.querySelector('.dashboard');
+                if (dashboardElement) {
+                    // console.log('📊 카드 섹션 이미지 생성 중...');
+                    const dashboardCanvas = await html2canvas(dashboardElement, {
+                        backgroundColor: '#ffffff',
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: true
+                    });
+                    images.dashboardImage = dashboardCanvas.toDataURL('image/png');
+                }
+                
+                // 트렌드 차트 이미지 생성
+                if (trendChart) {
+                    // console.log('📈 트렌드 차트 이미지 생성 중...');
+                    images.trendChartImage = trendChart.toBase64Image('image/png', 1);
+                }
+                
+                // 유형별 차트 이미지 생성
+                if (typeChart) {
+                    // console.log('🍕 유형별 차트 이미지 생성 중...');
+                    images.typeChartImage = typeChart.toBase64Image('image/png', 1);
+                }
+                
+                // console.log('✅ 모든 이미지 생성 완료');
+                
+                // 파라미터 준비
+                const params = {
+                    startDate: document.getElementById('startDate').value,
+                    endDate: document.getElementById('endDate').value,
+                    ...images
+                };
+                
+                // 서버로 POST 요청 (이미지 포함)
+                await downloadExcelWithImages(params);
+                
+            } catch (error) {
+                // console.error('❌ 이미지 생성 실패:', error);
+                // showErrorMessage('이미지 생성 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 이미지를 포함한 엑셀 다운로드 요청
+        async function downloadExcelWithImages(params) {
+            try {
+                // showInfoMessage('이미지가 포함된 엑셀 파일을 생성 중입니다...');
+                
+                const response = await fetch('/exchange/api/statistics/excel-with-images', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': window.csrfToken
+                    },
+                    body: JSON.stringify(params)
+                });
+                
+                if (response.ok) {
+                    // 파일 다운로드
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = '교환반품통계_' + new Date().toISOString().slice(0, 10) + '.xlsx';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                    
+                    // showSuccessMessage('이미지가 포함된 엑셀 다운로드가 완료되었습니다!');
+                } else {
+                    throw new Error('서버 응답 오류');
+                }
+                
+            } catch (error) {
+                // console.error('❌ 엑셀 다운로드 실패:', error);
+                // showErrorMessage('엑셀 다운로드 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 💬 메시지 표시 함수들
+        function showSuccessMessage(message) {
+            // console.log('✅ 성공:', message);
+            // Toastr 또는 알림 시스템이 있다면 사용
+            if (typeof toastr !== 'undefined') {
+                toastr.success(message);
+            } else {
+                // 간단한 브라우저 알림
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #2ecc71;
+                    color: white;
+                    padding: 15px 20px;
+                    border-radius: 8px;
+                    z-index: 10000;
+                    font-weight: 600;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                `;
+                notification.textContent = message;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+        }
+        
+        function showErrorMessage(message) {
+            // console.error('❌ 오류:', message);
+            // Toastr 또는 알림 시스템이 있다면 사용
+            if (typeof toastr !== 'undefined') {
+                toastr.error(message);
+            } else {
+                // 간단한 브라우저 알림
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #e74c3c;
+                    color: white;
+                    padding: 15px 20px;
+                    border-radius: 8px;
+                    z-index: 10000;
+                    font-weight: 600;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                `;
+                notification.textContent = message;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 5000);
+            }
+        }
+
+        function showInfoMessage(message) {
+            showToast(message, 'info');
+        }
+
+        // 토스트 메시지 표시
+        function showToast(message, type = 'info') {
+            const existingToast = document.querySelector('.toast-message');
+            if (existingToast) {
+                existingToast.remove();
+            }
+            
+            const toast = document.createElement('div');
+            toast.className = `toast-message toast-${type}`;
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 600;
+                z-index: 10000;
+                max-width: 400px;
+                animation: slideInRight 0.3s ease;
+            `;
+            
+            switch (type) {
+                case 'success':
+                    toast.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                    break;
+                case 'error':
+                    toast.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+                    break;
+                default:
+                    toast.style.background = 'linear-gradient(135deg, #3b82f6, #2563eb)';
+            }
+            
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.style.animation = 'slideOutRight 0.3s ease';
+                    setTimeout(() => toast.remove(), 300);
+                }
+            }, 3000);
+        }
+    </script>
+    
+    <!-- 애니메이션 CSS -->
+    <style>
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOutRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+    </style>
+</div>
+</html> 

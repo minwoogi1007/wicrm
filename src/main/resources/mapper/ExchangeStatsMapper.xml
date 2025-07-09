@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wio.crm.mapper.ExchangeStatsMapper">
+
+    <!-- 🚀 교환반품 통계 전용 매퍼 XML (신규 설계) -->
+    <!-- 목적: TB_RETURN_ITEM 테이블 기준 최적화된 통계 쿼리 -->
+    <!-- 특징: 단순하고 명확한 SQL, 중복 제거, 성능 최적화 -->
+
+    <!-- ==================== 공통 조건 구문 ==================== -->
+
+    <!-- 날짜 조건 -->
+    <sql id="dateCondition">
+        <choose>
+            <when test="request.dateFilterType == 'CS_RECEIVED'">
+                AND CS_RECEIVED_DATE BETWEEN #{request.csStartDate} AND #{request.csEndDate}
+            </when>
+            <when test="request.dateFilterType == 'ORDER_DATE'">
+                AND ORDER_DATE BETWEEN #{request.orderStartDate} AND #{request.orderEndDate}
+            </when>
+        </choose>
+    </sql>
+
+    <!-- 기타 필터 조건 -->
+    <sql id="filterConditions">
+        <if test="request.returnType != null and request.returnType != ''">
+            AND RETURN_TYPE_CODE = #{request.returnType}
+        </if>
+        <if test="request.completionStatus != null and request.completionStatus != ''">
+            <choose>
+                <when test="request.completionStatus == 'COMPLETED'">
+                    AND IS_COMPLETED = 1
+                </when>
+                <when test="request.completionStatus == 'INCOMPLETE'">
+                    AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL)
+                </when>
+            </choose>
+        </if>
+        <if test="request.siteName != null and request.siteName != ''">
+            AND SITE_NAME = #{request.siteName}
+        </if>
+    </sql>
+
+    <!-- 기본 WHERE 절 -->
+    <sql id="baseConditions">
+        WHERE 1=1
+        <include refid="dateCondition"/>
+        <include refid="filterConditions"/>
+    </sql>
+
+    <!-- ==================== 핵심 통계 조회 ==================== -->
+
+    <select id="getCoreStats" parameterType="com.wio.crm.dto.ExchangeStatsRequestDto" 
+            resultType="com.wio.crm.dto.ExchangeStatsData$CoreStats">
+        SELECT 
+            COUNT(*) as totalCount,
+            COUNT(CASE WHEN IS_COMPLETED = 1 THEN 1 END) as completedCount,
+            COUNT(CASE WHEN IS_COMPLETED = 0 OR IS_COMPLETED IS NULL THEN 1 END) as incompleteCount,
+            CASE 
+                WHEN COUNT(*) > 0 THEN ROUND((COUNT(CASE WHEN IS_COMPLETED = 1 THEN 1 END) * 100.0 / COUNT(*)), 2)
+                ELSE 0.0 
+            END as completionRate,
+            COALESCE(SUM(REFUND_AMOUNT), 0) as totalRefundAmount,
+            COALESCE(SUM(SHIPPING_FEE), 0) as totalShippingFee
+        FROM TB_RETURN_ITEM
+        <include refid="baseConditions"/>
+    </select>
+
+    <!-- ==================== 트렌드 데이터 조회 ==================== -->
+
+    <select id="getTrendData" parameterType="com.wio.crm.dto.ExchangeStatsRequestDto" 
+            resultType="com.wio.crm.dto.ExchangeStatsData$TrendPoint">
+        SELECT 
+            <choose>
+                <when test="request.dateFilterType == 'CS_RECEIVED'">
+                    TO_CHAR(CS_RECEIVED_DATE, 'YYYY-MM-DD') as dateLabel,
+                </when>
+                <when test="request.dateFilterType == 'ORDER_DATE'">
+                    TO_CHAR(ORDER_DATE, 'YYYY-MM-DD') as dateLabel,
+                </when>
+                <otherwise>
+                    TO_CHAR(CS_RECEIVED_DATE, 'YYYY-MM-DD') as dateLabel,
+                </otherwise>
+            </choose>
+            COUNT(*) as totalCount,
+            COUNT(CASE WHEN IS_COMPLETED = 1 THEN 1 END) as completedCount,
+            COUNT(CASE WHEN IS_COMPLETED = 0 OR IS_COMPLETED IS NULL THEN 1 END) as incompleteCount,
+            COALESCE(SUM(REFUND_AMOUNT), 0) as refundAmount,
+            CASE 
+                WHEN COUNT(*) > 0 THEN ROUND((COUNT(CASE WHEN IS_COMPLETED = 1 THEN 1 END) * 100.0 / COUNT(*)), 2)
+                ELSE 0.0 
+            END as completionRate
+        FROM TB_RETURN_ITEM
+        <include refid="baseConditions"/>
+        GROUP BY 
+            <choose>
+                <when test="request.dateFilterType == 'CS_RECEIVED'">
+                    TO_CHAR(CS_RECEIVED_DATE, 'YYYY-MM-DD')
+                </when>
+                <when test="request.dateFilterType == 'ORDER_DATE'">
+                    TO_CHAR(ORDER_DATE, 'YYYY-MM-DD')
+                </when>
+                <otherwise>
+                    TO_CHAR(CS_RECEIVED_DATE, 'YYYY-MM-DD')
+                </otherwise>
+            </choose>
+        ORDER BY dateLabel
+    </select>
+
+    <!-- ==================== 유형별 분포 조회 ==================== -->
+
+    <select id="getTypeDistribution" parameterType="com.wio.crm.dto.ExchangeStatsRequestDto" 
+            resultType="com.wio.crm.dto.ExchangeStatsData$TypeDistribution">
+        SELECT 
+            RETURN_TYPE_CODE as returnType,
+            COUNT(*) as count,
+            COALESCE(SUM(REFUND_AMOUNT), 0) as totalRefundAmount,
+            CASE 
+                WHEN COUNT(*) > 0 THEN ROUND(AVG(REFUND_AMOUNT), 0)
+                ELSE 0 
+            END as averageRefundAmount
+        FROM TB_RETURN_ITEM
+        <include refid="baseConditions"/>
+        AND RETURN_TYPE_CODE IS NOT NULL
+        GROUP BY RETURN_TYPE_CODE
+        ORDER BY count DESC
+    </select>
+
+    <!-- ==================== 상태별 분포 조회 ==================== -->
+
+    <select id="getStatusDistribution" parameterType="com.wio.crm.dto.ExchangeStatsRequestDto" 
+            resultType="com.wio.crm.dto.ExchangeStatsData$StatusDistribution">
+        SELECT 
+            CASE 
+                WHEN IS_COMPLETED = 1 THEN 1
+                ELSE 0 
+            END as isCompleted,
+            COUNT(*) as count,
+            0.0 as percentage  -- 비율은 서비스 레이어에서 계산
+        FROM TB_RETURN_ITEM
+        <include refid="baseConditions"/>
+        GROUP BY 
+            CASE 
+                WHEN IS_COMPLETED = 1 THEN 1
+                ELSE 0 
+            END
+        ORDER BY isCompleted DESC
+    </select>
+
+    <!-- ==================== 사유별 분석 조회 ==================== -->
+
+    <select id="getReasonAnalysis" parameterType="com.wio.crm.dto.ExchangeStatsRequestDto" 
+            resultType="com.wio.crm.dto.ExchangeStatsData$ReasonAnalysis">
+        SELECT 
+            COALESCE(RETURN_REASON, '사유없음') as returnReason,
+            COUNT(*) as count,
+            COALESCE(SUM(REFUND_AMOUNT), 0) as totalRefundAmount,
+            CASE 
+                WHEN COUNT(*) > 0 THEN ROUND(AVG(REFUND_AMOUNT), 0)
+                ELSE 0 
+            END as averageRefundAmount
+        FROM TB_RETURN_ITEM
+        <include refid="baseConditions"/>
+        GROUP BY RETURN_REASON
+        ORDER BY count DESC
+        FETCH FIRST 10 ROWS ONLY  -- 상위 10개 사유만 조회
+    </select>
+
+    <!-- ==================== 사이트별 성과 조회 ==================== -->
+
+    <select id="getSitePerformance" parameterType="com.wio.crm.dto.ExchangeStatsRequestDto" 
+            resultType="com.wio.crm.dto.ExchangeStatsData$SitePerformance">
+        SELECT 
+            COALESCE(SITE_NAME, '미지정') as siteName,
+            COUNT(*) as totalCount,
+            COUNT(CASE WHEN IS_COMPLETED = 1 THEN 1 END) as completedCount,
+            COUNT(CASE WHEN IS_COMPLETED = 0 OR IS_COMPLETED IS NULL THEN 1 END) as incompleteCount,
+            CASE 
+                WHEN COUNT(*) > 0 THEN ROUND((COUNT(CASE WHEN IS_COMPLETED = 1 THEN 1 END) * 100.0 / COUNT(*)), 2)
+                ELSE 0.0 
+            END as completionRate,
+            COALESCE(SUM(REFUND_AMOUNT), 0) as totalRefundAmount,
+            COALESCE(SUM(SHIPPING_FEE), 0) as totalShippingFee
+        FROM TB_RETURN_ITEM
+        <include refid="baseConditions"/>
+        GROUP BY SITE_NAME
+        ORDER BY totalCount DESC
+    </select>
+
+    <!-- ==================== 헬스체크 및 디버깅 메서드들 ==================== -->
+
+    <!-- 데이터베이스 연결 확인 -->
+    <select id="checkDatabaseConnection" resultType="Boolean">
+        SELECT 
+            CASE WHEN COUNT(*) >= 0 THEN 1 ELSE 0 END
+        FROM DUAL
+    </select>
+
+    <!-- 테이블 존재 확인 -->
+    <select id="checkTableExists" parameterType="String" resultType="Boolean">
+        SELECT 
+            CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
+        FROM USER_TABLES 
+        WHERE TABLE_NAME = UPPER(#{tableName})
+    </select>
+
+    <!-- 최근 데이터 건수 확인 (7일 이내) -->
+    <select id="getRecentDataCount" resultType="Long">
+        SELECT COUNT(*)
+        FROM TB_RETURN_ITEM
+        WHERE CS_RECEIVED_DATE >= SYSDATE - 7
+    </select>
+
+    <!-- 검색 조건 유효성 확인 -->
+    <select id="validateSearchConditions" parameterType="com.wio.crm.dto.ExchangeStatsRequestDto" 
+            resultType="Long">
+        SELECT COUNT(*)
+        FROM TB_RETURN_ITEM
+        <include refid="baseConditions"/>
+    </select>
+
+    <!-- 쿼리 성능 테스트 -->
+    <select id="measureQueryPerformance" parameterType="com.wio.crm.dto.ExchangeStatsRequestDto" 
+            resultType="com.wio.crm.dto.ExchangeStatsData$PerformanceInfo">
+        SELECT 
+            0 as queryExecutionTimeMs,      -- 실제 구현시 계산 필요
+            0 as totalProcessingTimeMs,     -- 실제 구현시 계산 필요
+            COUNT(*) as recordsProcessed,
+            0.0 as recordsPerSecond         -- 실제 구현시 계산 필요
+        FROM TB_RETURN_ITEM
+        <include refid="baseConditions"/>
+    </select>
+
+</mapper> 

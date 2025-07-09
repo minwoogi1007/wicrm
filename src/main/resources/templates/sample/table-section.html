@@ -1,0 +1,232 @@
+<!-- 🚀 AJAX 필터링용 테이블 섹션 (table-section.html) -->
+<div class="table-wrapper" xmlns:th="http://www.thymeleaf.org">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th class="fixed-column fixed-column-1" style="width: 35px;"><input type="checkbox" id="selectAll"></th>
+                <th class="fixed-column fixed-column-2" style="width: 50px;">유형</th>
+                <th class="fixed-column fixed-column-3" style="width: 60px;">주문일</th>
+                <th class="fixed-column fixed-column-4" style="width: 60px;">CS접수일</th>
+                <th class="fixed-column fixed-column-5" style="width: 80px;">사이트</th>
+                <th class="fixed-column fixed-column-6" style="width: 100px;">주문번호</th>
+                <th class="fixed-column fixed-column-7" style="width: 60px;">수취인</th>
+                <th style="width: 85px;">연락처</th>
+                <th style="width: 80px;">주문품번</th>
+                <th style="width: 40px;">색상</th>
+                <th style="width: 40px;">사이즈</th>
+                <th style="width: 35px;">수량</th>
+                <th style="width: 60px;">환불금액</th>
+                <th style="width: 55px;">배송비</th>
+                <th style="width: 65px;">🎯 입금상태</th>
+                <th style="width: 60px;">사유</th>
+                <th style="width: 80px;">운송장번호</th>
+                <th style="width: 70px;">회수완료</th>
+                <th style="width: 70px;">물류확인</th>
+                <th style="width: 70px;">출고일자</th>
+                <th style="width: 70px;">환불일자</th>
+                <th style="width: 40px;">완료</th>
+                <th style="width: 80px;">비고</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="item, iterStat : ${returnItems}" th:if="${returnItems != null and !returnItems.empty}" 
+                th:classappend="${item.isCompleted != null and item.isCompleted == 1 ? 'completed' : ''}">
+                <td class="fixed-column fixed-column-1"><input type="checkbox" name="selected" th:value="${item.id}"></td>
+                <td class="fixed-column fixed-column-2">
+                    <span class="type-badge" 
+                          th:classappend="${item.returnTypeCode == 'FULL_RETURN' ? 'full-return' : 
+                                          item.returnTypeCode == 'PARTIAL_RETURN' ? 'partial-return' : 
+                                          item.returnTypeCode == 'FULL_EXCHANGE' ? 'full-exchange' :
+                                          item.returnTypeCode == 'PARTIAL_EXCHANGE' ? 'partial-exchange' :
+                                          item.returnTypeCode == 'EXCHANGE' ? 'exchange' : 'partial-return'}"
+                          th:text="${item.returnTypeCode == 'FULL_RETURN' ? '전체반품' : 
+                                    item.returnTypeCode == 'PARTIAL_RETURN' ? '부분반품' : 
+                                    item.returnTypeCode == 'FULL_EXCHANGE' ? '전체교환' :
+                                    item.returnTypeCode == 'PARTIAL_EXCHANGE' ? '부분교환' :
+                                    item.returnTypeCode == 'EXCHANGE' ? '교환' : item.returnTypeCode}">부분반품</span>
+                </td>
+                <td class="fixed-column fixed-column-3" th:text="${item.orderDate != null ? #temporals.format(item.orderDate, 'MM-dd') : ''}">04-26</td>
+                <td class="fixed-column fixed-column-4" th:text="${item.csReceivedDate != null ? #temporals.format(item.csReceivedDate, 'MM-dd') : ''}">05-03</td>
+                <td class="fixed-column fixed-column-5 text-left" th:text="${item.siteName}">자사몰-레노마</td>
+                <td class="fixed-column fixed-column-6 order-info">
+                    <span class="order-number-copy" 
+                          th:text="${item.orderNumber}" 
+                          th:data-order-number="${item.orderNumber}"
+                          onclick="copyOrderNumber(this)"
+                          title="클릭하면 주문번호가 복사됩니다">20250426-0001236-03</span>
+                </td>
+                <td class="fixed-column fixed-column-7 important-info">
+                    <span class="customer-name-copy" 
+                          th:text="${item.customerName}" 
+                          th:data-customer-name="${item.customerName}"
+                          onclick="copyCustomerName(this)"
+                          title="클릭하면 고객명이 복사됩니다">김민지</span>
+                </td>
+                <td class="contact-info">
+                    <span class="customer-phone-copy" 
+                          th:text="${item.customerPhone}" 
+                          th:data-customer-phone="${item.customerPhone}"
+                          onclick="copyCustomerPhone(this)"
+                          title="클릭하면 연락처가 복사됩니다">010-7409-5050</span>
+                </td>
+                <td class="order-info">
+                    <span class="order-item-code-copy" 
+                          th:text="${item.orderItemCode}" 
+                          th:data-order-item-code="${item.orderItemCode}"
+                          onclick="copyOrderItemCode(this)"
+                          title="클릭하면 주문품번이 복사됩니다">RN-GSZD962</span>
+                </td>
+                <td th:text="${item.productColor}">PK</td>
+                <td th:text="${item.productSize}">75</td>
+                <td th:text="${item.quantity}">1</td>
+                <td class="money-info" th:text="${item.refundAmount != null ? #numbers.formatInteger(item.refundAmount, 0, 'COMMA') : ''}">39,200</td>
+                <td class="text-center">
+                    <span th:if="${item.shippingFee != null and item.shippingFee == '입금예정'}"
+                          class="badge bg-warning text-dark">입금예정</span>
+                    <span th:if="${item.shippingFee != null and item.shippingFee != '입금예정'}" 
+                          class="money-info" 
+                          th:text="${item.shippingFee matches '[0-9]+' ? #numbers.formatInteger(T(java.lang.Integer).parseInt(item.shippingFee), 0, 'COMMA') : item.shippingFee}">3,000</span>
+                </td>
+                <td class="text-center">
+                    <span th:if="${item.paymentStatusText == '입금완료'}" 
+                          class="badge bg-success text-white" 
+                          th:text="${item.paymentStatusText}">입금완료</span>
+                    <span th:if="${item.paymentStatusText == '입금예정'}" 
+                          class="badge bg-warning text-dark" 
+                          th:text="${item.paymentStatusText}">입금예정</span>
+                    <span th:if="${item.paymentStatusText == '입금불필요'}" 
+                          class="badge bg-info text-white" 
+                          th:text="${item.paymentStatusText}">입금불필요</span>
+                    <span th:if="${item.paymentStatusText != '입금완료' and item.paymentStatusText != '입금예정' and item.paymentStatusText != '입금불필요'}" 
+                          class="badge bg-secondary text-white" 
+                          th:text="${item.paymentStatusText}">기타</span>
+                </td>
+                <td class="text-left" th:text="${item.returnReason}">고객변심</td>
+                <td class="order-info">
+                    <span class="tracking-number-copy" 
+                          th:text="${item.trackingNumber}" 
+                          th:data-tracking-number="${item.trackingNumber}"
+                          onclick="copyTrackingNumber(this)"
+                          title="클릭하면 운송장번호가 복사됩니다">5738757014</span>
+                </td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 0.25rem;">
+                        <input type="date" 
+                               class="form-control date-input" 
+                               data-field="collectionCompletedDate"
+                               th:data-id="${item.id}"
+                               th:value="${item.collectionCompletedDate}"
+                               onchange="markDateAsChanged(this)"
+                               style="width: 85px; font-size: 0.65rem; padding: 0.2rem;">
+                        <button type="button" 
+                                class="btn-clear-date" 
+                                th:data-id="${item.id}"
+                                data-field="collectionCompletedDate"
+                                onclick="clearDateField(this)"
+                                title="날짜 초기화"
+                                style="background: none; border: none; color: #dc3545; cursor: pointer; padding: 0.2rem; font-size: 0.7rem; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center;">✕</button>
+                    </div>
+                </td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 0.25rem;">
+                        <input type="date" 
+                               class="form-control date-input" 
+                               data-field="logisticsConfirmedDate"
+                               th:data-id="${item.id}"
+                               th:value="${item.logisticsConfirmedDate}"
+                               onchange="markDateAsChanged(this)"
+                               style="width: 85px; font-size: 0.65rem; padding: 0.2rem;">
+                        <button type="button" 
+                                class="btn-clear-date" 
+                                th:data-id="${item.id}"
+                                data-field="logisticsConfirmedDate"
+                                onclick="clearDateField(this)"
+                                title="날짜 초기화"
+                                style="background: none; border: none; color: #dc3545; cursor: pointer; padding: 0.2rem; font-size: 0.7rem; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center;">✕</button>
+                    </div>
+                </td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 0.25rem;">
+                        <input type="date" 
+                               class="form-control date-input" 
+                               data-field="shippingDate"
+                               th:data-id="${item.id}"
+                               th:value="${item.shippingDate}"
+                               onchange="markDateAsChanged(this)"
+                               style="width: 85px; font-size: 0.65rem; padding: 0.2rem;">
+                        <button type="button" 
+                                class="btn-clear-date" 
+                                th:data-id="${item.id}"
+                                data-field="shippingDate"
+                                onclick="clearDateField(this)"
+                                title="날짜 초기화"
+                                style="background: none; border: none; color: #dc3545; cursor: pointer; padding: 0.2rem; font-size: 0.7rem; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center;">✕</button>
+                    </div>
+                </td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 0.25rem;">
+                        <input type="date" 
+                               class="form-control date-input" 
+                               data-field="refundDate"
+                               th:data-id="${item.id}"
+                               th:value="${item.refundDate}"
+                               onchange="markDateAsChanged(this)"
+                               style="width: 85px; font-size: 0.65rem; padding: 0.2rem;">
+                        <button type="button" 
+                                class="btn-clear-date" 
+                                th:data-id="${item.id}"
+                                data-field="refundDate"
+                                onclick="clearDateField(this)"
+                                title="날짜 초기화"
+                                style="background: none; border: none; color: #dc3545; cursor: pointer; padding: 0.2rem; font-size: 0.7rem; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center;">✕</button>
+                    </div>
+                </td>
+                <td>
+                    <input type="checkbox" 
+                           th:checked="${item.isCompleted}" 
+                           th:data-id="${item.id}"
+                           onchange="markCompletionAsChanged(this)"
+                           style="transform: scale(1.2);">
+                </td>
+                <td class="text-left" th:text="${item.remarks}"></td>
+            </tr>
+            <tr th:if="${returnItems == null or returnItems.empty}">
+                <td class="fixed-column fixed-column-1"></td>
+                <td class="fixed-column fixed-column-2"></td>
+                <td class="fixed-column fixed-column-3"></td>
+                <td class="fixed-column fixed-column-4"></td>
+                <td class="fixed-column fixed-column-5"></td>
+                <td class="fixed-column fixed-column-6"></td>
+                <td class="fixed-column fixed-column-7"></td>
+                <td colspan="16" class="no-data">해당 조건에 맞는 데이터가 없습니다.</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- 페이지네이션 (AJAX용) -->
+<div class="pagination-container" th:if="${returnItems != null and returnItems.totalPages > 1}">
+    <ul class="pagination">
+        <li th:if="${currentPage > 0}">
+            <a class="page-link ajax-page-link" href="#" th:data-page="0">&laquo;</a>
+        </li>
+        <li th:if="${currentPage > 0}">
+            <a class="page-link ajax-page-link" href="#" th:data-page="${currentPage - 1}">&lt;</a>
+        </li>
+        
+        <li th:each="i : ${#numbers.sequence(T(java.lang.Math).max(0, currentPage - 2), T(java.lang.Math).min(returnItems.totalPages - 1, currentPage + 2))}">
+            <a class="page-link ajax-page-link" 
+               href="#"
+               th:data-page="${i}"
+               th:text="${i + 1}"
+               th:classappend="${i == currentPage ? 'active' : ''}">1</a>
+        </li>
+        
+        <li th:if="${currentPage < returnItems.totalPages - 1}">
+            <a class="page-link ajax-page-link" href="#" th:data-page="${currentPage + 1}">&gt;</a>
+        </li>
+        <li th:if="${currentPage < returnItems.totalPages - 1}">
+            <a class="page-link ajax-page-link" href="#" th:data-page="${returnItems.totalPages - 1}">&raquo;</a>
+        </li>
+    </ul>
+</div> 
