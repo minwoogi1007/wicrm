@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 교환/반품 일괄 날짜 업데이트 DTO
@@ -31,4 +33,22 @@ public class ReturnItemBulkDateUpdateDTO {
     private LocalDate refundDate;
     
     private String updatedBy;
+    
+    // 변경된 필드들을 추적하기 위한 Set
+    @Builder.Default
+    private Set<String> changedFields = new HashSet<>();
+    
+    /**
+     * 필드가 변경되었는지 확인
+     */
+    public boolean hasFieldChanged(String fieldName) {
+        return changedFields.contains(fieldName);
+    }
+    
+    /**
+     * 변경된 필드 추가
+     */
+    public void addChangedField(String fieldName) {
+        changedFields.add(fieldName);
+    }
 } 
