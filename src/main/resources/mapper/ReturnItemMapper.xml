@@ -47,63 +47,43 @@
         <result column="REFUND_UPDATED_DATE" property="refundUpdatedDate"/>
     </resultMap>
 
-    <!-- 공통 조건 SQL -->
+    <!-- 공통 조건 SQL (인덱스 순서 최적화) -->
     <sql id="searchCondition">
         <where>
-            <!-- 🔍 통합 키워드 검색 (여러 필드에서 검색) -->
-            <if test="searchParams.keyword != null and searchParams.keyword != ''">
-                AND (
-                    UPPER(ORDER_NUMBER) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
-                    UPPER(CUSTOMER_NAME) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
-                    UPPER(CUSTOMER_PHONE) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
-                    UPPER(SITE_NAME) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
-                    UPPER(ORDER_ITEM_CODE) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
-                    UPPER(PRODUCT_COLOR) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
-                    UPPER(PRODUCT_SIZE) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
-                    UPPER(TRACKING_NUMBER) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
-                    UPPER(RETURN_REASON) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
-                    UPPER(PROCESSOR) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
-                    UPPER(REMARKS) LIKE UPPER('%' || #{searchParams.keyword} || '%')
-                )
-            </if>
-            
-            <!-- 개별 필드 검색 조건들 -->
-            <if test="searchParams.orderNumber != null and searchParams.orderNumber != ''">
-                AND ORDER_NUMBER LIKE '%' || #{searchParams.orderNumber} || '%'
-            </if>
-            <if test="searchParams.customerName != null and searchParams.customerName != ''">
-                AND CUSTOMER_NAME LIKE '%' || #{searchParams.customerName} || '%'
-            </if>
-            <if test="searchParams.customerPhone != null and searchParams.customerPhone != ''">
-                AND CUSTOMER_PHONE LIKE '%' || #{searchParams.customerPhone} || '%'
-            </if>
-            <if test="searchParams.orderItemCode != null and searchParams.orderItemCode != ''">
-                AND ORDER_ITEM_CODE LIKE '%' || #{searchParams.orderItemCode} || '%'
-            </if>
-            <if test="searchParams.returnTypeCode != null and searchParams.returnTypeCode != ''">
-                AND RETURN_TYPE_CODE = #{searchParams.returnTypeCode}
-            </if>
-            <if test="searchParams.returnStatusCode != null and searchParams.returnStatusCode != ''">
-                AND RETURN_STATUS_CODE = #{searchParams.returnStatusCode}
-            </if>
-            <if test="searchParams.paymentStatus != null and searchParams.paymentStatus != ''">
-                AND PAYMENT_STATUS = #{searchParams.paymentStatus}
-            </if>
+            <!-- 🎯 인덱스 컬럼 순서에 따른 조건 배치 (IDX_RETURN_ITEM_SEARCH) -->
+            <!-- 1. CS_RECEIVED_DATE (인덱스 첫 번째 컬럼) -->
             <if test="searchParams.startDate != null and searchParams.startDate != ''">
                 AND CS_RECEIVED_DATE >= TO_DATE(#{searchParams.startDate}, 'YYYY-MM-DD')
             </if>
             <if test="searchParams.endDate != null and searchParams.endDate != ''">
                 AND CS_RECEIVED_DATE &lt;= TO_DATE(#{searchParams.endDate}, 'YYYY-MM-DD')
             </if>
-            <if test="searchParams.siteName != null and searchParams.siteName != ''">
-                AND SITE_NAME = #{searchParams.siteName}
+            
+            <!-- 2. LOGISTICS_CONFIRMED_DATE (인덱스 두 번째 컬럼) -->
+            <if test="searchParams.logisticsStartDate != null and searchParams.logisticsStartDate != ''">
+                AND LOGISTICS_CONFIRMED_DATE >= TO_DATE(#{searchParams.logisticsStartDate}, 'YYYY-MM-DD')
             </if>
-            <if test="searchParams.processor != null and searchParams.processor != ''">
-                AND PROCESSOR = #{searchParams.processor}
+            <if test="searchParams.logisticsEndDate != null and searchParams.logisticsEndDate != ''">
+                AND LOGISTICS_CONFIRMED_DATE &lt;= TO_DATE(#{searchParams.logisticsEndDate}, 'YYYY-MM-DD')
             </if>
             
-            <!-- 🎯 브랜드 필터링 조건 추가 -->
-            <if test="searchParams.brandFilter != null and searchParams.brandFilter != ''">
+            <!-- 3. RETURN_TYPE_CODE (인덱스 세 번째 컬럼) -->
+            <if test="searchParams.returnTypeCode != null and searchParams.returnTypeCode != '' and searchParams.returnTypeCode != 'null'">
+                AND RETURN_TYPE_CODE = #{searchParams.returnTypeCode}
+            </if>
+            
+            <!-- 4. RETURN_STATUS_CODE (인덱스 네 번째 컬럼) -->
+            <if test="searchParams.returnStatusCode != null and searchParams.returnStatusCode != '' and searchParams.returnStatusCode != 'null'">
+                AND RETURN_STATUS_CODE = #{searchParams.returnStatusCode}
+            </if>
+            
+            <!-- 5. SITE_NAME (인덱스 다섯 번째 컬럼) -->
+            <if test="searchParams.siteName != null and searchParams.siteName != '' and searchParams.siteName != 'null'">
+                AND SITE_NAME = #{searchParams.siteName}
+            </if>
+            
+            <!-- 🎯 브랜드 필터링 조건 (사이트명 기반) -->
+            <if test="searchParams.brandFilter != null and searchParams.brandFilter != '' and searchParams.brandFilter != 'null'">
                 <choose>
                     <when test="searchParams.brandFilter == 'RENOMA'">
                         AND UPPER(SITE_NAME) LIKE UPPER('%레노마%')
@@ -116,6 +96,53 @@
                         AND UPPER(SITE_NAME) NOT LIKE UPPER('%코랄리크%')
                     </when>
                 </choose>
+            </if>
+            
+            <!-- 🎯 기타 등호 조건들 (인덱스 이후) -->
+            <if test="searchParams.paymentStatus != null and searchParams.paymentStatus != '' and searchParams.paymentStatus != 'null'">
+                AND PAYMENT_STATUS = #{searchParams.paymentStatus}
+            </if>
+            <if test="searchParams.processor != null and searchParams.processor != ''">
+                AND PROCESSOR = #{searchParams.processor}
+            </if>
+            
+            <!-- 🎯 개별 필드 검색 조건들 (LIKE 조건) -->
+            <if test="searchParams.orderNumber != null and searchParams.orderNumber != ''">
+                AND ORDER_NUMBER LIKE '%' || #{searchParams.orderNumber} || '%'
+            </if>
+            <if test="searchParams.customerName != null and searchParams.customerName != ''">
+                AND CUSTOMER_NAME LIKE '%' || #{searchParams.customerName} || '%'
+            </if>
+            <if test="searchParams.customerPhone != null and searchParams.customerPhone != ''">
+                AND CUSTOMER_PHONE LIKE '%' || #{searchParams.customerPhone} || '%'
+            </if>
+            <if test="searchParams.orderItemCode != null and searchParams.orderItemCode != ''">
+                AND ORDER_ITEM_CODE LIKE '%' || #{searchParams.orderItemCode} || '%'
+            </if>
+            
+            <!-- 🔍 통합 키워드 검색 (가장 마지막 - 별도 인덱스 활용) -->
+            <if test="searchParams.keyword != null and searchParams.keyword != ''">
+                AND (
+                    <!-- 숫자 패턴: 주문번호, 전화번호만 검색 (IDX_RETURN_ITEM_KEYWORD 활용) -->
+                    <choose>
+                        <when test='searchParams.keyword.matches("^\\d+$")'>
+                            UPPER(ORDER_NUMBER) LIKE UPPER(#{searchParams.keyword} || '%') OR
+                            UPPER(CUSTOMER_PHONE) LIKE UPPER(#{searchParams.keyword} || '%')
+                        </when>
+                        <when test='searchParams.keyword.matches("^[가-힣]+$")'>
+                            <!-- 한글 패턴: 고객명, 사이트명만 검색 (IDX_RETURN_ITEM_KEYWORD 활용) -->
+                            UPPER(CUSTOMER_NAME) LIKE UPPER(#{searchParams.keyword} || '%') OR
+                            UPPER(SITE_NAME) LIKE UPPER(#{searchParams.keyword} || '%')
+                        </when>
+                        <otherwise>
+                            <!-- 기타 패턴: 상품코드, 추적번호 우선 검색 -->
+                            UPPER(ORDER_ITEM_CODE) LIKE UPPER(#{searchParams.keyword} || '%') OR
+                            UPPER(TRACKING_NUMBER) LIKE UPPER(#{searchParams.keyword} || '%') OR
+                            UPPER(ORDER_NUMBER) LIKE UPPER(#{searchParams.keyword} || '%') OR
+                            UPPER(CUSTOMER_NAME) LIKE UPPER(#{searchParams.keyword} || '%')
+                        </otherwise>
+                    </choose>
+                )
             </if>
             
             <!-- 🎯 카드 필터링 조건들 추가 (OGNL 타입 안전성 개선) -->
@@ -162,67 +189,66 @@
         </where>
     </sql>
 
-    <!-- 교환/반품 목록 조회 -->
+    <!-- 교환/반품 목록 조회 (Oracle 11g ROW_NUMBER 최적화) -->
     <select id="selectReturnItemList" resultMap="ReturnItemResultMap">
         SELECT * FROM (
-            SELECT ROWNUM AS RN, T.* FROM (
-                SELECT 
-                    RETURN_ID,
-                    RETURN_TYPE_CODE,
-                    ORDER_DATE,
-                    CS_RECEIVED_DATE,
-                    SITE_NAME,
-                    ORDER_NUMBER,
-                    REFUND_AMOUNT,
-                    CUSTOMER_NAME,
-                    CUSTOMER_PHONE,
-                    ORDER_ITEM_CODE,
-                    PRODUCT_COLOR,
-                    PRODUCT_SIZE,
-                    QUANTITY,
-                    SHIPPING_FEE,
-                    RETURN_REASON,
-                    DEFECT_DETAIL,
-                    DEFECT_PHOTO_URL,
-                    TRACKING_NUMBER,
-                    COLLECTION_COMPLETED_DATE,
-                    LOGISTICS_CONFIRMED_DATE,
-                    SHIPPING_DATE,
-                    REFUND_DATE,
-                    IS_COMPLETED,
-                    REMARKS,
-                    RETURN_STATUS_CODE,
-                    PROCESSOR,
-                    CREATE_DATE,
-                    UPDATE_DATE,
-                    CREATED_BY,
-                    UPDATED_BY,
-                    PAYMENT_STATUS,
-                    PAYMENT_ID,
-                    COLLECTION_UPDATED_BY,
-                    LOGISTICS_UPDATED_BY,
-                    SHIPPING_UPDATED_BY,
-                    REFUND_UPDATED_BY,
-                    COLLECTION_UPDATED_DATE,
-                    LOGISTICS_UPDATED_DATE,
-                    SHIPPING_UPDATED_DATE,
-                    REFUND_UPDATED_DATE
-                FROM TB_RETURN_ITEM
-                <include refid="searchCondition"/>
-                ORDER BY 
-                    <choose>
-                        <when test="searchParams.sortBy != null and searchParams.sortOrder != null">
-                            ${searchParams.sortBy} ${searchParams.sortOrder}
-                        </when>
-                        <otherwise>
-                            CASE WHEN (IS_COMPLETED IS NULL OR IS_COMPLETED = 0) THEN 0 ELSE 1 END ASC,
-                            RETURN_ID DESC
-                        </otherwise>
-                    </choose>
-            ) T
-            WHERE ROWNUM &lt;= #{searchParams.endRow}
+            SELECT /*+ INDEX(TB_RETURN_ITEM IDX_RETURN_ITEM_SEARCH) FIRST_ROWS */ 
+                   ROW_NUMBER() OVER (
+                       ORDER BY 
+                           <choose>
+                               <when test="searchParams.sortBy != null and searchParams.sortOrder != null">
+                                   ${searchParams.sortBy} ${searchParams.sortOrder}
+                               </when>
+                               <otherwise>
+                                   CASE WHEN (IS_COMPLETED IS NULL OR IS_COMPLETED = 0) THEN 0 ELSE 1 END ASC,
+                                   RETURN_ID DESC
+                               </otherwise>
+                           </choose>
+                   ) AS RN,
+                   RETURN_ID,
+                   RETURN_TYPE_CODE,
+                   ORDER_DATE,
+                   CS_RECEIVED_DATE,
+                   SITE_NAME,
+                   ORDER_NUMBER,
+                   REFUND_AMOUNT,
+                   CUSTOMER_NAME,
+                   CUSTOMER_PHONE,
+                   ORDER_ITEM_CODE,
+                   PRODUCT_COLOR,
+                   PRODUCT_SIZE,
+                   QUANTITY,
+                   SHIPPING_FEE,
+                   RETURN_REASON,
+                   DEFECT_DETAIL,
+                   DEFECT_PHOTO_URL,
+                   TRACKING_NUMBER,
+                   COLLECTION_COMPLETED_DATE,
+                   LOGISTICS_CONFIRMED_DATE,
+                   SHIPPING_DATE,
+                   REFUND_DATE,
+                   IS_COMPLETED,
+                   REMARKS,
+                   RETURN_STATUS_CODE,
+                   PROCESSOR,
+                   CREATE_DATE,
+                   UPDATE_DATE,
+                   CREATED_BY,
+                   UPDATED_BY,
+                   PAYMENT_STATUS,
+                   PAYMENT_ID,
+                   COLLECTION_UPDATED_BY,
+                   LOGISTICS_UPDATED_BY,
+                   SHIPPING_UPDATED_BY,
+                   REFUND_UPDATED_BY,
+                   COLLECTION_UPDATED_DATE,
+                   LOGISTICS_UPDATED_DATE,
+                   SHIPPING_UPDATED_DATE,
+                   REFUND_UPDATED_DATE
+            FROM TB_RETURN_ITEM
+            <include refid="searchCondition"/>
         )
-        WHERE RN > #{searchParams.startRow}
+        WHERE RN BETWEEN #{searchParams.startRow} + 1 AND #{searchParams.endRow}
     </select>
 
     <!-- 교환/반품 목록 총 개수 -->
@@ -595,7 +621,14 @@
                     UPPER(TRACKING_NUMBER) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
                     UPPER(RETURN_REASON) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
                     UPPER(PROCESSOR) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
-                    UPPER(REMARKS) LIKE UPPER('%' || #{searchParams.keyword} || '%')
+                    UPPER(REMARKS) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
+                    (UPPER(TRIM(#{searchParams.keyword})) = '완료' AND IS_COMPLETED = 1) OR
+                    (UPPER(TRIM(#{searchParams.keyword})) = '전체완료' AND IS_COMPLETED = 1) OR
+                    (UPPER(TRIM(#{searchParams.keyword})) = '처리완료' AND IS_COMPLETED = 1) OR
+                    (UPPER(TRIM(#{searchParams.keyword})) = '미완료' AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL)) OR
+                    (UPPER(TRIM(#{searchParams.keyword})) = '진행중' AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL)) OR
+                    (UPPER(TRIM(#{searchParams.keyword})) = 'Y' AND IS_COMPLETED = 1) OR
+                    (UPPER(TRIM(#{searchParams.keyword})) = 'N' AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL))
                 )
             </if>
             <if test="searchParams.returnTypeCode != null and searchParams.returnTypeCode != ''">
@@ -708,7 +741,14 @@
                 AND (
                     UPPER(ORDER_NUMBER) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
                     UPPER(CUSTOMER_NAME) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
-                    UPPER(CUSTOMER_PHONE) LIKE UPPER('%' || #{searchParams.keyword} || '%')
+                    UPPER(CUSTOMER_PHONE) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
+                    (UPPER(TRIM(#{searchParams.keyword})) = '완료' AND IS_COMPLETED = 1) OR
+                    (UPPER(TRIM(#{searchParams.keyword})) = '전체완료' AND IS_COMPLETED = 1) OR
+                    (UPPER(TRIM(#{searchParams.keyword})) = '처리완료' AND IS_COMPLETED = 1) OR
+                    (UPPER(TRIM(#{searchParams.keyword})) = '미완료' AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL)) OR
+                    (UPPER(TRIM(#{searchParams.keyword})) = '진행중' AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL)) OR
+                    (UPPER(TRIM(#{searchParams.keyword})) = 'Y' AND IS_COMPLETED = 1) OR
+                    (UPPER(TRIM(#{searchParams.keyword})) = 'N' AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL))
                 )
             </if>
         </where>
@@ -745,7 +785,14 @@
                 AND (
                     UPPER(ORDER_NUMBER) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
                     UPPER(CUSTOMER_NAME) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
-                    UPPER(CUSTOMER_PHONE) LIKE UPPER('%' || #{searchParams.keyword} || '%')
+                    UPPER(CUSTOMER_PHONE) LIKE UPPER('%' || #{searchParams.keyword} || '%') OR
+                    (UPPER(TRIM(#{searchParams.keyword})) = '완료' AND IS_COMPLETED = 1) OR
+                    (UPPER(TRIM(#{searchParams.keyword})) = '전체완료' AND IS_COMPLETED = 1) OR
+                    (UPPER(TRIM(#{searchParams.keyword})) = '처리완료' AND IS_COMPLETED = 1) OR
+                    (UPPER(TRIM(#{searchParams.keyword})) = '미완료' AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL)) OR
+                    (UPPER(TRIM(#{searchParams.keyword})) = '진행중' AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL)) OR
+                    (UPPER(TRIM(#{searchParams.keyword})) = 'Y' AND IS_COMPLETED = 1) OR
+                    (UPPER(TRIM(#{searchParams.keyword})) = 'N' AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL))
                 )
             </if>
         </where>
@@ -775,7 +822,14 @@
                      OR CUSTOMER_PHONE LIKE #{searchParams.keyword} || '%'
                      OR ORDER_NUMBER LIKE #{searchParams.keyword} || '%'
                      OR ORDER_ITEM_CODE LIKE #{searchParams.keyword} || '%'
-                     OR TRACKING_NUMBER LIKE #{searchParams.keyword} || '%')
+                     OR TRACKING_NUMBER LIKE #{searchParams.keyword} || '%'
+                     OR (UPPER(TRIM(#{searchParams.keyword})) = '완료' AND IS_COMPLETED = 1)
+                     OR (UPPER(TRIM(#{searchParams.keyword})) = '전체완료' AND IS_COMPLETED = 1)
+                     OR (UPPER(TRIM(#{searchParams.keyword})) = '처리완료' AND IS_COMPLETED = 1)
+                     OR (UPPER(TRIM(#{searchParams.keyword})) = '미완료' AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL))
+                     OR (UPPER(TRIM(#{searchParams.keyword})) = '진행중' AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL))
+                     OR (UPPER(TRIM(#{searchParams.keyword})) = 'Y' AND IS_COMPLETED = 1)
+                     OR (UPPER(TRIM(#{searchParams.keyword})) = 'N' AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL)))
             </if>
         </where>
     </sql>
@@ -783,7 +837,7 @@
     <!-- 🚀 [성능 최적화] 통합 대시보드 통계 쿼리 (기존 12개 쿼리 → 1개 쿼리) -->
     <select id="getDashboardStatsUnified" resultType="map">
         <![CDATA[
-        SELECT 
+        SELECT /*+ INDEX(TB_RETURN_ITEM IDX_RETURN_ITEM_COMPOSITE) ALL_ROWS */
             -- 📊 전체 기본 통계
             COUNT(*) as totalCount,
             COUNT(CASE WHEN TRUNC(CS_RECEIVED_DATE) = TRUNC(SYSDATE) THEN 1 END) as todayCount,
@@ -859,7 +913,7 @@
     <!-- 🚀 검색 조건별 통합 통계 쿼리 (검색 시 사용) -->
     <select id="getDashboardStatsBySearch" resultType="map">
         <![CDATA[
-        SELECT 
+        SELECT /*+ INDEX(TB_RETURN_ITEM IDX_RETURN_ITEM_SEARCH) ALL_ROWS */
             COUNT(*) as totalCount,
             COUNT(CASE WHEN TRUNC(CS_RECEIVED_DATE) = TRUNC(SYSDATE) THEN 1 END) as todayCount,
             COUNT(CASE WHEN COLLECTION_COMPLETED_DATE IS NOT NULL 
@@ -1255,7 +1309,7 @@
     
     <!-- 검색 조건에 맞는 전체 데이터 (페이징 없이) -->
     <select id="findBySearch" resultMap="ReturnItemResultMap">
-        SELECT 
+        SELECT /*+ INDEX(TB_RETURN_ITEM IDX_RETURN_ITEM_SEARCH) FIRST_ROWS */
             RETURN_ID,
             RETURN_TYPE_CODE,
             ORDER_DATE,
@@ -1386,6 +1440,352 @@
                 </choose>
             </if>
         </where>
+    </select>
+
+    <!-- 🎯 다중 필터 통합 조회 최적화 (DB 레벨) -->
+    <select id="findByMultipleFiltersOptimized" resultMap="ReturnItemResultMap">
+        SELECT * FROM (
+            SELECT /*+ INDEX(TB_RETURN_ITEM IDX_RETURN_ITEM_SEARCH) FIRST_ROWS */
+                RETURN_ID,
+                RETURN_TYPE_CODE,
+                ORDER_DATE,
+                CS_RECEIVED_DATE,
+                SITE_NAME,
+                ORDER_NUMBER,
+                REFUND_AMOUNT,
+                CUSTOMER_NAME,
+                CUSTOMER_PHONE,
+                ORDER_ITEM_CODE,
+                PRODUCT_COLOR,
+                PRODUCT_SIZE,
+                QUANTITY,
+                SHIPPING_FEE,
+                RETURN_REASON,
+                DEFECT_DETAIL,
+                DEFECT_PHOTO_URL,
+                TRACKING_NUMBER,
+                COLLECTION_COMPLETED_DATE,
+                LOGISTICS_CONFIRMED_DATE,
+                SHIPPING_DATE,
+                REFUND_DATE,
+                IS_COMPLETED,
+                REMARKS,
+                RETURN_STATUS_CODE,
+                PROCESSOR,
+                CREATE_DATE,
+                UPDATE_DATE,
+                CREATED_BY,
+                UPDATED_BY,
+                PAYMENT_STATUS,
+                PAYMENT_ID,
+                COLLECTION_UPDATED_BY,
+                LOGISTICS_UPDATED_BY,
+                SHIPPING_UPDATED_BY,
+                REFUND_UPDATED_BY,
+                COLLECTION_UPDATED_DATE,
+                LOGISTICS_UPDATED_DATE,
+                SHIPPING_UPDATED_DATE,
+                REFUND_UPDATED_DATE,
+                ROW_NUMBER() OVER (ORDER BY CS_RECEIVED_DATE DESC, RETURN_ID DESC) AS RN
+            FROM TB_RETURN_ITEM
+            WHERE 1=1
+            <!-- 🎯 처리완료 필터가 없는 경우에만 미완료 조건 적용 -->
+            <if test="filters == null or filters.size == 0 or !filters.contains('completed')">
+                AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL)
+            </if>
+            <if test="filters != null and filters.size > 0">
+                <foreach collection="filters" item="filter">
+                    <choose>
+                        <when test="filter == 'collection-completed'">
+                            AND (COLLECTION_COMPLETED_DATE IS NOT NULL)
+                        </when>
+                        <when test="filter == 'collection-pending'">
+                            AND (COLLECTION_COMPLETED_DATE IS NULL)
+                        </when>
+                        <when test="filter == 'logistics-confirmed'">
+                            AND (LOGISTICS_CONFIRMED_DATE IS NOT NULL)
+                        </when>
+                        <when test="filter == 'logistics-pending'">
+                            AND (LOGISTICS_CONFIRMED_DATE IS NULL)
+                        </when>
+                        <when test="filter == 'shipping-completed'">
+                            AND (RETURN_TYPE_CODE IN ('FULL_EXCHANGE', 'PARTIAL_EXCHANGE') AND SHIPPING_DATE IS NOT NULL)
+                        </when>
+                        <when test="filter == 'shipping-pending'">
+                            AND (RETURN_TYPE_CODE IN ('FULL_EXCHANGE', 'PARTIAL_EXCHANGE') AND SHIPPING_DATE IS NULL)
+                        </when>
+                        <when test="filter == 'refund-completed'">
+                            AND (RETURN_TYPE_CODE IN ('FULL_RETURN', 'PARTIAL_RETURN') AND REFUND_DATE IS NOT NULL)
+                        </when>
+                        <when test="filter == 'refund-pending'">
+                            AND (RETURN_TYPE_CODE IN ('FULL_RETURN', 'PARTIAL_RETURN') AND REFUND_DATE IS NULL)
+                        </when>
+                        <when test="filter == 'payment-completed'">
+                            AND (PAYMENT_STATUS = 'COMPLETED')
+                        </when>
+                        <when test="filter == 'payment-pending'">
+                            AND (SHIPPING_FEE = '입금예정')
+                        </when>
+                        <!-- 🎯 처리완료 필터 추가 -->
+                        <when test="filter == 'completed'">
+                            AND (IS_COMPLETED = 1)
+                        </when>
+                        <when test="filter == 'incompleted'">
+                            AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL)
+                        </when>
+                        <when test="filter == 'overdue-ten-days'">
+                            AND (CS_RECEIVED_DATE &lt;= SYSDATE - 10)
+                        </when>
+                    </choose>
+                </foreach>
+            </if>
+            <if test="keyword != null and keyword != '' and keyword != 'null'">
+                AND (
+                    UPPER(ORDER_NUMBER) LIKE UPPER('%' || #{keyword} || '%') OR
+                    UPPER(CUSTOMER_NAME) LIKE UPPER('%' || #{keyword} || '%') OR
+                    UPPER(CUSTOMER_PHONE) LIKE UPPER('%' || #{keyword} || '%') OR
+                    UPPER(SITE_NAME) LIKE UPPER('%' || #{keyword} || '%') OR
+                    UPPER(ORDER_ITEM_CODE) LIKE UPPER('%' || #{keyword} || '%') OR
+                    UPPER(TRACKING_NUMBER) LIKE UPPER('%' || #{keyword} || '%')
+                )
+            </if>
+            <if test="startDate != null and startDate != '' and startDate != 'null'">
+                AND CS_RECEIVED_DATE >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+            </if>
+            <if test="endDate != null and endDate != '' and endDate != 'null'">
+                AND CS_RECEIVED_DATE &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD') + 0.99999
+            </if>
+            <if test="logisticsStartDate != null and logisticsStartDate != '' and logisticsStartDate != 'null'">
+                AND LOGISTICS_CONFIRMED_DATE >= TO_DATE(#{logisticsStartDate}, 'YYYY-MM-DD')
+            </if>
+            <if test="logisticsEndDate != null and logisticsEndDate != '' and logisticsEndDate != 'null'">
+                AND LOGISTICS_CONFIRMED_DATE &lt;= TO_DATE(#{logisticsEndDate}, 'YYYY-MM-DD') + 0.99999
+            </if>
+        )
+        WHERE RN BETWEEN (#{page} * #{size} + 1) AND ((#{page} + 1) * #{size})
+    </select>
+
+    <!-- 🎯 다중 필터 통합 조회 카운트 최적화 -->
+    <select id="countByMultipleFiltersOptimized" resultType="long">
+        SELECT /*+ INDEX(TB_RETURN_ITEM IDX_RETURN_ITEM_SEARCH) FIRST_ROWS */ COUNT(*)
+        FROM TB_RETURN_ITEM
+        WHERE 1=1
+        <!-- 🎯 처리완료 필터가 없는 경우에만 미완료 조건 적용 -->
+        <if test="filters == null or filters.size == 0 or !filters.contains('completed')">
+            AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL)
+        </if>
+        <if test="filters != null and filters.size > 0">
+            <foreach collection="filters" item="filter">
+                <choose>
+                    <when test="filter == 'collection-completed'">
+                        AND (COLLECTION_COMPLETED_DATE IS NOT NULL)
+                    </when>
+                    <when test="filter == 'collection-pending'">
+                        AND (COLLECTION_COMPLETED_DATE IS NULL)
+                    </when>
+                    <when test="filter == 'logistics-confirmed'">
+                        AND (LOGISTICS_CONFIRMED_DATE IS NOT NULL)
+                    </when>
+                    <when test="filter == 'logistics-pending'">
+                        AND (LOGISTICS_CONFIRMED_DATE IS NULL)
+                    </when>
+                    <when test="filter == 'shipping-completed'">
+                        AND (RETURN_TYPE_CODE IN ('FULL_EXCHANGE', 'PARTIAL_EXCHANGE') AND SHIPPING_DATE IS NOT NULL)
+                    </when>
+                    <when test="filter == 'shipping-pending'">
+                        AND (RETURN_TYPE_CODE IN ('FULL_EXCHANGE', 'PARTIAL_EXCHANGE') AND SHIPPING_DATE IS NULL)
+                    </when>
+                    <when test="filter == 'refund-completed'">
+                        AND (RETURN_TYPE_CODE IN ('FULL_RETURN', 'PARTIAL_RETURN') AND REFUND_DATE IS NOT NULL)
+                    </when>
+                    <when test="filter == 'refund-pending'">
+                        AND (RETURN_TYPE_CODE IN ('FULL_RETURN', 'PARTIAL_RETURN') AND REFUND_DATE IS NULL)
+                    </when>
+                    <when test="filter == 'payment-completed'">
+                        AND (PAYMENT_STATUS = 'COMPLETED')
+                    </when>
+                    <when test="filter == 'payment-pending'">
+                        AND (SHIPPING_FEE = '입금예정')
+                    </when>
+                    <!-- 🎯 처리완료 필터 추가 -->
+                    <when test="filter == 'completed'">
+                        AND (IS_COMPLETED = 1)
+                    </when>
+                    <when test="filter == 'incompleted'">
+                        AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL)
+                    </when>
+                    <when test="filter == 'overdue-ten-days'">
+                        AND (CS_RECEIVED_DATE &lt;= SYSDATE - 10)
+                    </when>
+                </choose>
+            </foreach>
+        </if>
+        <if test="keyword != null and keyword != '' and keyword != 'null'">
+            AND (
+                UPPER(ORDER_NUMBER) LIKE UPPER('%' || #{keyword} || '%') OR
+                UPPER(CUSTOMER_NAME) LIKE UPPER('%' || #{keyword} || '%') OR
+                UPPER(CUSTOMER_PHONE) LIKE UPPER('%' || #{keyword} || '%') OR
+                UPPER(SITE_NAME) LIKE UPPER('%' || #{keyword} || '%') OR
+                UPPER(ORDER_ITEM_CODE) LIKE UPPER('%' || #{keyword} || '%') OR
+                UPPER(PRODUCT_COLOR) LIKE UPPER('%' || #{keyword} || '%') OR
+                UPPER(PRODUCT_SIZE) LIKE UPPER('%' || #{keyword} || '%') OR
+                UPPER(TRACKING_NUMBER) LIKE UPPER('%' || #{keyword} || '%') OR
+                UPPER(RETURN_REASON) LIKE UPPER('%' || #{keyword} || '%') OR
+                UPPER(PROCESSOR) LIKE UPPER('%' || #{keyword} || '%') OR
+                UPPER(REMARKS) LIKE UPPER('%' || #{keyword} || '%') OR
+                (UPPER(TRIM(#{keyword})) = '완료' AND IS_COMPLETED = 1) OR
+                (UPPER(TRIM(#{keyword})) = '전체완료' AND IS_COMPLETED = 1) OR
+                (UPPER(TRIM(#{keyword})) = '처리완료' AND IS_COMPLETED = 1) OR
+                (UPPER(TRIM(#{keyword})) = '미완료' AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL)) OR
+                (UPPER(TRIM(#{keyword})) = '진행중' AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL)) OR
+                (UPPER(TRIM(#{keyword})) = 'Y' AND IS_COMPLETED = 1) OR
+                (UPPER(TRIM(#{keyword})) = 'N' AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL))
+            )
+        </if>
+        <if test="startDate != null and startDate != '' and startDate != 'null'">
+            AND CS_RECEIVED_DATE >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+        </if>
+        <if test="endDate != null and endDate != '' and endDate != 'null'">
+            AND CS_RECEIVED_DATE &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD') + 0.99999
+        </if>
+        <if test="logisticsStartDate != null and logisticsStartDate != '' and logisticsStartDate != 'null'">
+            AND LOGISTICS_CONFIRMED_DATE >= TO_DATE(#{logisticsStartDate}, 'YYYY-MM-DD')
+        </if>
+        <if test="logisticsEndDate != null and logisticsEndDate != '' and logisticsEndDate != 'null'">
+            AND LOGISTICS_CONFIRMED_DATE &lt;= TO_DATE(#{logisticsEndDate}, 'YYYY-MM-DD') + 0.99999
+        </if>
+    </select>
+
+    <!-- 🎯 다중 필터 통합 조회 최적화 (페이징 없음, 엑셀 다운로드용) -->
+    <select id="findByMultipleFiltersUnlimited" resultMap="ReturnItemResultMap">
+        SELECT /*+ INDEX(TB_RETURN_ITEM IDX_RETURN_ITEM_SEARCH) FIRST_ROWS */
+            RETURN_ID,
+            RETURN_TYPE_CODE,
+            ORDER_DATE,
+            CS_RECEIVED_DATE,
+            SITE_NAME,
+            ORDER_NUMBER,
+            REFUND_AMOUNT,
+            CUSTOMER_NAME,
+            CUSTOMER_PHONE,
+            ORDER_ITEM_CODE,
+            PRODUCT_COLOR,
+            PRODUCT_SIZE,
+            QUANTITY,
+            SHIPPING_FEE,
+            RETURN_REASON,
+            DEFECT_DETAIL,
+            DEFECT_PHOTO_URL,
+            TRACKING_NUMBER,
+            COLLECTION_COMPLETED_DATE,
+            LOGISTICS_CONFIRMED_DATE,
+            SHIPPING_DATE,
+            REFUND_DATE,
+            IS_COMPLETED,
+            REMARKS,
+            RETURN_STATUS_CODE,
+            PROCESSOR,
+            CREATE_DATE,
+            UPDATE_DATE,
+            CREATED_BY,
+            UPDATED_BY,
+            PAYMENT_STATUS,
+            PAYMENT_ID,
+            COLLECTION_UPDATED_BY,
+            LOGISTICS_UPDATED_BY,
+            SHIPPING_UPDATED_BY,
+            REFUND_UPDATED_BY,
+            COLLECTION_UPDATED_DATE,
+            LOGISTICS_UPDATED_DATE,
+            SHIPPING_UPDATED_DATE,
+            REFUND_UPDATED_DATE
+        FROM TB_RETURN_ITEM
+        WHERE 1=1
+        <!-- 🎯 처리완료 필터가 없는 경우에만 미완료 조건 적용 -->
+        <if test="filters == null or filters.size == 0 or !filters.contains('completed')">
+            AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL)
+        </if>
+        <if test="filters != null and filters.size > 0">
+            <foreach collection="filters" item="filter">
+                <choose>
+                    <when test="filter == 'collection-completed'">
+                        AND (COLLECTION_COMPLETED_DATE IS NOT NULL)
+                    </when>
+                    <when test="filter == 'collection-pending'">
+                        AND (COLLECTION_COMPLETED_DATE IS NULL)
+                    </when>
+                    <when test="filter == 'logistics-confirmed'">
+                        AND (LOGISTICS_CONFIRMED_DATE IS NOT NULL)
+                    </when>
+                    <when test="filter == 'logistics-pending'">
+                        AND (LOGISTICS_CONFIRMED_DATE IS NULL)
+                    </when>
+                    <when test="filter == 'shipping-completed'">
+                        AND (RETURN_TYPE_CODE IN ('FULL_EXCHANGE', 'PARTIAL_EXCHANGE') AND SHIPPING_DATE IS NOT NULL)
+                    </when>
+                    <when test="filter == 'shipping-pending'">
+                        AND (RETURN_TYPE_CODE IN ('FULL_EXCHANGE', 'PARTIAL_EXCHANGE') AND SHIPPING_DATE IS NULL)
+                    </when>
+                    <when test="filter == 'refund-completed'">
+                        AND (RETURN_TYPE_CODE IN ('FULL_RETURN', 'PARTIAL_RETURN') AND REFUND_DATE IS NOT NULL)
+                    </when>
+                    <when test="filter == 'refund-pending'">
+                        AND (RETURN_TYPE_CODE IN ('FULL_RETURN', 'PARTIAL_RETURN') AND REFUND_DATE IS NULL)
+                    </when>
+                    <when test="filter == 'payment-completed'">
+                        AND (PAYMENT_STATUS = 'COMPLETED')
+                    </when>
+                    <when test="filter == 'payment-pending'">
+                        AND (SHIPPING_FEE = '입금예정')
+                    </when>
+                    <!-- 🎯 처리완료 필터 추가 -->
+                    <when test="filter == 'completed'">
+                        AND (IS_COMPLETED = 1)
+                    </when>
+                    <when test="filter == 'incompleted'">
+                        AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL)
+                    </when>
+                    <when test="filter == 'overdue-ten-days'">
+                        AND (CS_RECEIVED_DATE &lt;= SYSDATE - 10)
+                    </when>
+                </choose>
+            </foreach>
+        </if>
+        <if test="keyword != null and keyword != '' and keyword != 'null'">
+            AND (
+                UPPER(ORDER_NUMBER) LIKE UPPER('%' || #{keyword} || '%') OR
+                UPPER(CUSTOMER_NAME) LIKE UPPER('%' || #{keyword} || '%') OR
+                UPPER(CUSTOMER_PHONE) LIKE UPPER('%' || #{keyword} || '%') OR
+                UPPER(SITE_NAME) LIKE UPPER('%' || #{keyword} || '%') OR
+                UPPER(ORDER_ITEM_CODE) LIKE UPPER('%' || #{keyword} || '%') OR
+                UPPER(PRODUCT_COLOR) LIKE UPPER('%' || #{keyword} || '%') OR
+                UPPER(PRODUCT_SIZE) LIKE UPPER('%' || #{keyword} || '%') OR
+                UPPER(TRACKING_NUMBER) LIKE UPPER('%' || #{keyword} || '%') OR
+                UPPER(RETURN_REASON) LIKE UPPER('%' || #{keyword} || '%') OR
+                UPPER(PROCESSOR) LIKE UPPER('%' || #{keyword} || '%') OR
+                UPPER(REMARKS) LIKE UPPER('%' || #{keyword} || '%') OR
+                (UPPER(TRIM(#{keyword})) = '완료' AND IS_COMPLETED = 1) OR
+                (UPPER(TRIM(#{keyword})) = '전체완료' AND IS_COMPLETED = 1) OR
+                (UPPER(TRIM(#{keyword})) = '처리완료' AND IS_COMPLETED = 1) OR
+                (UPPER(TRIM(#{keyword})) = '미완료' AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL)) OR
+                (UPPER(TRIM(#{keyword})) = '진행중' AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL)) OR
+                (UPPER(TRIM(#{keyword})) = 'Y' AND IS_COMPLETED = 1) OR
+                (UPPER(TRIM(#{keyword})) = 'N' AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL))
+            )
+        </if>
+        <if test="startDate != null and startDate != '' and startDate != 'null'">
+            AND CS_RECEIVED_DATE >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+        </if>
+        <if test="endDate != null and endDate != '' and endDate != 'null'">
+            AND CS_RECEIVED_DATE &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD') + 0.99999
+        </if>
+        <if test="logisticsStartDate != null and logisticsStartDate != '' and logisticsStartDate != 'null'">
+            AND LOGISTICS_CONFIRMED_DATE >= TO_DATE(#{logisticsStartDate}, 'YYYY-MM-DD')
+        </if>
+        <if test="logisticsEndDate != null and logisticsEndDate != '' and logisticsEndDate != 'null'">
+            AND LOGISTICS_CONFIRMED_DATE &lt;= TO_DATE(#{logisticsEndDate}, 'YYYY-MM-DD') + 0.99999
+        </if>
+        ORDER BY CS_RECEIVED_DATE DESC, RETURN_ID DESC
     </select>
 
 </mapper> 

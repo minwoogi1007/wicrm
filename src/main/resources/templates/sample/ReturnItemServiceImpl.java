@@ -1216,11 +1216,12 @@ public class ReturnItemServiceImpl implements ReturnItemService {
             case "incompleted":
                 return item.getIsCompleted() == null || item.getIsCompleted() != 1;
             case "overdue-ten-days":
-                // 처리기간 임박 필터 - 접수일 기준 10일 이상 미완료 건
+                // 처리기간 임박 필터 - 접수일 기준 10일 이상 미완료 건 (데이터베이스와 동일한 기준)
                 if (item.getCsReceivedDate() != null && 
                     (item.getIsCompleted() == null || item.getIsCompleted() != 1)) {
                     LocalDate tenDaysAgo = LocalDate.now().minusDays(10);
-                    return item.getCsReceivedDate().isBefore(tenDaysAgo);
+                    // 데이터베이스와 동일하게 <= 기준으로 통일 (10일 전 이하)
+                    return item.getCsReceivedDate().isBefore(tenDaysAgo) || item.getCsReceivedDate().isEqual(tenDaysAgo);
                 }
                 return false;
             default:
@@ -1353,26 +1354,25 @@ public class ReturnItemServiceImpl implements ReturnItemService {
     }
     
     /**
-     * 🎯 처리기간 임박 필터 - 접수일 기준 10일 이상 미완료 데이터 개수 조회
+     * 🎯 처리기간 임박 필터 - 접수일 기준 10일 이상 미완료 데이터 개수 조회 - Oracle SYSDATE 기준으로 통일
      */
     @Override
     @Transactional(readOnly = true)
     public Long getOverdueTenDaysCount() {
         log.info("🔍 처리기간 임박 카운트 조회 시작 - 접수일 기준 10일 이상 미완료 건");
         
-        // 10일 전 날짜 계산
-        LocalDateTime tenDaysAgo = LocalDateTime.now().minusDays(10);
-        log.info("📅 기준 날짜: {} (10일 전)", tenDaysAgo);
+        // Oracle SYSDATE 기준으로 통일 (Repository에서 자체 계산)
+        log.info("📅 기준: Oracle SYSDATE - 10일 (데이터베이스 시간 기준)");
         
         // 10일 전 이전에 접수되었으면서 아직 완료되지 않은 건 조회
-        long count = returnItemRepository.countOverdueTenDays(tenDaysAgo);
+        long count = returnItemRepository.countOverdueTenDays();
         log.info("📊 접수일 기준 10일 이상 미완료 건수: {} 건", count);
         
         return count;
     }
     
     /**
-     * 🎯 처리기간 임박 필터 - 접수일 기준 10일 이상 미완료 데이터 조회
+     * 🎯 처리기간 임박 필터 - 접수일 기준 10일 이상 미완료 데이터 조회 - Oracle SYSDATE 기준으로 통일
      */
     @Override
     @Transactional(readOnly = true)
@@ -1380,20 +1380,19 @@ public class ReturnItemServiceImpl implements ReturnItemService {
         log.info("🔍 처리기간 임박 데이터 조회 시작 - 접수일 기준 10일 이상 미완료 건");
         log.info("🔍 검색 조건: {}", searchDTO);
         
-        // 10일 전 날짜 계산
-        LocalDateTime tenDaysAgo = LocalDateTime.now().minusDays(10);
-        log.info("📅 기준 날짜: {} (10일 전)", tenDaysAgo);
+        // Oracle SYSDATE 기준으로 통일 (Repository에서 자체 계산)
+        log.info("📅 기준: Oracle SYSDATE - 10일 (데이터베이스 시간 기준)");
         
         // 페이징 처리
         int startRow = searchDTO.getPage() * searchDTO.getSize();
         int endRow = startRow + searchDTO.getSize();
         
         // 10일 전 이전에 접수되었으면서 아직 완료되지 않은 건 조회
-        List<ReturnItem> entities = returnItemRepository.findOverdueTenDays(tenDaysAgo, startRow, endRow);
+        List<ReturnItem> entities = returnItemRepository.findOverdueTenDays(startRow, endRow);
         log.info("📊 접수일 기준 10일 이상 미완료 데이터 조회 결과: {} 건", entities.size());
         
         // 전체 카운트 조회
-        long totalElements = returnItemRepository.countOverdueTenDays(tenDaysAgo);
+        long totalElements = returnItemRepository.countOverdueTenDays();
         log.info("📊 전체 접수일 기준 10일 이상 미완료 건수: {} 건", totalElements);
         
         // DTO 변환

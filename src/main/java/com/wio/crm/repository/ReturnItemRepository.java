@@ -311,21 +311,20 @@ public interface ReturnItemRepository extends JpaRepository<ReturnItem, Long> {
     // ==================== 🚨 처리기간 임박 필터 - 접수일 기준 10일 이상 미완료 데이터 조회 ====================
     
     /**
-     * 🚨 접수일 기준 10일 이상 미완료 건수 조회 (성능 최적화)
+     * 🚨 접수일 기준 10일 이상 미완료 건수 조회 (성능 최적화) - Oracle SYSDATE 기준으로 통일
      */
     @Query(value = "SELECT COUNT(*) FROM TB_RETURN_ITEM " +
-           "WHERE CS_RECEIVED_DATE < :tenDaysAgo AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL)", 
+           "WHERE CS_RECEIVED_DATE <= SYSDATE - 10 AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL)", 
            nativeQuery = true)
-    long countOverdueTenDays(@Param("tenDaysAgo") LocalDateTime tenDaysAgo);
+    long countOverdueTenDays();
     
     /**
-     * 🚨 접수일 기준 10일 이상 미완료 데이터 페이징 조회 (Oracle ROWNUM 페이징)
+     * 🚨 접수일 기준 10일 이상 미완료 데이터 페이징 조회 (Oracle ROWNUM 페이징) - Oracle SYSDATE 기준으로 통일
      */
     @Query(value = "SELECT * FROM (SELECT ROWNUM rn, sub.* FROM (SELECT * FROM TB_RETURN_ITEM " +
-           "WHERE CS_RECEIVED_DATE < :tenDaysAgo AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL) " +
+           "WHERE CS_RECEIVED_DATE <= SYSDATE - 10 AND (IS_COMPLETED = 0 OR IS_COMPLETED IS NULL) " +
            "ORDER BY CS_RECEIVED_DATE ASC) sub) WHERE rn > :startRow AND rn <= :endRow", 
            nativeQuery = true)
-    List<ReturnItem> findOverdueTenDays(@Param("tenDaysAgo") LocalDateTime tenDaysAgo, 
-                                        @Param("startRow") int startRow, 
+    List<ReturnItem> findOverdueTenDays(@Param("startRow") int startRow, 
                                         @Param("endRow") int endRow);
 } 

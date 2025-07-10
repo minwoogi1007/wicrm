@@ -463,4 +463,36 @@ public interface ReturnItemMapper {
      * 💰 검색 조건 기반 금액 통계 (DB 직접 집계)
      */
     Map<String, Object> getAmountStatsBySearch(@Param("searchParams") Map<String, Object> searchParams);
+    
+    /**
+     * 🎯 다중 필터 통합 조회 최적화 (DB 레벨)
+     */
+    List<ReturnItem> findByMultipleFiltersOptimized(@Param("filters") List<String> filters,
+                                                   @Param("keyword") String keyword,
+                                                   @Param("startDate") String startDate,
+                                                   @Param("endDate") String endDate,
+                                                   @Param("logisticsStartDate") String logisticsStartDate,
+                                                   @Param("logisticsEndDate") String logisticsEndDate,
+                                                   @Param("page") Integer page,
+                                                   @Param("size") Integer size);
+    
+    /**
+     * 🎯 다중 필터 통합 조회 카운트 최적화
+     */
+    Long countByMultipleFiltersOptimized(@Param("filters") List<String> filters,
+                                       @Param("keyword") String keyword,
+                                       @Param("startDate") String startDate,
+                                       @Param("endDate") String endDate,
+                                       @Param("logisticsStartDate") String logisticsStartDate,
+                                       @Param("logisticsEndDate") String logisticsEndDate);
+
+    /**
+     * 🎯 다중 필터 통합 조회 최적화 (페이징 없음, 엑셀 다운로드용)
+     */
+    List<ReturnItem> findByMultipleFiltersUnlimited(@Param("filters") List<String> filters,
+                                                   @Param("keyword") String keyword,
+                                                   @Param("startDate") String startDate,
+                                                   @Param("endDate") String endDate,
+                                                   @Param("logisticsStartDate") String logisticsStartDate,
+                                                   @Param("logisticsEndDate") String logisticsEndDate);
 } 

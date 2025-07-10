@@ -1223,6 +1223,20 @@
                     </div>
                 </div>
                 
+
+                
+                <!-- ⑦ 처리기간 임박 카드 (Sample 통합) -->
+                <div class="stat-box warning" data-card="overdue-ten-days">
+                    <div class="card-content">
+                        <h3>🚨 처리기간 임박</h3>
+                        <div class="value clickable">
+                            <span class="filter-link" data-filter="overdue-ten-days" data-stat="overdue-ten-days-count" th:text="${cardStats?.overdueTenDaysCount ?: 0}">0</span>
+                        </div>
+                        <div class="description">10일 이상 미완료</div>
+                    </div>
+                </div>
+
+
                 <!-- ⑥ 전체완료 카드 -->
                 <div class="stat-box info" data-card="completion">
                     <div class="card-content">
@@ -1233,17 +1247,6 @@
                             <span class="filter-link" data-filter="incompleted" data-stat="incomplete-count" th:text="${cardStats?.incompletedCount ?: 0}">0</span>
                         </div>
                         <div class="description">완료 / 미완료</div>
-                    </div>
-                </div>
-                
-                <!-- ⑦ 처리기간 임박 카드 (Sample 통합) -->
-                <div class="stat-box warning" data-card="overdue-ten-days">
-                    <div class="card-content">
-                        <h3>🚨 처리기간 임박</h3>
-                        <div class="value clickable">
-                            <span class="filter-link" data-filter="overdue-ten-days" data-stat="overdue-ten-days-count" th:text="${cardStats?.overdueTenDaysCount ?: 0}">0</span>
-                        </div>
-                        <div class="description">10일 이상 미완료</div>
                     </div>
                 </div>
             </div>
@@ -1375,7 +1378,7 @@
             <!-- 통합 검색 -->
             <div class="search-container">
                 <h3 class="search-title">🔍 통합 검색</h3>
-                <form id="searchForm" action="/exchange/list" method="get" class="search-form" th:object="${searchDTO}">
+                <form id="searchForm" action="/exchange/list" method="get" class="search-form" th:object="${searchDTO}" onsubmit="return handleSearchSubmit(event)">
                     <!-- 🎯 필터 정보 히든 필드 -->
                     <input type="hidden" id="filtersInput" name="filters" th:value="${filters}">
                     
@@ -1406,16 +1409,15 @@
                             <label>&nbsp;</label>
                             <div style="display: flex; gap: 0.5rem;">
                                 <button type="submit" class="btn btn-search">🔍 검색</button>
-                                <button type="button" class="btn btn-reset" onclick="window.location.href='/exchange/list'">🔄 초기화</button>
+                                <button type="button" class="btn btn-reset" onclick="handleReset()">🔄 초기화</button>
                             </div>
                         </div>
                     </div>
                     
                     <!-- 검색 도움말 -->
                     <div style="margin-top: 0.5rem; padding: 0.5rem; background-color: var(--primary-light); border-radius: var(--radius); font-size: 0.7rem; color: var(--text-muted);">
-                        💡 <strong>검색 팁:</strong> 주문번호, 고객명, 연락처, 사이트명, 품번, 색상, 사이즈, 운송장번호, 유형, 반품사유, 처리자, 비고 등 모든 정보를 하나의 검색창에서 찾을 수 있습니다.<br/>
-                        📅 <strong>날짜 검색:</strong> CS접수일과 물류확인일을 각각 독립적으로 검색할 수 있습니다. 필요한 날짜 범위만 설정하세요.<br/>
-                        🎯 <strong>완료 상태 검색:</strong> "완료" 또는 "전체완료" → 완료된 건만 조회 | "미완료" 또는 "진행중" → 미완료 건만 조회 | "Y" → 완료 | "N" → 미완료
+                                                💡 <strong>검색 팁:</strong> 주문번호, 고객명, 연락처, 사이트명, 품번, 색상, 사이즈, 운송장번호, 유형, 반품사유, 처리자, 비고 등 모든 정보를 하나의 검색창에서 찾을 수 있습니다.<br/>
+                        📅 <strong>날짜 검색:</strong> CS접수일과 물류확인일을 각각 독립적으로 검색할 수 있습니다. 필요한 날짜 범위만 설정하세요.
                     </div>
                 </form>
             </div>
@@ -1494,10 +1496,14 @@
                                 <th style="width: 40px;">완료</th>
                                 <th style="width: 80px;">비고</th>
                                 <th style="width: 60px;">첨부이미지</th>
+                                <th style="width: 80px;">작업</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="item, iterStat : ${returnItems}" th:if="${returnItems != null and !returnItems.empty}">
+                            <tr th:each="item, iterStat : ${returnItems}" th:if="${returnItems != null and !returnItems.empty}" 
+                                class="table-row-clickable"
+                                th:data-item-id="${item.id}"
+                                ondblclick="handleRowDoubleClick(event, this)">
                                 <td><input type="checkbox" name="selected" th:value="${item.id}"></td>
                                 <td>
                                     <span class="type-badge" 
@@ -1519,7 +1525,7 @@
                                     <span class="order-number-copy" 
                                           th:text="${item.orderNumber}" 
                                           th:data-order-number="${item.orderNumber}"
-                                          onclick="copyOrderNumber(this)"
+                                          onclick="copyOrderNumber(this, event)"
                                           title="클릭하면 주문번호가 복사됩니다">20250426-0001236-03</span>
                                 </td>
                                 <td class="money-info" th:text="${item.refundAmount != null ? #numbers.formatInteger(item.refundAmount, 0, 'COMMA') : ''}">39,200</td>
@@ -1527,14 +1533,14 @@
                                     <span class="customer-name-copy" 
                                           th:text="${item.customerName}" 
                                           th:data-customer-name="${item.customerName}"
-                                          onclick="copyCustomerName(this)"
+                                          onclick="copyCustomerName(this, event)"
                                           title="클릭하면 고객명이 복사됩니다">김민지</span>
                                 </td>
                                 <td class="contact-info">
                                     <span class="customer-phone-copy" 
                                           th:text="${item.customerPhone}" 
                                           th:data-customer-phone="${item.customerPhone}"
-                                          onclick="copyCustomerPhone(this)"
+                                          onclick="copyCustomerPhone(this, event)"
                                           title="클릭하면 연락처가 복사됩니다">010-7409-5050</span>
                                 </td>
                                 <td>
@@ -1544,6 +1550,7 @@
                                                data-field="logisticsConfirmedDate"
                                                th:data-id="${item.id}"
                                                th:value="${item.logisticsConfirmedDate}"
+                                               th:data-original-value="${item.logisticsConfirmedDate}"
                                                onchange="markDateAsChanged(this)"
                                                style="width: 140px; font-size: 1.2rem; padding: 0.6rem; min-height: 45px; font-weight: 600;">
                                         <button type="button" 
@@ -1559,7 +1566,7 @@
                                     <span class="order-item-code-copy" 
                                           th:text="${item.orderItemCode}" 
                                           th:data-order-item-code="${item.orderItemCode}"
-                                          onclick="copyOrderItemCode(this)"
+                                          onclick="copyOrderItemCode(this, event)"
                                           title="클릭하면 주문품번이 복사됩니다">RN-GSZD962</span>
                                 </td>
                                 <td th:text="${item.productColor}">PK</td>
@@ -1602,7 +1609,7 @@
                                     <span class="tracking-number-copy" 
                                           th:text="${item.trackingNumber}" 
                                           th:data-tracking-number="${item.trackingNumber}"
-                                          onclick="copyTrackingNumber(this)"
+                                          onclick="copyTrackingNumber(this, event)"
                                           title="클릭하면 운송장번호가 복사됩니다">5738757014</span>
                                 </td>
                                 <td class="date-cell" th:text="${item.collectionCompletedDate != null ? #temporals.format(item.collectionCompletedDate, 'yyyy-MM-dd') : ''}">2025-01-10</td>
@@ -1633,31 +1640,12 @@
                                         <!-- 이미지 없을 때는 공백 -->
                                     </div>
                                 </td>
-                                <!--<td>
+                                <td>
                                     <a th:href="@{'/exchange/view/' + ${item.id}}" class="action-link" style="font-size: 1.0rem; font-weight: 600;">보기</a>
-                                     수정, 삭제 버튼 주석 처리
-                                     |
-                                    <a th:href="@{'/exchange/edit/' + ${item.id}}" class="action-link">수정</a> |
-                                    <a href="#" th:onclick="'if(confirm(&quot;정말 삭제하시겠습니까?&quot;)) { 
-                                        fetch(&quot;/exchange/api/&quot; + ' + ${item.id} + ', { 
-                                            method: &quot;DELETE&quot;, 
-                                            headers: { &quot;Content-Type&quot;: &quot;application/json&quot; } 
-                                        }).then(response => { 
-                                            if(response.ok) { 
-                                                alert(&quot;삭제되었습니다.&quot;); 
-                                                location.reload(); 
-                                            } else { 
-                                                alert(&quot;삭제 중 오류가 발생했습니다.&quot;); 
-                                            } 
-                                        }).catch(error => { 
-                                            alert(&quot;삭제 중 오류가 발생했습니다.&quot;); 
-                                        }); 
-                                    }'" class="action-link danger">삭제</a>
-
-                                </td>-->
+                                </td>
                             </tr>
                             <tr th:if="${returnItems == null or returnItems.empty}">
-                                <td colspan="25" class="no-data">등록된 교환/반품 내역이 없습니다.</td>
+                                <td colspan="26" class="no-data">등록된 교환/반품 내역이 없습니다.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -1758,6 +1746,41 @@
         
         // 🎯 선택된 필터들을 저장하는 Set
         let selectedFilters = new Set();
+        
+        // 🔄 전역 초기화 함수 (즉시 사용 가능)
+        function handleReset() {
+            console.log('🔄 전체 초기화 시작');
+            
+            // 선택된 필터들 초기화
+            selectedFilters.clear();
+            
+            // 모든 필터 카드 비활성화
+            document.querySelectorAll('.stat-box').forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            // 필터 배너 제거
+            const existingBanner = document.querySelector('.filter-banner');
+            if (existingBanner) {
+                existingBanner.remove();
+            }
+            
+            // 검색 폼 입력값 초기화
+            const keywordField = document.getElementById('keyword');
+            const startDateField = document.getElementById('startDate');
+            const endDateField = document.getElementById('endDate');
+            const logisticsStartDateField = document.getElementById('logisticsStartDate');
+            const logisticsEndDateField = document.getElementById('logisticsEndDate');
+            
+            if (keywordField) keywordField.value = '';
+            if (startDateField) startDateField.value = '';
+            if (endDateField) endDateField.value = '';
+            if (logisticsStartDateField) logisticsStartDateField.value = '';
+            if (logisticsEndDateField) logisticsEndDateField.value = '';
+            
+            // 기본 목록 페이지로 이동
+            window.location.href = '/exchange/list';
+        }
         
         // 🎯 페이지 로드 시 현재 적용된 필터들을 selectedFilters에 추가
         const currentFilters = /*[[${currentFilters}]]*/ '';
@@ -1935,7 +1958,7 @@
                 <td class="text-center">${item.csReceivedDate || '-'}</td>
                 <td class="text-left">${item.siteName || '-'}</td>
                 <td class="order-info">
-                    <span class="order-number-copy" data-order-number="${item.orderNumber}" onclick="copyOrderNumber(this)" title="클릭하면 주문번호가 복사됩니다">
+                    <span class="order-number-copy" data-order-number="${item.orderNumber}" onclick="copyOrderNumber(this, event)" title="클릭하면 주문번호가 복사됩니다">
                         ${item.orderNumber || '-'}
                         </span>
                 </td>
@@ -1954,21 +1977,21 @@
                 </td>
                 <td class="text-left">${item.returnReason || '-'}</td>
                 <td class="order-info">
-                    <span class="tracking-number-copy" data-tracking-number="${item.trackingNumber}" onclick="copyTrackingNumber(this)" title="클릭하면 운송장번호가 복사됩니다">
+                    <span class="tracking-number-copy" data-tracking-number="${item.trackingNumber}" onclick="copyTrackingNumber(this, event)" title="클릭하면 운송장번호가 복사됩니다">
                         ${item.trackingNumber || '-'}
                     </span>
                 </td>
                 <td class="text-center date-editable">
-                    <input type="date" value="${item.collectionCompletedDate || ''}" data-id="${item.returnId}" data-field="collectionCompletedDate" onchange="markDateAsChanged(this)" style="width: 100%; border: none; background: transparent;">
+                    <input type="date" value="${item.collectionCompletedDate || ''}" data-id="${item.returnId}" data-field="collectionCompletedDate" data-original-value="${item.collectionCompletedDate || ''}" onchange="markDateAsChanged(this)" style="width: 100%; border: none; background: transparent;">
                 </td>
                 <td class="text-center date-editable">
-                    <input type="date" value="${item.logisticsConfirmedDate || ''}" data-id="${item.returnId}" data-field="logisticsConfirmedDate" onchange="markDateAsChanged(this)" style="width: 100%; border: none; background: transparent;">
+                    <input type="date" value="${item.logisticsConfirmedDate || ''}" data-id="${item.returnId}" data-field="logisticsConfirmedDate" data-original-value="${item.logisticsConfirmedDate || ''}" onchange="markDateAsChanged(this)" style="width: 100%; border: none; background: transparent;">
                 </td>
                 <td class="text-center date-editable">
-                    <input type="date" value="${item.shippingDate || ''}" data-id="${item.returnId}" data-field="shippingDate" onchange="markDateAsChanged(this)" style="width: 100%; border: none; background: transparent;">
+                    <input type="date" value="${item.shippingDate || ''}" data-id="${item.returnId}" data-field="shippingDate" data-original-value="${item.shippingDate || ''}" onchange="markDateAsChanged(this)" style="width: 100%; border: none; background: transparent;">
                 </td>
                 <td class="text-center date-editable">
-                    <input type="date" value="${item.refundDate || ''}" data-id="${item.returnId}" data-field="refundDate" onchange="markDateAsChanged(this)" style="width: 100%; border: none; background: transparent;">
+                    <input type="date" value="${item.refundDate || ''}" data-id="${item.returnId}" data-field="refundDate" data-original-value="${item.refundDate || ''}" onchange="markDateAsChanged(this)" style="width: 100%; border: none; background: transparent;">
                 </td>
                 <td class="text-center">
                     <span class="badge ${item.isCompleted ? 'bg-success' : 'bg-warning'}">
@@ -2297,13 +2320,19 @@
             
             // 🎯 페이지 로드 시 URL 파라미터에서 필터 상태 복원
             function syncFiltersFromUrl() {
+                console.log('🔄 URL에서 필터 상태 복원 시작');
                 const urlParams = new URLSearchParams(window.location.search);
                 const urlFilters = urlParams.get('filters');
                 
+                console.log('🔍 URL에서 추출한 필터:', urlFilters);
+                
                 if (urlFilters) {
                     const filters = urlFilters.split(',').map(f => f.trim()).filter(f => f);
+                    console.log('🔍 분해된 필터 배열:', filters);
+                    
                     filters.forEach(filter => {
                         selectedFilters.add(filter);
+                        console.log('✅ 필터 추가됨:', filter);
                         
                         // 해당 필터 카드들을 활성 상태로 표시
                         const filterElement = document.querySelector(`[data-filter="${filter}"]`);
@@ -2311,15 +2340,74 @@
                             const parentCard = filterElement.closest('.stat-box');
                             if (parentCard) {
                                 parentCard.classList.add('active');
+                                console.log('✅ 카드 활성화됨:', filter);
                             }
+                        } else {
+                            console.log('❌ 필터 카드를 찾을 수 없음:', filter);
                         }
                     });
                     
                     // 필터 배너 표시
                     if (filters.length > 0) {
                         showCurrentFilterBanner(filters);
+                        console.log('✅ 필터 배너 표시됨');
                     }
                 }
+                
+                console.log('🔄 URL에서 필터 상태 복원 완료 - selectedFilters:', Array.from(selectedFilters));
+            }
+            
+            // 🎯 검색 폼 제출 시 현재 선택된 필터들을 히든 필드에 설정
+            function handleSearchSubmit(event) {
+                console.log('🔍 검색 폼 제출 - 현재 선택된 필터:', Array.from(selectedFilters));
+                
+                // 현재 선택된 필터들을 히든 필드에 설정
+                const filtersInput = document.getElementById('filtersInput');
+                if (filtersInput) {
+                    if (selectedFilters.size > 0) {
+                        const filtersString = Array.from(selectedFilters).join(',');
+                        filtersInput.value = filtersString;
+                        console.log('✅ 필터 정보 설정됨:', filtersString);
+                    } else {
+                        filtersInput.value = '';
+                        console.log('✅ 필터 정보 초기화됨');
+                    }
+                }
+                
+                // 🔍 폼 제출 전 최종 확인
+                console.log('🔍 폼 제출 전 hidenInput 값:', filtersInput ? filtersInput.value : 'not found');
+                
+                // 폼 제출 계속 진행
+                return true;
+            }
+            
+            // 🎯 초기화 버튼 처리
+            function handleReset() {
+                console.log('🔄 전체 초기화 시작');
+                
+                // 선택된 필터들 초기화
+                selectedFilters.clear();
+                
+                // 모든 필터 카드 비활성화
+                document.querySelectorAll('.stat-box').forEach(card => {
+                    card.classList.remove('active');
+                });
+                
+                // 필터 배너 제거
+                const existingBanner = document.querySelector('.filter-banner');
+                if (existingBanner) {
+                    existingBanner.remove();
+                }
+                
+                // 검색 폼 입력값 초기화
+                document.getElementById('keyword').value = '';
+                document.getElementById('startDate').value = '';
+                document.getElementById('endDate').value = '';
+                document.getElementById('logisticsStartDate').value = '';
+                document.getElementById('logisticsEndDate').value = '';
+                
+                // 기본 목록 페이지로 이동
+                window.location.href = '/exchange/list';
             }
             
             // 🎯 다중 필터 배너 표시
@@ -2374,6 +2462,34 @@
                 }
             }
             
+            // 🎯 검색 폼 제출 시 현재 선택된 필터들을 히든 필드에 설정
+            function handleSearchSubmit(event) {
+                console.log('🔍 검색 폼 제출 - 현재 선택된 필터:', Array.from(selectedFilters));
+                
+                // 현재 선택된 필터들을 히든 필드에 설정
+                const filtersInput = document.getElementById('filtersInput');
+                if (filtersInput) {
+                    if (selectedFilters.size > 0) {
+                        const filtersString = Array.from(selectedFilters).join(',');
+                        filtersInput.value = filtersString;
+                        console.log('✅ 필터 정보 설정됨:', filtersString);
+                    } else {
+                        filtersInput.value = '';
+                        console.log('✅ 필터 정보 초기화됨');
+                    }
+                }
+                
+                // 🔍 폼 제출 전 최종 확인
+                console.log('🔍 폼 제출 전 hidenInput 값:', filtersInput ? filtersInput.value : 'not found');
+                
+                // 폼 제출 계속 진행
+                return true;
+            }
+            
+            // 🎯 전역 함수로 등록
+            window.handleSearchSubmit = handleSearchSubmit;
+            window.handleReset = handleReset;
+            
             // 🎯 개별 필터 제거 함수
             window.removeFilter = function(filterType) {
                 selectedFilters.delete(filterType);
@@ -2387,8 +2503,26 @@
                     }
                 }
                 
-                // 서버로 이동
-                applySelectedFilters();
+                // 🚀 검색 조건을 유지하면서 필터만 업데이트
+                if (selectedFilters.size > 0) {
+                    // 남은 필터가 있으면 적용
+                    applySelectedFilters();
+                } else {
+                    // 모든 필터가 제거되었으면 검색 조건만으로 조회
+                    const searchForm = document.getElementById('searchForm');
+                    const formData = new FormData(searchForm);
+                    const hasSearchCondition = (formData.get('keyword') && formData.get('keyword').trim() !== '') ||
+                                              formData.get('startDate') || formData.get('endDate') ||
+                                              formData.get('logisticsStartDate') || formData.get('logisticsEndDate');
+                    
+                    if (hasSearchCondition) {
+                        // 검색 조건이 있으면 검색 폼 제출
+                        searchForm.submit();
+                    } else {
+                        // 검색 조건도 없으면 기본 목록으로 이동
+                        window.location.href = '/exchange/list';
+                    }
+                }
             };
             
             // 🎯 전역 함수로 등록
@@ -2521,22 +2655,51 @@
             const id = input.getAttribute('data-id');
             const field = input.getAttribute('data-field');
             const value = input.value;
+            const originalValue = input.getAttribute('data-original-value');
             
-            console.log('📅 날짜 변경:', id, field, value);
+            console.log('📅 날짜 변경:', id, field, '현재:', value, '원래:', originalValue);
             
-            // 변경사항 저장
-            if (!dateChanges.has(id)) {
-                dateChanges.set(id, {});
-            }
+            // 🎯 원래 값과 비교하여 실제로 변경된 경우에만 처리
+            const currentValueNormalized = value || '';
+            const originalValueNormalized = originalValue || '';
             
-            const itemChanges = dateChanges.get(id);
-            itemChanges[field] = value || null;
-            
-            // 시각적 피드백 - 변경된 행 배경색 변경
             const row = input.closest('tr');
-            if (row) {
-                row.style.backgroundColor = '#fff3cd'; // 연한 노란색
-                row.classList.add('date-changed');
+            
+            if (currentValueNormalized === originalValueNormalized) {
+                // 원래 값과 같으면 변경사항에서 제거
+                if (dateChanges.has(id)) {
+                    const itemChanges = dateChanges.get(id);
+                    delete itemChanges[field];
+                    
+                    // 해당 항목의 다른 변경사항이 없으면 항목 자체를 제거
+                    if (Object.keys(itemChanges).length === 0) {
+                        dateChanges.delete(id);
+                        
+                        // 시각적 피드백 제거 - 행 배경색 원래대로
+                        if (row) {
+                            row.style.backgroundColor = '';
+                            row.classList.remove('date-changed');
+                        }
+                    }
+                }
+                
+                console.log('📅 원래 값과 동일하므로 변경사항 제거:', id, field);
+            } else {
+                // 실제로 변경된 경우에만 변경사항 저장
+                if (!dateChanges.has(id)) {
+                    dateChanges.set(id, {});
+                }
+                
+                const itemChanges = dateChanges.get(id);
+                itemChanges[field] = value || null;
+                
+                // 시각적 피드백 - 변경된 행 배경색 변경
+                if (row) {
+                    row.style.backgroundColor = '#fff3cd'; // 연한 노란색
+                    row.classList.add('date-changed');
+                }
+                
+                console.log('📅 실제 변경사항 저장:', id, field, value);
             }
             
             // 변경 카운트 업데이트
@@ -2634,13 +2797,14 @@
                     console.log('🔍 셀 개수:', cells.length);
                     
                     // 기존 비고 내용 로드
-                    const remarksCell = cells[22]; // 비고 컬럼 (23번째이지만 0-based이므로 22)
+                    const remarksCell = cells[23]; // 비고 컬럼 (24번째이지만 0-based이므로 23)
                     if (remarksCell) {
                         existingRemarks = remarksCell.textContent.trim();
                     }
                     
                     // 🔍 중요한 셀들 디버깅
-                    console.log('🔍 비고 셀 (22):', cells[22]?.textContent);
+                    console.log('🔍 비고 셀 (23):', cells[23]?.textContent);
+                    console.log('🔍 완료 셀 (22):', cells[22]?.innerHTML);
                     console.log('🔍 유형 셀 (1):', cells[1]?.innerHTML);
                     console.log('🔍 주문번호 셀 (5):', cells[5]?.innerHTML);
                     console.log('🔍 고객명 셀 (7):', cells[7]?.innerHTML);
@@ -2667,7 +2831,7 @@
                         collectionCompletedDate: cells[18]?.textContent.trim() || '-', // 회수완료일
                         shippingDate: cells[19]?.textContent.trim() || '-', // 출고일자
                         refundDate: cells[20]?.textContent.trim() || '-', // 환불일자
-                        isCompleted: cells[21]?.querySelector('input[type="checkbox"]')?.checked ? '완료' : '미완료', // 완료상태
+                        isCompleted: cells[22]?.querySelector('input[type="checkbox"]')?.checked ? '완료' : '미완료', // 완료상태
                         logisticsConfirmedDate: cells[9]?.querySelector('input[type="date"]')?.value || '-' // 물류확인일
                     };
                     
@@ -2688,8 +2852,8 @@
                             <div><strong>📅 주문일:</strong> ${itemInfo.orderDate || '-'}</div>
                             <div><strong>📞 CS접수일:</strong> ${itemInfo.registrationDate || '-'}</div>
                             <div><strong>🏪 사이트명:</strong> ${itemInfo.siteName || '-'}</div>
-                            <div><strong>📦 주문번호:</strong> ${itemInfo.orderNumber || '-'}</div>
-                            <div><strong>👤 수취인:</strong> ${itemInfo.customerName || '-'}</div>
+                            <div style="grid-column: 1 / -1; padding: 8px; background: #fef3c7; border-radius: 6px; border-left: 4px solid #f59e0b;"><strong>📦 주문번호:</strong> <span style="color: #92400e; font-weight: 700; font-size: 14px;">${itemInfo.orderNumber || '-'}</span></div>
+                            <div style="grid-column: 1 / -1; padding: 8px; background: #dbeafe; border-radius: 6px; border-left: 4px solid #3b82f6;"><strong>👤 고객명:</strong> <span style="color: #1e40af; font-weight: 700; font-size: 14px;">${itemInfo.customerName || '-'}</span></div>
                             <div><strong>📱 연락처:</strong> ${itemInfo.customerPhone || '-'}</div>
                             <div><strong>🛍️ 주문품번:</strong> ${itemInfo.orderItemCode || '-'}</div>
                             <div><strong>🎨 색상/사이즈:</strong> ${itemInfo.productColor || '-'} / ${itemInfo.productSize || '-'}</div>
@@ -3127,28 +3291,55 @@
            const dateInput = document.querySelector(`input[data-id="${itemId}"][data-field="${fieldName}"]`);
            
            if (dateInput) {
+               const originalValue = dateInput.getAttribute('data-original-value');
+               
                // 날짜 필드 초기화
                dateInput.value = '';
                
-               // 변경사항 추가 (null로 설정)
-               if (!dateChanges.has(itemId)) {
-                   dateChanges.set(itemId, {});
-               }
+               // 🎯 원래 값과 비교하여 실제로 변경된 경우에만 처리
+               const originalValueNormalized = originalValue || '';
                
-               const changes = dateChanges.get(itemId);
-               changes[fieldName] = null; // null로 설정하여 DB에서 NULL로 업데이트
-               
-               // 행 스타일 변경 (변경된 것으로 표시)
-               const row = dateInput.closest('tr');
-               if (row) {
-                   row.classList.add('date-changed');
-                   row.style.backgroundColor = '#fff3cd'; // 연한 노란색 배경
+               if (originalValueNormalized === '') {
+                   // 원래 값이 비어있었다면 변경사항에서 제거
+                   if (dateChanges.has(itemId)) {
+                       const itemChanges = dateChanges.get(itemId);
+                       delete itemChanges[fieldName];
+                       
+                       // 해당 항목의 다른 변경사항이 없으면 항목 자체를 제거
+                       if (Object.keys(itemChanges).length === 0) {
+                           dateChanges.delete(itemId);
+                           
+                           // 시각적 피드백 제거 - 행 배경색 원래대로
+                           const row = dateInput.closest('tr');
+                           if (row) {
+                               row.style.backgroundColor = '';
+                               row.classList.remove('date-changed');
+                           }
+                       }
+                   }
+                   
+                   console.log(`날짜 초기화 - 원래 값과 동일하므로 변경사항 제거: ID=${itemId}, 필드=${fieldName}`);
+               } else {
+                   // 실제로 변경된 경우 (원래 값이 있었는데 지운 경우)
+                   if (!dateChanges.has(itemId)) {
+                       dateChanges.set(itemId, {});
+                   }
+                   
+                   const changes = dateChanges.get(itemId);
+                   changes[fieldName] = null; // null로 설정하여 DB에서 NULL로 업데이트
+                   
+                   // 행 스타일 변경 (변경된 것으로 표시)
+                   const row = dateInput.closest('tr');
+                   if (row) {
+                       row.classList.add('date-changed');
+                       row.style.backgroundColor = '#fff3cd'; // 연한 노란색 배경
+                   }
+                   
+                   console.log(`날짜 초기화 - 실제 변경사항 저장: ID=${itemId}, 필드=${fieldName}`);
                }
                
                // 변경 카운트 업데이트
                updateDateChangeCount();
-               
-               console.log(`날짜 초기화: ID=${itemId}, 필드=${fieldName}`);
                
                // 🎯 실시간 카드 통계 업데이트 (약간의 지연 후)
                setTimeout(() => {
@@ -3158,105 +3349,39 @@
        }
        
        // 🎯 주문번호 복사 기능
-       function copyOrderNumber(element) {
-           const orderNumber = element.getAttribute('data-order-number');
-           
-           // 클립보드에 복사
-           navigator.clipboard.writeText(orderNumber).then(function() {
-               console.log('📋 주문번호 복사 성공:', orderNumber);
-               
-               // 시각적 피드백
-               const originalText = element.textContent;
-               const originalColor = element.style.color;
-               const originalBg = element.style.backgroundColor;
-               
-               // 복사 완료 표시
-               element.style.backgroundColor = '#28a745';
-               element.style.color = 'white';
-               element.style.transform = 'scale(1.05)';
-               element.textContent = '✅ 복사완료!';
-               
-               // 1초 후 원래 상태로 복원
-               setTimeout(() => {
-                   element.style.backgroundColor = originalBg;
-                   element.style.color = originalColor;
-                   element.style.transform = 'scale(1)';
-                   element.textContent = originalText;
-               }, 1000);
-               
-               // 토스트 메시지 표시
-               showCopyToast(orderNumber, '📋 주문번호');
-               
-           }).catch(function(err) {
-               console.error('❌ 주문번호 복사 실패:', err);
-               handleCopyError(element, orderNumber, '주문번호');
-           });
-       }
-       
-       // 복사 완료 토스트 메시지 표시
-       function showCopyToast(value, type) {
-           // 기존 토스트 제거
-           const existingToast = document.querySelector('.copy-toast');
-           if (existingToast) {
-               existingToast.remove();
+       function copyOrderNumber(element, event) {
+           // 🚫 이벤트 전파 방지 (더블클릭 이벤트와 충돌 방지)
+           if (event) {
+               event.stopPropagation();
            }
            
-           // 새 토스트 생성
-           const toast = document.createElement('div');
-           toast.className = 'copy-toast';
-           toast.innerHTML = `
-               <div style="
-                   position: fixed;
-                   top: 20px;
-                   right: 20px;
-                   background: linear-gradient(135deg, #28a745, #20c997);
-                   color: white;
-                   padding: 1rem 1.5rem;
-                   border-radius: 0.5rem;
-                   box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
-                   z-index: 9999;
-                   display: flex;
-                   align-items: center;
-                   gap: 0.5rem;
-                   font-size: 0.9rem;
-                   font-weight: 500;
-                   animation: slideInRight 0.3s ease-out;
-               ">
-                   <span>${type.split(' ')[0]}</span>
-                   <span><strong>${type} 복사완료!</strong><br/><small>${value}</small></span>
-               </div>
-           `;
-           
-           document.body.appendChild(toast);
-           
-           // 3초 후 자동 제거
-           setTimeout(() => {
-               if (toast.parentNode) {
-                   toast.style.animation = 'slideOutRight 0.3s ease-out';
-                   setTimeout(() => {
-                       if (toast.parentNode) {
-                           toast.remove();
-                       }
-                   }, 300);
-               }
-           }, 3000);
+           const orderNumber = element.getAttribute('data-order-number');
+           safeCopyToClipboard(orderNumber, element, '📋 주문번호');
        }
+       
+
        
                // 🎯 안전한 복사 함수 (HTTP/HTTPS 환경 모두 지원)
         function safeCopyToClipboard(text, element, type) {
-            // Method 1: 최신 Clipboard API 시도 (HTTPS 환경)
-            if (navigator.clipboard && navigator.clipboard.writeText) {
+            // 🔒 HTTPS 환경에서만 최신 Clipboard API 사용
+            const isSecureContext = (window.location.protocol === 'https:' || window.location.hostname === 'localhost');
+            
+            if (isSecureContext && navigator.clipboard && navigator.clipboard.writeText) {
+                console.log('🔒 HTTPS 환경 - Clipboard API 사용');
                 return navigator.clipboard.writeText(text)
                     .then(() => {
+                        console.log('✅ Clipboard API 복사 성공');
                         showCopySuccess(element, type, text);
                         return true;
                     })
-                    .catch(() => {
+                    .catch((error) => {
+                        console.warn('⚠️ Clipboard API 실패, fallback 사용:', error);
                         return fallbackCopyMethod(text, element, type);
                     });
             }
             
-            // Method 2: 대체 방법 (HTTP 환경)
+            // 🌐 HTTP 환경 또는 Clipboard API 미지원 - 대체 방법 사용
+            console.log('🌐 HTTP 환경 또는 Clipboard API 미지원 - fallback 사용');
             return Promise.resolve(fallbackCopyMethod(text, element, type));
         }
 
@@ -3646,6 +3771,8 @@
        
        // 대체 복사 방법 (HTTP 환경용)
        function fallbackCopyMethod(text, element, type) {
+           console.log('📋 fallback 복사 시도:', text);
+           
            try {
                // 임시 텍스트 영역 생성
                const textArea = document.createElement('textarea');
@@ -3653,26 +3780,40 @@
                textArea.style.position = 'fixed';
                textArea.style.left = '-9999px';
                textArea.style.top = '-9999px';
+               textArea.style.opacity = '0';
+               textArea.setAttribute('readonly', '');
                document.body.appendChild(textArea);
                
                // 텍스트 선택 및 복사
                textArea.focus();
                textArea.select();
+               textArea.setSelectionRange(0, 99999); // 모바일 지원
                
                // execCommand로 복사 시도
                const success = document.execCommand('copy');
                document.body.removeChild(textArea);
                
                if (success) {
+                   console.log('✅ execCommand 복사 성공');
                    showCopySuccess(element, type, text);
                    return true;
                } else {
+                   console.warn('⚠️ execCommand 복사 실패');
                    throw new Error('execCommand failed');
                }
            } catch (err) {
-               // 최후의 수단: 텍스트 선택 상태로 만들기
-               selectText(element);
-               showCopyError(element, type, text);
+               console.error('❌ fallback 복사 실패:', err);
+               
+               // 최후의 수단: 수동 복사 안내
+               try {
+                   // 텍스트 선택 상태로 만들기
+                   selectText(element);
+                   showCopyError(element, type, text);
+               } catch (selectErr) {
+                   console.error('❌ 텍스트 선택도 실패:', selectErr);
+                   // 완전한 최후의 수단: 알림창으로 텍스트 표시
+                   showManualCopyDialog(text, type);
+               }
                return false;
            }
        }
@@ -3719,6 +3860,8 @@
        
        // 복사 실패 처리
        function showCopyError(element, type, text) {
+           console.log('❌ 복사 실패 처리:', type, text);
+           
            // 실패 피드백
            element.style.backgroundColor = '#dc3545';
            element.style.color = 'white';
@@ -3732,17 +3875,73 @@
                element.textContent = text;
            }, 1500);
            
-           alert(`${type} 자동 복사에 실패했습니다.\n텍스트가 선택된 상태입니다. Ctrl+C로 복사해주세요.\n\n📋 ${type}: ${text}`);
+           alert(`🔐 ${type} 자동 복사에 실패했습니다.\n\n📋 복사할 내용: ${text}\n\n💡 해결 방법:\n1. 텍스트가 선택된 상태입니다\n2. Ctrl+C (또는 Cmd+C)로 복사하세요\n3. 또는 마우스 우클릭 → 복사를 선택하세요`);
+       }
+       
+       // 완전한 최후의 수단: 수동 복사 안내 다이얼로그
+       function showManualCopyDialog(text, type) {
+           console.log('📋 수동 복사 다이얼로그 표시:', type, text);
+           
+           const message = `🔐 ${type} 복사 기능을 사용할 수 없습니다.\n\n📋 복사할 내용:\n${text}\n\n💡 수동 복사 방법:\n1. 위 텍스트를 선택하세요\n2. Ctrl+C (또는 Cmd+C)로 복사하세요\n3. 또는 마우스 우클릭 → 복사를 선택하세요`;
+           
+           // 텍스트 선택 가능한 알림창 표시
+           if (confirm(message + '\n\n✅ 확인을 누르면 텍스트가 선택됩니다.')) {
+               // 임시 텍스트 영역 생성하여 선택 상태로 만들기
+               const textArea = document.createElement('textarea');
+               textArea.value = text;
+               textArea.style.position = 'fixed';
+               textArea.style.left = '50%';
+               textArea.style.top = '50%';
+               textArea.style.transform = 'translate(-50%, -50%)';
+               textArea.style.width = '300px';
+               textArea.style.height = '100px';
+               textArea.style.zIndex = '10000';
+               textArea.style.border = '2px solid #007bff';
+               textArea.style.borderRadius = '4px';
+               textArea.style.padding = '10px';
+               textArea.style.fontSize = '14px';
+               textArea.setAttribute('readonly', '');
+               
+               document.body.appendChild(textArea);
+               textArea.focus();
+               textArea.select();
+               
+               // 5초 후 자동 제거
+               setTimeout(() => {
+                   if (textArea.parentNode) {
+                       textArea.remove();
+                   }
+               }, 5000);
+               
+               // 클릭 시 제거
+               textArea.addEventListener('blur', () => {
+                   setTimeout(() => {
+                       if (textArea.parentNode) {
+                           textArea.remove();
+                       }
+                   }, 100);
+               });
+           }
        }
 
        // 🎯 고객명 복사 기능
-       function copyCustomerName(element) {
+       function copyCustomerName(element, event) {
+           // 🚫 이벤트 전파 방지 (더블클릭 이벤트와 충돌 방지)
+           if (event) {
+               event.stopPropagation();
+           }
+           
            const customerName = element.getAttribute('data-customer-name');
            safeCopyToClipboard(customerName, element, '👤 고객명');
        }
        
        // 🎯 연락처 복사 기능
-       function copyCustomerPhone(element) {
+       function copyCustomerPhone(element, event) {
+           // 🚫 이벤트 전파 방지 (더블클릭 이벤트와 충돌 방지)
+           if (event) {
+               event.stopPropagation();
+           }
+           
            const customerPhone = element.getAttribute('data-customer-phone');
            safeCopyToClipboard(customerPhone, element, '📞 연락처');
        }
@@ -3750,20 +3949,79 @@
 
        
        // 🎯 주문품번 복사 기능
-       function copyOrderItemCode(element) {
+       function copyOrderItemCode(element, event) {
+           // 🚫 이벤트 전파 방지 (더블클릭 이벤트와 충돌 방지)
+           if (event) {
+               event.stopPropagation();
+           }
+           
            const orderItemCode = element.getAttribute('data-order-item-code');
            safeCopyToClipboard(orderItemCode, element, '🏷️ 주문품번');
        }
        
        // 🎯 운송장번호 복사 기능
-       function copyTrackingNumber(element) {
+       function copyTrackingNumber(element, event) {
+           // 🚫 이벤트 전파 방지 (더블클릭 이벤트와 충돌 방지)
+           if (event) {
+               event.stopPropagation();
+           }
+           
            const trackingNumber = element.getAttribute('data-tracking-number');
            safeCopyToClipboard(trackingNumber, element, '🚚 운송장번호');
        }
 
-       // 🎯 대표님 요청: 실시간 카드 통계 업데이트 함수
+       // 복사 완료 토스트 메시지 표시
+       function showCopyToast(value, type) {
+           // 기존 토스트 제거
+           const existingToast = document.querySelector('.copy-toast');
+           if (existingToast) {
+               existingToast.remove();
+           }
+           
+           // 새 토스트 생성
+           const toast = document.createElement('div');
+           toast.className = 'copy-toast';
+           toast.innerHTML = `
+               <div style="
+                   position: fixed;
+                   top: 20px;
+                   right: 20px;
+                   background: linear-gradient(135deg, #28a745, #20c997);
+                   color: white;
+                   padding: 1rem 1.5rem;
+                   border-radius: 0.5rem;
+                   box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+                   z-index: 9999;
+                   display: flex;
+                   align-items: center;
+                   gap: 0.5rem;
+                   font-size: 0.9rem;
+                   font-weight: 500;
+                   animation: slideInRight 0.3s ease-out;
+               ">
+                   <span>${type.split(' ')[0]}</span>
+                   <span><strong>${type} 복사완료!</strong><br/><small>${value}</small></span>
+               </div>
+           `;
+           
+           document.body.appendChild(toast);
+           
+           // 3초 후 자동 제거
+           setTimeout(() => {
+               if (toast.parentNode) {
+                   toast.style.animation = 'slideOutRight 0.3s ease-out';
+                   setTimeout(() => {
+                       if (toast.parentNode) {
+                           toast.remove();
+                       }
+                   }, 300);
+               }
+           }, 3000);
+       }
+
+       // 🎯 최적화된 실시간 카드 통계 업데이트 함수
        function refreshCardStats() {
-           console.log('📊 카드 통계 실시간 업데이트 시작...');
+           // console.log('📊 카드 통계 실시간 업데이트 시작...');  // 프로덕션용 주석처리
            
            // 현재 검색 조건 가져오기
            const searchForm = document.getElementById('searchForm');
@@ -3773,24 +4031,24 @@
            // 카드 통계 API 호출
            fetch(`/exchange/api/card-stats?${searchParams.toString()}`)
                .then(response => {
-                   console.log('🌐 API 응답 상태:', response.status);
+                   // console.log('🌐 API 응답 상태:', response.status);  // 프로덕션용 주석처리
                    return response.json();
                })
                .then(data => {
-                   console.log('📊 전체 응답 데이터:', data);
-                   console.log('📊 응답 데이터 타입:', typeof data);
-                   console.log('📊 data.data 내용:', data.data);
-                   console.log('📊 data.data 타입:', typeof data.data);
+                   // console.log('📊 전체 응답 데이터:', data);  // 프로덕션용 주석처리
+                   // console.log('📊 응답 데이터 타입:', typeof data);  // 프로덕션용 주석처리
+                   // console.log('📊 data.data 내용:', data.data);  // 프로덕션용 주석처리
+                   // console.log('📊 data.data 타입:', typeof data.data);  // 프로덕션용 주석처리
                    
                    if (!data || (!data.data && !data.success)) {
-                       console.warn('⚠️ 카드 통계 데이터가 없습니다:', data);
+                       // console.warn('⚠️ 카드 통계 데이터가 없습니다:', data);  // 프로덕션용 주석처리
                        return;
                    }
                    
                    // API 응답 구조에 따라 유연하게 처리
                    const statsData = data.data || data || {};
-                   console.log('📊 실제 사용할 통계 데이터:', statsData);
-                   console.log('📊 통계 데이터의 모든 키:', Object.keys(statsData));
+                   // console.log('📊 실제 사용할 통계 데이터:', statsData);  // 프로덕션용 주석처리
+                   // console.log('📊 통계 데이터의 모든 키:', Object.keys(statsData));  // 프로덕션용 주석처리
                    
                    // 📊 API 응답 키 이름에 맞게 카드 업데이트
                    updateCardValue('collectionCompleted', statsData.collectionCompleted);
@@ -3810,16 +4068,16 @@
                    // 통계 요약 부분의 todayCount 업데이트
                    updateStatsValue('todayCount', statsData.todayCount);
                    
-                   console.log('✅ 카드 통계 업데이트 완료');
+                   // console.log('✅ 카드 통계 업데이트 완료');  // 프로덕션용 주석처리
                })
                .catch(error => {
-                   console.error('❌ 카드 통계 업데이트 오류:', error);
+                   console.error('❌ 카드 통계 업데이트 오류:', error);  // 오류는 유지
                });
        }
        
        // 카드 값 업데이트 함수 (애니메이션 효과 포함)
        function updateCardValue(cardId, newValue) {
-           console.log(`🔍 카드 업데이트 시도: ${cardId} = ${newValue}`);
+           // console.log(`🔍 카드 업데이트 시도: ${cardId} = ${newValue}`);  // 프로덕션용 주석처리
            
            // 카드 ID에 따른 실제 data-filter 속성 매핑
            const filterMapping = {
@@ -3841,24 +4099,24 @@
            
            const filterName = filterMapping[cardId];
            if (!filterName) {
-               console.warn(`⚠️ 매핑되지 않은 카드 ID: ${cardId}`);
+               // console.warn(`⚠️ 매핑되지 않은 카드 ID: ${cardId}`);  // 프로덕션용 주석처리
                return;
            }
            
-           console.log(`🎯 필터명 매핑: ${cardId} → ${filterName}`);
+           // console.log(`🎯 필터명 매핑: ${cardId} → ${filterName}`);  // 프로덕션용 주석처리
            
            // data-filter 속성으로 카드 요소 찾기
            const cardElement = document.querySelector(`[data-filter="${filterName}"]`);
-           console.log(`🔍 요소 찾기 결과:`, cardElement);
+           // console.log(`🔍 요소 찾기 결과:`, cardElement);  // 프로덕션용 주석처리
            
            if (cardElement) {
                const currentValue = parseInt(cardElement.textContent.replace(/,/g, '')) || 0;
                const safeNewValue = newValue || 0;
                
-               console.log(`📊 값 비교: ${currentValue} → ${safeNewValue}`);
+               // console.log(`📊 값 비교: ${currentValue} → ${safeNewValue}`);  // 프로덕션용 주석처리
                
                // 항상 업데이트 (값이 같아도 시각적 피드백 제공)
-               console.log(`✅ 카드 업데이트 실행: ${cardId} (${filterName}) ${currentValue} → ${safeNewValue}`);
+               // console.log(`✅ 카드 업데이트 실행: ${cardId} (${filterName}) ${currentValue} → ${safeNewValue}`);  // 프로덕션용 주석처리
                
                // 깜빡임 효과
                cardElement.style.transition = 'all 0.3s ease';
@@ -3869,7 +4127,7 @@
                // 숫자 업데이트
                setTimeout(() => {
                    cardElement.textContent = (safeNewValue || 0).toLocaleString();
-                   console.log(`📝 텍스트 업데이트 완료: ${safeNewValue}`);
+                   // console.log(`📝 텍스트 업데이트 완료: ${safeNewValue}`);  // 프로덕션용 주석처리
                    
                    // 원래 상태로 복원
                    setTimeout(() => {
@@ -3879,9 +4137,9 @@
                    }, 300);
                }, 150);
            } else {
-               console.error(`❌ 카드 요소를 찾을 수 없음: ${cardId} (filter: ${filterName})`);
-               console.log(`🔍 현재 페이지의 모든 data-filter 요소:`, 
-                   Array.from(document.querySelectorAll('[data-filter]')).map(el => el.getAttribute('data-filter')));
+               console.error(`❌ 카드 요소를 찾을 수 없음: ${cardId} (filter: ${filterName})`);  // 오류는 유지
+               // console.log(`🔍 현재 페이지의 모든 data-filter 요소:`, 
+               //     Array.from(document.querySelectorAll('[data-filter]')).map(el => el.getAttribute('data-filter')));  // 프로덕션용 주석처리
            }
        }
        
@@ -3898,7 +4156,7 @@
                            const currentValue = parseInt(valueElement.textContent.replace(/[^0-9]/g, '')) || 0;
                            const safeNewValue = newValue || 0;
                            if (currentValue !== safeNewValue) {
-                               console.log(`📊 통계 업데이트: ${statId} ${currentValue} → ${safeNewValue}`);
+                               // console.log(`📊 통계 업데이트: ${statId} ${currentValue} → ${safeNewValue}`);  // 프로덕션용 주석처리
                                
                                // 애니메이션 효과
                                valueElement.style.transition = 'all 0.3s ease';
@@ -3936,12 +4194,73 @@
                }
            });
            
-           // 🎯 페이지 로드 시 카드 통계 테스트 (1초 후)
-           setTimeout(() => {
-               console.log('🧪 카드 통계 테스트 실행...');
-               refreshCardStats();
-           }, 1000);
+           // 🎯 페이지 로드 시 카드 통계 즉시 로딩 (지연 제거)
+           // console.log('🧪 카드 통계 즉시 실행...');  // 프로덕션용 주석처리
+           refreshCardStats();
        });
+
+       // ============================================================================
+       // 🖱️ 테이블 행 더블클릭 기능
+       // ============================================================================
+
+       /**
+        * 🖱️ 테이블 행 더블클릭 처리 함수
+        * 기존 복사 기능과 충돌하지 않도록 구현
+        */
+       function handleRowDoubleClick(event, row) {
+           // 🚫 특정 요소들에서는 더블클릭 방지
+           const target = event.target;
+           const tagName = target.tagName.toLowerCase();
+           
+           // 클릭된 요소가 다음 중 하나라면 더블클릭 무시
+           const excludeElements = [
+               'input',    // 체크박스, 날짜 입력
+               'button',   // 각종 버튼
+               'a',        // 링크
+               'img'       // 이미지
+           ];
+           
+           // 클릭된 요소나 부모 요소가 제외 대상인지 확인
+           if (excludeElements.includes(tagName)) {
+               console.log('🚫 더블클릭 무시 - 제외 요소:', tagName);
+               return;
+           }
+           
+           // 복사 기능이 있는 span 태그들 확인
+           const copyableClasses = [
+               'order-number-copy',
+               'customer-name-copy', 
+               'customer-phone-copy',
+               'tracking-number-copy',
+               'order-item-code-copy'
+           ];
+           
+           // 복사 가능한 요소인지 확인
+           const hasCopyClass = copyableClasses.some(className => target.classList.contains(className));
+           if (hasCopyClass) {
+               console.log('🚫 더블클릭 무시 - 복사 가능 요소');
+               return;
+           }
+           
+           // 부모 요소도 확인 (span 안의 텍스트를 클릭했을 때)
+           const parentElement = target.parentElement;
+           if (parentElement) {
+               const parentHasCopyClass = copyableClasses.some(className => parentElement.classList.contains(className));
+               if (parentHasCopyClass) {
+                   console.log('🚫 더블클릭 무시 - 부모가 복사 가능 요소');
+                   return;
+               }
+           }
+           
+           // 📝 ID 추출 및 수정 페이지로 이동
+           const itemId = row.getAttribute('data-item-id');
+           if (itemId) {
+               console.log('✅ 행 더블클릭 - 수정 페이지로 이동:', itemId);
+               window.location.href = `/exchange/edit/${itemId}`;
+           } else {
+               console.error('❌ 항목 ID를 찾을 수 없습니다');
+           }
+       }
 
        // ============================================================================
        // 📊 엑셀 다운로드/업로드 기능
@@ -3954,15 +4273,33 @@
            console.log('📥 엑셀 다운로드 시작...');
            
            try {
+               // 🔄 로딩 모달 표시
+               showExcelLoadingModal();
+               
                // 현재 검색 폼의 데이터를 가져와서 POST로 전송
                const searchForm = document.getElementById('searchForm');
                const formData = new FormData(searchForm);
                
+               // 🔍 현재 selectedFilters 상태 디버깅
+               console.log('🔍 현재 selectedFilters 상태:', selectedFilters);
+               console.log('🔍 selectedFilters.size:', selectedFilters ? selectedFilters.size : 'undefined');
+               console.log('🔍 selectedFilters 내용:', selectedFilters ? Array.from(selectedFilters) : 'undefined');
+               
                // 🎯 현재 활성 필터들을 필터 데이터에 추가
+               let filtersString = '';
                if (selectedFilters && selectedFilters.size > 0) {
-                   const filtersString = Array.from(selectedFilters).join(',');
+                   filtersString = Array.from(selectedFilters).join(',');
                    formData.set('filters', filtersString);
                    console.log('🎯 활성 필터들 추가:', filtersString);
+               } else {
+                   // selectedFilters가 비어있으면 URL에서 직접 추출
+                   const urlParams = new URLSearchParams(window.location.search);
+                   const urlFilters = urlParams.get('filters');
+                   if (urlFilters && urlFilters.trim() !== '') {
+                       filtersString = urlFilters;
+                       formData.set('filters', filtersString);
+                       console.log('🎯 URL에서 필터 추출:', filtersString);
+                   }
                }
                
                // 🔍 전송될 데이터 확인
@@ -4021,9 +4358,13 @@
                showToast('📥 엑셀 다운로드가 시작되었습니다.', 'success');
                console.log('✅ 엑셀 다운로드 요청 완료');
                
+               // 🎯 다운로드 완료 쿠키 확인하여 로딩 모달 자동 닫기
+               checkDownloadComplete();
+               
            } catch (error) {
                console.error('❌ 엑셀 다운로드 실패:', error);
                showToast('❌ 엑셀 다운로드 중 오류가 발생했습니다.', 'error');
+               hideExcelLoadingModal();
            }
        }
 
@@ -4034,15 +4375,33 @@
            console.log('📥🖼️ 이미지 포함 엑셀 다운로드 시작...');
            
            try {
+               // 🔄 로딩 모달 표시
+               showExcelLoadingModal();
+               
                // 현재 검색 폼의 데이터를 가져와서 POST로 전송
                const searchForm = document.getElementById('searchForm');
                const formData = new FormData(searchForm);
                
+               // 🔍 현재 selectedFilters 상태 디버깅
+               console.log('🔍 현재 selectedFilters 상태:', selectedFilters);
+               console.log('🔍 selectedFilters.size:', selectedFilters ? selectedFilters.size : 'undefined');
+               console.log('🔍 selectedFilters 내용:', selectedFilters ? Array.from(selectedFilters) : 'undefined');
+               
                // 🎯 현재 활성 필터들을 필터 데이터에 추가
+               let filtersString = '';
                if (selectedFilters && selectedFilters.size > 0) {
-                   const filtersString = Array.from(selectedFilters).join(',');
+                   filtersString = Array.from(selectedFilters).join(',');
                    formData.set('filters', filtersString);
                    console.log('🎯 활성 필터들 추가:', filtersString);
+               } else {
+                   // selectedFilters가 비어있으면 URL에서 직접 추출
+                   const urlParams = new URLSearchParams(window.location.search);
+                   const urlFilters = urlParams.get('filters');
+                   if (urlFilters && urlFilters.trim() !== '') {
+                       filtersString = urlFilters;
+                       formData.set('filters', filtersString);
+                       console.log('🎯 URL에서 필터 추출:', filtersString);
+                   }
                }
                
                // 🔍 전송될 데이터 확인
@@ -4101,9 +4460,13 @@
                showToast('📥🖼️ 이미지 포함 엑셀 다운로드가 시작되었습니다. 처리 시간이 조금 걸릴 수 있습니다.', 'success');
                console.log('✅ 이미지 포함 엑셀 다운로드 요청 완료');
                
+               // 🎯 다운로드 완료 쿠키 확인하여 로딩 모달 자동 닫기
+               checkDownloadComplete();
+               
            } catch (error) {
                console.error('❌ 이미지 포함 엑셀 다운로드 실패:', error);
                showToast('❌ 이미지 포함 엑셀 다운로드 중 오류가 발생했습니다.', 'error');
+               hideExcelLoadingModal();
            }
        }
 
@@ -4382,8 +4745,159 @@
                closeImageModal();
            }
        }
+
+       // 🎯 엑셀 다운로드 로딩 모달 표시
+       function showExcelLoadingModal() {
+           const modal = document.getElementById('excelLoadingModal');
+           if (modal) {
+               modal.style.display = 'flex';
+               console.log('📄 엑셀 다운로드 로딩 모달 표시됨');
+           }
+       }
+
+       // 🎯 엑셀 다운로드 로딩 모달 숨기기
+       function hideExcelLoadingModal() {
+           const modal = document.getElementById('excelLoadingModal');
+           if (modal) {
+               modal.style.display = 'none';
+               console.log('📄 엑셀 다운로드 로딩 모달 숨김');
+           }
+       }
+
+       // 🎯 다운로드 완료 감지 (파일 저장 창 감지 + 타이머 조합)
+       function checkDownloadComplete() {
+           let downloadStarted = false;
+           let focusCheckCount = 0;
+           const maxFocusChecks = 20; // 최대 10초 동안 체크 (0.5초 간격)
+           
+           // 🔍 윈도우 포커스 변화 감지 (파일 저장 창이 나타날 때)
+           const handleFocusChange = () => {
+               if (!downloadStarted) {
+                   downloadStarted = true;
+                   console.log('📁 파일 다운로드 시작 감지됨');
+                   
+                   // 파일 저장 창이 나타났으므로 2초 후 로딩창 닫기
+                   setTimeout(() => {
+                       hideExcelLoadingModal();
+                       showToast('✅ 엑셀 다운로드가 시작되었습니다.', 'success');
+                       console.log('✅ 파일 저장 창 감지로 로딩 모달 닫기');
+                   }, 2000);
+               }
+           };
+           
+           // 🎯 포커스 이벤트 리스너 등록
+           window.addEventListener('blur', handleFocusChange);
+           window.addEventListener('focus', handleFocusChange);
+           
+           // 🔄 주기적 체크 (포커스 변화가 감지되지 않는 경우 대비)
+           const checkInterval = setInterval(() => {
+               focusCheckCount++;
+               
+               // 포커스 변화가 감지되지 않았고 일정 시간이 지나면 자동 종료
+               if (focusCheckCount >= maxFocusChecks && !downloadStarted) {
+                   clearInterval(checkInterval);
+                   window.removeEventListener('blur', handleFocusChange);
+                   window.removeEventListener('focus', handleFocusChange);
+                   
+                   hideExcelLoadingModal();
+                   showToast('✅ 엑셀 다운로드가 완료되었습니다.', 'success');
+                   console.log('✅ 타이머 방식으로 로딩 모달 닫기');
+               } else if (downloadStarted) {
+                   // 이미 다운로드가 시작되었으면 체크 중지
+                   clearInterval(checkInterval);
+                   window.removeEventListener('blur', handleFocusChange);
+                   window.removeEventListener('focus', handleFocusChange);
+               }
+           }, 500); // 0.5초마다 체크
+           
+           // 🚨 안전장치: 15초 후 강제 종료
+           setTimeout(() => {
+               clearInterval(checkInterval);
+               window.removeEventListener('blur', handleFocusChange);
+               window.removeEventListener('focus', handleFocusChange);
+               
+               const modal = document.getElementById('excelLoadingModal');
+               if (modal && modal.style.display !== 'none') {
+                   hideExcelLoadingModal();
+                   showToast('⚠️ 엑셀 다운로드가 완료되었을 것으로 예상됩니다.', 'warning');
+                   console.log('⚠️ 안전장치 동작 - 강제 종료');
+               }
+           }, 15000); // 15초 후 강제 종료
+       }
+
+
+
+       // 🎯 필터 조회 로딩 오버레이 표시
+       function showFilterLoadingOverlay() {
+           const overlay = document.getElementById('filterLoadingOverlay');
+           if (overlay) {
+               overlay.style.display = 'flex';
+               console.log('🔍 필터 조회 로딩 오버레이 표시됨');
+           }
+       }
+
+       // 🎯 필터 조회 로딩 오버레이 숨기기
+       function hideFilterLoadingOverlay() {
+           const overlay = document.getElementById('filterLoadingOverlay');
+           if (overlay) {
+               overlay.style.display = 'none';
+               console.log('🔍 필터 조회 로딩 오버레이 숨김');
+           }
+       }
+
+       // 🎯 선택한 필터들 적용 (서버 방식) - 로딩 UI 추가
+       function applySelectedFilters() {
+           // 🔄 로딩 표시
+           showFilterLoadingOverlay();
+           
+           const searchParams = getCurrentSearchParams();
+           searchParams.set('page', '0');
+           
+           if (selectedFilters.size > 0) {
+               const filterParams = Array.from(selectedFilters).join(',');
+               searchParams.append('filters', filterParams);
+           }
+           
+           const urlWithParams = `/exchange/list/filters${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
+           
+           // 페이지 이동 전 로딩 표시
+           console.log('🔍 필터 조회 시작 - URL:', urlWithParams);
+           window.location.href = urlWithParams;
+       }
     </script>
     
+    <!-- 🔄 엑셀 다운로드 로딩 모달 -->
+    <div id="excelLoadingModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; justify-content: center; align-items: center;">
+        <div style="background: white; padding: 2rem; border-radius: 10px; text-align: center; max-width: 400px; margin: 0 auto; position: relative;">
+            <div style="margin-bottom: 1.5rem;">
+                <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+            <h4 style="color: #333; margin-bottom: 1rem;">🔄 엑셀 다운로드 처리 중...</h4>
+            <p style="color: #666; margin-bottom: 1rem;">데이터를 수집하고 엑셀 파일을 생성하고 있습니다.</p>
+            <p style="color: #999; font-size: 0.9rem; margin-bottom: 1.5rem;">파일 저장 창이 나타나면 자동으로 닫힙니다.</p>
+            
+            <!-- 🎯 수동으로 닫기 버튼 -->
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="hideExcelLoadingModal(); showToast('다운로드 대기를 종료했습니다.', 'info');" style="margin-top: 0.5rem;">
+                <i class="fas fa-times"></i> 닫기
+            </button>
+        </div>
+    </div>
+
+    <!-- 🔍 필터 조회 로딩 오버레이 -->
+    <div id="filterLoadingOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center;">
+        <div style="background: white; padding: 2rem; border-radius: 10px; text-align: center; max-width: 350px; margin: 0 auto;">
+            <div style="margin-bottom: 1.5rem;">
+                <div class="spinner-border text-success" role="status" style="width: 2.5rem; height: 2.5rem;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+            <h5 style="color: #333; margin-bottom: 1rem;">🔍 필터 조회 중...</h5>
+            <p style="color: #666; font-size: 0.9rem;">데이터를 필터링하고 있습니다.</p>
+        </div>
+    </div>
+
     <!-- 📤 엑셀 업로드 모달 -->
     <div id="excelUploadModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999;">
         <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 12px; padding: 30px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
@@ -4599,9 +5113,7 @@
                 </button>
             </div>
             
-            <div style="font-size: 12px; color: #6b7280; text-align: center; padding: 10px; background: #f1f5f9; border-radius: 6px;">
-                💡 <strong>팁:</strong> 이미지는 원격 서버(175.119.224.45:8080)에 저장되며, 실시간으로 목록에 반영됩니다.
-            </div>
+
         </div>
     </div>
     
@@ -4620,6 +5132,36 @@
             100% { transform: rotate(360deg); }
         }
         
+        /* 🖱️ 더블클릭 가능한 테이블 행 스타일 */
+        .table-row-clickable {
+            cursor: pointer;
+        }
+        
+        /* 복사 가능한 요소들은 다른 커서 표시 */
+        .order-number-copy,
+        .customer-name-copy,
+        .customer-phone-copy,
+        .tracking-number-copy,
+        .order-item-code-copy {
+            cursor: copy !important;
+        }
+        
+        /* 입력 필드나 버튼들은 기본 커서 유지 */
+        .table-row-clickable input,
+        .table-row-clickable button,
+        .table-row-clickable a,
+        .table-row-clickable img {
+            cursor: auto;
+        }
+        
+        .table-row-clickable input[type="checkbox"] {
+            cursor: pointer;
+        }
+        
+        .table-row-clickable input[type="date"] {
+            cursor: text;
+        }
+
         /* 📷 이미지 관련 스타일 */
         .image-container {
             display: flex;
@@ -4758,17 +5300,6 @@
         .filter-selection-area {
             animation: fadeIn 0.3s ease;
         }
-        
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
     </style>
-</div>
-</html> 
+</body>
+</html>

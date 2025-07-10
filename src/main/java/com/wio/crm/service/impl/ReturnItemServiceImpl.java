@@ -500,9 +500,8 @@ public class ReturnItemServiceImpl implements ReturnItemService {
     @Override
     public Long getOverdueTenDaysCount() {
         try {
-            // 10일 전 날짜 계산 (Sample에서 통합)
-            LocalDateTime tenDaysAgo = LocalDateTime.now().minusDays(10);
-            long count = returnItemRepository.countOverdueTenDays(tenDaysAgo);
+            // Oracle SYSDATE 기준으로 통일 (Repository에서 자체 계산)
+            long count = returnItemRepository.countOverdueTenDays();
             log.info("🚨 10일 경과 미완료 건수: {}", count);
             return count;
         } catch (Exception e) {
@@ -2447,9 +2446,19 @@ public class ReturnItemServiceImpl implements ReturnItemService {
                     excelSearchDTO.getLogisticsStartDate() != null ||
                     excelSearchDTO.getLogisticsEndDate() != null) {
                     
-                    log.info("📊 필터 + 검색 조건 함께 처리");
-                    Page<ReturnItemDTO> result = findByMultipleFiltersWithSearch(filterList, excelSearchDTO);
-                    return result.getContent();
+                    log.info("📊 필터 + 검색 조건 함께 처리 (무한 재귀 방지)");
+                    // 🔥 무한 재귀 방지: 직접 데이터베이스 조회 후 필터 적용
+                    Map<String, Object> searchParams = buildOptimizedSearchParams(excelSearchDTO);
+                    List<ReturnItem> searchItems = returnItemMapper.findBySearch(searchParams);
+                    List<ReturnItemDTO> searchResults = convertToDTO(searchItems);
+                    
+                    // 메모리에서 필터 적용
+                    List<ReturnItemDTO> filteredResults = searchResults.stream()
+                        .filter(item -> filterList.stream().allMatch(filter -> matchesFilter(item, filter.trim())))
+                        .collect(Collectors.toList());
+                    
+                    log.info("📊 필터 적용 결과: {} 건", filteredResults.size());
+                    return filteredResults;
                 } else {
                     log.info("📊 필터만 처리");
                     Page<ReturnItemDTO> result = findByMultipleFilters(filterList, excelSearchDTO);
@@ -2583,20 +2592,19 @@ public class ReturnItemServiceImpl implements ReturnItemService {
         log.info("🔍 검색 조건: {}", searchDTO);
         
         try {
-            // 10일 전 날짜 계산
-            LocalDateTime tenDaysAgo = LocalDateTime.now().minusDays(10);
-            log.info("📅 기준 날짜: {} (10일 전)", tenDaysAgo);
+            // Oracle SYSDATE 기준으로 통일 (Repository에서 자체 계산)
+            log.info("📅 기준: Oracle SYSDATE - 10일 (데이터베이스 시간 기준)");
             
             // Oracle ROWNUM 페이징 처리
             int startRow = searchDTO.getPage() * searchDTO.getSize();
             int endRow = startRow + searchDTO.getSize();
             
             // 10일 전 이전에 접수되었으면서 아직 완료되지 않은 건 조회
-            List<ReturnItem> entities = returnItemRepository.findOverdueTenDays(tenDaysAgo, startRow, endRow);
+            List<ReturnItem> entities = returnItemRepository.findOverdueTenDays(startRow, endRow);
             log.info("📊 접수일 기준 10일 이상 미완료 데이터 조회 결과: {} 건", entities.size());
             
             // 전체 카운트 조회
-            long totalElements = returnItemRepository.countOverdueTenDays(tenDaysAgo);
+            long totalElements = returnItemRepository.countOverdueTenDays();
             log.info("📊 전체 접수일 기준 10일 이상 미완료 건수: {} 건", totalElements);
             
             // DTO 변환
@@ -2632,67 +2640,62 @@ public class ReturnItemServiceImpl implements ReturnItemService {
     }
     
     /**
-     * 🎯 다중 필터 처리 메서드 (Sample 통합)
+     * 🎯 다중 필터 처리 메서드 (DB 레벨 최적화)
      */
     @Override
     @Transactional(readOnly = true)
     public Page<ReturnItemDTO> findByMultipleFilters(List<String> filters, ReturnItemSearchDTO searchDTO) {
-        log.info("🔍 다중 필터 처리 시작 - filters: {}", filters);
+        log.info("🔍 다중 필터 처리 시작 (DB 레벨 최적화) - filters: {}", filters);
         
         if (filters == null || filters.isEmpty()) {
             log.warn("⚠️ 필터 목록이 비어있음, 전체 조회로 처리");
             return findAll(searchDTO.getPage(), searchDTO.getSize(), searchDTO.getSortBy(), searchDTO.getSortDir());
         }
         
+        // 🎯 MyBatis에서 AND 조건으로 처리하므로 Service 로직 단순화
+        log.info("🎯 다중 필터 MyBatis AND 조건 처리 - filters: {}", filters);
+        
         try {
-            // 🎯 첫 번째 필터를 기본으로 하고 나머지 필터들로 교집합 처리
-            Page<ReturnItemDTO> resultPage = null;
+            // 🚀 DB 레벨에서 최적화된 다중 필터 처리
+            log.info("🚀 DB 레벨 최적화 조회 시작");
             
-            // 다중 필터를 서비스에 전달 (우선 첫 번째 필터만 적용)
-            String firstFilter = filters.get(0).trim();
-            log.info("🔄 첫 번째 필터로 기본 조회: {}", firstFilter);
-            resultPage = applySingleFilter(firstFilter, searchDTO);
+            // 매퍼 호출용 파라미터 정리 (LocalDate -> String 변환)
+            List<ReturnItem> items = returnItemMapper.findByMultipleFiltersOptimized(
+                filters,
+                searchDTO.getKeyword(),
+                searchDTO.getStartDate() != null ? searchDTO.getStartDate().toString() : null,
+                searchDTO.getEndDate() != null ? searchDTO.getEndDate().toString() : null,
+                searchDTO.getLogisticsStartDate() != null ? searchDTO.getLogisticsStartDate().toString() : null,
+                searchDTO.getLogisticsEndDate() != null ? searchDTO.getLogisticsEndDate().toString() : null,
+                searchDTO.getPage(),
+                searchDTO.getSize()
+            );
             
-            // 추가 필터가 있으면 교집합 처리 (메모리에서)
-            if (filters.size() > 1) {
-                log.info("🔍 추가 필터 교집합 처리: {}", filters.subList(1, filters.size()));
-                
-                // 현재 결과를 기반으로 추가 필터링
-                List<ReturnItemDTO> filteredData = resultPage.getContent().stream()
-                    .filter(item -> filters.stream().allMatch(filter -> matchesFilter(item, filter.trim())))
-                    .collect(Collectors.toList());
-                
-                // 페이징 처리
-                int start = searchDTO.getPage() * searchDTO.getSize();
-                int end = Math.min(start + searchDTO.getSize(), filteredData.size());
-                
-                List<ReturnItemDTO> pagedData;
-                if (start < filteredData.size()) {
-                    pagedData = filteredData.subList(start, end);
-                } else {
-                    pagedData = new ArrayList<>();
-                }
-                
-                Pageable pageable = PageRequest.of(searchDTO.getPage(), searchDTO.getSize());
-                resultPage = new PageImpl<>(pagedData, pageable, filteredData.size());
-            }
+            Long totalCount = returnItemMapper.countByMultipleFiltersOptimized(
+                filters,
+                searchDTO.getKeyword(),
+                searchDTO.getStartDate() != null ? searchDTO.getStartDate().toString() : null,
+                searchDTO.getEndDate() != null ? searchDTO.getEndDate().toString() : null,
+                searchDTO.getLogisticsStartDate() != null ? searchDTO.getLogisticsStartDate().toString() : null,
+                searchDTO.getLogisticsEndDate() != null ? searchDTO.getLogisticsEndDate().toString() : null
+            );
             
-            log.info("✅ 다중 필터 적용 완료 - 필터: {}, 결과: {} 건", filters, resultPage.getTotalElements());
+            // Entity → DTO 변환
+            List<ReturnItemDTO> dtoList = convertToDTO(items);
+            
+            // 페이징 처리
+            Pageable pageable = PageRequest.of(searchDTO.getPage(), searchDTO.getSize());
+            Page<ReturnItemDTO> resultPage = new PageImpl<>(dtoList, pageable, totalCount);
+            
+            log.info("✅ DB 레벨 최적화 다중 필터 적용 완료 - 필터: {}, 결과: {} 건", filters, resultPage.getTotalElements());
             return resultPage;
             
         } catch (Exception e) {
-            log.error("❌ 다중 필터 적용 중 오류 발생, 개별 필터로 fallback 처리", e);
+            log.error("❌ DB 레벨 최적화 다중 필터 적용 중 오류 발생, 미처리 건만 조회로 fallback 처리", e);
             
-            // 서비스에서 다중 필터를 지원하지 않는 경우 첫 번째 필터만 적용
-            if (filters.size() > 0) {
-                String firstFilter = filters.get(0).trim();
-                log.info("🔄 첫 번째 필터로 fallback: {}", firstFilter);
-                return applySingleFilter(firstFilter, searchDTO);
-            } else {
-                // 필터가 없으면 전체 조회
-                return findAll(searchDTO.getPage(), searchDTO.getSize(), 
-                    searchDTO.getSortBy(), searchDTO.getSortDir());
-            }
+            // 🚫 안전한 fallback: 미처리 건만 조회 (IS_COMPLETED = 0)
+            log.info("🔄 안전한 fallback 처리: 미처리 건만 조회");
+            return findByIncompleted(searchDTO);
         }
     }
     
@@ -2710,63 +2713,61 @@ public class ReturnItemServiceImpl implements ReturnItemService {
         }
         
         try {
-            // 🎯 먼저 검색 조건으로 데이터 필터링
-            log.info("🔍 1단계: 검색 조건 적용");
+            // 🎯 MyBatis에서 AND 조건으로 처리하므로 Service 로직 단순화
+            log.info("🎯 다중 필터 + 검색 MyBatis AND 조건 처리 - filters: {}", filters);
             
-            // 검색 조건이 있으면 먼저 검색하여 기본 데이터셋 구성
-            List<ReturnItemDTO> searchResults;
+            // 🚀 DB 레벨에서 최적화된 다중 필터 + 검색 조건 처리
+            log.info("🚀 DB 레벨 최적화 다중 필터 + 검색 조건 처리 시작");
             
-            if (searchDTO.hasSearchCondition()) {
-                // 🔥 성능 최적화: 페이징 없는 검색 조건 전체 데이터 조회
-                searchResults = findBySearch(searchDTO);
-                log.info("📊 검색 결과: {} 건", searchResults.size());
-            } else {
-                // 🔥 성능 최적화: 페이징 없는 전체 데이터 조회
-                searchResults = findAll();
-                log.info("📊 전체 데이터: {} 건", searchResults.size());
-            }
+            // 매퍼 호출용 파라미터 정리 (LocalDate -> String 변환)
+            List<ReturnItem> items = returnItemMapper.findByMultipleFiltersOptimized(
+                filters,
+                searchDTO.getKeyword(),
+                searchDTO.getStartDate() != null ? searchDTO.getStartDate().toString() : null,
+                searchDTO.getEndDate() != null ? searchDTO.getEndDate().toString() : null,
+                searchDTO.getLogisticsStartDate() != null ? searchDTO.getLogisticsStartDate().toString() : null,
+                searchDTO.getLogisticsEndDate() != null ? searchDTO.getLogisticsEndDate().toString() : null,
+                searchDTO.getPage(),
+                searchDTO.getSize()
+            );
             
-            // 🎯 2단계: 검색 결과에 필터 적용
-            log.info("🔍 2단계: 검색 결과에 필터 적용");
-            List<ReturnItemDTO> filteredData = new ArrayList<>(searchResults);
+            Long totalCount = returnItemMapper.countByMultipleFiltersOptimized(
+                filters,
+                searchDTO.getKeyword(),
+                searchDTO.getStartDate() != null ? searchDTO.getStartDate().toString() : null,
+                searchDTO.getEndDate() != null ? searchDTO.getEndDate().toString() : null,
+                searchDTO.getLogisticsStartDate() != null ? searchDTO.getLogisticsStartDate().toString() : null,
+                searchDTO.getLogisticsEndDate() != null ? searchDTO.getLogisticsEndDate().toString() : null
+            );
             
-            for (String filter : filters) {
-                String filterType = filter.trim();
-                log.info("🔍 필터 적용 중: {} (현재 데이터: {} 건)", filterType, filteredData.size());
-                
-                // 현재 필터 조건에 맞는 데이터 필터링
-                filteredData = filteredData.stream()
-                    .filter(item -> matchesFilter(item, filterType))
+            // Entity → DTO 변환
+            List<ReturnItemDTO> dtoList = convertToDTO(items);
+            
+            // 🔍 IS_COMPLETED 값 확인 (디버깅용)
+            long completedCount = dtoList.stream()
+                .filter(item -> Boolean.TRUE.equals(item.getIsCompleted()))
+                .count();
+            
+            log.info("🔍 결과 검증 - 전체: {} 건, 처리완료: {} 건, 미처리: {} 건", 
+                dtoList.size(), completedCount, (dtoList.size() - completedCount));
+            
+            if (completedCount > 0) {
+                log.warn("⚠️⚠️⚠️ 경고: 처리완료 건이 {} 건 포함되어 있습니다! 강제 제거합니다.", completedCount);
+                // 완료 건 제거 (강제 필터링)
+                dtoList = dtoList.stream()
+                    .filter(item -> !Boolean.TRUE.equals(item.getIsCompleted()))
                     .collect(Collectors.toList());
+                log.info("🚫 처리완료 건 제거 후 - 남은 건수: {}", dtoList.size());
                 
-                log.info("✅ 필터 적용 완료: {} -> {} 건", filterType, filteredData.size());
+                // 총 개수도 재계산
+                totalCount = (long) dtoList.size();
             }
             
-            log.info("🎯 최종 교집합 결과: {} 건", filteredData.size());
-            
-            // 🎯 3단계: 페이징 처리
-            int start = searchDTO.getPage() * searchDTO.getSize();
-            int end = Math.min(start + searchDTO.getSize(), filteredData.size());
-            
-            List<ReturnItemDTO> pagedData;
-            if (start < filteredData.size()) {
-                pagedData = filteredData.subList(start, end);
-            } else {
-                pagedData = new ArrayList<>();
-            }
-            
-            // 정렬 처리 (필요한 경우) - null 체크 추가
-            if ("id".equals(searchDTO.getSortBy())) {
-                String sortDir = searchDTO.getSortDir();
-                boolean isAsc = sortDir != null && "ASC".equalsIgnoreCase(sortDir);
-                pagedData.sort((a, b) -> isAsc ? 
-                    Long.compare(a.getId(), b.getId()) : Long.compare(b.getId(), a.getId()));
-            }
-            
+            // 페이징 처리
             Pageable pageable = PageRequest.of(searchDTO.getPage(), searchDTO.getSize());
-            Page<ReturnItemDTO> result = new PageImpl<>(pagedData, pageable, filteredData.size());
+            Page<ReturnItemDTO> result = new PageImpl<>(dtoList, pageable, totalCount);
             
-            log.info("✅ 다중 필터 + 검색 교집합 처리 완료 - 최종 결과: {} 건 (페이지: {}/{})", 
+            log.info("✅ DB 레벨 최적화 다중 필터 + 검색 조건 처리 완료 - 최종 결과: {} 건 (페이지: {}/{})", 
                 result.getTotalElements(), searchDTO.getPage() + 1, result.getTotalPages());
             
             return result;
@@ -2782,51 +2783,118 @@ public class ReturnItemServiceImpl implements ReturnItemService {
     }
     
     /**
-     * 🎯 단일 필터 적용 메서드 (Sample 통합)
+     * 🎯 단일 필터 적용 메서드 (🚫 처리완료 건 제외 적용) - 무한 재귀 방지
      */
     private Page<ReturnItemDTO> applySingleFilter(String filterType, ReturnItemSearchDTO searchDTO) {
-        log.info("🔍 단일 필터 적용 - filterType: {}", filterType);
+        log.info("🔍 단일 필터 적용 - filterType: {} (🚫 처리완료 건 제외)", filterType);
         
         try {
-            switch (filterType) {
-                case "collection-completed":
-                    return findByCollectionCompleted(searchDTO);
-                case "collection-pending":
-                    return findByCollectionPending(searchDTO);
-                case "logistics-confirmed":
-                    return findByLogisticsConfirmed(searchDTO);
-                case "logistics-pending":
-                    return findByLogisticsPending(searchDTO);
-                case "shipping-completed":
-                    return findByShippingCompleted(searchDTO);
-                case "shipping-pending":
-                    return findByShippingPending(searchDTO);
-                case "refund-completed":
-                    return findByRefundCompleted(searchDTO);
-                case "refund-pending":
-                    return findByRefundPending(searchDTO);
-                case "payment-completed":
-                    return findByPaymentCompleted(searchDTO);
-                case "payment-pending":
-                    return findByPaymentPending(searchDTO);
-                case "completed":
-                    return findByCompleted(searchDTO);
-                case "incompleted":
-                    return findByIncompleted(searchDTO);
-                case "overdue-ten-days":
-                    return findOverdueTenDays(searchDTO);
-                default:
-                    log.warn("⚠️ 알 수 없는 필터 타입: {}", filterType);
-                    return findAll(searchDTO.getPage(), searchDTO.getSize(), 
-                        searchDTO.getSortBy(), searchDTO.getSortDir());
+            // 🎯 직접 최적화된 매퍼 호출 (무한 재귀 방지)
+            List<String> filters = Arrays.asList(filterType);
+            
+            List<ReturnItem> items = returnItemMapper.findByMultipleFiltersOptimized(
+                filters,
+                searchDTO.getKeyword(),
+                searchDTO.getStartDate() != null ? searchDTO.getStartDate().toString() : null,
+                searchDTO.getEndDate() != null ? searchDTO.getEndDate().toString() : null,
+                searchDTO.getLogisticsStartDate() != null ? searchDTO.getLogisticsStartDate().toString() : null,
+                searchDTO.getLogisticsEndDate() != null ? searchDTO.getLogisticsEndDate().toString() : null,
+                searchDTO.getPage(),
+                searchDTO.getSize()
+            );
+            
+            Long totalCount = returnItemMapper.countByMultipleFiltersOptimized(
+                filters,
+                searchDTO.getKeyword(),
+                searchDTO.getStartDate() != null ? searchDTO.getStartDate().toString() : null,
+                searchDTO.getEndDate() != null ? searchDTO.getEndDate().toString() : null,
+                searchDTO.getLogisticsStartDate() != null ? searchDTO.getLogisticsStartDate().toString() : null,
+                searchDTO.getLogisticsEndDate() != null ? searchDTO.getLogisticsEndDate().toString() : null
+            );
+            
+            // Entity → DTO 변환
+            List<ReturnItemDTO> dtoList = convertToDTO(items);
+            
+            // 🔍 IS_COMPLETED 값 확인 (디버깅용)
+            long completedCount = dtoList.stream()
+                .filter(item -> Boolean.TRUE.equals(item.getIsCompleted()))
+                .count();
+            
+            log.info("🔍 단일 필터 결과 검증 - 전체: {} 건, 처리완료: {} 건, 미처리: {} 건", 
+                dtoList.size(), completedCount, (dtoList.size() - completedCount));
+            
+            if (completedCount > 0) {
+                log.warn("⚠️⚠️⚠️ 경고: 처리완료 건이 {} 건 포함되어 있습니다! 강제 제거합니다.", completedCount);
+                // 완료 건 제거 (강제 필터링)
+                dtoList = dtoList.stream()
+                    .filter(item -> !Boolean.TRUE.equals(item.getIsCompleted()))
+                    .collect(Collectors.toList());
+                log.info("🚫 처리완료 건 제거 후 - 남은 건수: {}", dtoList.size());
+                
+                // 총 개수도 재계산
+                totalCount = (long) dtoList.size();
             }
+            
+            // 페이징 처리
+            Pageable pageable = PageRequest.of(searchDTO.getPage(), searchDTO.getSize());
+            Page<ReturnItemDTO> resultPage = new PageImpl<>(dtoList, pageable, totalCount);
+            
+            log.info("✅ 단일 필터 적용 완료 - 필터: {}, 결과: {} 건", filterType, resultPage.getTotalElements());
+            return resultPage;
+            
         } catch (Exception e) {
             log.error("❌ 단일 필터 적용 중 오류 발생: {}", e.getMessage(), e);
-            return findAll(searchDTO.getPage(), searchDTO.getSize(), 
-                searchDTO.getSortBy(), searchDTO.getSortDir());
+            // 🚫 안전한 fallback: 미처리 건만 조회
+            return findByIncompleted(searchDTO);
         }
     }
     
+    /**
+     * 🎯 다중 필터 조회 (페이징 없음, 엑셀 다운로드용)
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReturnItemDTO> findByMultipleFiltersUnlimited(List<String> filters, ReturnItemSearchDTO searchDTO) {
+        log.info("📥 다중 필터 조회 (페이징 없음, 엑셀용) - filters: {}", filters);
+        
+        if (filters == null || filters.isEmpty()) {
+            log.warn("⚠️ 필터 목록이 비어있음, 전체 검색 조회");
+            return findBySearch(searchDTO);
+        }
+        
+        // 🎯 MyBatis에서 AND 조건으로 처리하므로 Service 로직 단순화
+        log.info("🎯 다중 필터 무제한 조회 MyBatis AND 조건 처리 - filters: {}", filters);
+        
+        try {
+            // 🚀 DB 레벨에서 최적화된 다중 필터 처리 (페이징 없음)
+            log.info("🚀 DB 레벨 최적화 조회 시작 (페이징 없음)");
+            
+            // 페이징 없이 전체 데이터 조회 (새로운 최적화 매퍼 사용)
+            List<ReturnItem> items = returnItemMapper.findByMultipleFiltersUnlimited(
+                filters,
+                searchDTO.getKeyword(),
+                searchDTO.getStartDate() != null ? searchDTO.getStartDate().toString() : null,
+                searchDTO.getEndDate() != null ? searchDTO.getEndDate().toString() : null,
+                searchDTO.getLogisticsStartDate() != null ? searchDTO.getLogisticsStartDate().toString() : null,
+                searchDTO.getLogisticsEndDate() != null ? searchDTO.getLogisticsEndDate().toString() : null
+            );
+            
+            // Entity → DTO 변환
+            List<ReturnItemDTO> dtoList = convertToDTO(items);
+            
+            log.info("✅ DB 레벨 최적화 다중 필터 적용 완료 (페이징 없음) - 필터: {}, 결과: {} 건", filters, dtoList.size());
+            return dtoList;
+            
+        } catch (Exception e) {
+            log.error("❌ DB 레벨 최적화 다중 필터 적용 중 오류 발생 (페이징 없음), 기존 방식으로 fallback 처리", e);
+            
+            // fallback: 검색만 적용
+            List<ReturnItemDTO> result = findBySearch(searchDTO);
+            log.info("🔄 검색만 적용으로 fallback (페이징 없음) - 결과: {} 건", result.size());
+            return result;
+        }
+    }
+
     /**
      * 🎯 개별 필터 조건 매칭 (Sample 통합)
      */
@@ -2861,11 +2929,12 @@ public class ReturnItemServiceImpl implements ReturnItemService {
             case "incompleted":
                 return item.getIsCompleted() == null || Boolean.FALSE.equals(item.getIsCompleted());
             case "overdue-ten-days":
-                // 처리기간 임박 필터 - 접수일 기준 10일 이상 미완료 건
+                // 처리기간 임박 필터 - 접수일 기준 10일 이상 미완료 건 (데이터베이스와 동일한 기준)
                 if (item.getCsReceivedDate() != null && 
                     (item.getIsCompleted() == null || Boolean.FALSE.equals(item.getIsCompleted()))) {
                     LocalDate tenDaysAgo = LocalDate.now().minusDays(10);
-                    return item.getCsReceivedDate().isBefore(tenDaysAgo);
+                    // 데이터베이스와 동일하게 <= 기준으로 통일 (10일 전 이하)
+                    return item.getCsReceivedDate().isBefore(tenDaysAgo) || item.getCsReceivedDate().isEqual(tenDaysAgo);
                 }
                 return false;
             default:

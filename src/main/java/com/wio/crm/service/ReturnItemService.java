@@ -43,6 +43,11 @@ public interface ReturnItemService {
      * 🎯 다중 필터 + 검색 조건 함께 처리 (Sample 통합)
      */
     Page<ReturnItemDTO> findByMultipleFiltersWithSearch(List<String> filters, ReturnItemSearchDTO searchDTO);
+    
+    /**
+     * 🎯 다중 필터 조회 (페이징 없음, 엑셀 다운로드용)
+     */
+    List<ReturnItemDTO> findByMultipleFiltersUnlimited(List<String> filters, ReturnItemSearchDTO searchDTO);
 
     /**
      * ID로 조회

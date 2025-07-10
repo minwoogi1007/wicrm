@@ -46,20 +46,20 @@ public class ReturnItemSearchDTO {
     private String sortDir = "DESC";
     
     /**
-     * 검색 조건이 있는지 확인
+     * 검색 조건이 있는지 확인 (필터는 제외)
      */
     public boolean hasSearchCondition() {
-        return (keyword != null && !keyword.trim().isEmpty()) ||
+        return (keyword != null && !keyword.trim().isEmpty() && !"null".equals(keyword.trim())) ||
                startDate != null ||
                endDate != null ||
                logisticsStartDate != null ||
                logisticsEndDate != null ||
-               (returnTypeCode != null && !returnTypeCode.trim().isEmpty()) ||
-               (returnStatusCode != null && !returnStatusCode.trim().isEmpty()) ||
-               (siteName != null && !siteName.trim().isEmpty()) ||
-               (paymentStatus != null && !paymentStatus.trim().isEmpty()) ||
-               (brandFilter != null && !brandFilter.trim().isEmpty()) ||
-               (filters != null && !filters.trim().isEmpty());
+               (returnTypeCode != null && !returnTypeCode.trim().isEmpty() && !"null".equals(returnTypeCode.trim())) ||
+               (returnStatusCode != null && !returnStatusCode.trim().isEmpty() && !"null".equals(returnStatusCode.trim())) ||
+               (siteName != null && !siteName.trim().isEmpty() && !"null".equals(siteName.trim())) ||
+               (paymentStatus != null && !paymentStatus.trim().isEmpty() && !"null".equals(paymentStatus.trim())) ||
+               (brandFilter != null && !brandFilter.trim().isEmpty() && !"null".equals(brandFilter.trim()));
+               // 🚫 filters 조건 제거: 필터는 검색 조건이 아님
     }
     
     /**

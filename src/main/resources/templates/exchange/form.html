@@ -424,6 +424,8 @@
             siteName: /*[[${returnItem?.siteName}]]*/ '',
             returnTypeCode: /*[[${returnItem?.returnTypeCode}]]*/ '',
             returnReason: /*[[${returnItem?.returnReason}]]*/ '',
+            orderDate: /*[[${returnItem?.orderDate}]]*/ '',
+            csReceivedDate: /*[[${returnItem?.csReceivedDate}]]*/ '',
             orderNumber: /*[[${returnItem?.orderNumber}]]*/ '',
             orderItemCode: /*[[${returnItem?.orderItemCode}]]*/ '',
             customerName: /*[[${returnItem?.customerName}]]*/ '',
@@ -435,7 +437,14 @@
             shippingFee: /*[[${returnItem?.shippingFee}]]*/ '',
             trackingNumber: /*[[${returnItem?.trackingNumber}]]*/ '',
             processor: /*[[${returnItem?.processor}]]*/ '',
-            remarks: /*[[${returnItem?.remarks}]]*/ ''
+            remarks: /*[[${returnItem?.remarks}]]*/ '',
+            defectDetail: /*[[${returnItem?.defectDetail}]]*/ '',
+            // 🎯 처리 관련 날짜 필드들 추가
+            collectionCompletedDate: /*[[${returnItem?.collectionCompletedDate}]]*/ '',
+            logisticsConfirmedDate: /*[[${returnItem?.logisticsConfirmedDate}]]*/ '',
+            shippingDate: /*[[${returnItem?.shippingDate}]]*/ '',
+            refundDate: /*[[${returnItem?.refundDate}]]*/ '',
+            isCompleted: /*[[${returnItem?.isCompleted}]]*/ ''
         };
 
         console.log('🎯 서버 데이터:', serverData);
@@ -637,6 +646,123 @@
             }
         }
 
+        // 🎯 수정 모드일 때 버튼 자동 활성화
+        function initializeEditMode() {
+            console.log('🔧 수정 모드 버튼 초기화 시작');
+            
+            // 1. 사이트명에서 브랜드 추출 및 브랜드 버튼 활성화
+            const siteName = serverData.siteName;
+            console.log('🌐 사이트명:', siteName);
+            
+            if (siteName) {
+                let brand = '';
+                
+                // 사이트명에서 브랜드 추출
+                if (siteName.includes('레노마')) {
+                    brand = '레노마';
+                } else if (siteName.includes('코랄리크')) {
+                    brand = '코랄리크';
+                }
+                
+                console.log('🏷️ 추출된 브랜드:', brand);
+                
+                if (brand) {
+                    // 브랜드 버튼 활성화
+                    const brandButtons = document.querySelectorAll('.selection-row:first-child .selection-btn');
+                    brandButtons.forEach(btn => {
+                        if (btn.textContent.trim() === brand) {
+                            btn.classList.add('active');
+                            console.log('✅ 브랜드 버튼 활성화:', brand);
+                            
+                            // 사이트 버튼 생성 (selectBrand 함수와 동일한 로직)
+                            const siteButtonsContainer = document.getElementById('siteButtons');
+                            let siteButtons = '';
+
+                            if (brand === '레노마') {
+                                siteButtons = `
+                                    <div class="selection-btn" onclick="selectSite('29CM-레노마', this)">29CM-레노마</div>
+                                    <div class="selection-btn" onclick="selectSite('롯데온-레노마', this)">롯데온-레노마</div>
+                                    <div class="selection-btn" onclick="selectSite('무신사-레노마', this)">무신사-레노마</div>
+                                    <div class="selection-btn" onclick="selectSite('스토어팜-레노마', this)">스토어팜-레노마</div>
+                                    <div class="selection-btn" onclick="selectSite('자사몰-레노마', this)">자사몰-레노마</div>
+                                    <div class="selection-btn" onclick="selectSite('지그재그-레노마', this)">지그재그-레노마</div>
+                                    <div class="selection-btn" onclick="selectSite('카카오-레노마', this)">카카오-레노마</div>
+                                    <div class="selection-btn" onclick="selectSite('패션플러스-레노마', this)">패션플러스-레노마</div>
+                                    <div class="selection-btn" onclick="selectSite('하프클럽-레노마', this)">하프클럽-레노마</div>
+                                    <div class="selection-btn" onclick="selectSite('SSG-레노마', this)">SSG-레노마</div>
+                                    <div class="selection-btn" onclick="selectSite('EQL-레노마', this)">EQL-레노마</div>
+                                    <div class="selection-btn" onclick="selectSite('W컨셉-레노마', this)">W컨셉-레노마</div>
+                                `;
+                            } else if (brand === '코랄리크') {
+                                siteButtons = `
+                                    <div class="selection-btn" onclick="selectSite('29CM-코랄리크', this)">29CM-코랄리크</div>
+                                    <div class="selection-btn" onclick="selectSite('무신사-코랄리크', this)">무신사-코랄리크</div>
+                                    <div class="selection-btn" onclick="selectSite('자사몰-코랄리크', this)">자사몰-코랄리크</div>
+                                    <div class="selection-btn" onclick="selectSite('지그재그-코랄리크', this)">지그재그-코랄리크</div>
+                                    <div class="selection-btn" onclick="selectSite('CJ오쇼핑-코랄리크', this)">CJ오쇼핑-코랄리크</div>
+                                    <div class="selection-btn" onclick="selectSite('SSG-코랄리크', this)">SSG-코랄리크</div>
+                                    <div class="selection-btn" onclick="selectSite('EQL-코랄리크', this)">EQL-코랄리크</div>
+                                    <div class="selection-btn" onclick="selectSite('LF몰-코랄리크', this)">LF몰-코랄리크</div>
+                                    <div class="selection-btn" onclick="selectSite('스토어팜-코랄리크', this)">스토어팜-코랄리크</div>
+                                `;
+                            }
+
+                            if (siteButtonsContainer) {
+                                siteButtonsContainer.innerHTML = siteButtons;
+                                
+                                // 2. 사이트 버튼 활성화
+                                setTimeout(() => {
+                                    const siteButtons = document.querySelectorAll('#siteButtons .selection-btn');
+                                    siteButtons.forEach(btn => {
+                                        if (btn.textContent.trim() === siteName) {
+                                            btn.classList.add('active');
+                                            console.log('✅ 사이트 버튼 활성화:', siteName);
+                                        }
+                                    });
+                                }, 100);
+                            }
+                        }
+                    });
+                }
+            }
+            
+            // 3. 유형 버튼 활성화
+            const returnTypeCode = serverData.returnTypeCode;
+            console.log('📋 유형 코드:', returnTypeCode);
+            
+            if (returnTypeCode) {
+                const typeButtons = document.querySelectorAll('.selection-row:nth-child(3) .selection-btn');
+                typeButtons.forEach(btn => {
+                    const buttonTypeCode = btn.getAttribute('onclick').match(/'([^']+)'/)[1];
+                    if (buttonTypeCode === returnTypeCode) {
+                        btn.classList.add('active');
+                        console.log('✅ 유형 버튼 활성화:', returnTypeCode);
+                    }
+                });
+            }
+            
+            // 4. 사유 버튼 활성화
+            const returnReason = serverData.returnReason;
+            console.log('📝 사유:', returnReason);
+            
+            if (returnReason) {
+                const reasonButtons = document.querySelectorAll('.selection-row:nth-child(4) .selection-btn');
+                reasonButtons.forEach(btn => {
+                    if (btn.textContent.trim() === returnReason) {
+                        btn.classList.add('active');
+                        console.log('✅ 사유 버튼 활성화:', returnReason);
+                    }
+                });
+            }
+            
+            // 5. 선택 정보 업데이트
+            setTimeout(() => {
+                updateSelectedInfo();
+            }, 200);
+            
+            console.log('🔧 수정 모드 버튼 초기화 완료');
+        }
+
         // 🎯 페이지 로드 시 초기화
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🔥 페이지 로드 완료');
@@ -644,16 +770,49 @@
             // 수정 모드일 때 원본값 설정
             if (serverData.isEdit) {
                 console.log('🔧 수정 모드 - 원본값 설정');
+                console.log('📊 서버 데이터:', serverData);
+                
                 Object.keys(serverData).forEach(key => {
                     const field = document.getElementById(key);
                     const value = serverData[key];
                     
+                    console.log(`🔍 필드 처리: ${key} = ${value}`);
+                    
                     if (field && value !== null && value !== undefined && value !== '') {
-                        field.dataset.originalValue = value;
-                        field.value = value;
+                        // 🎯 날짜 필드 특별 처리
+                        if (key.includes('Date') || key === 'orderDate' || key === 'csReceivedDate') {
+                            console.log(`📅 날짜 필드 처리: ${key}`);
+                            
+                            // 날짜 형식 변환 (다양한 형식 지원)
+                            let dateValue = value;
+                            if (typeof value === 'string' && value.includes('T')) {
+                                // ISO 형식 (2024-01-01T00:00:00)
+                                dateValue = value.split('T')[0];
+                            } else if (typeof value === 'string' && value.includes(' ')) {
+                                // SQL 형식 (2024-01-01 00:00:00)
+                                dateValue = value.split(' ')[0];
+                            }
+                            
+                            console.log(`📅 변환된 날짜 값: ${dateValue}`);
+                            field.dataset.originalValue = dateValue;
+                            field.value = dateValue;
+                        } else {
+                            // 일반 필드
+                            field.dataset.originalValue = value;
+                            field.value = value;
+                        }
+                        
                         updateFieldColor(field);
+                        console.log(`✅ 필드 설정 완료: ${key} = ${field.value}`);
+                    } else {
+                        console.log(`⚠️ 필드 스킵: ${key} (필드 없음 또는 값 없음)`);
                     }
                 });
+                
+                // 🎯 수정 모드일 때 버튼 자동 활성화
+                setTimeout(() => {
+                    initializeEditMode();
+                }, 300);
             }
 
             // CS 접수일 자동 설정 (등록 모드)

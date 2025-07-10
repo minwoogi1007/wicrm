@@ -89,19 +89,32 @@ public class ExchangeController {
             
             // 🎯 필터와 검색 조건 함께 처리 (Sample 로직 통합)
             boolean hasFilters = StringUtils.hasText(filters);
-            boolean hasSearchCondition = searchDTO.hasSearchCondition();
             
-            if (hasFilters && hasSearchCondition) {
+            // 🚨 실제 검색 조건 엄격하게 확인 (filters는 제외)
+            boolean hasRealSearchCondition = (searchDTO.getKeyword() != null && !searchDTO.getKeyword().trim().isEmpty() && !"null".equals(searchDTO.getKeyword().trim())) ||
+                                             searchDTO.getStartDate() != null ||
+                                             searchDTO.getEndDate() != null ||
+                                             searchDTO.getLogisticsStartDate() != null ||
+                                             searchDTO.getLogisticsEndDate() != null ||
+                                             (searchDTO.getReturnTypeCode() != null && !searchDTO.getReturnTypeCode().trim().isEmpty() && !"null".equals(searchDTO.getReturnTypeCode().trim())) ||
+                                             (searchDTO.getReturnStatusCode() != null && !searchDTO.getReturnStatusCode().trim().isEmpty() && !"null".equals(searchDTO.getReturnStatusCode().trim())) ||
+                                             (searchDTO.getSiteName() != null && !searchDTO.getSiteName().trim().isEmpty() && !"null".equals(searchDTO.getSiteName().trim())) ||
+                                             (searchDTO.getPaymentStatus() != null && !searchDTO.getPaymentStatus().trim().isEmpty() && !"null".equals(searchDTO.getPaymentStatus().trim())) ||
+                                             (searchDTO.getBrandFilter() != null && !searchDTO.getBrandFilter().trim().isEmpty() && !"null".equals(searchDTO.getBrandFilter().trim()));
+            
+            log.info("🚨 DEBUG: hasFilters={}, hasRealSearchCondition={}", hasFilters, hasRealSearchCondition);
+            
+            if (hasFilters && hasRealSearchCondition) {
                 // 필터 + 검색 조건 둘 다 있는 경우
                 log.info("🔍 필터 + 검색 조건 함께 적용 - 필터: {}, 검색: {}", filters, searchDTO.getKeyword());
                 returnItems = applyMultipleFiltersWithSearch(filters, searchDTO);
                 log.info("✅ 필터 + 검색 조회 완료 - 결과 수: {}", returnItems.getTotalElements());
             } else if (hasFilters) {
-                // 필터만 있는 경우
+                // 필터만 있는 경우 (🚀 이 경로가 올바른 경로)
                 log.info("🔍 다중 필터만 적용: {}", filters);
                 returnItems = applyMultipleFilters(filters, searchDTO);
                 log.info("✅ 다중 필터 조회 완료 - 필터: {}, 결과 수: {}", filters, returnItems.getTotalElements());
-            } else if (hasSearchCondition) {
+            } else if (hasRealSearchCondition) {
                 // 검색 조건만 있는 경우
                 returnItems = returnItemService.search(searchDTO);
                 log.info("🔍 검색 조건으로 조회 완료 - 결과 수: {}", returnItems.getTotalElements());
@@ -131,10 +144,19 @@ public class ExchangeController {
         
         try {
             // 🔍 검색 조건이 있는지 확인
-            boolean hasSearchCondition = searchDTO != null && searchDTO.hasSearchCondition();
-            log.info("🔍 통계 조회 - 검색 조건 존재: {}, 검색DTO: {}", hasSearchCondition, searchDTO);
+            boolean hasRealSearchCondition = (searchDTO.getKeyword() != null && !searchDTO.getKeyword().trim().isEmpty() && !"null".equals(searchDTO.getKeyword().trim())) ||
+                                             searchDTO.getStartDate() != null ||
+                                             searchDTO.getEndDate() != null ||
+                                             searchDTO.getLogisticsStartDate() != null ||
+                                             searchDTO.getLogisticsEndDate() != null ||
+                                             (searchDTO.getReturnTypeCode() != null && !searchDTO.getReturnTypeCode().trim().isEmpty() && !"null".equals(searchDTO.getReturnTypeCode().trim())) ||
+                                             (searchDTO.getReturnStatusCode() != null && !searchDTO.getReturnStatusCode().trim().isEmpty() && !"null".equals(searchDTO.getReturnStatusCode().trim())) ||
+                                             (searchDTO.getSiteName() != null && !searchDTO.getSiteName().trim().isEmpty() && !"null".equals(searchDTO.getSiteName().trim())) ||
+                                             (searchDTO.getPaymentStatus() != null && !searchDTO.getPaymentStatus().trim().isEmpty() && !"null".equals(searchDTO.getPaymentStatus().trim())) ||
+                                             (searchDTO.getBrandFilter() != null && !searchDTO.getBrandFilter().trim().isEmpty() && !"null".equals(searchDTO.getBrandFilter().trim()));
+            log.info("🔍 통계 조회 - 검색 조건 존재: {}, 검색DTO: {}", hasRealSearchCondition, searchDTO);
             
-            if (hasSearchCondition) {
+            if (hasRealSearchCondition) {
                 // 🎯 검색 조건에 맞는 통합 통계 조회 (1개 쿼리)
                 log.info("📊 검색 조건 기반 통합 통계 조회 시작");
                 unifiedStats = returnItemService.getDashboardStatsUnifiedBySearch(searchDTO);
@@ -957,25 +979,35 @@ public class ExchangeController {
             todayCount = 0L;
         }
         
-        // 🎯 상단 카드 대시보드 통계 계산
+        // 🚀 상단 카드 대시보드 통계 계산 (통합 쿼리로 성능 최적화)
         Map<String, Long> cardStats = new HashMap<>();
         try {
-            cardStats.put("collectionCompleted", returnItemService.getCollectionCompletedCount());
-            cardStats.put("collectionPending", returnItemService.getCollectionPendingCount());
-            cardStats.put("logisticsConfirmed", returnItemService.getLogisticsConfirmedCount());
-            cardStats.put("logisticsPending", returnItemService.getLogisticsPendingCount());
-            cardStats.put("exchangeShipped", returnItemService.getExchangeShippedCount());
-            cardStats.put("exchangeNotShipped", returnItemService.getExchangeNotShippedCount());
-            cardStats.put("returnRefunded", returnItemService.getReturnRefundedCount());
-            cardStats.put("returnNotRefunded", returnItemService.getReturnNotRefundedCount());
-            cardStats.put("paymentCompleted", returnItemService.getPaymentCompletedCount());
-            cardStats.put("paymentPending", returnItemService.getPaymentPendingCount());
-            cardStats.put("completedCount", returnItemService.getCompletedCount());
-            cardStats.put("incompletedCount", returnItemService.getIncompletedCount());
-            // 🚨 처리기간 임박 통계 추가 (Sample 통합)
-            cardStats.put("overdueTenDaysCount", returnItemService.getOverdueTenDaysCount());
+            log.info("🚀 통합 카드 통계 조회 시작");
+            long cardStartTime = System.currentTimeMillis();
+            
+            // 🎯 통합 통계 조회 (기존 13개 쿼리 → 1개 쿼리)
+            Map<String, Object> unifiedStats = returnItemService.getDashboardStatsUnified();
+            
+            // 🚀 통합 결과에서 개별 값들 추출 (기존 인터페이스 호환성 유지)
+            cardStats.put("collectionCompleted", getLongValue(unifiedStats, "collectionCompletedCount"));
+            cardStats.put("collectionPending", getLongValue(unifiedStats, "collectionPendingCount"));
+            cardStats.put("logisticsConfirmed", getLongValue(unifiedStats, "logisticsConfirmedCount"));
+            cardStats.put("logisticsPending", getLongValue(unifiedStats, "logisticsPendingCount"));
+            cardStats.put("exchangeShipped", getLongValue(unifiedStats, "exchangeShippedCount"));
+            cardStats.put("exchangeNotShipped", getLongValue(unifiedStats, "exchangeNotShippedCount"));
+            cardStats.put("returnRefunded", getLongValue(unifiedStats, "returnRefundedCount"));
+            cardStats.put("returnNotRefunded", getLongValue(unifiedStats, "returnNotRefundedCount"));
+            cardStats.put("paymentCompleted", getLongValue(unifiedStats, "paymentCompletedCount"));
+            cardStats.put("paymentPending", getLongValue(unifiedStats, "paymentPendingCount"));
+            cardStats.put("completedCount", getLongValue(unifiedStats, "completedCount"));
+            cardStats.put("incompletedCount", getLongValue(unifiedStats, "incompletedCount"));
+            cardStats.put("overdueTenDaysCount", getLongValue(unifiedStats, "overdueTenDaysCount"));
+            
+            long cardEndTime = System.currentTimeMillis();
+            log.info("✅ 통합 카드 통계 조회 완료 - 소요시간: {}ms (기존 13개 쿼리 → 1개 쿼리)", cardEndTime - cardStartTime);
+            
         } catch (Exception e) {
-            log.error("상단 카드 통계 조회 실패: {}", e.getMessage());
+            log.error("❌ 상단 카드 통계 조회 실패, 기본값 사용: {}", e.getMessage());
             // 기본값으로 초기화
             cardStats.put("collectionCompleted", 0L);
             cardStats.put("collectionPending", 0L);
@@ -989,6 +1021,7 @@ public class ExchangeController {
             cardStats.put("paymentPending", 0L);
             cardStats.put("completedCount", 0L);
             cardStats.put("incompletedCount", 0L);
+            cardStats.put("overdueTenDaysCount", 0L);
         }
         
         // 모델에 데이터 추가
@@ -1091,19 +1124,32 @@ public class ExchangeController {
             
             // 🎯 필터와 검색 조건 함께 처리
             boolean hasFilters = StringUtils.hasText(filters);
-            boolean hasSearchCondition = searchDTO.hasSearchCondition();
             
-            if (hasFilters && hasSearchCondition) {
+            // 🚨 실제 검색 조건 엄격하게 확인 (filters는 제외)
+            boolean hasRealSearchCondition = (searchDTO.getKeyword() != null && !searchDTO.getKeyword().trim().isEmpty() && !"null".equals(searchDTO.getKeyword().trim())) ||
+                                             searchDTO.getStartDate() != null ||
+                                             searchDTO.getEndDate() != null ||
+                                             searchDTO.getLogisticsStartDate() != null ||
+                                             searchDTO.getLogisticsEndDate() != null ||
+                                             (searchDTO.getReturnTypeCode() != null && !searchDTO.getReturnTypeCode().trim().isEmpty() && !"null".equals(searchDTO.getReturnTypeCode().trim())) ||
+                                             (searchDTO.getReturnStatusCode() != null && !searchDTO.getReturnStatusCode().trim().isEmpty() && !"null".equals(searchDTO.getReturnStatusCode().trim())) ||
+                                             (searchDTO.getSiteName() != null && !searchDTO.getSiteName().trim().isEmpty() && !"null".equals(searchDTO.getSiteName().trim())) ||
+                                             (searchDTO.getPaymentStatus() != null && !searchDTO.getPaymentStatus().trim().isEmpty() && !"null".equals(searchDTO.getPaymentStatus().trim())) ||
+                                             (searchDTO.getBrandFilter() != null && !searchDTO.getBrandFilter().trim().isEmpty() && !"null".equals(searchDTO.getBrandFilter().trim()));
+            
+            log.info("🚨 DEBUG: hasFilters={}, hasRealSearchCondition={}", hasFilters, hasRealSearchCondition);
+            
+            if (hasFilters && hasRealSearchCondition) {
                 // 필터 + 검색 조건 둘 다 있는 경우
                 log.info("🔍 필터 + 검색 조건 함께 적용 - 필터: {}, 검색: {}", filters, searchDTO.getKeyword());
                 returnItems = applyMultipleFiltersWithSearch(filters, searchDTO);
                 log.info("✅ 필터 + 검색 조회 완료 - 결과 수: {}", returnItems.getTotalElements());
             } else if (hasFilters) {
-                // 필터만 있는 경우
+                // 필터만 있는 경우 (🚀 이 경로가 올바른 경로)
                 log.info("🔍 다중 필터만 적용: {}", filters);
                 returnItems = applyMultipleFilters(filters, searchDTO);
                 log.info("✅ 다중 필터 조회 완료 - 필터: {}, 결과 수: {}", filters, returnItems.getTotalElements());
-            } else if (hasSearchCondition) {
+            } else if (hasRealSearchCondition) {
                 // 검색 조건만 있는 경우
                 returnItems = returnItemService.search(searchDTO);
                 log.info("🔍 검색 조건으로 조회 완료 - 결과 수: {}", returnItems.getTotalElements());
@@ -1130,10 +1176,19 @@ public class ExchangeController {
         
         try {
             // 🔍 검색 조건이 있는지 확인
-            boolean hasSearchCondition = searchDTO != null && searchDTO.hasSearchCondition();
-            log.info("🔍 통계 조회 - 검색 조건 존재: {}, 검색DTO: {}", hasSearchCondition, searchDTO);
+            boolean hasRealSearchCondition = (searchDTO.getKeyword() != null && !searchDTO.getKeyword().trim().isEmpty() && !"null".equals(searchDTO.getKeyword().trim())) ||
+                                             searchDTO.getStartDate() != null ||
+                                             searchDTO.getEndDate() != null ||
+                                             searchDTO.getLogisticsStartDate() != null ||
+                                             searchDTO.getLogisticsEndDate() != null ||
+                                             (searchDTO.getReturnTypeCode() != null && !searchDTO.getReturnTypeCode().trim().isEmpty() && !"null".equals(searchDTO.getReturnTypeCode().trim())) ||
+                                             (searchDTO.getReturnStatusCode() != null && !searchDTO.getReturnStatusCode().trim().isEmpty() && !"null".equals(searchDTO.getReturnStatusCode().trim())) ||
+                                             (searchDTO.getSiteName() != null && !searchDTO.getSiteName().trim().isEmpty() && !"null".equals(searchDTO.getSiteName().trim())) ||
+                                             (searchDTO.getPaymentStatus() != null && !searchDTO.getPaymentStatus().trim().isEmpty() && !"null".equals(searchDTO.getPaymentStatus().trim())) ||
+                                             (searchDTO.getBrandFilter() != null && !searchDTO.getBrandFilter().trim().isEmpty() && !"null".equals(searchDTO.getBrandFilter().trim()));
+            log.info("🔍 통계 조회 - 검색 조건 존재: {}, 검색DTO: {}", hasRealSearchCondition, searchDTO);
             
-            if (hasSearchCondition) {
+            if (hasRealSearchCondition) {
                 // 🎯 검색 조건에 맞는 통합 통계 조회
                 log.info("📊 검색 조건 기반 통합 통계 조회 시작");
                 unifiedStats = returnItemService.getDashboardStatsUnifiedBySearch(searchDTO);
@@ -1492,11 +1547,21 @@ public class ExchangeController {
         });
         
         try {
-            // 🧪 테스트: 항상 검색 조건 적용하여 문제 확인 (일반 엑셀)
+            // 🎯 필터가 있는 경우 다중 필터 처리, 없으면 검색 조건 적용
             List<ReturnItemDTO> allData;
-            log.info("🧪 테스트: 검색 조건과 관계없이 findBySearch 호출 (일반 엑셀)");
-            allData = returnItemService.findBySearch(searchDTO);
-            log.info("📊 검색 결과: {} 건의 데이터 추출 (일반 엑셀)", allData.size());
+            
+            // 필터 파라미터 처리
+            String filters = searchDTO.getFilters();
+            if (filters != null && !filters.trim().isEmpty()) {
+                log.info("🎯 필터 조건 적용 (일반 엑셀) - filters: {}", filters);
+                List<String> filterList = Arrays.asList(filters.split(","));
+                allData = returnItemService.findByMultipleFiltersUnlimited(filterList, searchDTO);
+                log.info("📊 필터 결과: {} 건의 데이터 추출 (일반 엑셀)", allData.size());
+            } else {
+                log.info("🔍 검색 조건 적용 (일반 엑셀)");
+                allData = returnItemService.findBySearch(searchDTO);
+                log.info("📊 검색 결과: {} 건의 데이터 추출 (일반 엑셀)", allData.size());
+            }
             
             // 원래 로직 (주석 처리)
             /*
@@ -1579,11 +1644,21 @@ public class ExchangeController {
         });
         
         try {
-            // 🧪 테스트: 항상 검색 조건 적용하여 문제 확인 (이미지 포함 엑셀)
+            // 🎯 필터가 있는 경우 다중 필터 처리, 없으면 검색 조건 적용
             List<ReturnItemDTO> allData;
-            log.info("🧪 테스트: 검색 조건과 관계없이 findBySearch 호출 (이미지 포함 엑셀)");
-            allData = returnItemService.findBySearch(searchDTO);
-            log.info("📊 검색 결과: {} 건의 데이터 추출 (이미지 포함 엑셀)", allData.size());
+            
+            // 필터 파라미터 처리
+            String filters = searchDTO.getFilters();
+            if (filters != null && !filters.trim().isEmpty()) {
+                log.info("🎯 필터 조건 적용 (이미지 포함 엑셀) - filters: {}", filters);
+                List<String> filterList = Arrays.asList(filters.split(","));
+                allData = returnItemService.findByMultipleFiltersUnlimited(filterList, searchDTO);
+                log.info("📊 필터 결과: {} 건의 데이터 추출 (이미지 포함 엑셀)", allData.size());
+            } else {
+                log.info("🔍 검색 조건 적용 (이미지 포함 엑셀)");
+                allData = returnItemService.findBySearch(searchDTO);
+                log.info("📊 검색 결과: {} 건의 데이터 추출 (이미지 포함 엑셀)", allData.size());
+            }
             
             // 원래 로직 (주석 처리)
             /*
@@ -3562,47 +3637,16 @@ public class ExchangeController {
     }
     
     /**
-     * 🎯 단일 필터 적용 메서드 (Sample에서 통합)
+     * 🎯 단일 필터 적용 메서드 (🚫 처리완료 건 제외 적용)
      */
     private Page<ReturnItemDTO> applySingleFilter(String filterType, ReturnItemSearchDTO searchDTO) {
-        log.info("🔍 단일 필터 적용 - filterType: {}", filterType);
+        log.info("🔍 단일 필터 적용 - filterType: {} (🚫 처리완료 건 제외)", filterType);
         
         try {
-            switch (filterType) {
-                case "collection-completed":
-                    return returnItemService.findByCollectionCompleted(searchDTO);
-                case "collection-pending":
-                    return returnItemService.findByCollectionPending(searchDTO);
-                case "logistics-confirmed":
-                    return returnItemService.findByLogisticsConfirmed(searchDTO);
-                case "logistics-pending":
-                    return returnItemService.findByLogisticsPending(searchDTO);
-                case "shipping-completed":
-                    return returnItemService.findByShippingCompleted(searchDTO);
-                case "shipping-pending":
-                    return returnItemService.findByShippingPending(searchDTO);
-                case "refund-completed":
-                    return returnItemService.findByRefundCompleted(searchDTO);
-                case "refund-pending":
-                    return returnItemService.findByRefundPending(searchDTO);
-                case "payment-completed":
-                    return returnItemService.findByPaymentCompleted(searchDTO);
-                case "payment-pending":
-                    return returnItemService.findByPaymentPending(searchDTO);
-                case "completed":
-                    return returnItemService.findByCompleted(searchDTO);
-                case "incompleted":
-                    return returnItemService.findByIncompleted(searchDTO);
-                case "overdue-ten-days":
-                    // 🚨 10일 경과 건 필터링 기능 (Sample에서 통합)
-                    log.warn("⚠️ 10일 경과 건 필터링 기능이 아직 구현되지 않음, 전체 조회로 fallback");
-                    return returnItemService.findAll(searchDTO.getPage(), searchDTO.getSize(), 
-                        searchDTO.getSortBy(), searchDTO.getSortDir());
-                default:
-                    log.warn("⚠️ 알 수 없는 필터 타입: {}", filterType);
-                    return returnItemService.findAll(searchDTO.getPage(), searchDTO.getSize(), 
-                        searchDTO.getSortBy(), searchDTO.getSortDir());
-            }
+            // 🎯 모든 개별 필터를 최적화된 매퍼로 처리 (IS_COMPLETED = 0 조건 적용)
+            List<String> filters = Arrays.asList(filterType);
+            return returnItemService.findByMultipleFilters(filters, searchDTO);
+            
         } catch (Exception e) {
             log.error("❌ 단일 필터 적용 중 오류 발생: {}", e.getMessage(), e);
             return returnItemService.findAll(searchDTO.getPage(), searchDTO.getSize(), 
