@@ -1206,10 +1206,6 @@
                                 <option value="EQL-코랄리크">EQL-코랄리크</option>
                                 <option value="LF몰-코랄리크">LF몰-코랄리크</option>
                                 <option value="스토어팜-코랄리크">스토어팜-코랄리크</option>
-                                <!-- 기타 사이트들 -->
-                                <option value="쿠팡">쿠팡</option>
-                                <option value="네이버">네이버</option>
-                                <option value="11번가">11번가</option>
                             </select>
                         </div>
                     </div>
@@ -1332,54 +1328,6 @@
 
 <script>
 // 모든 함수는 head에 정의됨
-console.log('페이지 로드됨');
-    
-    const form = document.getElementById('addForm');
-    const modal = document.getElementById('addModal');
-    const receivedDateInput = document.getElementById('addReceivedDate');
-    
-    console.log('모달 요소들:', { form: !!form, modal: !!modal, receivedDateInput: !!receivedDateInput });
-    
-    if (!form) {
-        console.error('addForm을 찾을 수 없습니다');
-        alert('폼을 찾을 수 없습니다. 페이지를 새로고침 해주세요.');
-        return;
-    }
-    
-    if (!modal) {
-        console.error('addModal을 찾을 수 없습니다');
-        alert('모달을 찾을 수 없습니다. 페이지를 새로고침 해주세요.');
-        return;
-    }
-    
-    try {
-        // 오늘 날짜를 기본값으로 설정
-        const today = new Date().toISOString().split('T')[0];
-        
-        // 폼 초기화
-        form.reset();
-        
-        // 기본값 설정
-        if (receivedDateInput) receivedDateInput.value = today;
-        
-        const quantityInput = document.getElementById('addQuantity');
-        if (quantityInput) quantityInput.value = 1;
-        
-        const processingStatusSelect = document.getElementById('addProcessingStatus');
-        if (processingStatusSelect) processingStatusSelect.value = 'RECEIVED';
-        
-        const mappingStatusSelect = document.getElementById('addMappingStatus');
-        if (mappingStatusSelect) mappingStatusSelect.value = 'PENDING';
-        
-        // 모달 표시
-        modal.style.display = 'block';
-        console.log('모달 표시 완료');
-        
-    } catch (error) {
-        console.error('모달 표시 에러:', error);
-        alert('모달 표시 중 오류: ' + error.message);
-    }
-}
 
 function closeAddModal() {
     console.log('모달 닫기');
