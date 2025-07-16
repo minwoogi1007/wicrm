@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wio.crm.mapper.LmsTrackingMapper">
+
+    <!-- 🚀 LMS 문자 발송 추적 매퍼 XML -->
+    <!-- 목적: LMS_LOG와 CALL_LOG_D 테이블 기반 추적 쿼리 -->
+    <!-- 특징: Oracle 최적화, 성능 고려된 SQL -->
+
+    <!-- ==================== ResultMap 정의 ==================== -->
+
+    <!-- LMS 로그 ResultMap -->
+    <resultMap id="LmsLogResultMap" type="com.wio.crm.dto.LmsLogDto">
+        <id property="id" column="ID"/>
+        <result property="clid" column="CLID"/>
+        <result property="subject" column="SUBJECT"/>
+        <result property="message" column="MESSAGE"/>
+        <result property="sendDate" column="SEND_DATE"/>
+        <result property="status" column="STATUS"/>
+        <result property="errorMessage" column="ERROR_MESSAGE"/>
+        <result property="createdDate" column="CREATED_DATE"/>
+        <result property="retryCount" column="RETRY_COUNT"/>
+        <result property="hasFollowUp" column="HAS_FOLLOW_UP"/>
+        <result property="followUpCount" column="FOLLOW_UP_COUNT"/>
+        <result property="lastCallDate" column="LAST_CALL_DATE"/>
+        <result property="lastCallResult" column="LAST_CALL_RESULT"/>
+    </resultMap>
+
+    <!-- 통화 로그 ResultMap -->
+    <resultMap id="CallLogResultMap" type="com.wio.crm.dto.CallLogDto">
+        <result property="callDate" column="CALLDATE"/>
+        <result property="clid" column="CLID"/>
+        <result property="personCode" column="PERSON_CODE"/>
+        <result property="custCode" column="CUST_CODE"/>
+        <result property="projectCode" column="PROJECT_CODE"/>
+        <result property="result" column="RESULT"/>
+        <result property="empno" column="EMPNO"/>
+        <result property="incallNo" column="INCALL_NO"/>
+        <result property="context" column="CONTEXT"/>
+        <result property="confirm" column="CONFIRM"/>
+        <result property="regid" column="REGID"/>
+        <result property="empName" column="EMP_NAME"/>
+        <result property="agentName" column="AGENT_NAME"/>
+        <result property="callDateTime" column="CALL_DATETIME"/>
+    </resultMap>
+
+    <!-- ==================== 공통 조건 구문 ==================== -->
+
+    <!-- LMS 검색 조건 -->
+    <sql id="lmsSearchCondition">
+        <where>
+            1=1
+            <!-- 날짜 범위 조건 (필수) -->
+            <if test="search.startDate != null and search.startDate != ''">
+                AND TRUNC(CREATED_DATE) &gt;= TO_DATE(#{search.startDate}, 'YYYY-MM-DD')
+            </if>
+            <if test="search.endDate != null and search.endDate != ''">
+                AND TRUNC(CREATED_DATE) &lt;= TO_DATE(#{search.endDate}, 'YYYY-MM-DD')
+            </if>
+            
+            <!-- 전화번호 조건 -->
+            <if test="search.clid != null and search.clid != ''">
+                AND CLID LIKE '%' || #{search.clid} || '%'
+            </if>
+            
+            <!-- 상태 조건 -->
+            <if test="search.status != null and search.status != ''">
+                AND STATUS = #{search.status}
+            </if>
+            
+            <!-- 키워드 검색 (제목, 메시지) -->
+            <if test="search.keyword != null and search.keyword != ''">
+                AND (
+                    UPPER(SUBJECT) LIKE UPPER('%' || #{search.keyword} || '%') OR
+                    UPPER(MESSAGE) LIKE UPPER('%' || #{search.keyword} || '%')
+                )
+            </if>
+        </where>
+    </sql>
+
+    <!-- 통화 로그 검색 조건 -->
+    <sql id="callLogSearchCondition">
+        <where>
+            CUST_CODE = #{search.custCode}
+            <if test="search.startDate != null and search.startDate != ''">
+                AND TO_DATE(CALLDATE, 'YYYY-MM-DD HH24:MI:SS') &gt;= TO_DATE(#{search.startDate}, 'YYYY-MM-DD')
+            </if>
+            <if test="search.endDate != null and search.endDate != ''">
+                AND TO_DATE(CALLDATE, 'YYYY-MM-DD HH24:MI:SS') &lt;= TO_DATE(#{search.endDate} || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+            </if>
+        </where>
+    </sql>
+
+    <!-- ==================== LMS 발송 내역 조회 ==================== -->
+
+    <!-- LMS 발송 내역 목록 조회 (페이징) - Oracle 11g 최적화 버전 -->
+    <select id="findLmsList" resultMap="LmsLogResultMap">
+        SELECT 
+            ID, CLID, SUBJECT, MESSAGE, SEND_DATE, STATUS, ERROR_MESSAGE, 
+            CREATED_DATE, RETRY_COUNT, HAS_FOLLOW_UP, FOLLOW_UP_COUNT, 
+            LAST_CALL_DATE, LAST_CALL_RESULT 
+        FROM (
+            SELECT ROWNUM AS RN, T.* FROM (
+                SELECT 
+                    L.ID,
+                    L.CLID,
+                    L.SUBJECT,
+                    L.MESSAGE,
+                    L.CREATED_DATE AS SEND_DATE,
+                    L.STATUS,
+                    L.ERROR_MESSAGE,
+                    L.CREATED_DATE,
+                    L.RETRY_COUNT,
+                    0 AS HAS_FOLLOW_UP,
+                    0 AS FOLLOW_UP_COUNT,
+                    NULL AS LAST_CALL_DATE,
+                    NULL AS LAST_CALL_RESULT
+                FROM LMS_LOG L
+                <include refid="lmsSearchCondition"/>
+                ORDER BY L.CREATED_DATE DESC, L.ID DESC
+            ) T
+            WHERE ROWNUM &lt;= #{search.endRow}
+        )
+        WHERE RN &gt; #{search.startRow}
+    </select>
+
+    <!-- LMS 발송 내역 총 개수 조회 -->
+    <select id="countLmsList" resultType="long">
+        SELECT COUNT(*)
+        FROM LMS_LOG L
+        <include refid="lmsSearchCondition"/>
+    </select>
+
+    <!-- LMS 발송 내역 상세 조회 -->
+    <select id="findLmsById" resultMap="LmsLogResultMap">
+        SELECT 
+            ID,
+            CLID,
+            SUBJECT,
+            MESSAGE,
+            SEND_DATE,
+            STATUS,
+            ERROR_MESSAGE,
+            CREATED_DATE,
+            RETRY_COUNT
+        FROM LMS_LOG
+        WHERE ID = #{id}
+    </select>
+
+    <!-- ==================== 통화 내역 조회 ==================== -->
+
+    <!-- 특정 LMS 발송 건의 후속 통화 내역 조회 -->
+    <select id="findCallHistoryByLms" resultMap="CallLogResultMap">
+        SELECT 
+            C.CALLDATE,
+            C.CLID,
+            C.PERSON_CODE,
+            C.CUST_CODE,
+            C.PROJECT_CODE,
+            C.RESULT,
+            C.EMPNO,
+            C.INCALL_NO,
+            C.CONTEXT,
+            C.CONFIRM,
+            C.REGID,
+            NULL AS EMP_NAME,
+            NULL AS AGENT_NAME,
+            TO_DATE(C.CALLDATE, 'YYYY-MM-DD HH24:MI:SS') AS CALL_DATETIME
+        FROM CALL_LOG_D C
+        INNER JOIN LMS_LOG L ON C.CLID = L.CLID
+        WHERE L.ID = #{lmsId}
+          AND C.CUST_CODE = 'P000000179'
+          AND TO_DATE(C.CALLDATE, 'YYYY-MM-DD HH24:MI:SS') &gt;= L.CREATED_DATE
+          AND TO_DATE(C.CALLDATE, 'YYYY-MM-DD HH24:MI:SS') &lt;= L.CREATED_DATE + INTERVAL '1' DAY
+        ORDER BY TO_DATE(C.CALLDATE, 'YYYY-MM-DD HH24:MI:SS') DESC
+    </select>
+
+    <!-- 전화번호와 날짜 기준 후속 통화 내역 조회 -->
+    <select id="findCallHistoryByPhoneAndDate" resultMap="CallLogResultMap">
+        SELECT 
+            C.CALLDATE,
+            C.CLID,
+            C.PERSON_CODE,
+            C.CUST_CODE,
+            C.PROJECT_CODE,
+            C.RESULT,
+            C.EMPNO,
+            C.INCALL_NO,
+            C.CONTEXT,
+            C.CONFIRM,
+            C.REGID,
+            NULL AS EMP_NAME,
+            NULL AS AGENT_NAME,
+            TO_DATE(C.CALLDATE, 'YYYY-MM-DD HH24:MI:SS') AS CALL_DATETIME
+        FROM CALL_LOG_D C
+        WHERE C.CLID = #{clid}
+          AND C.CUST_CODE = #{custCode}
+          AND TO_DATE(C.CALLDATE, 'YYYY-MM-DD HH24:MI:SS') &gt;= TO_DATE(#{sendDate}, 'YYYY-MM-DD HH24:MI:SS')
+          AND TO_DATE(C.CALLDATE, 'YYYY-MM-DD HH24:MI:SS') &lt;= TO_DATE(#{sendDate}, 'YYYY-MM-DD HH24:MI:SS') + INTERVAL '1' DAY
+        ORDER BY TO_DATE(C.CALLDATE, 'YYYY-MM-DD HH24:MI:SS') DESC
+    </select>
+
+    <!-- ==================== 통계 쿼리 ==================== -->
+
+    <!-- 기본 통계 조회 -->
+    <select id="getBasicStats" resultType="map">
+        SELECT 
+            COUNT(*) AS TOTAL_SENT,
+            COUNT(CASE WHEN C.LMS_ID IS NOT NULL THEN 1 END) AS RECONTACTED,
+            COUNT(CASE WHEN C.HAS_SUCCESS = 1 THEN 1 END) AS CALL_SUCCESS
+        FROM LMS_LOG L
+        LEFT JOIN (
+            SELECT 
+                L2.ID as LMS_ID,
+                CASE WHEN COUNT(CASE WHEN C2.RESULT LIKE '%완료%' OR C2.RESULT LIKE '%성공%' OR C2.RESULT = 'ANSWER' THEN 1 END) &gt; 0 
+                     THEN 1 ELSE 0 END AS HAS_SUCCESS
+            FROM LMS_LOG L2
+            INNER JOIN CALL_LOG_D C2 ON L2.CLID = C2.CLID 
+                AND C2.CUST_CODE = #{search.custCode}
+                AND TO_DATE(C2.CALLDATE, 'YYYY-MM-DD HH24:MI:SS') &gt; L2.CREATED_DATE
+                AND TO_DATE(C2.CALLDATE, 'YYYY-MM-DD HH24:MI:SS') &lt;= L2.CREATED_DATE + INTERVAL '7' DAY
+            GROUP BY L2.ID
+        ) C ON L.ID = C.LMS_ID
+        <include refid="lmsSearchCondition"/>
+    </select>
+
+            <!-- 시간대별 통계 조회 -->
+    <select id="getTimeSlotStats" resultType="map">
+        SELECT 
+            CASE 
+                WHEN EXTRACT(HOUR FROM L.CREATED_DATE) BETWEEN 8 AND 11 THEN 'MORNING'
+                WHEN EXTRACT(HOUR FROM L.CREATED_DATE) BETWEEN 12 AND 17 THEN 'AFTERNOON'
+                WHEN EXTRACT(HOUR FROM L.CREATED_DATE) BETWEEN 18 AND 21 THEN 'EVENING'
+                ELSE 'OTHER'
+            END AS TIME_SLOT,
+            COUNT(*) AS SENT,
+            COUNT(CASE WHEN C.LMS_ID IS NOT NULL THEN 1 END) AS RECONTACTED
+        FROM LMS_LOG L
+        LEFT JOIN (
+            SELECT L2.ID as LMS_ID
+            FROM LMS_LOG L2
+            INNER JOIN CALL_LOG_D C2 ON L2.CLID = C2.CLID 
+                AND C2.CUST_CODE = #{search.custCode}
+                AND TO_DATE(C2.CALLDATE, 'YYYY-MM-DD HH24:MI:SS') &gt; L2.CREATED_DATE
+                AND TO_DATE(C2.CALLDATE, 'YYYY-MM-DD HH24:MI:SS') &lt;= L2.CREATED_DATE + INTERVAL '7' DAY
+            GROUP BY L2.ID
+        ) C ON L.ID = C.LMS_ID
+        <include refid="lmsSearchCondition"/>
+        GROUP BY 
+            CASE 
+                WHEN EXTRACT(HOUR FROM L.CREATED_DATE) BETWEEN 8 AND 11 THEN 'MORNING'
+                WHEN EXTRACT(HOUR FROM L.CREATED_DATE) BETWEEN 12 AND 17 THEN 'AFTERNOON'
+                WHEN EXTRACT(HOUR FROM L.CREATED_DATE) BETWEEN 18 AND 21 THEN 'EVENING'
+                ELSE 'OTHER'
+            END
+        ORDER BY TIME_SLOT
+    </select>
+
+    <!-- 상담원별 성과 통계 조회 -->
+    <select id="getAgentStats" resultType="map">
+        SELECT 
+            C.EMPNO AS AGENT_NAME,
+            C.EMPNO,
+            COUNT(DISTINCT L.ID) AS SENT,
+            COUNT(DISTINCT C.CLID) AS RECONTACTED,
+            COUNT(CASE WHEN C.RESULT LIKE '%완료%' OR C.RESULT LIKE '%성공%' THEN 1 END) AS CALL_SUCCESS
+        FROM LMS_LOG L
+        INNER JOIN CALL_LOG_D C ON L.CLID = C.CLID 
+            AND TO_DATE(C.CALLDATE, 'YYYY-MM-DD HH24:MI:SS') &gt;= L.CREATED_DATE
+            AND TO_DATE(C.CALLDATE, 'YYYY-MM-DD HH24:MI:SS') &lt;= L.CREATED_DATE + INTERVAL '1' DAY
+        WHERE C.CUST_CODE = #{search.custCode}
+        <if test="search.startDate != null and search.startDate != ''">
+            AND TRUNC(L.CREATED_DATE) &gt;= TO_DATE(#{search.startDate}, 'YYYY-MM-DD')
+        </if>
+        <if test="search.endDate != null and search.endDate != ''">
+            AND TRUNC(L.CREATED_DATE) &lt;= TO_DATE(#{search.endDate}, 'YYYY-MM-DD')
+        </if>
+        GROUP BY C.EMPNO
+        HAVING COUNT(DISTINCT L.ID) &gt; 0
+        ORDER BY RECONTACTED DESC, CALL_SUCCESS DESC
+    </select>
+
+    <!-- 일별 트렌드 통계 조회 (최근 7일) -->
+    <select id="getDailyTrendStats" resultType="map">
+        SELECT * FROM (
+            SELECT 
+                TO_CHAR(L.CREATED_DATE, 'YYYY-MM-DD') AS SEND_DATE,
+                COUNT(*) AS SENT,
+                COUNT(CASE WHEN C.LMS_ID IS NOT NULL THEN 1 END) AS RECONTACTED,
+                COUNT(CASE WHEN C.HAS_SUCCESS = 1 THEN 1 END) AS CALL_SUCCESS
+            FROM LMS_LOG L
+            LEFT JOIN (
+                SELECT 
+                    L2.ID as LMS_ID,
+                    CASE WHEN COUNT(CASE WHEN C2.RESULT LIKE '%완료%' OR C2.RESULT LIKE '%성공%' OR C2.RESULT = 'ANSWER' THEN 1 END) &gt; 0 
+                         THEN 1 ELSE 0 END AS HAS_SUCCESS
+                FROM LMS_LOG L2
+                INNER JOIN CALL_LOG_D C2 ON L2.CLID = C2.CLID 
+                    AND C2.CUST_CODE = #{search.custCode}
+                    AND TO_DATE(C2.CALLDATE, 'YYYY-MM-DD HH24:MI:SS') &gt; L2.CREATED_DATE
+                    AND TO_DATE(C2.CALLDATE, 'YYYY-MM-DD HH24:MI:SS') &lt;= L2.CREATED_DATE + INTERVAL '7' DAY
+                GROUP BY L2.ID
+            ) C ON L.ID = C.LMS_ID
+            <include refid="lmsSearchCondition"/>
+            GROUP BY TO_CHAR(L.CREATED_DATE, 'YYYY-MM-DD')
+            ORDER BY TO_CHAR(L.CREATED_DATE, 'YYYY-MM-DD') DESC
+        ) WHERE ROWNUM &lt;= 7
+    </select>
+
+    <!-- 메시지 유형별 통계 조회 -->
+    <select id="getMessageTypeStats" resultType="map">
+        SELECT 
+            CASE 
+                WHEN UPPER(L.SUBJECT) LIKE '%상담%' OR UPPER(L.SUBJECT) LIKE '%문의%' THEN '상담 요청'
+                WHEN UPPER(L.SUBJECT) LIKE '%재상담%' OR UPPER(L.SUBJECT) LIKE '%재문의%' THEN '재상담 안내'
+                WHEN UPPER(L.SUBJECT) LIKE '%완료%' OR UPPER(L.SUBJECT) LIKE '%감사%' THEN '상담 완료'
+                ELSE '기타'
+            END AS MESSAGE_TYPE,
+            COUNT(*) AS SENT,
+            COUNT(CASE WHEN C.LMS_ID IS NOT NULL THEN 1 END) AS RECONTACTED
+        FROM LMS_LOG L
+        LEFT JOIN (
+            SELECT L2.ID as LMS_ID
+            FROM LMS_LOG L2
+            INNER JOIN CALL_LOG_D C2 ON L2.CLID = C2.CLID 
+                AND C2.CUST_CODE = #{search.custCode}
+                AND TO_DATE(C2.CALLDATE, 'YYYY-MM-DD HH24:MI:SS') &gt; L2.CREATED_DATE
+                AND TO_DATE(C2.CALLDATE, 'YYYY-MM-DD HH24:MI:SS') &lt;= L2.CREATED_DATE + INTERVAL '7' DAY
+            GROUP BY L2.ID
+        ) C ON L.ID = C.LMS_ID
+        <include refid="lmsSearchCondition"/>
+        GROUP BY 
+            CASE 
+                WHEN UPPER(L.SUBJECT) LIKE '%상담%' OR UPPER(L.SUBJECT) LIKE '%문의%' THEN '상담 요청'
+                WHEN UPPER(L.SUBJECT) LIKE '%재상담%' OR UPPER(L.SUBJECT) LIKE '%재문의%' THEN '재상담 안내'
+                WHEN UPPER(L.SUBJECT) LIKE '%완료%' OR UPPER(L.SUBJECT) LIKE '%감사%' THEN '상담 완료'
+                ELSE '기타'
+            END
+        ORDER BY SENT DESC
+    </select>
+
+    <!-- 평균 응답시간 조회 (분 단위, 소수점 2자리) -->
+    <select id="getAvgResponseTime" resultType="double">
+        SELECT 
+            ROUND(
+                NVL(AVG(
+                    EXTRACT(HOUR FROM (TO_DATE(C.CALLDATE, 'YYYY-MM-DD HH24:MI:SS') - L.CREATED_DATE)) * 60 +
+                    EXTRACT(MINUTE FROM (TO_DATE(C.CALLDATE, 'YYYY-MM-DD HH24:MI:SS') - L.CREATED_DATE))
+                ), 0), 
+                2
+            ) AS AVG_RESPONSE_TIME
+        FROM LMS_LOG L
+        INNER JOIN CALL_LOG_D C ON L.CLID = C.CLID 
+            AND C.CUST_CODE = #{search.custCode}
+            AND TO_DATE(C.CALLDATE, 'YYYY-MM-DD HH24:MI:SS') &gt; L.CREATED_DATE
+            AND TO_DATE(C.CALLDATE, 'YYYY-MM-DD HH24:MI:SS') &lt;= L.CREATED_DATE + INTERVAL '7' DAY
+        <include refid="lmsSearchCondition"/>
+    </select>
+
+    <!-- 🚀 성능 최적화된 통합 LMS 통계 조회 (6개 쿼리 → 1개 쿼리) -->
+    <select id="getUnifiedStats" resultType="map">
+        <![CDATA[
+        WITH LMS_WITH_FOLLOWUP AS (
+            SELECT /*+ USE_INDEX(L, PK_LMS_LOG) USE_INDEX(C, IDX_CALL_LOG_CLID_DATE) */
+                L.ID,
+                L.CLID,
+                L.CREATED_DATE,
+                L.SEND_DATE,
+                EXTRACT(HOUR FROM L.CREATED_DATE) AS HOUR_SENT,
+                -- 후속 통화 여부 (문자열 비교로 성능 최적화)
+                CASE WHEN EXISTS (
+                    SELECT 1 FROM CALL_LOG_D C 
+                    WHERE C.CLID = L.CLID 
+                    AND C.CUST_CODE = #{search.custCode}
+                    AND C.CALLDATE > TO_CHAR(L.CREATED_DATE, 'YYYY-MM-DD HH24:MI:SS')
+                    AND C.CALLDATE <= TO_CHAR(L.CREATED_DATE + INTERVAL '7' DAY, 'YYYY-MM-DD HH24:MI:SS')
+                ) THEN 1 ELSE 0 END AS HAS_FOLLOWUP,
+                -- 성공 통화 여부
+                CASE WHEN EXISTS (
+                    SELECT 1 FROM CALL_LOG_D C 
+                    WHERE C.CLID = L.CLID 
+                    AND C.CUST_CODE = #{search.custCode}
+                    AND C.CALLDATE > TO_CHAR(L.CREATED_DATE, 'YYYY-MM-DD HH24:MI:SS')
+                    AND C.CALLDATE <= TO_CHAR(L.CREATED_DATE + INTERVAL '7' DAY, 'YYYY-MM-DD HH24:MI:SS')
+                    AND (C.RESULT LIKE '%완료%' OR C.RESULT LIKE '%성공%' OR C.RESULT = 'ANSWER')
+                ) THEN 1 ELSE 0 END AS HAS_SUCCESS,
+                -- 평균 응답시간 계산 (분 단위)
+                (SELECT ROUND(AVG(
+                    EXTRACT(HOUR FROM (TO_DATE(C.CALLDATE, 'YYYY-MM-DD HH24:MI:SS') - L.CREATED_DATE)) * 60 +
+                    EXTRACT(MINUTE FROM (TO_DATE(C.CALLDATE, 'YYYY-MM-DD HH24:MI:SS') - L.CREATED_DATE))
+                ), 2) FROM CALL_LOG_D C 
+                WHERE C.CLID = L.CLID 
+                AND C.CUST_CODE = #{search.custCode}
+                AND C.CALLDATE > TO_CHAR(L.CREATED_DATE, 'YYYY-MM-DD HH24:MI:SS')
+                AND C.CALLDATE <= TO_CHAR(L.CREATED_DATE + INTERVAL '7' DAY, 'YYYY-MM-DD HH24:MI:SS')
+                ) AS RESPONSE_TIME_MINUTES
+            FROM LMS_LOG L
+            ]]>
+            <include refid="lmsSearchCondition"/>
+        )
+        SELECT 
+            -- 기본 통계
+            COUNT(*) AS TOTAL_SENT,
+            SUM(HAS_FOLLOWUP) AS RECONTACTED,
+            ROUND((SUM(HAS_FOLLOWUP) * 100.0 / NULLIF(COUNT(*), 0)), 1) AS RECONTACT_RATE,
+            SUM(HAS_SUCCESS) AS CALL_SUCCESS,
+            ROUND((SUM(HAS_SUCCESS) * 100.0 / NULLIF(SUM(HAS_FOLLOWUP), 0)), 1) AS CALL_SUCCESS_RATE,
+            
+            -- 평균 응답시간 (분 단위, 소수점 2자리)
+            ROUND(AVG(RESPONSE_TIME_MINUTES), 2) AS AVG_RESPONSE_TIME,
+            
+            -- 시간대별 통계
+            SUM(CASE WHEN HOUR_SENT BETWEEN 8 AND 11 THEN 1 ELSE 0 END) AS MORNING_SENT,
+            SUM(CASE WHEN HOUR_SENT BETWEEN 8 AND 11 AND HAS_FOLLOWUP = 1 THEN 1 ELSE 0 END) AS MORNING_RECONTACTED,
+            SUM(CASE WHEN HOUR_SENT BETWEEN 12 AND 17 THEN 1 ELSE 0 END) AS AFTERNOON_SENT,
+            SUM(CASE WHEN HOUR_SENT BETWEEN 12 AND 17 AND HAS_FOLLOWUP = 1 THEN 1 ELSE 0 END) AS AFTERNOON_RECONTACTED,
+            SUM(CASE WHEN HOUR_SENT BETWEEN 18 AND 21 THEN 1 ELSE 0 END) AS EVENING_SENT,
+            SUM(CASE WHEN HOUR_SENT BETWEEN 18 AND 21 AND HAS_FOLLOWUP = 1 THEN 1 ELSE 0 END) AS EVENING_RECONTACTED,
+            
+            -- 추가 통계 (현재는 기본값)
+            0 AS CONSULT_REQUEST_SENT,
+            0 AS CONSULT_REQUEST_RECONTACTED,
+            0 AS RECONSULT_SENT, 
+            0 AS RECONSULT_RECONTACTED,
+            0 AS COMPLETE_SENT,
+            0 AS COMPLETE_RECONTACTED,
+            0 AS OTHER_SENT,
+            0 AS OTHER_RECONTACTED,
+            'SYSTEM' AS TOP_AGENT,
+            TO_CHAR(SYSDATE, 'YYYY-MM-DD') AS TODAY_DATE,
+            SUM(CASE WHEN TRUNC(CREATED_DATE) = TRUNC(SYSDATE) THEN 1 ELSE 0 END) AS TODAY_SENT,
+            SUM(CASE WHEN TRUNC(CREATED_DATE) = TRUNC(SYSDATE) AND HAS_FOLLOWUP = 1 THEN 1 ELSE 0 END) AS TODAY_RECONTACTED
+        FROM LMS_WITH_FOLLOWUP
+    </select>
+
+    <!-- ==================== 검증 및 디버깅 ==================== -->
+
+    <!-- LMS_LOG 테이블 존재 여부 확인 -->
+    <select id="checkLmsLogTableExists" resultType="int">
+        SELECT COUNT(*)
+        FROM USER_TABLES
+        WHERE TABLE_NAME = 'LMS_LOG'
+    </select>
+
+    <!-- CALL_LOG_D 테이블 존재 여부 확인 -->
+    <select id="checkCallLogTableExists" resultType="int">
+        SELECT COUNT(*)
+        FROM USER_TABLES
+        WHERE TABLE_NAME = 'CALL_LOG_D'
+    </select>
+
+    <!-- 샘플 데이터 개수 조회 (디버깅용) -->
+    <select id="getSampleDataCount" resultType="map">
+        SELECT 
+            (SELECT COUNT(*) FROM LMS_LOG) AS LMS_LOG_COUNT,
+            (SELECT COUNT(*) FROM CALL_LOG_D WHERE CUST_CODE = #{custCode}) AS CALL_LOG_COUNT,
+            (SELECT COUNT(*) FROM CALL_LOG_D WHERE CUST_CODE = #{custCode} AND CALLDATE IS NOT NULL) AS VALID_CALL_LOG_COUNT
+        FROM DUAL
+    </select>
+
+    <!-- 대량 후속 연락 정보 조회 (N+1 문제 해결용) -->
+    <select id="findCallHistoryBatchByLmsIds" resultType="map">
+        SELECT 
+            L.ID AS LMS_ID,
+            C.CALLDATE,
+            C.CLID,
+            C.RESULT,
+            C.CONTEXT,
+            TO_DATE(C.CALLDATE, 'YYYY-MM-DD HH24:MI:SS') AS CALL_DATETIME
+        FROM LMS_LOG L
+        INNER JOIN CALL_LOG_D C ON L.CLID = C.CLID 
+            AND TO_DATE(C.CALLDATE, 'YYYY-MM-DD HH24:MI:SS') &gt;= L.CREATED_DATE
+            AND TO_DATE(C.CALLDATE, 'YYYY-MM-DD HH24:MI:SS') &lt;= L.CREATED_DATE + INTERVAL '1' DAY
+        WHERE L.ID IN
+        <foreach collection="lmsIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+          AND C.CUST_CODE = #{custCode}
+        ORDER BY L.ID, TO_DATE(C.CALLDATE, 'YYYY-MM-DD HH24:MI:SS') DESC
+    </select>
+
+</mapper> 
