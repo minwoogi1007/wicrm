@@ -364,9 +364,9 @@ public class LogisticsDirectReturnService {
      * 여러 제품 일괄 등록
      */
     @Transactional
-    public void saveBulkItems(DirectReturnBulkRequestDTO request) {
-        log.debug("물류 직접입고 일괄 등록 시작 - 공통정보: {}, 제품 수: {}", 
-                  request.getCustomerName(), request.getProducts().size());
+    public void saveBulkItems(DirectReturnBulkRequestDTO request, String currentUser) {
+        log.debug("물류 직접입고 일괄 등록 시작 - 공통정보: {}, 제품 수: {}, 등록자: {}", 
+                  request.getCustomerName(), request.getProducts().size(), currentUser);
         
         // 요청 데이터 유효성 검증
         validateBulkRequest(request);
@@ -395,16 +395,20 @@ public class LogisticsDirectReturnService {
                 item.setProductColor(product.getProductColor());
                 item.setProductSize(product.getProductSize());
                 
+                // 등록자 정보 설정
+                item.setCreatedBy(currentUser);
+                item.setUpdatedBy(currentUser);
+                
                 // 등록일시는 @PrePersist에서 자동 설정됨
                 
                 // 개별 저장
                 logisticsDirectReturnMapper.insert(item);
-                log.debug("제품 저장 완료 - 제품코드: {}, 수량: {}", 
-                          product.getProductCode(), product.getQuantity());
+                log.debug("제품 저장 완료 - 제품코드: {}, 수량: {}, 등록자: {}", 
+                          product.getProductCode(), product.getQuantity(), currentUser);
             }
             
-            log.info("물류 직접입고 일괄 등록 완료 - 고객: {}, 총 제품 수: {}", 
-                     request.getCustomerName(), request.getProducts().size());
+            log.info("물류 직접입고 일괄 등록 완료 - 고객: {}, 총 제품 수: {}, 등록자: {}", 
+                     request.getCustomerName(), request.getProducts().size(), currentUser);
                      
         } catch (Exception e) {
             log.error("물류 직접입고 일괄 등록 실패", e);

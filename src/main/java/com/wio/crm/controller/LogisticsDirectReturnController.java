@@ -551,8 +551,11 @@ public class LogisticsDirectReturnController {
             // 요청 데이터 로깅
             log.debug("일괄 등록 요청 상세: {}", request);
             
+            // 현재 로그인 사용자 정보 가져오기
+            String currentUser = getCurrentUser();
+            
             // 일괄 저장 실행
-            logisticsDirectReturnService.saveBulkItems(request);
+            logisticsDirectReturnService.saveBulkItems(request, currentUser);
             
             response.put("success", true);
             response.put("message", "총 " + request.getProducts().size() + "개 제품이 성공적으로 등록되었습니다.");
