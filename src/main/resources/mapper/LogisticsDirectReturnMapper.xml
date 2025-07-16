@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wio.crm.mapper.LogisticsDirectReturnMapper">
+
+    <!-- 결과 매핑 -->
+    <resultMap id="LogisticsDirectReturnResultMap" type="com.wio.crm.dto.LogisticsDirectReturnDTO">
+        <id column="DIRECT_RETURN_ID" property="id"/>
+        <result column="RECEIVED_DATE" property="receivedDate"/>
+        <result column="SITE_NAME" property="siteName"/>
+        <result column="CUSTOMER_NAME" property="customerName"/>
+        <result column="CUSTOMER_PHONE" property="customerPhone"/>
+        <result column="PRODUCT_CODE" property="productCode"/>
+        <result column="PRODUCT_COLOR" property="productColor"/>
+        <result column="PRODUCT_SIZE" property="productSize"/>
+        <result column="QUANTITY" property="quantity"/>
+        <result column="TRACKING_NUMBER" property="trackingNumber"/>
+        <result column="COURIER_COMPANY" property="courierCompany"/>
+        <result column="REMARKS" property="remarks"/>
+        <result column="PROCESSING_STATUS" property="processingStatus"/>
+        <result column="MATCHED_RETURN_ID" property="matchedReturnId"/>
+        <result column="MAPPING_STATUS" property="mappingStatus"/>
+        <result column="MAPPING_DATE" property="mappingDate"/>
+        <result column="MAPPING_BY" property="mappingBy"/>
+        <result column="CREATED_DATE" property="createdDate"/>
+        <result column="UPDATED_DATE" property="updatedDate"/>
+        <result column="CREATED_BY" property="createdBy"/>
+        <result column="UPDATED_BY" property="updatedBy"/>
+        <!-- 매핑된 교환반품 정보 -->
+        <result column="MATCHED_ORDER_NUMBER" property="matchedOrderNumber"/>
+        <result column="MATCHED_CUSTOMER_NAME" property="matchedCustomerName"/>
+        <result column="MATCHED_RETURN_TYPE_CODE" property="matchedReturnTypeCode"/>
+        <result column="MATCHED_CS_RECEIVED_DATE" property="matchedCsReceivedDate"/>
+    </resultMap>
+
+    <!-- 기본 컬럼 -->
+    <sql id="baseColumns">
+        ldr.DIRECT_RETURN_ID,
+        ldr.RECEIVED_DATE,
+        ldr.SITE_NAME,
+        ldr.CUSTOMER_NAME,
+        ldr.CUSTOMER_PHONE,
+        ldr.PRODUCT_CODE,
+        ldr.PRODUCT_COLOR,
+        ldr.PRODUCT_SIZE,
+        ldr.QUANTITY,
+        ldr.TRACKING_NUMBER,
+        ldr.COURIER_COMPANY,
+        ldr.REMARKS,
+        ldr.PROCESSING_STATUS,
+        ldr.MATCHED_RETURN_ID,
+        ldr.MAPPING_STATUS,
+        ldr.MAPPING_DATE,
+        ldr.MAPPING_BY,
+        ldr.CREATED_DATE,
+        ldr.UPDATED_DATE,
+        ldr.CREATED_BY,
+        ldr.UPDATED_BY
+    </sql>
+
+    <!-- 매핑된 교환반품 정보 컬럼 -->
+    <sql id="mappedColumns">
+        ri.ORDER_NUMBER as MATCHED_ORDER_NUMBER,
+        ri.CUSTOMER_NAME as MATCHED_CUSTOMER_NAME,
+        ri.RETURN_TYPE_CODE as MATCHED_RETURN_TYPE_CODE,
+        ri.CS_RECEIVED_DATE as MATCHED_CS_RECEIVED_DATE
+    </sql>
+
+    <!-- 검색 조건 -->
+    <sql id="searchConditions">
+        <where>
+            <if test="search.startDate != null">
+                AND ldr.RECEIVED_DATE &gt;= #{search.startDate}
+            </if>
+            <if test="search.endDate != null">
+                AND ldr.RECEIVED_DATE &lt;= #{search.endDate}
+            </if>
+            <if test="search.keyword != null and search.keyword != ''">
+                AND (
+                    UPPER(ldr.CUSTOMER_NAME) LIKE UPPER('%' || #{search.keyword} || '%') OR
+                    UPPER(ldr.PRODUCT_CODE) LIKE UPPER('%' || #{search.keyword} || '%') OR
+                    UPPER(ldr.TRACKING_NUMBER) LIKE UPPER('%' || #{search.keyword} || '%') OR
+                    UPPER(ldr.COURIER_COMPANY) LIKE UPPER('%' || #{search.keyword} || '%') OR
+                    UPPER(ldr.REMARKS) LIKE UPPER('%' || #{search.keyword} || '%')
+                )
+            </if>
+            <if test="search.siteName != null and search.siteName != ''">
+                AND ldr.SITE_NAME = #{search.siteName}
+            </if>
+            <if test="search.customerName != null and search.customerName != ''">
+                AND UPPER(ldr.CUSTOMER_NAME) LIKE UPPER('%' || #{search.customerName} || '%')
+            </if>
+            <if test="search.productCode != null and search.productCode != ''">
+                AND UPPER(ldr.PRODUCT_CODE) LIKE UPPER('%' || #{search.productCode} || '%')
+            </if>
+            <if test="search.trackingNumber != null and search.trackingNumber != ''">
+                AND UPPER(ldr.TRACKING_NUMBER) LIKE UPPER('%' || #{search.trackingNumber} || '%')
+            </if>
+            <if test="search.processingStatus != null and search.processingStatus != ''">
+                AND ldr.PROCESSING_STATUS = #{search.processingStatus}
+            </if>
+            <if test="search.mappingStatus != null and search.mappingStatus != ''">
+                AND ldr.MAPPING_STATUS = #{search.mappingStatus}
+            </if>
+        </where>
+    </sql>
+
+    <!-- 전체 목록 조회 (Oracle 11g 호환 페이징) -->
+    <select id="findAll" resultMap="LogisticsDirectReturnResultMap">
+        SELECT * FROM (
+            SELECT a.*, ROWNUM rnum FROM (
+                SELECT 
+                    <include refid="baseColumns"/>,
+                    <include refid="mappedColumns"/>
+                FROM TB_LOGISTICS_DIRECT_RETURN ldr
+                LEFT JOIN TB_RETURN_ITEM ri ON ldr.MATCHED_RETURN_ID = ri.RETURN_ID
+                <include refid="searchConditions"/>
+                ORDER BY 
+                    <choose>
+                        <when test="search.sort == 'receivedDate'">ldr.RECEIVED_DATE</when>
+                        <when test="search.sort == 'customerName'">ldr.CUSTOMER_NAME</when>
+                        <when test="search.sort == 'mappingStatus'">ldr.MAPPING_STATUS</when>
+                        <when test="search.sort == 'processingStatus'">ldr.PROCESSING_STATUS</when>
+                        <otherwise>ldr.DIRECT_RETURN_ID</otherwise>
+                    </choose>
+                    ${search.sortDirection}
+            ) a WHERE ROWNUM &lt;= #{search.endRow}
+        ) WHERE rnum &gt; #{search.offset}
+    </select>
+
+    <!-- 전체 개수 조회 -->
+    <select id="countAll" resultType="long">
+        SELECT COUNT(*)
+        FROM TB_LOGISTICS_DIRECT_RETURN ldr
+        <include refid="searchConditions"/>
+    </select>
+
+    <!-- ID로 조회 -->
+    <select id="findById" resultMap="LogisticsDirectReturnResultMap">
+        SELECT 
+            <include refid="baseColumns"/>,
+            <include refid="mappedColumns"/>
+        FROM TB_LOGISTICS_DIRECT_RETURN ldr
+        LEFT JOIN TB_RETURN_ITEM ri ON ldr.MATCHED_RETURN_ID = ri.RETURN_ID
+        WHERE ldr.DIRECT_RETURN_ID = #{id}
+    </select>
+
+    <!-- 등록 -->
+    <insert id="insert" parameterType="com.wio.crm.model.LogisticsDirectReturn">
+        <selectKey keyProperty="id" resultType="Long" order="BEFORE">
+            SELECT TB_LOGISTICS_DIRECT_RETURN_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TB_LOGISTICS_DIRECT_RETURN (
+            DIRECT_RETURN_ID,
+            RECEIVED_DATE,
+            SITE_NAME,
+            CUSTOMER_NAME,
+            CUSTOMER_PHONE,
+            PRODUCT_CODE,
+            PRODUCT_COLOR,
+            PRODUCT_SIZE,
+            QUANTITY,
+            TRACKING_NUMBER,
+            COURIER_COMPANY,
+            REMARKS,
+            PROCESSING_STATUS,
+            MATCHED_RETURN_ID,
+            MAPPING_STATUS,
+            MAPPING_DATE,
+            MAPPING_BY,
+            CREATED_DATE,
+            UPDATED_DATE,
+            CREATED_BY,
+            UPDATED_BY
+        ) VALUES (
+            #{id},
+            #{receivedDate},
+            #{siteName},
+            #{customerName},
+            #{customerPhone},
+            #{productCode},
+            #{productColor},
+            #{productSize},
+            #{quantity},
+            #{trackingNumber},
+            #{courierCompany},
+            #{remarks},
+            #{processingStatus},
+            #{matchedReturnId},
+            #{mappingStatus},
+            #{mappingDate},
+            #{mappingBy},
+            SYSTIMESTAMP,
+            SYSTIMESTAMP,
+            #{createdBy},
+            #{updatedBy}
+        )
+    </insert>
+
+    <!-- 수정 -->
+    <update id="update" parameterType="com.wio.crm.model.LogisticsDirectReturn">
+        UPDATE TB_LOGISTICS_DIRECT_RETURN SET
+            RECEIVED_DATE = #{receivedDate},
+            SITE_NAME = #{siteName},
+            CUSTOMER_NAME = #{customerName},
+            CUSTOMER_PHONE = #{customerPhone},
+            PRODUCT_CODE = #{productCode},
+            PRODUCT_COLOR = #{productColor},
+            PRODUCT_SIZE = #{productSize},
+            QUANTITY = #{quantity},
+            TRACKING_NUMBER = #{trackingNumber},
+            COURIER_COMPANY = #{courierCompany},
+            REMARKS = #{remarks},
+            PROCESSING_STATUS = #{processingStatus},
+            MATCHED_RETURN_ID = #{matchedReturnId},
+            MAPPING_STATUS = #{mappingStatus},
+            MAPPING_DATE = #{mappingDate},
+            MAPPING_BY = #{mappingBy},
+            UPDATED_DATE = SYSTIMESTAMP,
+            UPDATED_BY = #{updatedBy}
+        WHERE DIRECT_RETURN_ID = #{id}
+    </update>
+
+    <!-- 삭제 -->
+    <delete id="delete">
+        DELETE FROM TB_LOGISTICS_DIRECT_RETURN WHERE DIRECT_RETURN_ID = #{id}
+    </delete>
+
+    <!-- 운송장번호로 기존 교환반품 데이터 찾기 -->
+    <select id="findReturnItemsByTrackingNumber" resultType="map">
+        SELECT 
+            RETURN_ID,
+            ORDER_NUMBER,
+            CUSTOMER_NAME,
+            RETURN_TYPE_CODE,
+            CS_RECEIVED_DATE,
+            TRACKING_NUMBER,
+            SITE_NAME
+        FROM TB_RETURN_ITEM
+        WHERE TRACKING_NUMBER = #{trackingNumber}
+        ORDER BY CS_RECEIVED_DATE DESC
+    </select>
+
+    <!-- 매핑 처리 -->
+    <update id="updateMapping">
+        UPDATE TB_LOGISTICS_DIRECT_RETURN SET
+            MATCHED_RETURN_ID = #{matchedReturnId},
+            MAPPING_STATUS = #{mappingStatus},
+            MAPPING_DATE = SYSTIMESTAMP,
+            MAPPING_BY = #{mappingBy},
+            UPDATED_DATE = SYSTIMESTAMP
+        WHERE DIRECT_RETURN_ID = #{id}
+    </update>
+
+    <!-- 매핑 해제 -->
+    <update id="clearMapping">
+        UPDATE TB_LOGISTICS_DIRECT_RETURN SET
+            MATCHED_RETURN_ID = NULL,
+            MAPPING_STATUS = 'PENDING',
+            MAPPING_DATE = NULL,
+            MAPPING_BY = NULL,
+            UPDATED_DATE = SYSTIMESTAMP,
+            UPDATED_BY = #{updatedBy}
+        WHERE DIRECT_RETURN_ID = #{id}
+    </update>
+
+    <!-- 매핑 통계 조회 -->
+    <select id="getMappingStatistics" resultType="map">
+        SELECT 
+            COUNT(*) as TOTAL_COUNT,
+            COUNT(CASE WHEN MAPPING_STATUS = 'PENDING' THEN 1 END) as PENDING_COUNT,
+            COUNT(CASE WHEN MAPPING_STATUS = 'MATCHED' THEN 1 END) as MATCHED_COUNT,
+            COUNT(CASE WHEN MAPPING_STATUS = 'UNMATCHED' THEN 1 END) as UNMATCHED_COUNT
+        FROM TB_LOGISTICS_DIRECT_RETURN
+    </select>
+
+    <!-- 일괄 삭제 -->
+    <delete id="deleteBatch">
+        DELETE FROM TB_LOGISTICS_DIRECT_RETURN 
+        WHERE DIRECT_RETURN_ID IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 일괄 상태 변경 -->
+    <update id="updateStatusBatch">
+        UPDATE TB_LOGISTICS_DIRECT_RETURN SET
+            PROCESSING_STATUS = #{processingStatus},
+            UPDATED_DATE = SYSTIMESTAMP,
+            UPDATED_BY = #{updatedBy}
+        WHERE DIRECT_RETURN_ID IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- 운송장번호 중복 체크 -->
+    <select id="existsByTrackingNumber" resultType="boolean">
+        SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
+        FROM TB_LOGISTICS_DIRECT_RETURN
+        WHERE TRACKING_NUMBER = #{trackingNumber}
+        <if test="excludeId != null">
+            AND DIRECT_RETURN_ID != #{excludeId}
+        </if>
+    </select>
+
+    <!-- 처리 상태별 통계 -->
+    <select id="getStatusStatistics" resultType="map">
+        SELECT 
+            COUNT(*) as TOTAL_COUNT,
+            COUNT(CASE WHEN PROCESSING_STATUS = 'RECEIVED' THEN 1 END) as RECEIVED_COUNT,
+            COUNT(CASE WHEN PROCESSING_STATUS = 'PROCESSED' THEN 1 END) as PROCESSED_COUNT
+        FROM TB_LOGISTICS_DIRECT_RETURN
+    </select>
+    
+    <!-- 오늘 입고 통계 -->
+    <select id="getTodayStatistics" resultType="map">
+        SELECT 
+            COUNT(*) as TODAY_COUNT
+        FROM TB_LOGISTICS_DIRECT_RETURN
+        WHERE RECEIVED_DATE = TRUNC(SYSDATE)
+    </select>
+
+    <!-- 엑셀 다운로드용 전체 데이터 조회 -->
+    <select id="findAllForExcel" resultMap="LogisticsDirectReturnResultMap">
+        SELECT 
+            <include refid="baseColumns"/>,
+            <include refid="mappedColumns"/>
+        FROM TB_LOGISTICS_DIRECT_RETURN ldr
+        LEFT JOIN TB_RETURN_ITEM ri ON ldr.MATCHED_RETURN_ID = ri.RETURN_ID
+        <include refid="searchConditions"/>
+        ORDER BY ldr.DIRECT_RETURN_ID DESC
+    </select>
+
+</mapper> 
