@@ -1770,7 +1770,7 @@
 
     <!-- JavaScript -->
     <script th:inline="javascript">
-        console.log('🔥 서버 기반 필터링 시스템 로딩...');
+        //console.loge.log('🔥 서버 기반 필터링 시스템 로딩...');
         
         // CSRF 토큰을 전역 변수로 설정
         window.csrfToken = /*[[${_csrf != null ? _csrf.token : ''}]]*/ '';
@@ -1781,7 +1781,7 @@
         
         // 🔄 전역 초기화 함수 (즉시 사용 가능)
         function handleReset() {
-            console.log('🔄 전체 초기화 시작');
+            //console.loge.log('🔄 전체 초기화 시작');
             
             // 선택된 필터들 초기화
             selectedFilters.clear();
@@ -1816,38 +1816,19 @@
         
         // 🎯 페이지 로드 시 현재 적용된 필터들을 selectedFilters에 추가
         const currentFilters = /*[[${currentFilters}]]*/ '';
-        console.log('🔍 서버에서 전달받은 필터:', currentFilters);
-        
         if (currentFilters && currentFilters.trim() !== '') {
             const filtersArray = currentFilters.split(',');
             filtersArray.forEach(filter => {
-                const trimmedFilter = filter.trim();
-                if (trimmedFilter) {
-                    selectedFilters.add(trimmedFilter);
-                    console.log('✅ 필터 추가됨:', trimmedFilter);
-                }
+                selectedFilters.add(filter.trim());
             });
-            
-            console.log('✅ 최종 selectedFilters:', Array.from(selectedFilters));
             
             // 해당 필터 버튼들을 활성화 상태로 표시
             selectedFilters.forEach(filter => {
                 const button = document.querySelector(`button[data-filter="${filter}"]`);
-                const filterLink = document.querySelector(`[data-filter="${filter}"]`);
                 if (button) {
                     button.classList.add('active');
-                    console.log('🎯 버튼 활성화:', filter);
-                }
-                if (filterLink) {
-                    const parentCard = filterLink.closest('.stat-box');
-                    if (parentCard) {
-                        parentCard.classList.add('active');
-                        console.log('🎯 카드 활성화:', filter);
-                    }
                 }
             });
-        } else {
-            console.log('⚠️ 서버에서 전달받은 필터 없음');
         }
         
         // 🎯 필터 토글 함수 (다중 선택 가능)
@@ -1858,15 +1839,15 @@
                 // 이미 선택된 필터면 제거
                 selectedFilters.delete(filterType);
                 button.classList.remove('active');
-                console.log('❌ 필터 제거:', filterType);
+                //console.loge.log('❌ 필터 제거:', filterType);
                     } else {
                 // 새로운 필터 추가
                 selectedFilters.add(filterType);
                 button.classList.add('active');
-                console.log('✅ 필터 추가:', filterType);
+                //console.loge.log('✅ 필터 추가:', filterType);
             }
             
-            console.log('🎯 현재 선택된 필터들:', Array.from(selectedFilters));
+            //console.loge.log('🎯 현재 선택된 필터들:', Array.from(selectedFilters));
         }
         
         // 🎯 선택한 필터들 적용
@@ -1876,7 +1857,7 @@
                     return;
                 }
                 
-            console.log('🎯 필터 적용:', Array.from(selectedFilters));
+            //console.loge.log('🎯 필터 적용:', Array.from(selectedFilters));
             
             // 현재 검색 조건들 가져오기
             const keyword = document.getElementById('keyword').value || '';
@@ -1900,13 +1881,13 @@
             if (logisticsStartDate.trim()) url.searchParams.set('logisticsStartDate', logisticsStartDate.trim());
             if (logisticsEndDate.trim()) url.searchParams.set('logisticsEndDate', logisticsEndDate.trim());
             
-            console.log('🚀 서버로 이동:', url.toString());
+            //console.loge.log('🚀 서버로 이동:', url.toString());
             window.location.href = url.toString();
         }
         
         // 🔄 모든 필터 해제
         function clearAllFilters() {
-            console.log('🔄 모든 필터 해제');
+            //console.loge.log('🔄 모든 필터 해제');
             
             // 선택된 필터들 초기화
             selectedFilters.clear();
@@ -1933,23 +1914,23 @@
             if (logisticsStartDate.trim()) url.searchParams.set('logisticsStartDate', logisticsStartDate.trim());
             if (logisticsEndDate.trim()) url.searchParams.set('logisticsEndDate', logisticsEndDate.trim());
             
-            console.log('🚀 기본 목록으로 이동:', url.toString());
+            //console.loge.log('🚀 기본 목록으로 이동:', url.toString());
             window.location.href = url.toString();
         }
         
         // 🚀 테이블 데이터 업데이트 (AJAX 결과로)
         function updateTableWithFilteredData(data, filterType) {
-            console.log('🔍 테이블 업데이트 시작 - data:', data, 'filterType:', filterType);
+            //console.loge.log('🔍 테이블 업데이트 시작 - data:', data, 'filterType:', filterType);
             
             const tbody = document.querySelector('.data-table tbody');
             if (!tbody) {
-                console.error('❌ 테이블 본문을 찾을 수 없습니다');
+                //console.loge.error('❌ 테이블 본문을 찾을 수 없습니다');
                 return;
             }
             
             // 📋 안전한 데이터 처리 (null/undefined 체크)
             if (!data || !Array.isArray(data)) {
-                console.warn('⚠️ 데이터가 배열이 아니거나 null입니다:', data);
+                //console.loge.warn('⚠️ 데이터가 배열이 아니거나 null입니다:', data);
                 data = [];  // 빈 배열로 초기화
             }
             
@@ -1972,7 +1953,7 @@
                 tbody.appendChild(row);
             });
             
-            console.log('✅ 테이블 업데이트 완료:', data.length, '건');
+            //console.loge.log('✅ 테이블 업데이트 완료:', data.length, '건');
             
             // 체크박스 이벤트 다시 등록
             reattachCheckboxEvents();
@@ -1993,7 +1974,7 @@
                 checkbox.addEventListener('change', updateSelectAllState);
             });
             
-            console.log('✅ 체크박스 이벤트 재등록 완료:', rowCheckboxes.length, '개');
+            //console.loge.log('✅ 체크박스 이벤트 재등록 완료:', rowCheckboxes.length, '개');
         }
         
         // 테이블 행 생성
@@ -2117,7 +2098,7 @@
         
         // 🚀 빠른 필터 해제 (AJAX 방식)
         function clearFilterFast() {
-            console.log('🚀 빠른 필터 해제');
+            //console.loge.log('🚀 빠른 필터 해제');
             
             // 필터 배너 제거
             const existingBanner = document.querySelector('.filter-banner');
@@ -2143,7 +2124,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const currentFilter = /*[[${currentFilter}]]*/ '';
             if (currentFilter && currentFilter !== 'null' && currentFilter !== '') {
-                console.log('🎯 현재 적용된 필터:', currentFilter);
+                //console.loge.log('🎯 현재 적용된 필터:', currentFilter);
                 
                 // 해당 카드를 활성화
                 const filterElement = document.querySelector(`[data-filter="${currentFilter}"]`);
@@ -2194,7 +2175,7 @@
         
         // DOM 로드 완료 후 실행
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🎯 DOM 로드 완료 - 카드 이벤트 등록 시작');
+            //console.loge.log('🎯 DOM 로드 완료 - 카드 이벤트 등록 시작');
             
             // 🎯 전역 selectedFilters 변수 사용 (중복 정의 제거)
             
@@ -2255,7 +2236,7 @@
                     selectedFilters.add(filterType);
                 }
                 
-                console.log('🎯 필터 토글:', filterType, '현재 선택된 필터:', Array.from(selectedFilters));
+                //console.loge.log('🎯 필터 토글:', filterType, '현재 선택된 필터:', Array.from(selectedFilters));
             }
             
             // 🎯 선택한 필터들 적용 (서버 방식)
@@ -2295,7 +2276,7 @@
                 const selectAllCheckbox = document.getElementById('selectAll');
                 if (selectAllCheckbox) {
                     selectAllCheckbox.addEventListener('change', toggleSelectAll);
-                    console.log('✅ 헤더 체크박스 이벤트 등록 완료');
+                    //console.loge.log('✅ 헤더 체크박스 이벤트 등록 완료');
                 }
                 
                 // 개별 체크박스 이벤트
@@ -2303,7 +2284,7 @@
                 rowCheckboxes.forEach(checkbox => {
                     checkbox.addEventListener('change', updateSelectAllState);
                 });
-                console.log('✅ 개별 체크박스 이벤트 등록 완료:', rowCheckboxes.length, '개');
+                //console.loge.log('✅ 개별 체크박스 이벤트 등록 완료:', rowCheckboxes.length, '개');
                 
                 // 🚀 카드 클릭 이벤트 등록 (sample/list.html 방식)
                 const cardMappings = [
@@ -2324,7 +2305,7 @@
                 
                 cardMappings.forEach(mapping => {
                     const elements = document.querySelectorAll(mapping.selector);
-                    console.log(`🔗 ${mapping.selector} 요소 개수:`, elements.length);
+                    //console.loge.log(`🔗 ${mapping.selector} 요소 개수:`, elements.length);
                     
                     elements.forEach(element => {
                         element.style.cursor = 'pointer';
@@ -2332,7 +2313,7 @@
                         
                         element.addEventListener('click', function(e) {
                             e.stopPropagation();
-                            console.log('🎯 카드 클릭 (서버 방식):', mapping.filterType);
+                            //console.loge.log('🎯 카드 클릭 (서버 방식):', mapping.filterType);
                             
                             // 🎯 개별 카드 활성 상태 토글
                             const parentCard = this.closest('.stat-box');
@@ -2365,24 +2346,24 @@
                     });
                 });
                 
-                console.log('✅ 모든 카드 이벤트 등록 완료 - 서버 방식 적용');
+                //console.loge.log('✅ 모든 카드 이벤트 등록 완료 - 서버 방식 적용');
             }, 500);
             
             // 🎯 페이지 로드 시 URL 파라미터에서 필터 상태 복원
             function syncFiltersFromUrl() {
-                console.log('🔄 URL에서 필터 상태 복원 시작');
+                //console.loge.log('🔄 URL에서 필터 상태 복원 시작');
                 const urlParams = new URLSearchParams(window.location.search);
                 const urlFilters = urlParams.get('filters');
                 
-                console.log('🔍 URL에서 추출한 필터:', urlFilters);
+                //console.loge.log('🔍 URL에서 추출한 필터:', urlFilters);
                 
                 if (urlFilters) {
                     const filters = urlFilters.split(',').map(f => f.trim()).filter(f => f);
-                    console.log('🔍 분해된 필터 배열:', filters);
+                    //console.loge.log('🔍 분해된 필터 배열:', filters);
                     
                     filters.forEach(filter => {
                         selectedFilters.add(filter);
-                        console.log('✅ 필터 추가됨:', filter);
+                        //console.loge.log('✅ 필터 추가됨:', filter);
                         
                         // 해당 필터 카드들을 활성 상태로 표시
                         const filterElement = document.querySelector(`[data-filter="${filter}"]`);
@@ -2390,26 +2371,26 @@
                             const parentCard = filterElement.closest('.stat-box');
                             if (parentCard) {
                                 parentCard.classList.add('active');
-                                console.log('✅ 카드 활성화됨:', filter);
+                                //console.loge.log('✅ 카드 활성화됨:', filter);
                             }
                         } else {
-                            console.log('❌ 필터 카드를 찾을 수 없음:', filter);
+                            //console.loge.log('❌ 필터 카드를 찾을 수 없음:', filter);
                         }
                     });
                     
                     // 필터 배너 표시
                     if (filters.length > 0) {
                         showCurrentFilterBanner(filters);
-                        console.log('✅ 필터 배너 표시됨');
+                        //console.loge.log('✅ 필터 배너 표시됨');
                     }
                 }
                 
-                console.log('🔄 URL에서 필터 상태 복원 완료 - selectedFilters:', Array.from(selectedFilters));
+                //console.loge.log('🔄 URL에서 필터 상태 복원 완료 - selectedFilters:', Array.from(selectedFilters));
             }
             
             // 🎯 검색 폼 제출 시 현재 선택된 필터들을 히든 필드에 설정
             function handleSearchSubmit(event) {
-                console.log('🔍 검색 폼 제출 - 현재 선택된 필터:', Array.from(selectedFilters));
+                //console.loge.log('🔍 검색 폼 제출 - 현재 선택된 필터:', Array.from(selectedFilters));
                 
                 // 현재 선택된 필터들을 히든 필드에 설정
                 const filtersInput = document.getElementById('filtersInput');
@@ -2417,15 +2398,15 @@
                     if (selectedFilters.size > 0) {
                         const filtersString = Array.from(selectedFilters).join(',');
                         filtersInput.value = filtersString;
-                        console.log('✅ 필터 정보 설정됨:', filtersString);
+                        //console.loge.log('✅ 필터 정보 설정됨:', filtersString);
                     } else {
                         filtersInput.value = '';
-                        console.log('✅ 필터 정보 초기화됨');
+                        //console.loge.log('✅ 필터 정보 초기화됨');
                     }
                 }
                 
                 // 🔍 폼 제출 전 최종 확인
-                console.log('🔍 폼 제출 전 hidenInput 값:', filtersInput ? filtersInput.value : 'not found');
+                //console.loge.log('🔍 폼 제출 전 hidenInput 값:', filtersInput ? filtersInput.value : 'not found');
                 
                 // 폼 제출 계속 진행
                 return true;
@@ -2433,7 +2414,7 @@
             
             // 🎯 초기화 버튼 처리
             function handleReset() {
-                console.log('🔄 전체 초기화 시작');
+                //console.loge.log('🔄 전체 초기화 시작');
                 
                 // 선택된 필터들 초기화
                 selectedFilters.clear();
@@ -2514,7 +2495,7 @@
             
             // 🎯 검색 폼 제출 시 현재 선택된 필터들을 히든 필드에 설정
             function handleSearchSubmit(event) {
-                console.log('🔍 검색 폼 제출 - 현재 선택된 필터:', Array.from(selectedFilters));
+                //console.loge.log('🔍 검색 폼 제출 - 현재 선택된 필터:', Array.from(selectedFilters));
                 
                 // 현재 선택된 필터들을 히든 필드에 설정
                 const filtersInput = document.getElementById('filtersInput');
@@ -2522,15 +2503,15 @@
                     if (selectedFilters.size > 0) {
                         const filtersString = Array.from(selectedFilters).join(',');
                         filtersInput.value = filtersString;
-                        console.log('✅ 필터 정보 설정됨:', filtersString);
+                        //console.loge.log('✅ 필터 정보 설정됨:', filtersString);
                     } else {
                         filtersInput.value = '';
-                        console.log('✅ 필터 정보 초기화됨');
+                        //console.loge.log('✅ 필터 정보 초기화됨');
                     }
                 }
                 
                 // 🔍 폼 제출 전 최종 확인
-                console.log('🔍 폼 제출 전 hidenInput 값:', filtersInput ? filtersInput.value : 'not found');
+                //console.loge.log('🔍 폼 제출 전 hidenInput 값:', filtersInput ? filtersInput.value : 'not found');
                 
                 // 폼 제출 계속 진행
                 return true;
@@ -2587,8 +2568,8 @@
             const selectAllCheckbox = document.getElementById('selectAll');
             const rowCheckboxes = document.querySelectorAll('input[name="selected"]');
             
-            console.log('🔄 전체 선택 토글:', selectAllCheckbox.checked);
-            console.log('📝 대상 체크박스 개수:', rowCheckboxes.length);
+            //console.loge.log('🔄 전체 선택 토글:', selectAllCheckbox.checked);
+            //console.loge.log('📝 대상 체크박스 개수:', rowCheckboxes.length);
             
             // 모든 행 체크박스를 헤더 체크박스 상태에 맞춤
             rowCheckboxes.forEach(checkbox => {
@@ -2606,7 +2587,7 @@
             const rowCheckboxes = document.querySelectorAll('input[name="selected"]');
             const checkedCount = document.querySelectorAll('input[name="selected"]:checked').length;
             
-            console.log('📊 체크박스 상태 업데이트:', checkedCount, '/', rowCheckboxes.length);
+            //console.loge.log('📊 체크박스 상태 업데이트:', checkedCount, '/', rowCheckboxes.length);
             
             if (checkedCount === 0) {
                 // 아무것도 선택되지 않음
@@ -2707,7 +2688,7 @@
             const value = input.value;
             const originalValue = input.getAttribute('data-original-value');
             
-            console.log('📅 날짜 변경:', id, field, '현재:', value, '원래:', originalValue);
+            //console.loge.log('📅 날짜 변경:', id, field, '현재:', value, '원래:', originalValue);
             
             // 🎯 원래 값과 비교하여 실제로 변경된 경우에만 처리
             const currentValueNormalized = value || '';
@@ -2733,7 +2714,7 @@
                     }
                 }
                 
-                console.log('📅 원래 값과 동일하므로 변경사항 제거:', id, field);
+                //console.loge.log('📅 원래 값과 동일하므로 변경사항 제거:', id, field);
             } else {
                 // 실제로 변경된 경우에만 변경사항 저장
                 if (!dateChanges.has(id)) {
@@ -2749,7 +2730,7 @@
                     row.classList.add('date-changed');
                 }
                 
-                console.log('📅 실제 변경사항 저장:', id, field, value);
+                //console.loge.log('📅 실제 변경사항 저장:', id, field, value);
             }
             
             // 변경 카운트 업데이트
@@ -2785,14 +2766,14 @@
                 return;
             }
             
-            console.log('📝 순차적 비고 처리 시작:', dateChanges);
+            //console.loge.log('📝 순차적 비고 처리 시작:', dateChanges);
             
             // 처리할 항목들 준비
             itemsToProcess = Array.from(dateChanges.keys());
             totalItemsCount = itemsToProcess.length;
             currentItemIndex = 0;
             
-            console.log('📋 처리할 항목 목록:', itemsToProcess);
+            //console.loge.log('📋 처리할 항목 목록:', itemsToProcess);
             
             // 첫 번째 항목부터 시작
             processNextItem();
@@ -2800,17 +2781,17 @@
         
         // 🆕 다음 항목 처리 함수
         function processNextItem() {
-            console.log(`🔍 processNextItem 호출 - currentItemIndex: ${currentItemIndex}, itemsToProcess.length: ${itemsToProcess.length}`);
+            //console.loge.log(`🔍 processNextItem 호출 - currentItemIndex: ${currentItemIndex}, itemsToProcess.length: ${itemsToProcess.length}`);
             
             if (currentItemIndex >= itemsToProcess.length) {
                 // 모든 항목 처리 완료
-                console.log('✅ 모든 항목 처리 완료');
+                //console.loge.log('✅ 모든 항목 처리 완료');
                 finishAllProcessing();
                 return;
             }
             
             const currentItemId = itemsToProcess[currentItemIndex];
-            console.log(`📝 ${currentItemIndex + 1}/${totalItemsCount} 항목 처리: ID ${currentItemId}`);
+            //console.loge.log(`📝 ${currentItemIndex + 1}/${totalItemsCount} 항목 처리: ID ${currentItemId}`);
             
             // 잠깐 대기 후 모달창 열기 (DOM 업데이트 대기)
             setTimeout(() => {
@@ -2840,11 +2821,11 @@
                 
                 // 🔍 체크박스 값으로 행 찾기 (data-id 속성 대신)
                 const row = document.querySelector(`input[name="selected"][value="${itemId}"]`)?.closest('tr');
-                console.log('🔍 찾은 행:', row);
+                //console.loge.log('🔍 찾은 행:', row);
                 
                 if (row) {
                     const cells = row.querySelectorAll('td');
-                    console.log('🔍 셀 개수:', cells.length);
+                    //console.loge.log('🔍 셀 개수:', cells.length);
                     
                     // 기존 비고 내용 로드
                     const remarksCell = cells[23]; // 비고 컬럼 (24번째이지만 0-based이므로 23)
@@ -2853,11 +2834,11 @@
                     }
                     
                     // 🔍 중요한 셀들 디버깅
-                    console.log('🔍 비고 셀 (23):', cells[23]?.textContent);
-                    console.log('🔍 완료 셀 (22):', cells[22]?.innerHTML);
-                    console.log('🔍 유형 셀 (1):', cells[1]?.innerHTML);
-                    console.log('🔍 주문번호 셀 (5):', cells[5]?.innerHTML);
-                    console.log('🔍 고객명 셀 (7):', cells[7]?.innerHTML);
+                    //console.loge.log('🔍 비고 셀 (23):', cells[23]?.textContent);
+                    //console.loge.log('🔍 완료 셀 (22):', cells[22]?.innerHTML);
+                    //console.loge.log('🔍 유형 셀 (1):', cells[1]?.innerHTML);
+                    //console.loge.log('🔍 주문번호 셀 (5):', cells[5]?.innerHTML);
+                    //console.loge.log('🔍 고객명 셀 (7):', cells[7]?.innerHTML);
                     
                     // 항목 정보 추출 (테이블 구조에 맞춰 조정)
                     itemInfo = {
@@ -2885,7 +2866,7 @@
                         logisticsConfirmedDate: cells[9]?.querySelector('input[type="date"]')?.value || '-' // 물류확인일
                     };
                     
-                    console.log('🔍 항목 정보 디버깅:', itemInfo);
+                    //console.loge.log('🔍 항목 정보 디버깅:', itemInfo);
                 }
                 
                 // 항목 정보 표시 업데이트
@@ -2932,7 +2913,7 @@
                 
                 // 모달 표시 (이미 열려있는 경우 먼저 닫기)
                 if (modal.style.display === 'block') {
-                    console.log('🔍 모달이 이미 열려있음 - 먼저 닫기');
+                    //console.loge.log('🔍 모달이 이미 열려있음 - 먼저 닫기');
                     modal.style.display = 'none';
                     
                     setTimeout(() => {
@@ -2991,7 +2972,7 @@
                 // 변경 카운트 업데이트
                 updateDateChangeCount();
                 
-                console.log('❌ 비고 처리 취소됨');
+                //console.loge.log('❌ 비고 처리 취소됨');
             } else {
                 // 취소하지 않으면 모달 다시 열기
                 modal.style.display = 'block';
@@ -3004,7 +2985,7 @@
             const remarks = remarksContent ? remarksContent.value.trim() : '';
             
             const currentItemId = itemsToProcess[currentItemIndex];
-            console.log('💾 현재 항목 저장:', { itemId: currentItemId, remarks });
+            //console.loge.log('💾 현재 항목 저장:', { itemId: currentItemId, remarks });
             
             // 모달 닫기
             const modal = document.getElementById('remarksModal');
@@ -3021,18 +3002,18 @@
         // 🆕 현재 항목만 저장하는 함수
         function saveCurrentItemWithRemarks(itemId, remarks = '') {
             if (isProcessing) {
-                console.log('🔄 이미 처리 중 - 중복 호출 방지');
+                //console.loge.log('🔄 이미 처리 중 - 중복 호출 방지');
                 return;
             }
             
             const changes = dateChanges.get(itemId);
             if (!changes) {
-                console.error('❌ 해당 항목의 변경사항을 찾을 수 없음:', itemId);
+                //console.loge.error('❌ 해당 항목의 변경사항을 찾을 수 없음:', itemId);
                 return;
             }
             
             isProcessing = true;
-            console.log('💾 개별 항목 저장 시작:', { itemId, changes, remarks });
+            //console.loge.log('💾 개별 항목 저장 시작:', { itemId, changes, remarks });
             
             // 저장 버튼 비활성화 및 진행상황 표시
             const saveBtn = document.getElementById('bulkSaveBtn');
@@ -3063,7 +3044,7 @@
                 updateData.remarks = remarks;
             }
             
-            console.log('📤 서버 전송 데이터 (개별 항목):', updateData);
+            //console.loge.log('📤 서버 전송 데이터 (개별 항목):', updateData);
             
             // 서버로 AJAX 요청 (단일 항목)
             fetch('/exchange/api/bulk-update-dates', {
@@ -3076,10 +3057,10 @@
             })
             .then(response => response.json())
             .then(data => {
-                console.log('📥 서버 응답 (개별 항목):', data);
+                //console.loge.log('📥 서버 응답 (개별 항목):', data);
                 
                 if (data.success) {
-                    console.log(`✅ 항목 ${itemId} 저장 성공`);
+                    //console.loge.log(`✅ 항목 ${itemId} 저장 성공`);
                     
                     // 현재 항목의 변경사항을 dateChanges에서 제거
                     dateChanges.delete(itemId);
@@ -3093,7 +3074,7 @@
                     
                     // 다음 항목으로 이동
                     currentItemIndex++;
-                    console.log(`🔍 다음 항목으로 이동: currentItemIndex = ${currentItemIndex}`);
+                    //console.loge.log(`🔍 다음 항목으로 이동: currentItemIndex = ${currentItemIndex}`);
                     
                     // 처리 완료 플래그 해제
                     isProcessing = false;
@@ -3104,7 +3085,7 @@
                     }, 200);
                     
                 } else {
-                    console.error(`❌ 항목 ${itemId} 저장 실패:`, data.message);
+                    //console.loge.error(`❌ 항목 ${itemId} 저장 실패:`, data.message);
                     alert(`❌ 항목 저장 실패: ${data.message}`);
                     
                     // 처리 완료 플래그 해제
@@ -3113,7 +3094,7 @@
                     // 실패해도 다음 항목으로 이동할지 묻기
                     if (confirm('저장에 실패했습니다. 다음 항목을 계속 처리하시겠습니까?')) {
                         currentItemIndex++;
-                        console.log(`🔍 실패 후 다음 항목으로 이동: currentItemIndex = ${currentItemIndex}`);
+                        //console.loge.log(`🔍 실패 후 다음 항목으로 이동: currentItemIndex = ${currentItemIndex}`);
                         
                         setTimeout(() => {
                             processNextItem();
@@ -3124,7 +3105,7 @@
                 }
             })
             .catch(error => {
-                console.error('❌ 저장 오류:', error);
+                //console.loge.error('❌ 저장 오류:', error);
                 alert('저장 중 오류가 발생했습니다. 다음 항목을 계속 처리하시겠습니까?');
                 
                 // 처리 완료 플래그 해제
@@ -3132,7 +3113,7 @@
                 
                 if (confirm('다음 항목을 계속 처리하시겠습니까?')) {
                     currentItemIndex++;
-                    console.log(`🔍 오류 후 다음 항목으로 이동: currentItemIndex = ${currentItemIndex}`);
+                    //console.loge.log(`🔍 오류 후 다음 항목으로 이동: currentItemIndex = ${currentItemIndex}`);
                     
                     setTimeout(() => {
                         processNextItem();
@@ -3145,7 +3126,7 @@
         
         // 🆕 모든 처리 완료 함수
         function finishAllProcessing() {
-            console.log('🎉 모든 항목 처리 완료');
+            //console.loge.log('🎉 모든 항목 처리 완료');
             
             // 처리 완료 플래그 해제
             isProcessing = false;
@@ -3179,7 +3160,7 @@
             const id = checkbox.getAttribute('data-id');
             const isCompleted = checkbox.checked;
             
-            console.log('✅ 완료 상태 변경:', id, isCompleted);
+            //console.loge.log('✅ 완료 상태 변경:', id, isCompleted);
             
             // 변경사항 저장
             completionChanges.set(id, isCompleted);
@@ -3229,7 +3210,7 @@
                 return;
             }
             
-            console.log('✅ 일괄 완료 상태 저장 시작:', completionChanges);
+            //console.loge.log('✅ 일괄 완료 상태 저장 시작:', completionChanges);
             
             // 저장 버튼 비활성화
             const completeBtn = document.getElementById('bulkCompleteBtn');
@@ -3247,7 +3228,7 @@
                 });
             });
             
-            console.log('📤 완료 상태 서버 전송 데이터:', updates);
+            //console.loge.log('📤 완료 상태 서버 전송 데이터:', updates);
             
             // 각 항목을 개별적으로 처리
             let processedCount = 0;
@@ -3316,7 +3297,7 @@
                    }
                })
                .catch(error => {
-                   console.error('❌ 완료 상태 저장 오류:', error);
+                   //console.loge.error('❌ 완료 상태 저장 오류:', error);
                    processedCount++;
                    
                    if (processedCount === updates.length) {
@@ -3368,7 +3349,7 @@
                        }
                    }
                    
-                   console.log(`날짜 초기화 - 원래 값과 동일하므로 변경사항 제거: ID=${itemId}, 필드=${fieldName}`);
+                   //console.loge.log(`날짜 초기화 - 원래 값과 동일하므로 변경사항 제거: ID=${itemId}, 필드=${fieldName}`);
                } else {
                    // 실제로 변경된 경우 (원래 값이 있었는데 지운 경우)
                    if (!dateChanges.has(itemId)) {
@@ -3385,7 +3366,7 @@
                        row.style.backgroundColor = '#fff3cd'; // 연한 노란색 배경
                    }
                    
-                   console.log(`날짜 초기화 - 실제 변경사항 저장: ID=${itemId}, 필드=${fieldName}`);
+                   //console.loge.log(`날짜 초기화 - 실제 변경사항 저장: ID=${itemId}, 필드=${fieldName}`);
                }
                
                // 변경 카운트 업데이트
@@ -3417,21 +3398,21 @@
             const isSecureContext = (window.location.protocol === 'https:' || window.location.hostname === 'localhost');
             
             if (isSecureContext && navigator.clipboard && navigator.clipboard.writeText) {
-                console.log('🔒 HTTPS 환경 - Clipboard API 사용');
+                //console.loge.log('🔒 HTTPS 환경 - Clipboard API 사용');
                 return navigator.clipboard.writeText(text)
                     .then(() => {
-                        console.log('✅ Clipboard API 복사 성공');
+                        //console.loge.log('✅ Clipboard API 복사 성공');
                         showCopySuccess(element, type, text);
                         return true;
                     })
                     .catch((error) => {
-                        console.warn('⚠️ Clipboard API 실패, fallback 사용:', error);
+                        //console.loge.warn('⚠️ Clipboard API 실패, fallback 사용:', error);
                         return fallbackCopyMethod(text, element, type);
                     });
             }
             
             // 🌐 HTTP 환경 또는 Clipboard API 미지원 - 대체 방법 사용
-            console.log('🌐 HTTP 환경 또는 Clipboard API 미지원 - fallback 사용');
+            //console.loge.log('🌐 HTTP 환경 또는 Clipboard API 미지원 - fallback 사용');
             return Promise.resolve(fallbackCopyMethod(text, element, type));
         }
 
@@ -3483,12 +3464,12 @@
 
         // 선택된 항목 정보 표시
         function displaySelectedItemInfo(itemId) {
-            console.log('📝 모달 정보 로딩 시작 - itemId:', itemId);
+            //console.loge.log('📝 모달 정보 로딩 시작 - itemId:', itemId);
             
             const row = document.querySelector(`input[name="selected"][value="${itemId}"]`).closest('tr');
             const cells = row.getElementsByTagName('td');
             
-            console.log('🔍 테이블 행 찾음, 총 셀 개수:', cells.length);
+            //console.loge.log('🔍 테이블 행 찾음, 총 셀 개수:', cells.length);
             
             const itemInfo = {
                 type: cells[1].textContent.trim(),
@@ -3503,7 +3484,7 @@
                 defectDetail: getDefectDetailFromCell(cells[17]) // 불량상세 컬럼 (올바른 인덱스)
             };
             
-            console.log('📋 추출된 항목 정보:', itemInfo);
+            //console.loge.log('📋 추출된 항목 정보:', itemInfo);
             
             const infoContainer = document.getElementById('selectedItemInfo');
             infoContainer.innerHTML = `
@@ -3523,35 +3504,35 @@
             const defectDetailInput = document.getElementById('defectDetailInput');
             const currentDefectDetail = itemInfo.defectDetail && itemInfo.defectDetail !== '-' && itemInfo.defectDetail.trim() !== '' ? itemInfo.defectDetail : '';
             
-            console.log('📝 textarea에 설정할 불량상세 값:', currentDefectDetail);
-            console.log('📝 textarea 요소:', defectDetailInput);
+            //console.loge.log('📝 textarea에 설정할 불량상세 값:', currentDefectDetail);
+            //console.loge.log('📝 textarea 요소:', defectDetailInput);
             
             defectDetailInput.value = currentDefectDetail;
             updateDefectDetailCounter(); // 글자 수 카운터 업데이트
             
-            console.log('✅ 불량상세 메모 textarea 설정 완료, 현재 값:', defectDetailInput.value);
+            //console.loge.log('✅ 불량상세 메모 textarea 설정 완료, 현재 값:', defectDetailInput.value);
         }
         
         // 불량상세 셀에서 실제 값 추출하는 헬퍼 함수
         function getDefectDetailFromCell(cell) {
-            console.log('🔍 불량상세 셀 분석:', cell);
-            console.log('🔍 셀 HTML:', cell.innerHTML);
+            //console.loge.log('🔍 불량상세 셀 분석:', cell);
+            //console.loge.log('🔍 셀 HTML:', cell.innerHTML);
             
             // defect-detail-cell 클래스를 가진 div 찾기
             const defectDetailDiv = cell.querySelector('.defect-detail-cell');
-            console.log('🔍 defect-detail-cell div:', defectDetailDiv);
+            //console.loge.log('🔍 defect-detail-cell div:', defectDetailDiv);
             
             if (defectDetailDiv && defectDetailDiv.title) {
-                console.log('✅ title 속성에서 불량상세 발견:', defectDetailDiv.title);
+                //console.loge.log('✅ title 속성에서 불량상세 발견:', defectDetailDiv.title);
                 // title 속성에 실제 전체 불량상세 내용이 있음
                 return defectDetailDiv.title.trim();
             }
             
             // title이 없으면 텍스트 내용 확인
             const textContent = cell.textContent.trim();
-            console.log('🔍 텍스트 내용:', textContent);
+            //console.loge.log('🔍 텍스트 내용:', textContent);
             if (textContent && textContent !== '-') {
-                console.log('✅ 텍스트 내용에서 불량상세 발견:', textContent);
+                //console.loge.log('✅ 텍스트 내용에서 불량상세 발견:', textContent);
                 return textContent;
             }
             
@@ -4456,40 +4437,21 @@
                console.log('🔍 selectedFilters.size:', selectedFilters ? selectedFilters.size : 'undefined');
                console.log('🔍 selectedFilters 내용:', selectedFilters ? Array.from(selectedFilters) : 'undefined');
                
-               // 🎯 필터 정보 처리 (우선순위: selectedFilters > URL params > form hidden input)
+               // 🎯 현재 활성 필터들을 필터 데이터에 추가
                let filtersString = '';
-               
-               // 1차: JavaScript selectedFilters 확인
                if (selectedFilters && selectedFilters.size > 0) {
                    filtersString = Array.from(selectedFilters).join(',');
-                   console.log('🎯 selectedFilters에서 필터 추출:', filtersString);
-               }
-               
-               // 2차: URL 파라미터에서 필터 추출
-               if (!filtersString) {
+                   formData.set('filters', filtersString);
+                   console.log('🎯 활성 필터들 추가:', filtersString);
+               } else {
+                   // selectedFilters가 비어있으면 URL에서 직접 추출
                    const urlParams = new URLSearchParams(window.location.search);
                    const urlFilters = urlParams.get('filters');
                    if (urlFilters && urlFilters.trim() !== '') {
                        filtersString = urlFilters;
+                       formData.set('filters', filtersString);
                        console.log('🎯 URL에서 필터 추출:', filtersString);
                    }
-               }
-               
-               // 3차: 폼의 히든 필드에서 필터 추출
-               if (!filtersString) {
-                   const hiddenFilters = formData.get('filters');
-                   if (hiddenFilters && hiddenFilters.trim() !== '') {
-                       filtersString = hiddenFilters;
-                       console.log('🎯 히든 필드에서 필터 추출:', filtersString);
-                   }
-               }
-               
-               // 최종 필터 설정
-               if (filtersString) {
-                   formData.set('filters', filtersString);
-                   console.log('✅ 최종 필터 설정:', filtersString);
-               } else {
-                   console.log('⚠️ 필터 정보 없음');
                }
                
                // 🔍 전송될 데이터 확인

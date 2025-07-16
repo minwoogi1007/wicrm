@@ -447,11 +447,11 @@
             isCompleted: /*[[${returnItem?.isCompleted}]]*/ ''
         };
 
-        console.log('🎯 서버 데이터:', serverData);
+        //console.log(' 서버 데이터:', serverData);
 
         // 🎯 브랜드 선택 함수
         function selectBrand(brand, element) {
-            console.log('🏷️ 브랜드 선택:', brand);
+            //console.log('브랜드 선택:', brand);
 
             // 모든 브랜드 버튼 초기화
             document.querySelectorAll('.selection-row:first-child .selection-btn').forEach(btn => {
@@ -502,7 +502,7 @@
 
         // 🎯 사이트 선택 함수
         function selectSite(site, element) {
-            console.log('🌐 사이트 선택:', site);
+            //console.log(' 사이트 선택:', site);
 
             // 모든 사이트 버튼 초기화
             document.querySelectorAll('#siteButtons .selection-btn').forEach(btn => {
@@ -522,9 +522,9 @@
             updateSelectedInfo();
         }
 
-        // 🎯 유형 선택 함수
+        // 유형 선택 함수
         function selectType(type, element) {
-            console.log('📋 유형 선택:', type);
+            //console.log(' 유형 선택:', type);
 
             // 모든 유형 버튼 초기화
             document.querySelectorAll('.selection-row:nth-child(3) .selection-btn').forEach(btn => {
@@ -546,7 +546,7 @@
 
         // 🎯 사유 선택 함수
         function selectReason(reason, element) {
-            console.log('📝 사유 선택:', reason);
+            //console.log('📝 사유 선택:', reason);
 
             // 모든 사유 버튼 초기화
             document.querySelectorAll('.selection-row:nth-child(4) .selection-btn').forEach(btn => {
@@ -582,7 +582,7 @@
                     defectDetailGroup.style.transform = 'translateY(0)';
                 }, 10);
                 
-                console.log('🔴 불량 사유 선택: 불량상세메모 필드 표시');
+                //console.log(' 불량 사유 선택: 불량상세메모 필드 표시');
             } else {
                 // 다른 사유 선택 시 필드 숨김 및 필수 해제
                 defectDetailGroup.style.display = 'none';
@@ -590,7 +590,7 @@
                 defectDetailField.removeAttribute('aria-required');
                 defectDetailField.value = ''; // 내용 초기화
                 
-                console.log('🟢 다른 사유 선택: 불량상세메모 필드 숨김');
+                //console.log(' 다른 사유 선택: 불량상세메모 필드 숨김');
             }
 
             updateSelectedInfo();
@@ -648,11 +648,11 @@
 
         // 🎯 수정 모드일 때 버튼 자동 활성화
         function initializeEditMode() {
-            console.log('🔧 수정 모드 버튼 초기화 시작');
+            //console.log(' 수정 모드 버튼 초기화 시작');
             
             // 1. 사이트명에서 브랜드 추출 및 브랜드 버튼 활성화
             const siteName = serverData.siteName;
-            console.log('🌐 사이트명:', siteName);
+            //console.log(' 사이트명:', siteName);
             
             if (siteName) {
                 let brand = '';
@@ -664,7 +664,7 @@
                     brand = '코랄리크';
                 }
                 
-                console.log('🏷️ 추출된 브랜드:', brand);
+                //console.log(' 추출된 브랜드:', brand);
                 
                 if (brand) {
                     // 브랜드 버튼 활성화
@@ -672,7 +672,7 @@
                     brandButtons.forEach(btn => {
                         if (btn.textContent.trim() === brand) {
                             btn.classList.add('active');
-                            console.log('✅ 브랜드 버튼 활성화:', brand);
+                            //console.log('✅ 브랜드 버튼 활성화:', brand);
                             
                             // 사이트 버튼 생성 (selectBrand 함수와 동일한 로직)
                             const siteButtonsContainer = document.getElementById('siteButtons');
@@ -716,7 +716,7 @@
                                     siteButtons.forEach(btn => {
                                         if (btn.textContent.trim() === siteName) {
                                             btn.classList.add('active');
-                                            console.log('✅ 사이트 버튼 활성화:', siteName);
+                                            //console.log(' 사이트 버튼 활성화:', siteName);
                                         }
                                     });
                                 }, 100);
@@ -728,7 +728,7 @@
             
             // 3. 유형 버튼 활성화
             const returnTypeCode = serverData.returnTypeCode;
-            console.log('📋 유형 코드:', returnTypeCode);
+            //console.log('📋 유형 코드:', returnTypeCode);
             
             if (returnTypeCode) {
                 const typeButtons = document.querySelectorAll('.selection-row:nth-child(3) .selection-btn');
@@ -736,21 +736,21 @@
                     const buttonTypeCode = btn.getAttribute('onclick').match(/'([^']+)'/)[1];
                     if (buttonTypeCode === returnTypeCode) {
                         btn.classList.add('active');
-                        console.log('✅ 유형 버튼 활성화:', returnTypeCode);
+                        //console.log('유형 버튼 활성화:', returnTypeCode);
                     }
                 });
             }
             
             // 4. 사유 버튼 활성화
             const returnReason = serverData.returnReason;
-            console.log('📝 사유:', returnReason);
+            //console.log(' 사유:', returnReason);
             
             if (returnReason) {
                 const reasonButtons = document.querySelectorAll('.selection-row:nth-child(4) .selection-btn');
                 reasonButtons.forEach(btn => {
                     if (btn.textContent.trim() === returnReason) {
                         btn.classList.add('active');
-                        console.log('✅ 사유 버튼 활성화:', returnReason);
+                        //console.log(' 사유 버튼 활성화:', returnReason);
                     }
                 });
             }
@@ -760,28 +760,28 @@
                 updateSelectedInfo();
             }, 200);
             
-            console.log('🔧 수정 모드 버튼 초기화 완료');
+            //console.log('수정 모드 버튼 초기화 완료');
         }
 
         // 🎯 페이지 로드 시 초기화
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🔥 페이지 로드 완료');
+            //console.log('페이지 로드 완료');
 
             // 수정 모드일 때 원본값 설정
             if (serverData.isEdit) {
-                console.log('🔧 수정 모드 - 원본값 설정');
-                console.log('📊 서버 데이터:', serverData);
+                //console.log(' 수정 모드 - 원본값 설정');
+                //console.log(' 서버 데이터:', serverData);
                 
                 Object.keys(serverData).forEach(key => {
                     const field = document.getElementById(key);
                     const value = serverData[key];
                     
-                    console.log(`🔍 필드 처리: ${key} = ${value}`);
+                    //console.log(` 필드 처리: ${key} = ${value}`);
                     
                     if (field && value !== null && value !== undefined && value !== '') {
                         // 🎯 날짜 필드 특별 처리
                         if (key.includes('Date') || key === 'orderDate' || key === 'csReceivedDate') {
-                            console.log(`📅 날짜 필드 처리: ${key}`);
+                            //console.log(` 날짜 필드 처리: ${key}`);
                             
                             // 날짜 형식 변환 (다양한 형식 지원)
                             let dateValue = value;
@@ -793,7 +793,7 @@
                                 dateValue = value.split(' ')[0];
                             }
                             
-                            console.log(`📅 변환된 날짜 값: ${dateValue}`);
+                            //console.log(` 변환된 날짜 값: ${dateValue}`);
                             field.dataset.originalValue = dateValue;
                             field.value = dateValue;
                         } else {
@@ -803,9 +803,9 @@
                         }
                         
                         updateFieldColor(field);
-                        console.log(`✅ 필드 설정 완료: ${key} = ${field.value}`);
+                        //console.log(` 필드 설정 완료: ${key} = ${field.value}`);
                     } else {
-                        console.log(`⚠️ 필드 스킵: ${key} (필드 없음 또는 값 없음)`);
+                        //console.log(`⚠ 필드 스킵: ${key} (필드 없음 또는 값 없음)`);
                     }
                 });
                 
@@ -847,7 +847,7 @@
                     defectDetailGroup.style.display = 'block';
                     defectDetailField.setAttribute('required', 'required');
                     defectDetailField.setAttribute('aria-required', 'true');
-                    console.log('🔧 수정 모드: 불량 사유로 불량상세메모 필드 표시');
+                    //console.log('수정 모드: 불량 사유로 불량상세메모 필드 표시');
                 }
             }
         });
