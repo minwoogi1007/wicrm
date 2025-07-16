@@ -584,13 +584,47 @@
             text-align: center;
         }
 
-        .bg-success { background: var(--success); }
-        .bg-warning { background: var(--warning); }
-        .bg-danger { background: var(--danger); }
-        .bg-info { background: var(--info); }
-        .bg-secondary { background: var(--gray-500); }
-        .text-white { color: white; }
-        .text-dark { color: var(--gray-800); }
+        /* 🎨 배지 색상 클래스 - 확실한 색상 표시를 위한 강화된 스타일 */
+        .badge.bg-success { 
+            background: #10b981 !important; 
+            background: var(--success) !important; 
+            color: white !important;
+            border: 1px solid #059669 !important;
+        }
+        .badge.bg-warning { 
+            background: #f59e0b !important; 
+            background: var(--warning) !important; 
+            color: #92400e !important;
+            border: 1px solid #d97706 !important;
+        }
+        .badge.bg-danger { 
+            background: #ef4444 !important; 
+            background: var(--danger) !important; 
+            color: white !important;
+            border: 1px solid #dc2626 !important;
+        }
+        .badge.bg-info { 
+            background: #06b6d4 !important; 
+            background: var(--info) !important; 
+            color: white !important;
+            border: 1px solid #0891b2 !important;
+        }
+        .badge.bg-secondary { 
+            background: #6b7280 !important; 
+            background: var(--gray-500) !important; 
+            color: white !important;
+            border: 1px solid #4b5563 !important;
+        }
+        
+        /* 텍스트 색상 강제 적용 */
+        .badge.text-white { color: white !important; }
+        .badge.text-dark { color: #1f2937 !important; color: var(--gray-800) !important; }
+        
+        /* 📱 입금 관련 배지 추가 스타일링 */
+        .badge {
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24) !important;
+            font-weight: 700 !important;
+        }
 
         /* 📋 복사 가능한 요소들 */
         .order-number-copy,
@@ -1496,7 +1530,7 @@
                                 <th style="width: 40px;">완료</th>
                                 <th style="width: 80px;">비고</th>
                                 <th style="width: 60px;">첨부이미지</th>
-                                <th style="width: 80px;">작업</th>
+
                             </tr>
                         </thead>
                         <tbody>
@@ -1640,12 +1674,10 @@
                                         <!-- 이미지 없을 때는 공백 -->
                                     </div>
                                 </td>
-                                <td>
-                                    <a th:href="@{'/exchange/view/' + ${item.id}}" class="action-link" style="font-size: 1.0rem; font-weight: 600;">보기</a>
-                                </td>
+
                             </tr>
                             <tr th:if="${returnItems == null or returnItems.empty}">
-                                <td colspan="26" class="no-data">등록된 교환/반품 내역이 없습니다.</td>
+                                <td colspan="25" class="no-data">등록된 교환/반품 내역이 없습니다.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -1784,19 +1816,38 @@
         
         // 🎯 페이지 로드 시 현재 적용된 필터들을 selectedFilters에 추가
         const currentFilters = /*[[${currentFilters}]]*/ '';
+        console.log('🔍 서버에서 전달받은 필터:', currentFilters);
+        
         if (currentFilters && currentFilters.trim() !== '') {
             const filtersArray = currentFilters.split(',');
             filtersArray.forEach(filter => {
-                selectedFilters.add(filter.trim());
+                const trimmedFilter = filter.trim();
+                if (trimmedFilter) {
+                    selectedFilters.add(trimmedFilter);
+                    console.log('✅ 필터 추가됨:', trimmedFilter);
+                }
             });
+            
+            console.log('✅ 최종 selectedFilters:', Array.from(selectedFilters));
             
             // 해당 필터 버튼들을 활성화 상태로 표시
             selectedFilters.forEach(filter => {
                 const button = document.querySelector(`button[data-filter="${filter}"]`);
+                const filterLink = document.querySelector(`[data-filter="${filter}"]`);
                 if (button) {
                     button.classList.add('active');
+                    console.log('🎯 버튼 활성화:', filter);
+                }
+                if (filterLink) {
+                    const parentCard = filterLink.closest('.stat-box');
+                    if (parentCard) {
+                        parentCard.classList.add('active');
+                        console.log('🎯 카드 활성화:', filter);
+                    }
                 }
             });
+        } else {
+            console.log('⚠️ 서버에서 전달받은 필터 없음');
         }
         
         // 🎯 필터 토글 함수 (다중 선택 가능)
@@ -2145,8 +2196,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🎯 DOM 로드 완료 - 카드 이벤트 등록 시작');
             
-            // 🎯 선택된 필터들을 관리하는 Set
-            let selectedFilters = new Set();
+            // 🎯 전역 selectedFilters 변수 사용 (중복 정의 제거)
             
             // 🎯 현재 검색 조건을 읽어오는 함수 (filters 제외)
             function getCurrentSearchParams() {
@@ -4285,21 +4335,40 @@
                console.log('🔍 selectedFilters.size:', selectedFilters ? selectedFilters.size : 'undefined');
                console.log('🔍 selectedFilters 내용:', selectedFilters ? Array.from(selectedFilters) : 'undefined');
                
-               // 🎯 현재 활성 필터들을 필터 데이터에 추가
+               // 🎯 필터 정보 처리 (우선순위: selectedFilters > URL params > form hidden input)
                let filtersString = '';
+               
+               // 1차: JavaScript selectedFilters 확인
                if (selectedFilters && selectedFilters.size > 0) {
                    filtersString = Array.from(selectedFilters).join(',');
-                   formData.set('filters', filtersString);
-                   console.log('🎯 활성 필터들 추가:', filtersString);
-               } else {
-                   // selectedFilters가 비어있으면 URL에서 직접 추출
+                   console.log('🎯 selectedFilters에서 필터 추출:', filtersString);
+               }
+               
+               // 2차: URL 파라미터에서 필터 추출
+               if (!filtersString) {
                    const urlParams = new URLSearchParams(window.location.search);
                    const urlFilters = urlParams.get('filters');
                    if (urlFilters && urlFilters.trim() !== '') {
                        filtersString = urlFilters;
-                       formData.set('filters', filtersString);
                        console.log('🎯 URL에서 필터 추출:', filtersString);
                    }
+               }
+               
+               // 3차: 폼의 히든 필드에서 필터 추출
+               if (!filtersString) {
+                   const hiddenFilters = formData.get('filters');
+                   if (hiddenFilters && hiddenFilters.trim() !== '') {
+                       filtersString = hiddenFilters;
+                       console.log('🎯 히든 필드에서 필터 추출:', filtersString);
+                   }
+               }
+               
+               // 최종 필터 설정
+               if (filtersString) {
+                   formData.set('filters', filtersString);
+                   console.log('✅ 최종 필터 설정:', filtersString);
+               } else {
+                   console.log('⚠️ 필터 정보 없음');
                }
                
                // 🔍 전송될 데이터 확인
@@ -4387,21 +4456,40 @@
                console.log('🔍 selectedFilters.size:', selectedFilters ? selectedFilters.size : 'undefined');
                console.log('🔍 selectedFilters 내용:', selectedFilters ? Array.from(selectedFilters) : 'undefined');
                
-               // 🎯 현재 활성 필터들을 필터 데이터에 추가
+               // 🎯 필터 정보 처리 (우선순위: selectedFilters > URL params > form hidden input)
                let filtersString = '';
+               
+               // 1차: JavaScript selectedFilters 확인
                if (selectedFilters && selectedFilters.size > 0) {
                    filtersString = Array.from(selectedFilters).join(',');
-                   formData.set('filters', filtersString);
-                   console.log('🎯 활성 필터들 추가:', filtersString);
-               } else {
-                   // selectedFilters가 비어있으면 URL에서 직접 추출
+                   console.log('🎯 selectedFilters에서 필터 추출:', filtersString);
+               }
+               
+               // 2차: URL 파라미터에서 필터 추출
+               if (!filtersString) {
                    const urlParams = new URLSearchParams(window.location.search);
                    const urlFilters = urlParams.get('filters');
                    if (urlFilters && urlFilters.trim() !== '') {
                        filtersString = urlFilters;
-                       formData.set('filters', filtersString);
                        console.log('🎯 URL에서 필터 추출:', filtersString);
                    }
+               }
+               
+               // 3차: 폼의 히든 필드에서 필터 추출
+               if (!filtersString) {
+                   const hiddenFilters = formData.get('filters');
+                   if (hiddenFilters && hiddenFilters.trim() !== '') {
+                       filtersString = hiddenFilters;
+                       console.log('🎯 히든 필드에서 필터 추출:', filtersString);
+                   }
+               }
+               
+               // 최종 필터 설정
+               if (filtersString) {
+                   formData.set('filters', filtersString);
+                   console.log('✅ 최종 필터 설정:', filtersString);
+               } else {
+                   console.log('⚠️ 필터 정보 없음');
                }
                
                // 🔍 전송될 데이터 확인

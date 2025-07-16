@@ -4,6 +4,8 @@ globs:
 alwaysApply: true
 ---
 ## 🎯 Cursor용 프로젝트 지침 (Shrimp Task Manager 기반)
+java 컴파일 절대 하지 말것
+서버재 시작이나 실행은 ide 에서 따로 실행
 
 ### 🧱 프로젝트 개요
 

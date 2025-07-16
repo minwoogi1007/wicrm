@@ -819,8 +819,110 @@ logging.level.org.hibernate.stat=DEBUG
 
 ---
 
-**📅 마지막 업데이트**: 2025년 7월 9일  
-**📝 문서 버전**: v2.0  
+## 📈 12. 개발 이력 (Development Changelog)
+
+### 🚀 **2025년 7월 16일 - 물류센터 직접입고 관리 시스템 완성**
+
+#### **📦 물류센터 직접입고 관리 기능 완료**
+
+**✅ 완성된 기능들:**
+
+1. **📋 일괄등록 기능**
+   - **파일**: `src/main/resources/templates/logistics/direct-return-list.html`
+   - **기능**: 한 번에 여러 제품을 등록할 수 있는 일괄등록 모달
+   - **구현 내용**:
+     - 공통정보 (입고일자, 사이트명, 고객명, 연락처, 운송장번호) 한 번 입력
+     - 제품정보 (제품코드, 수량, 색상, 사이즈) 동적 추가/삭제 가능
+     - 각 제품별 개별 레코드 생성 (공통정보 동일)
+     - 프론트엔드 검증 및 서버 처리 완료
+
+2. **🔐 CSRF 토큰 문제 해결**
+   - **파일**: `src/main/java/com/wio/crm/config/SecurityConfig.java`
+   - **문제**: POST 요청 시 403 Forbidden 오류 발생
+   - **해결**: `/logistics/**` 경로를 CSRF 보호에서 제외
+   - **추가**: JavaScript에서 CSRF 토큰을 헤더에 포함
+
+3. **🌐 사이트명 완성**
+   - **파일**: `src/main/resources/templates/logistics/direct-return-list.html`
+   - **기능**: 교환반품 페이지(`form.html`)의 모든 사이트명 반영
+   - **추가된 사이트**:
+     - **레노마**: 29CM-레노마, 롯데온-레노마, 무신사-레노마, 스토어팜-레노마, 지그재그-레노마, 카카오-레노마, 패션플러스-레노마, 하프클럽-레노마, SSG-레노마, EQL-레노마, W컨셉-레노마
+     - **코랄리크**: 29CM-코랄리크, 무신사-코랄리크, 지그재그-코랄리크, CJ오쇼핑-코랄리크, SSG-코랄리크, EQL-코랄리크, LF몰-코랄리크, 스토어팜-코랄리크
+
+4. **📊 리스트 조회 문제 해결**
+   - **파일**: `src/main/java/com/wio/crm/controller/LogisticsDirectReturnController.java`
+   - **문제**: 등록은 되지만 리스트에 표시되지 않음
+   - **원인**: HTML에서 기대하는 변수명과 컨트롤러에서 전달하는 변수명 불일치
+   - **해결**: 
+     - `directReturns` → `page` 변경
+     - 통계 데이터 변수명 매핑 (`totalCount`, `matchedCount` 등)
+     - 오늘 입고 통계 추가
+
+5. **🎨 UI/UX 개선**
+   - **테이블 체크박스 정렬**: 중앙 정렬, 18px 크기, 파란색 accent
+   - **액션 버튼 정렬**: 마지막 컬럼 중앙 정렬
+   - **미개발 기능 주석처리**: 수정/매핑/삭제 버튼, 일괄 매핑, 엑셀 다운로드 버튼
+
+#### **📈 교환반품 페이지 개선**
+
+1. **🗑️ 작업 컬럼 제거**
+   - **파일**: `src/main/resources/templates/exchange/list.html`
+   - **제거된 기능**: "보기" 버튼이 있는 작업 컬럼
+   - **대체 기능**: 행 더블클릭으로 상세 페이지 이동
+   - **영향 없음**: 다른 기능들 정상 작동 확인
+
+2. **🎨 입금 배지 색상 문제 해결**
+   - **문제**: 입금 관련 배지 색상이 표시되지 않음
+   - **해결**: CSS 명시도 높여서 `!important` 적용
+   - **추가**: Fallback 색상, 테두리, 그림자 효과 적용
+   - **결과**: 
+     - 🔴 입금필요 (빨간색)
+     - 🟡 입금대기 (노란색)  
+     - 🟢 입금완료 (녹색)
+     - 🔵 입금불필요 (파란색)
+
+#### **🛠️ 백엔드 구현 내용**
+
+**새로 생성된 파일들:**
+- `DirectReturnBulkRequestDTO.java` - 일괄등록 요청 DTO
+- `LogisticsDirectReturnService.java` - 서비스 로직
+- `LogisticsDirectReturnController.java` - 컨트롤러
+- `LogisticsDirectReturnMapper.java` - MyBatis 매퍼
+- `LogisticsDirectReturnMapper.xml` - SQL 쿼리
+- `LogisticsDirectReturn.java` - 엔티티 모델
+
+**주요 API 엔드포인트:**
+- `POST /logistics/direct-return/api/bulk` - 일괄등록
+- `GET /logistics/direct-return/list` - 목록 조회
+- `GET /logistics/direct-return/api/list` - API 목록 조회
+
+#### **📊 통계 기능**
+
+- **전체 현황**: 총 입고 건수
+- **매핑 현황**: 매핑완료/매핑대기 건수
+- **처리 현황**: 처리완료/입고대기 건수  
+- **미매핑**: 매핑 불가 항목
+- **오늘 입고**: 금일 입고 건수
+
+#### **🎯 개발 완료 상태**
+
+**✅ 완전히 작동하는 기능:**
+- 신규 일괄등록 (여러 제품 동시 등록)
+- 검색 및 필터링 (키워드, 날짜, 사이트명, 상태별)
+- 페이징 및 정렬
+- 통계 대시보드
+- 데이터 유효성 검증
+
+**💤 주석처리된 기능 (향후 개발 예정):**
+- 개별 수정/삭제
+- 매핑 기능
+- 일괄 매핑
+- 엑셀 다운로드
+
+---
+
+**📅 마지막 업데이트**: 2025년 7월 16일  
+**📝 문서 버전**: v2.1  
 **✍️ 작성자**: WICRM 개발팀
 
 > **💡 참고**: 이 문서는 WICRM 프로젝트의 전체 구조와 개발 가이드를 제공합니다. 

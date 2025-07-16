@@ -59,6 +59,7 @@ public class SecurityConfig {
                                 new AntPathRequestMatcher("/return/**"),  // 교환/반품 관리 경로 추가
                                 new AntPathRequestMatcher("/exchange/**"),  // 교환/반품 관리 경로 추가
                                 new AntPathRequestMatcher("/payment/**"),  // 입금 관리 경로 추가
+                                new AntPathRequestMatcher("/logistics/**"),  // 물류 관리 경로 추가
                                 new AntPathRequestMatcher("/admin/banners/**"),  // 배너 관리 경로 추가
                                 new AntPathRequestMatcher("/project-plan/**"),  // 프로젝트 모니터링 경로 추가
                                 new AntPathRequestMatcher("/error")  // 에러 페이지 CSRF 보호 비활성화
@@ -78,6 +79,7 @@ public class SecurityConfig {
                         .requestMatchers("/return/**").authenticated()  // 교환/반품 관리 경로는 인증된 사용자만 접근 가능
                         .requestMatchers("/exchange/**").authenticated()  // 교환/반품 관리 경로는 인증된 사용자만 접근 가능
                         .requestMatchers("/payment/**").authenticated()  // 입금 관리 경로는 인증된 사용자만 접근 가능
+                        .requestMatchers("/logistics/**").authenticated()  // 물류 관리 경로는 인증된 사용자만 접근 가능
                         .requestMatchers("/api/log/user-action").authenticated()  // 사용자 액션 로깅 API 접근 설정
                         .requestMatchers("/admin/banners/**").hasAuthority("ROLE_EMPLOYEE")  // 배너 관리 페이지는 내부 직원만 접근 가능
                         .anyRequest().authenticated())
