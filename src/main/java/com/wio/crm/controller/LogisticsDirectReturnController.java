@@ -210,6 +210,52 @@ public class LogisticsDirectReturnController {
             return ResponseEntity.badRequest().body(response);
         }
     }
+
+    /**
+     * 수정 일괄 처리 API (기존 레코드 삭제 후 새로운 제품들 일괄 생성)
+     */
+    @PutMapping("/api/{id}/bulk")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> updateBulkItems(@PathVariable Long id, 
+                                                              @RequestBody DirectReturnBulkRequestDTO request) {
+        log.debug("물류 직접입고 수정 일괄 처리 - 기존 ID: {}, 새 데이터: {}", id, request);
+        
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            // 요청 데이터 로깅
+            log.debug("수정 일괄 처리 요청 상세 - 기존 ID: {}, 고객: {}, 제품 수: {}", 
+                      id, request.getCustomerName(), request.getProducts().size());
+            
+            // 현재 로그인 사용자 정보 가져오기
+            String currentUser = getCurrentUser();
+            
+            // 수정 일괄 처리 실행 (기존 레코드 삭제 후 새로운 제품들 일괄 생성)
+            List<LogisticsDirectReturn> updatedItems = logisticsDirectReturnService.updateBulkItems(id, request, currentUser);
+            
+            response.put("success", true);
+            response.put("message", "총 " + request.getProducts().size() + "개 제품으로 수정되었습니다.");
+            response.put("updatedCount", request.getProducts().size());
+            response.put("data", updatedItems);
+            
+            log.info("물류 직접입고 수정 일괄 처리 성공 - 기존 ID: {}, 고객: {}, 제품 수: {}", 
+                     id, request.getCustomerName(), request.getProducts().size());
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (IllegalArgumentException e) {
+            log.warn("물류 직접입고 수정 일괄 처리 유효성 검증 실패 - 기존 ID: {}, 오류: {}", id, e.getMessage());
+            response.put("success", false);
+            response.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+            
+        } catch (Exception e) {
+            log.error("물류 직접입고 수정 일괄 처리 실패 - 기존 ID: {}", id, e);
+            response.put("success", false);
+            response.put("message", "수정 중 오류가 발생했습니다: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
     
     /**
      * 삭제 API

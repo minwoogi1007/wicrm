@@ -59,4 +59,14 @@ public interface ShippingPaymentService {
      * 최근 입금 내역 조회
      */
     List<Map<String, Object>> getRecentPayments(int limit);
+
+    /**
+     * 브랜드별 사이트 목록 조회
+     */
+    List<Map<String, Object>> getSitesByBrand(String brand);
+
+    /**
+     * 전체 사이트 목록 조회
+     */
+    List<Map<String, Object>> getAllSites();
 } 

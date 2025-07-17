@@ -123,9 +123,25 @@ public class ShippingPaymentServiceImpl implements ShippingPaymentService {
     @Override
     public boolean delete(Long id) {
         try {
-            // 임시 구현 - 실제로는 데이터베이스에서 삭제
             log.info("입금 내역 삭제: ID={}", id);
-            return true;
+            
+            // 매핑 상태 확인
+            ShippingPaymentRegisterDTO payment = findById(id);
+            if (payment == null) {
+                log.warn("삭제 대상 입금 내역을 찾을 수 없음: ID={}", id);
+                return false;
+            }
+            
+            if ("MAPPED".equals(payment.getMappingStatus())) {
+                log.warn("매핑된 입금 내역은 삭제할 수 없음: ID={}", id);
+                return false;
+            }
+            
+            int result = shippingPaymentMapper.deletePayment(id);
+            boolean success = result > 0;
+            
+            log.info("입금 내역 삭제 완료: ID={}, 결과={}", id, success);
+            return success;
             
         } catch (Exception e) {
             log.error("입금 내역 삭제 실패: ID={}, 오류={}", id, e.getMessage(), e);
@@ -136,16 +152,17 @@ public class ShippingPaymentServiceImpl implements ShippingPaymentService {
     @Override
     public ShippingPaymentRegisterDTO findById(Long id) {
         try {
-            // 임시 구현 - 실제로는 데이터베이스에서 조회
-            ShippingPaymentRegisterDTO dto = new ShippingPaymentRegisterDTO();
-            dto.setRegisterId(id);
-            dto.setCustomerName("홍길동");
-            dto.setCustomerPhone("010-1234-5678");
-            dto.setAmount(3000L);
-            dto.setRegisterDate(LocalDateTime.now());
-            dto.setNotes("교환 배송비");
+            log.info("입금 내역 조회: ID={}", id);
             
-            return dto;
+            ShippingPaymentRegisterDTO payment = shippingPaymentMapper.selectById(id);
+            
+            if (payment != null) {
+                log.info("입금 내역 조회 완료: ID={}, 고객명={}", id, payment.getCustomerName());
+            } else {
+                log.warn("입금 내역을 찾을 수 없음: ID={}", id);
+            }
+            
+            return payment;
             
         } catch (Exception e) {
             log.error("입금 내역 조회 실패: ID={}, 오류={}", id, e.getMessage(), e);
@@ -156,13 +173,34 @@ public class ShippingPaymentServiceImpl implements ShippingPaymentService {
     @Override
     public ShippingPaymentRegisterDTO update(ShippingPaymentRegisterDTO registerDTO) {
         try {
-            // 임시 구현 - 실제로는 데이터베이스에서 수정
-            log.info("입금 내역 수정: {}", registerDTO);
-            return registerDTO;
+            log.info("입금 내역 수정 시작: ID={}, 고객명={}", registerDTO.getRegisterId(), registerDTO.getCustomerName());
+            
+            // 기존 데이터 존재 여부 확인
+            ShippingPaymentRegisterDTO existing = findById(registerDTO.getRegisterId());
+            if (existing == null) {
+                throw new RuntimeException("수정할 입금 내역을 찾을 수 없습니다: ID=" + registerDTO.getRegisterId());
+            }
+            
+            // 매핑 상태 확인
+            if ("MAPPED".equals(existing.getMappingStatus())) {
+                throw new RuntimeException("매핑이 완료된 입금 내역은 수정할 수 없습니다: ID=" + registerDTO.getRegisterId());
+            }
+            
+            // 수정 처리
+            int result = shippingPaymentMapper.updatePayment(registerDTO);
+            if (result <= 0) {
+                throw new RuntimeException("입금 내역 수정에 실패했습니다: ID=" + registerDTO.getRegisterId());
+            }
+            
+            // 수정된 데이터 다시 조회해서 반환
+            ShippingPaymentRegisterDTO updated = findById(registerDTO.getRegisterId());
+            
+            log.info("입금 내역 수정 완료: ID={}, 고객명={}", registerDTO.getRegisterId(), registerDTO.getCustomerName());
+            return updated;
             
         } catch (Exception e) {
-            log.error("입금 내역 수정 실패: {}", e.getMessage(), e);
-            throw new RuntimeException("입금 내역 수정에 실패했습니다.", e);
+            log.error("입금 내역 수정 실패: ID={}, 오류={}", registerDTO.getRegisterId(), e.getMessage(), e);
+            throw new RuntimeException("입금 내역 수정에 실패했습니다: " + e.getMessage(), e);
         }
     }
 
@@ -217,6 +255,38 @@ public class ShippingPaymentServiceImpl implements ShippingPaymentService {
             
         } catch (Exception e) {
             log.error("최근 입금 내역 조회 실패: {}", e.getMessage(), e);
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public List<Map<String, Object>> getSitesByBrand(String brand) {
+        try {
+            log.info("브랜드별 사이트 목록 조회: {}", brand);
+            
+            List<Map<String, Object>> sites = shippingPaymentMapper.selectSitesByBrand(brand);
+            
+            log.info("브랜드({}) 사이트 목록 조회 완료: {} 개", brand, sites != null ? sites.size() : 0);
+            return sites != null ? sites : new ArrayList<>();
+            
+        } catch (Exception e) {
+            log.error("브랜드별 사이트 목록 조회 실패: brand={}, error={}", brand, e.getMessage(), e);
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public List<Map<String, Object>> getAllSites() {
+        try {
+            log.info("전체 사이트 목록 조회");
+            
+            List<Map<String, Object>> sites = shippingPaymentMapper.selectAllSites();
+            
+            log.info("전체 사이트 목록 조회 완료: {} 개", sites != null ? sites.size() : 0);
+            return sites != null ? sites : new ArrayList<>();
+            
+        } catch (Exception e) {
+            log.error("전체 사이트 목록 조회 실패: {}", e.getMessage(), e);
             return new ArrayList<>();
         }
     }

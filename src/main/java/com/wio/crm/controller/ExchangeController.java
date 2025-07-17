@@ -4,6 +4,7 @@ import com.wio.crm.dto.ReturnItemDTO;
 import com.wio.crm.dto.ReturnItemSearchDTO;
 import com.wio.crm.dto.ReturnItemBulkDateUpdateDTO;
 import com.wio.crm.service.ReturnItemService;
+import com.wio.crm.service.ShippingPaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -53,6 +54,7 @@ import java.io.*;
 public class ExchangeController {
 
     private final ReturnItemService returnItemService;
+    private final ShippingPaymentService shippingPaymentService;
     
     @Value("${file.upload-dir:./uploads}")
     private String uploadBaseDir;
@@ -311,6 +313,48 @@ public class ExchangeController {
             errorResult.put("success", false);
             errorResult.put("message", "상세 조회 중 오류가 발생했습니다: " + e.getMessage());
             return ResponseEntity.internalServerError().body(errorResult);
+        }
+    }
+
+    /**
+     * 브랜드별 사이트 목록 조회 API
+     */
+    @GetMapping("/api/sites")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getSitesByBrand(@RequestParam(required = false) String brand) {
+        
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            log.info("교환/반품 - 사이트 목록 조회 요청: brand={}", brand);
+            
+            List<Map<String, Object>> sites;
+            
+            if (brand != null && !brand.trim().isEmpty()) {
+                // 브랜드별 조회
+                sites = shippingPaymentService.getSitesByBrand(brand.trim());
+                log.info("브랜드({}) 사이트 조회 완료: {} 개", brand, sites.size());
+            } else {
+                // 전체 조회
+                sites = shippingPaymentService.getAllSites();
+                log.info("전체 사이트 조회 완료: {} 개", sites.size());
+            }
+            
+            result.put("success", true);
+            result.put("data", sites);
+            result.put("count", sites.size());
+            
+            return ResponseEntity.ok(result);
+            
+        } catch (Exception e) {
+            log.error("교환/반품 - 사이트 목록 조회 실패: brand={}, error={}", brand, e.getMessage(), e);
+            
+            result.put("success", false);
+            result.put("message", "사이트 목록 조회 중 오류가 발생했습니다: " + e.getMessage());
+            result.put("data", List.of());
+            result.put("count", 0);
+            
+            return ResponseEntity.internalServerError().body(result);
         }
     }
 

@@ -84,6 +84,15 @@ public class LmsTrackingService {
             // 🚀 통합 쿼리로 모든 통계를 한 번에 조회 (6개 쿼리 → 1개 쿼리)
             Map<String, Object> unifiedStats = lmsTrackingMapper.getUnifiedStats(searchDto);
             
+            // 🔍 디버그: 통계 쿼리 결과 상세 로그
+            log.info("📊 통계 쿼리 결과 상세:");
+            log.info("  - TOTAL_SENT: {}", unifiedStats.get("TOTAL_SENT"));
+            log.info("  - RECONTACTED: {}", unifiedStats.get("RECONTACTED"));
+            log.info("  - CALL_SUCCESS: {}", unifiedStats.get("CALL_SUCCESS"));
+            log.info("  - RECONTACT_RATE: {}", unifiedStats.get("RECONTACT_RATE"));
+            log.info("  - CALL_SUCCESS_RATE: {}", unifiedStats.get("CALL_SUCCESS_RATE"));
+            log.info("  - AVG_RESPONSE_TIME: {}", unifiedStats.get("AVG_RESPONSE_TIME"));
+            
             // 통계 DTO 빌드 (통합 결과 기반)
             LmsTrackingStatsDto statsDto = buildUnifiedStatsDto(unifiedStats);
             

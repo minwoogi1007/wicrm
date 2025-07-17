@@ -218,4 +218,30 @@
         WHERE REGISTER_ID = #{registerId}
     </update>
 
+    <!-- 브랜드별 사이트 목록 조회 -->
+    <select id="selectSitesByBrand" parameterType="String" resultType="map">
+        SELECT 
+            SITE_ID as siteId,
+            SITE_NAME as siteName,
+            SITE_CODE as siteCode,
+            SORT_ORDER as sortOrder
+        FROM TB_SITE_MASTER
+        WHERE BRAND = #{brand}
+          AND ACTIVE_YN = 'Y'
+        ORDER BY SORT_ORDER, SITE_NAME
+    </select>
+
+    <!-- 전체 사이트 목록 조회 -->
+    <select id="selectAllSites" resultType="map">
+        SELECT 
+            SITE_ID as siteId,
+            BRAND as brand,
+            SITE_NAME as siteName,
+            SITE_CODE as siteCode,
+            SORT_ORDER as sortOrder
+        FROM TB_SITE_MASTER
+        WHERE ACTIVE_YN = 'Y'
+        ORDER BY BRAND, SORT_ORDER, SITE_NAME
+    </select>
+
 </mapper> 

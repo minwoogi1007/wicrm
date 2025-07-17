@@ -449,9 +449,11 @@
 
         //console.log(' 서버 데이터:', serverData);
 
-        // 🎯 브랜드 선택 함수
+        // 🎯 브랜드 선택 함수 (동적 사이트 로딩)
         function selectBrand(brand, element) {
-            //console.log('브랜드 선택:', brand);
+            console.log('🎯 selectBrand 함수 호출됨!');
+            console.log('🎯 선택된 브랜드:', brand);
+            console.log('🎯 클릭된 요소:', element);
 
             // 모든 브랜드 버튼 초기화
             document.querySelectorAll('.selection-row:first-child .selection-btn').forEach(btn => {
@@ -460,44 +462,218 @@
 
             // 선택된 버튼 활성화
             element.classList.add('active');
+            console.log('✅ 브랜드 버튼 활성화 완료');
 
-            // 사이트 버튼 생성
-            const siteButtonsContainer = document.getElementById('siteButtons');
-            let siteButtons = '';
-
-            if (brand === '레노마') {
-                siteButtons = `
-                    <div class="selection-btn" onclick="selectSite('29CM-레노마', this)">29CM-레노마</div>
-                    <div class="selection-btn" onclick="selectSite('롯데온-레노마', this)">롯데온-레노마</div>
-                    <div class="selection-btn" onclick="selectSite('무신사-레노마', this)">무신사-레노마</div>
-                    <div class="selection-btn" onclick="selectSite('스토어팜-레노마', this)">스토어팜-레노마</div>
-                    <div class="selection-btn" onclick="selectSite('자사몰-레노마', this)">자사몰-레노마</div>
-                    <div class="selection-btn" onclick="selectSite('지그재그-레노마', this)">지그재그-레노마</div>
-                    <div class="selection-btn" onclick="selectSite('카카오-레노마', this)">카카오-레노마</div>
-                    <div class="selection-btn" onclick="selectSite('패션플러스-레노마', this)">패션플러스-레노마</div>
-                    <div class="selection-btn" onclick="selectSite('하프클럽-레노마', this)">하프클럽-레노마</div>
-                    <div class="selection-btn" onclick="selectSite('SSG-레노마', this)">SSG-레노마</div>
-                    <div class="selection-btn" onclick="selectSite('EQL-레노마', this)">EQL-레노마</div>
-                    <div class="selection-btn" onclick="selectSite('W컨셉-레노마', this)">W컨셉-레노마</div>
-                `;
-            } else if (brand === '코랄리크') {
-                siteButtons = `
-                    <div class="selection-btn" onclick="selectSite('29CM-코랄리크', this)">29CM-코랄리크</div>
-                    <div class="selection-btn" onclick="selectSite('무신사-코랄리크', this)">무신사-코랄리크</div>
-                    <div class="selection-btn" onclick="selectSite('자사몰-코랄리크', this)">자사몰-코랄리크</div>
-                    <div class="selection-btn" onclick="selectSite('지그재그-코랄리크', this)">지그재그-코랄리크</div>
-                    <div class="selection-btn" onclick="selectSite('CJ오쇼핑-코랄리크', this)">CJ오쇼핑-코랄리크</div>
-                    <div class="selection-btn" onclick="selectSite('SSG-코랄리크', this)">SSG-코랄리크</div>
-                    <div class="selection-btn" onclick="selectSite('EQL-코랄리크', this)">EQL-코랄리크</div>
-                    <div class="selection-btn" onclick="selectSite('LF몰-코랄리크', this)">LF몰-코랄리크</div>
-                    <div class="selection-btn" onclick="selectSite('스토어팜-코랄리크', this)">스토어팜-코랄리크</div>
-                `;
-            }
-
-            if (siteButtonsContainer) {
-                siteButtonsContainer.innerHTML = siteButtons;
-            }
+            // API로 사이트 목록 조회
+            console.log('🚀 loadSitesByBrand 호출 시작...');
+            loadSitesByBrand(brand);
             updateSelectedInfo();
+        }
+
+        // 🚀 브랜드별 사이트 목록 동적 로딩
+        function loadSitesByBrand(brand) {
+            const siteButtonsContainer = document.getElementById('siteButtons');
+            
+            console.log('🔍 siteButtonsContainer 요소:', siteButtonsContainer);
+            console.log('🔍 siteButtonsContainer ID 존재 여부:', !!document.getElementById('siteButtons'));
+            
+            // 로딩 표시
+            if (siteButtonsContainer) {
+                console.log('✅ siteButtonsContainer 발견, 로딩 메시지 설정');
+                siteButtonsContainer.innerHTML = '<div class="selection-btn" style="color: #6b7280;">사이트 목록 로딩 중...</div>';
+                console.log('✅ 로딩 메시지 HTML 설정 완료:', siteButtonsContainer.innerHTML);
+            } else {
+                console.error('❌ siteButtonsContainer를 찾을 수 없습니다!');
+                console.log('🔍 현재 페이지의 모든 ID 요소들:');
+                const allElements = document.querySelectorAll('[id]');
+                allElements.forEach(el => console.log(`  - ID: ${el.id}, 태그: ${el.tagName}`));
+            }
+
+            // 브랜드명을 영어로 변환
+            let brandCode = '';
+            if (brand === '레노마') {
+                brandCode = 'RENOMA';
+            } else if (brand === '코랄리크') {
+                brandCode = 'CORALIQUE';
+            }
+
+            if (!brandCode) {
+                console.error('지원하지 않는 브랜드:', brand);
+                if (siteButtonsContainer) {
+                    siteButtonsContainer.innerHTML = '<div class="selection-btn" style="color: #ef4444;">지원하지 않는 브랜드</div>';
+                }
+                return;
+            }
+
+            // AJAX로 사이트 목록 조회
+            fetch(`/exchange/api/sites?brand=${brandCode}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [window.csrfHeader]: window.csrfToken
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('🔍 API 응답 데이터:', data);
+                
+                if (data.success && data.data && Array.isArray(data.data)) {
+                    let siteButtons = '';
+                    
+                    console.log('📋 사이트 목록:', data.data);
+                    
+                    // 사이트 버튼 생성
+                    data.data.forEach((site, index) => {
+                        console.log(`🔍 사이트 ${index}:`, site);
+                        console.log(`🔍 전체 객체:`, JSON.stringify(site, null, 2));
+                        console.log(`🔍 siteName 타입: ${typeof site.siteName}, 값: "${site.siteName}"`);
+                        console.log(`🔍 SITE_NAME 타입: ${typeof site.SITE_NAME}, 값: "${site.SITE_NAME}"`);
+                        console.log(`🔍 SITENAME 타입: ${typeof site.SITENAME}, 값: "${site.SITENAME}"`);
+                        
+                        // 모든 가능한 필드 확인
+                        Object.keys(site).forEach(key => {
+                            if (key.toLowerCase().includes('name')) {
+                                console.log(`🔍 name 관련 필드 ${key}: "${site[key]}"`);
+                            }
+                        });
+                        
+                        const siteName = site.SITENAME || site.siteName || site.SITE_NAME || site.name || '사이트명 없음';
+                        console.log(`🎯 최종 사용할 사이트명: "${siteName}"`);
+                        siteButtons += `<div class="selection-btn" onclick="selectSite('${siteName}', this)">${siteName}</div>`;
+                    });
+
+                    console.log('🔧 생성된 siteButtons HTML:', siteButtons);
+                    console.log('🔧 siteButtons HTML 길이:', siteButtons.length);
+
+                    if (siteButtonsContainer) {
+                        console.log('✅ siteButtonsContainer에 HTML 삽입 시작');
+                        siteButtonsContainer.innerHTML = siteButtons;
+                        console.log('✅ HTML 삽입 완료, 현재 innerHTML:', siteButtonsContainer.innerHTML);
+                        console.log('✅ 삽입 후 자식 요소 개수:', siteButtonsContainer.children.length);
+                        
+                        // 실제 화면에 표시되는지 확인
+                        const insertedButtons = siteButtonsContainer.querySelectorAll('.selection-btn');
+                        console.log('✅ 삽입된 버튼 개수:', insertedButtons.length);
+                        insertedButtons.forEach((btn, idx) => {
+                            console.log(`  버튼 ${idx}: "${btn.textContent}" - 표시여부: ${btn.offsetWidth > 0 && btn.offsetHeight > 0}`);
+                        });
+                    } else {
+                        console.error('❌ siteButtonsContainer가 null입니다!');
+                    }
+
+                    console.log(`✅ ${brand} 사이트 목록 로딩 완료: ${data.count}개`);
+                } else {
+                    console.error('❌ API 응답 구조 오류:', data);
+                    throw new Error(data.message || '사이트 목록 데이터가 올바르지 않습니다');
+                }
+            })
+            .catch(error => {
+                console.error(`❌ ${brand} 사이트 목록 로딩 실패:`, error);
+                if (siteButtonsContainer) {
+                    siteButtonsContainer.innerHTML = `<div class="selection-btn" style="color: #ef4444;">사이트 로딩 실패: ${error.message}</div>`;
+                }
+            });
+        }
+
+        // 🎯 수정 모드 전용: 사이트 로딩 후 자동 선택
+        function loadSitesByBrandForEdit(brand, targetSiteName) {
+            const siteButtonsContainer = document.getElementById('siteButtons');
+            
+            // 로딩 표시
+            if (siteButtonsContainer) {
+                siteButtonsContainer.innerHTML = '<div class="selection-btn" style="color: #6b7280;">사이트 목록 로딩 중...</div>';
+            }
+
+            // 브랜드명을 영어로 변환
+            let brandCode = '';
+            if (brand === '레노마') {
+                brandCode = 'RENOMA';
+            } else if (brand === '코랄리크') {
+                brandCode = 'CORALIQUE';
+            }
+
+            if (!brandCode) {
+                console.error('지원하지 않는 브랜드:', brand);
+                if (siteButtonsContainer) {
+                    siteButtonsContainer.innerHTML = '<div class="selection-btn" style="color: #ef4444;">지원하지 않는 브랜드</div>';
+                }
+                return;
+            }
+
+            // AJAX로 사이트 목록 조회
+            fetch(`/exchange/api/sites?brand=${brandCode}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [window.csrfHeader]: window.csrfToken
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('🔍 API 응답 데이터 (수정모드):', data);
+                
+                if (data.success && data.data && Array.isArray(data.data)) {
+                    let siteButtons = '';
+                    
+                    console.log('📋 사이트 목록 (수정모드):', data.data);
+                    
+                    // 사이트 버튼 생성
+                    data.data.forEach((site, index) => {
+                        console.log(`🔍 수정모드 사이트 ${index}:`, site);
+                        console.log(`🔍 수정모드 전체 객체:`, JSON.stringify(site, null, 2));
+                        console.log(`🔍 수정모드 siteName 타입: ${typeof site.siteName}, 값: "${site.siteName}"`);
+                        console.log(`🔍 수정모드 SITE_NAME 타입: ${typeof site.SITE_NAME}, 값: "${site.SITE_NAME}"`);
+                        console.log(`🔍 수정모드 SITENAME 타입: ${typeof site.SITENAME}, 값: "${site.SITENAME}"`);
+                        
+                        // 모든 가능한 필드 확인
+                        Object.keys(site).forEach(key => {
+                            if (key.toLowerCase().includes('name')) {
+                                console.log(`🔍 수정모드 name 관련 필드 ${key}: "${site[key]}"`);
+                            }
+                        });
+                        
+                        const siteName = site.SITENAME || site.siteName || site.SITE_NAME || site.name || '사이트명 없음';
+                        console.log(`🎯 수정모드 최종 사용할 사이트명: "${siteName}"`);
+                        siteButtons += `<div class="selection-btn" onclick="selectSite('${siteName}', this)">${siteName}</div>`;
+                    });
+
+                    if (siteButtonsContainer) {
+                        siteButtonsContainer.innerHTML = siteButtons;
+                        
+                        // 기존 사이트 자동 선택
+                        setTimeout(() => {
+                            const siteButtons = document.querySelectorAll('#siteButtons .selection-btn');
+                            siteButtons.forEach(btn => {
+                                if (btn.textContent.trim() === targetSiteName) {
+                                    btn.classList.add('active');
+                                    console.log('✅ 사이트 버튼 자동 활성화:', targetSiteName);
+                                }
+                            });
+                        }, 100);
+                    }
+
+                    console.log(`✅ ${brand} 사이트 목록 로딩 완료 (수정모드): ${data.count}개`);
+                } else {
+                    console.error('❌ API 응답 구조 오류 (수정모드):', data);
+                    throw new Error(data.message || '사이트 목록 데이터가 올바르지 않습니다');
+                }
+            })
+            .catch(error => {
+                console.error(`❌ ${brand} 사이트 목록 로딩 실패 (수정모드):`, error);
+                if (siteButtonsContainer) {
+                    siteButtonsContainer.innerHTML = `<div class="selection-btn" style="color: #ef4444;">사이트 로딩 실패: ${error.message}</div>`;
+                }
+            });
         }
 
         // 🎯 사이트 선택 함수
@@ -674,53 +850,8 @@
                             btn.classList.add('active');
                             //console.log('✅ 브랜드 버튼 활성화:', brand);
                             
-                            // 사이트 버튼 생성 (selectBrand 함수와 동일한 로직)
-                            const siteButtonsContainer = document.getElementById('siteButtons');
-                            let siteButtons = '';
-
-                            if (brand === '레노마') {
-                                siteButtons = `
-                                    <div class="selection-btn" onclick="selectSite('29CM-레노마', this)">29CM-레노마</div>
-                                    <div class="selection-btn" onclick="selectSite('롯데온-레노마', this)">롯데온-레노마</div>
-                                    <div class="selection-btn" onclick="selectSite('무신사-레노마', this)">무신사-레노마</div>
-                                    <div class="selection-btn" onclick="selectSite('스토어팜-레노마', this)">스토어팜-레노마</div>
-                                    <div class="selection-btn" onclick="selectSite('자사몰-레노마', this)">자사몰-레노마</div>
-                                    <div class="selection-btn" onclick="selectSite('지그재그-레노마', this)">지그재그-레노마</div>
-                                    <div class="selection-btn" onclick="selectSite('카카오-레노마', this)">카카오-레노마</div>
-                                    <div class="selection-btn" onclick="selectSite('패션플러스-레노마', this)">패션플러스-레노마</div>
-                                    <div class="selection-btn" onclick="selectSite('하프클럽-레노마', this)">하프클럽-레노마</div>
-                                    <div class="selection-btn" onclick="selectSite('SSG-레노마', this)">SSG-레노마</div>
-                                    <div class="selection-btn" onclick="selectSite('EQL-레노마', this)">EQL-레노마</div>
-                                    <div class="selection-btn" onclick="selectSite('W컨셉-레노마', this)">W컨셉-레노마</div>
-                                `;
-                            } else if (brand === '코랄리크') {
-                                siteButtons = `
-                                    <div class="selection-btn" onclick="selectSite('29CM-코랄리크', this)">29CM-코랄리크</div>
-                                    <div class="selection-btn" onclick="selectSite('무신사-코랄리크', this)">무신사-코랄리크</div>
-                                    <div class="selection-btn" onclick="selectSite('자사몰-코랄리크', this)">자사몰-코랄리크</div>
-                                    <div class="selection-btn" onclick="selectSite('지그재그-코랄리크', this)">지그재그-코랄리크</div>
-                                    <div class="selection-btn" onclick="selectSite('CJ오쇼핑-코랄리크', this)">CJ오쇼핑-코랄리크</div>
-                                    <div class="selection-btn" onclick="selectSite('SSG-코랄리크', this)">SSG-코랄리크</div>
-                                    <div class="selection-btn" onclick="selectSite('EQL-코랄리크', this)">EQL-코랄리크</div>
-                                    <div class="selection-btn" onclick="selectSite('LF몰-코랄리크', this)">LF몰-코랄리크</div>
-                                    <div class="selection-btn" onclick="selectSite('스토어팜-코랄리크', this)">스토어팜-코랄리크</div>
-                                `;
-                            }
-
-                            if (siteButtonsContainer) {
-                                siteButtonsContainer.innerHTML = siteButtons;
-                                
-                                // 2. 사이트 버튼 활성화
-                                setTimeout(() => {
-                                    const siteButtons = document.querySelectorAll('#siteButtons .selection-btn');
-                                    siteButtons.forEach(btn => {
-                                        if (btn.textContent.trim() === siteName) {
-                                            btn.classList.add('active');
-                                            //console.log(' 사이트 버튼 활성화:', siteName);
-                                        }
-                                    });
-                                }, 100);
-                            }
+                            // 동적 사이트 로딩 후 사이트 버튼 활성화
+                            loadSitesByBrandForEdit(brand, siteName);
                         }
                     });
                 }

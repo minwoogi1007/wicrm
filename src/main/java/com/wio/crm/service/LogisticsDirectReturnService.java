@@ -417,6 +417,89 @@ public class LogisticsDirectReturnService {
     }
     
     /**
+     * 수정 일괄 처리 (기존 레코드 삭제 후 새로운 제품들 일괄 생성)
+     */
+    @Transactional
+    public List<LogisticsDirectReturn> updateBulkItems(Long originalId, DirectReturnBulkRequestDTO request, String currentUser) {
+        log.debug("물류 직접입고 수정 일괄 처리 시작 - 기존 ID: {}, 공통정보: {}, 제품 수: {}, 수정자: {}", 
+                  originalId, request.getCustomerName(), request.getProducts().size(), currentUser);
+        
+        // 기존 데이터 존재 확인
+        LogisticsDirectReturnDTO existing = findById(originalId);
+        log.debug("기존 데이터 확인 완료 - 고객명: {}, 제품코드: {}", existing.getCustomerName(), existing.getProductCode());
+        
+        // 요청 데이터 유효성 검증
+        validateBulkRequest(request);
+        
+        try {
+            // 1단계: 기존 레코드 삭제
+            log.debug("기존 레코드 삭제 - ID: {}", originalId);
+            logisticsDirectReturnMapper.delete(originalId);
+            
+            // 2단계: 새로운 제품들 일괄 생성
+            List<LogisticsDirectReturn> newItems = createNewItemsFromRequest(request, currentUser);
+            
+            log.info("물류 직접입고 수정 일괄 처리 완료 - 기존 ID: {}, 새로 생성된 제품 수: {}, 수정자: {}", 
+                     originalId, newItems.size(), currentUser);
+                     
+            return newItems;
+                     
+        } catch (Exception e) {
+            log.error("물류 직접입고 수정 일괄 처리 실패 - 기존 ID: {}", originalId, e);
+            throw new RuntimeException("수정 일괄 처리 중 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * 요청 데이터에서 새로운 아이템들 생성
+     */
+    private List<LogisticsDirectReturn> createNewItemsFromRequest(DirectReturnBulkRequestDTO request, String currentUser) {
+        log.debug("새로운 아이템들 생성 시작 - 제품 수: {}", request.getProducts().size());
+        
+        List<LogisticsDirectReturn> newItems = new java.util.ArrayList<>();
+        
+        // 입고일자 파싱
+        LocalDate receivedDate = LocalDate.parse(request.getReceivedDate());
+        
+        // 각 제품별로 레코드 생성
+        for (int i = 0; i < request.getProducts().size(); i++) {
+            DirectReturnBulkRequestDTO.ProductInfo product = request.getProducts().get(i);
+            
+            LogisticsDirectReturn item = new LogisticsDirectReturn();
+            
+            // 공통 정보 설정
+            item.setReceivedDate(receivedDate);
+            item.setSiteName(request.getSiteName());
+            item.setCustomerName(request.getCustomerName());
+            item.setCustomerPhone(request.getCustomerPhone());
+            item.setTrackingNumber(request.getTrackingNumber());
+            item.setProcessingStatus(request.getProcessingStatus());
+            item.setMappingStatus(request.getMappingStatus());
+            item.setRemarks(request.getRemarks());
+            
+            // 개별 제품 정보 설정
+            item.setProductCode(product.getProductCode());
+            item.setQuantity(product.getQuantity());
+            item.setProductColor(product.getProductColor());
+            item.setProductSize(product.getProductSize());
+            
+            // 등록자 정보 설정 (새로 생성되는 것이므로 createdBy도 현재 사용자로)
+            item.setCreatedBy(currentUser);
+            item.setUpdatedBy(currentUser);
+            
+            // 개별 저장
+            logisticsDirectReturnMapper.insert(item);
+            newItems.add(item);
+            
+            log.debug("새로운 제품 생성 완료 - 순서: {}, 제품코드: {}, 수량: {}, ID: {}", 
+                      i + 1, product.getProductCode(), product.getQuantity(), item.getId());
+        }
+        
+        log.debug("새로운 아이템들 생성 완료 - 총 생성 수: {}", newItems.size());
+        return newItems;
+    }
+    
+    /**
      * 일괄 등록 요청 데이터 유효성 검증
      */
     private void validateBulkRequest(DirectReturnBulkRequestDTO request) {

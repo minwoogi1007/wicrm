@@ -194,6 +194,20 @@ public class PaymentController {
         try {
             log.info("입금 내역 삭제 요청: ID={}", id);
             
+            // 매핑 상태 확인
+            ShippingPaymentRegisterDTO payment = shippingPaymentService.findById(id);
+            if (payment == null) {
+                result.put("success", false);
+                result.put("message", "해당 입금 내역을 찾을 수 없습니다.");
+                return ResponseEntity.badRequest().body(result);
+            }
+            
+            if ("MAPPED".equals(payment.getMappingStatus())) {
+                result.put("success", false);
+                result.put("message", "매핑이 완료된 입금 내역은 삭제할 수 없습니다.");
+                return ResponseEntity.badRequest().body(result);
+            }
+            
             boolean deleted = shippingPaymentService.delete(id);
             
             if (deleted) {
@@ -213,6 +227,99 @@ public class PaymentController {
             
             result.put("success", false);
             result.put("message", "입금 내역 삭제 중 오류가 발생했습니다: " + e.getMessage());
+            
+            return ResponseEntity.internalServerError().body(result);
+        }
+    }
+
+    /**
+     * 입금 내역 단건 조회 API (수정용)
+     */
+    @GetMapping("/api/{id}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getPaymentById(@PathVariable Long id) {
+        
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            log.info("입금 내역 단건 조회: ID={}", id);
+            
+            ShippingPaymentRegisterDTO payment = shippingPaymentService.findById(id);
+            
+            if (payment == null) {
+                result.put("success", false);
+                result.put("message", "해당 입금 내역을 찾을 수 없습니다.");
+                return ResponseEntity.badRequest().body(result);
+            }
+            
+            result.put("success", true);
+            result.put("data", payment);
+            
+            log.info("입금 내역 단건 조회 완료: ID={}", id);
+            
+            return ResponseEntity.ok(result);
+            
+        } catch (Exception e) {
+            log.error("입금 내역 단건 조회 오류: {}", e.getMessage(), e);
+            
+            result.put("success", false);
+            result.put("message", "입금 내역 조회 중 오류가 발생했습니다: " + e.getMessage());
+            
+            return ResponseEntity.internalServerError().body(result);
+        }
+    }
+
+    /**
+     * 입금 내역 수정 API
+     */
+    @PutMapping("/api/{id}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> updatePayment(
+            @PathVariable Long id,
+            @RequestBody ShippingPaymentRegisterDTO updateDTO,
+            Authentication authentication) {
+        
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            log.info("입금 내역 수정 요청: ID={}, 데이터={}", id, updateDTO);
+            
+            // 기존 데이터 조회 및 매핑 상태 확인
+            ShippingPaymentRegisterDTO existingPayment = shippingPaymentService.findById(id);
+            if (existingPayment == null) {
+                result.put("success", false);
+                result.put("message", "해당 입금 내역을 찾을 수 없습니다.");
+                return ResponseEntity.badRequest().body(result);
+            }
+            
+            if ("MAPPED".equals(existingPayment.getMappingStatus())) {
+                result.put("success", false);
+                result.put("message", "매핑이 완료된 입금 내역은 수정할 수 없습니다.");
+                return ResponseEntity.badRequest().body(result);
+            }
+            
+            // 수정할 데이터 설정
+            updateDTO.setRegisterId(id);
+            updateDTO.setMappingStatus(existingPayment.getMappingStatus()); // 매핑 상태는 변경하지 않음
+            updateDTO.setReturnItemId(existingPayment.getReturnItemId()); // 매핑 정보도 유지
+            updateDTO.setRegisterDate(existingPayment.getRegisterDate()); // 등록일자 유지
+            updateDTO.setRegistrar(existingPayment.getRegistrar()); // 등록자 유지
+            
+            ShippingPaymentRegisterDTO updated = shippingPaymentService.update(updateDTO);
+            
+            result.put("success", true);
+            result.put("message", "입금 내역이 성공적으로 수정되었습니다.");
+            result.put("data", updated);
+            
+            log.info("입금 내역 수정 완료: ID={}", id);
+            
+            return ResponseEntity.ok(result);
+            
+        } catch (Exception e) {
+            log.error("입금 내역 수정 오류: {}", e.getMessage(), e);
+            
+            result.put("success", false);
+            result.put("message", "입금 내역 수정 중 오류가 발생했습니다: " + e.getMessage());
             
             return ResponseEntity.internalServerError().body(result);
         }
@@ -280,6 +387,82 @@ public class PaymentController {
             result.put("success", false);
             result.put("message", "오늘 입금 건수 조회 중 오류가 발생했습니다: " + e.getMessage());
             result.put("count", 0L);
+            
+            return ResponseEntity.internalServerError().body(result);
+        }
+    }
+
+    /**
+     * 브랜드별 사이트 목록 조회 API
+     */
+    @GetMapping("/api/sites")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getSitesByBrand(@RequestParam(required = false) String brand) {
+        
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            log.info("사이트 목록 조회 요청: brand={}", brand);
+            
+            List<Map<String, Object>> sites;
+            
+            if (brand != null && !brand.trim().isEmpty()) {
+                // 브랜드별 조회
+                sites = shippingPaymentService.getSitesByBrand(brand.trim());
+                log.info("브랜드({}) 사이트 조회 완료: {} 개", brand, sites.size());
+            } else {
+                // 전체 조회
+                sites = shippingPaymentService.getAllSites();
+                log.info("전체 사이트 조회 완료: {} 개", sites.size());
+            }
+            
+            result.put("success", true);
+            result.put("data", sites);
+            result.put("count", sites.size());
+            
+            return ResponseEntity.ok(result);
+            
+        } catch (Exception e) {
+            log.error("사이트 목록 조회 실패: brand={}, error={}", brand, e.getMessage(), e);
+            
+            result.put("success", false);
+            result.put("message", "사이트 목록 조회 중 오류가 발생했습니다: " + e.getMessage());
+            result.put("data", List.of());
+            result.put("count", 0);
+            
+            return ResponseEntity.internalServerError().body(result);
+        }
+    }
+
+    /**
+     * 전체 사이트 목록 조회 API
+     */
+    @GetMapping("/api/sites/all")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getAllSites() {
+        
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            log.info("전체 사이트 목록 조회");
+            
+            List<Map<String, Object>> sites = shippingPaymentService.getAllSites();
+            
+            result.put("success", true);
+            result.put("data", sites);
+            result.put("count", sites.size());
+            
+            log.info("전체 사이트 목록 조회 완료: {} 개", sites.size());
+            
+            return ResponseEntity.ok(result);
+            
+        } catch (Exception e) {
+            log.error("전체 사이트 목록 조회 실패: {}", e.getMessage(), e);
+            
+            result.put("success", false);
+            result.put("message", "전체 사이트 목록 조회 중 오류가 발생했습니다: " + e.getMessage());
+            result.put("data", List.of());
+            result.put("count", 0);
             
             return ResponseEntity.internalServerError().body(result);
         }

@@ -65,4 +65,14 @@ public interface ShippingPaymentMapper {
      * 매핑 해제
      */
     int unmapPayment(@Param("registerId") Long registerId);
+
+    /**
+     * 브랜드별 사이트 목록 조회
+     */
+    List<Map<String, Object>> selectSitesByBrand(@Param("brand") String brand);
+
+    /**
+     * 전체 사이트 목록 조회
+     */
+    List<Map<String, Object>> selectAllSites();
 } 

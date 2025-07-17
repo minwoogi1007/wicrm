@@ -260,14 +260,139 @@
         .table {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed;
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
         }
 
         .table th,
         .table td {
-            padding: 0.75rem;
+            padding: 1rem 0.75rem;
             text-align: left;
             border-bottom: 1px solid var(--gray-100);
-            font-size: 0.875rem;
+            font-size: 0.9rem;
+            vertical-align: top;
+            line-height: 1.5;
+        }
+        
+        .table th {
+            background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
+            font-weight: 600;
+            color: var(--text-primary);
+            text-transform: none;
+            font-size: 0.85rem;
+            letter-spacing: 0.02em;
+            border-bottom: 2px solid var(--gray-200);
+        }
+        
+        /* 스트라이프 효과 */
+        .table tbody tr:nth-child(even) {
+            background: var(--gray-50);
+        }
+        
+        .table tbody tr:hover {
+            background: var(--primary-light);
+            transition: background-color 0.2s ease;
+        }
+        
+
+        
+        /* 발송일시, 수신번호, 제목 컬럼 - 글씨 크기 증가 */
+        .table td:nth-child(1),
+        .table td:nth-child(2),
+        .table td:nth-child(3) {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+        
+        /* 발송일시 컬럼 */
+        .table td:nth-child(1) {
+            color: var(--text-secondary);
+            font-family: 'Courier New', monospace;
+        }
+        
+        /* 수신번호 컬럼 */
+        .table td:nth-child(2) {
+            font-family: 'Courier New', monospace;
+            color: var(--primary);
+        }
+        
+        /* 제목 컬럼 */
+        .table td:nth-child(3) {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text-primary);
+        }
+        
+        /* 메시지 컬럼 - 축약 표시 */
+        .table td:nth-child(4) {
+            word-break: break-word;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
+            cursor: help;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+        
+        /* 발송상태, 후속연락, 상세보기 컬럼 */
+        .table td:nth-child(5),
+        .table td:nth-child(6),
+        .table td:nth-child(7) {
+            font-size: 0.8rem;
+        }
+        
+        /* 📱 추가 가독성 개선 */
+        .table-responsive {
+            margin: 1.5rem 0;
+            border-radius: var(--radius);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            border: 1px solid var(--gray-200);
+        }
+        
+        /* 로딩 상태 개선 */
+        .loading {
+            padding: 3rem 2rem;
+            text-align: center;
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            margin: 1rem 0;
+            box-shadow: var(--shadow);
+        }
+        
+        /* 페이지네이션 개선 */
+        .pagination {
+            margin-top: 2rem;
+        }
+        
+        .pagination .page-link {
+            padding: 0.75rem 1rem;
+            margin: 0 0.25rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--gray-300);
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .pagination .page-link:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .pagination .page-item.active .page-link {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-color: var(--primary);
+            color: white;
+            font-weight: 600;
         }
 
         .table th {
@@ -312,6 +437,11 @@
         .badge.info {
             background: var(--info-light);
             color: var(--info);
+        }
+
+        .badge.primary {
+            background: var(--primary-light);
+            color: var(--primary);
         }
 
         /* 🔗 링크 스타일 */
@@ -580,13 +710,13 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>발송일시</th>
-                                <th>수신번호</th>
-                                <th>제목</th>
-                                <th>메시지 내용</th>
-                                <th>발송상태</th>
-                                <th>후속연락</th>
-                                <th>상세보기</th>
+                                <th style="width: 120px;">발송일시</th>
+                                <th style="width: 110px;">수신번호</th>
+                                <th style="width: 120px;">제목</th>
+                                <th style="width: 200px;">메시지 내용</th>
+                                <th style="width: 80px;">발송상태</th>
+                                <th style="width: 80px;">후속연락</th>
+                                <th style="width: 90px;">상세보기</th>
                             </tr>
                         </thead>
                         <tbody id="lmsTableBody">
@@ -828,19 +958,22 @@ function renderLmsTable(data) {
             '<span class="badge success">있음</span>' : 
             '<span class="badge warning">없음</span>';
         
+        // 메시지 내용 축약 (50자로 줄이고 툴팁으로만 전체 보기)
+        const messagePreview = item.message.length > 50 ? 
+            item.message.substring(0, 50) + '...' : 
+            item.message;
+        
         tbody.append(`
             <tr>
                 <td>${formatDate(item.sendDate)}</td>
                 <td>${item.clid}</td>
-                <td>${item.subject}</td>
-                <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                    ${item.message}
-                </td>
+                <td title="${item.subject}">${item.subject}</td>
+                <td title="${item.message}">${messagePreview}</td>
                 <td>${statusBadge}</td>
                 <td>${followUpBadge}</td>
                 <td>
                     <a href="javascript:void(0)" class="link-button" onclick="showCallHistory(${item.id})">
-                        📞 통화내역
+                        통화내역
                     </a>
                 </td>
             </tr>
@@ -924,26 +1057,62 @@ function renderCallHistory(data) {
             <thead>
                 <tr>
                     <th>통화일시</th>
-                    <th>상담원</th>
                     <th>결과</th>
                     <th>내용</th>
-                    <th>확인</th>
+                    <th>비고</th>
                 </tr>
             </thead>
             <tbody>
     `;
     
     data.forEach(function(item) {
-        const resultBadge = getCallResultBadge(item.result);
-        const confirmBadge = getConfirmBadge(item.confirm);
+        // 결과 매핑 (요청사항에 따라)
+        let resultText = '';
+        let resultClass = '';
+        switch ((item.result || '').toUpperCase()) {
+            case 'ANSWER':
+                resultText = '통화완료';
+                resultClass = 'badge success';
+                break;
+            case 'CANCEL':
+                resultText = '부재';
+                resultClass = 'badge warning';
+                break;
+            case 'BUSY':
+                resultText = '부재';
+                resultClass = 'badge warning';
+                break;
+            default:
+                resultText = item.result || '-';
+                resultClass = 'badge info';
+        }
+        
+        // 내용 매핑 (요청사항에 따라)
+        let directionText = '';
+        let directionClass = '';
+        switch ((item.context || '').toLowerCase()) {
+            case 'inbound':
+                directionText = '수신';
+                directionClass = 'badge info';
+                break;
+            case 'outbound':
+                directionText = '발신';
+                directionClass = 'badge primary';
+                break;
+            default:
+                directionText = item.context || '-';
+                directionClass = 'badge info';
+        }
+        
+        // 비고 (기존의 context나 추가 정보)
+        const memo = item.memo || item.note || item.remarks || '-';
         
         historyHtml += `
             <tr>
                 <td>${formatDate(item.callDate)}</td>
-                <td>${item.agent}</td>
-                <td>${resultBadge}</td>
-                <td>${item.context}</td>
-                <td>${confirmBadge}</td>
+                <td><span class="${resultClass}">${resultText}</span></td>
+                <td><span class="${directionClass}">${directionText}</span></td>
+                <td>${memo}</td>
             </tr>
         `;
     });
