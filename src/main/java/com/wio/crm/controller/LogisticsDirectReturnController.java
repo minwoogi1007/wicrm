@@ -22,6 +22,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
@@ -474,7 +475,16 @@ public class LogisticsDirectReturnController {
     // ========== 엑셀 다운로드 ==========
     
     /**
-     * 엑셀 다운로드
+     * 엑셀 다운로드 (GET 방식)
+     */
+    @GetMapping("/export")
+    public void exportExcel(LogisticsDirectReturnSearchDTO search, HttpServletResponse response) {
+        log.debug("엑셀 다운로드 (GET) - 검색조건: {}", search);
+        downloadExcel(search, response);
+    }
+    
+    /**
+     * 엑셀 다운로드 (POST 방식)
      */
     @PostMapping("/downloadExcel")
     public void downloadExcel(LogisticsDirectReturnSearchDTO search, HttpServletResponse response) {
@@ -486,12 +496,15 @@ public class LogisticsDirectReturnController {
             // 엑셀 파일 생성
             Workbook workbook = createExcelWorkbook(data);
             
-            // 파일명 설정
-            String fileName = "물류직접입고_" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + ".xlsx";
+            // 파일명 설정 (날짜 + 시간) - 영문으로 변경
+            String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+            String fileName = "logistics_direct_return_" + timestamp + ".xlsx";
+            String encodedFileName = java.net.URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
             
-            // 응답 헤더 설정
+            // 응답 헤더 설정 (UTF-8 인코딩 적용)
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+            response.setCharacterEncoding("UTF-8");
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"; filename*=UTF-8''" + encodedFileName);
             
             // 엑셀 파일 출력
             workbook.write(response.getOutputStream());

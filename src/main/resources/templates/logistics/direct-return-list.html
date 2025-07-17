@@ -870,24 +870,6 @@
             border-color: #dc2626;
         }
 
-        .btn-info {
-            background: var(--info);
-            color: white;
-            border-color: var(--info);
-        }
-
-        .btn-info:hover {
-            background: #0891b2;
-            border-color: #0891b2;
-        }
-
-        .btn-xs {
-            padding: 0.25rem 0.5rem;
-            font-size: 0.75rem;
-            line-height: 1.2;
-            min-height: 28px;
-        }
-
         .button-group {
             display: flex;
             gap: 0.5rem;
@@ -1361,12 +1343,12 @@
                             <button type="button" class="btn btn-danger" id="bulkDeleteBtn" onclick="bulkDeleteItems()" disabled>
                                 🗑️ 선택 삭제
                             </button>
+                            <button type="button" class="btn btn-success" id="exportExcelBtn" onclick="exportExcel()">
+                                📊 엑셀 다운로드
+                            </button>
                             <!-- 기능 개발 예정으로 임시 주석처리
                             <button type="button" class="btn btn-success" id="bulkMappingBtn" onclick="bulkMapping()">
                                 <i class="fas fa-link"></i> 일괄 매핑
-                            </button>
-                            <button type="button" class="btn btn-warning" id="exportExcelBtn" onclick="exportExcel()">
-                                <i class="fas fa-download"></i> 엑셀 다운로드
                             </button>
                             -->
                         </div>
@@ -1410,18 +1392,7 @@
                                     <td th:text="${#temporals.format(item.receivedDate, 'yyyy-MM-dd')}">2025-01-16</td>
                                     <td th:text="${item.siteName}">자사몰-레노마</td>
                                     <td th:text="${item.customerName}">홍길동</td>
-                                    <td>
-                                        <div th:if="${item.customerPhone and item.customerPhone.trim() != ''}">
-                                            <span th:text="${item.customerPhone}">010-1234-5678</span>
-                                            <br>
-                                            <button type="button" class="btn btn-xs btn-info" 
-                                                    th:onclick="|showCallHistory('${item.customerPhone}')|"
-                                                    style="margin-top: 2px;">
-                                                📞 통화내역
-                                            </button>
-                                        </div>
-                                        <span th:unless="${item.customerPhone and item.customerPhone.trim() != ''}" class="text-muted">-</span>
-                                    </td>
+                                    <td th:text="${item.customerPhone}">010-1234-5678</td>
                                     <td th:text="${item.productCode}">RN240101</td>
                                     <td>
                                         <span th:text="${item.productColor}">블랙</span>
@@ -1448,13 +1419,13 @@
                                     </td>
                                     <td>
                                         <div class="button-group" style="gap: 0.25rem;">
-                                            <button type="button" class="btn btn-xs btn-primary" 
+                                            <button type="button" class="btn btn-sm btn-primary" 
                                                     th:onclick="|editItem(${item.id})|">
-                                                수정
+                                                ✏️ 수정
                                             </button>
-                                            <button type="button" class="btn btn-xs btn-danger" 
+                                            <button type="button" class="btn btn-sm btn-danger" 
                                                     th:onclick="|deleteItem(${item.id})|">
-                                                삭제
+                                                🗑️ 삭제
                                             </button>
                                             <!-- 기능 개발 예정으로 임시 주석처리
                                             <button type="button" class="btn btn-sm btn-success" 
@@ -1770,43 +1741,6 @@
     </div>
 </div>
 
-<!-- 후속 통화 내역 모달 -->
-<div id="callHistoryModal" class="modal-backdrop" style="display: none;">
-    <div class="modal" style="max-width: 700px;">
-        <div class="modal-header">
-            <h5 class="modal-title">📞 후속 통화 내역</h5>
-            <button type="button" class="btn-close" onclick="closeCallHistoryModal()" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        <div class="modal-body">
-            <div class="table-container">
-                <table class="table table-sm">
-                    <thead>
-                        <tr>
-                            <th style="width: 30%;">통화일시</th>
-                            <th style="width: 25%;">결과</th>
-                            <th style="width: 25%;">내용</th>
-                            <th style="width: 20%;">비고</th>
-                        </tr>
-                    </thead>
-                    <tbody id="callHistoryTableBody">
-                        <!-- 통화내역 데이터가 동적으로 로드됩니다 -->
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- 데이터가 없는 경우 -->
-            <div id="noCallHistoryMessage" style="display: none; text-align: center; padding: 40px; color: #6b7280;">
-                📵 통화 내역이 없습니다.
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" onclick="closeCallHistoryModal()">닫기</button>
-        </div>
-    </div>
-</div>
-
 <script>
 // 모든 함수는 head에 정의됨
 
@@ -1879,10 +1813,99 @@ function bulkMapping() {
 }
 
 function exportExcel() {
-    console.log('엑셀 다운로드 버튼 클릭됨');
-    const params = new URLSearchParams(window.location.search);
-    params.set('export', 'excel');
-    window.location.href = '/logistics/direct-return/export?' + params.toString();
+    console.log('📊 엑셀 다운로드 버튼 클릭됨');
+    
+    const exportBtn = document.getElementById('exportExcelBtn');
+    const originalText = exportBtn.innerHTML;
+    
+    try {
+        // 버튼 상태 변경 (로딩 중)
+        exportBtn.disabled = true;
+        exportBtn.innerHTML = '⏳ 다운로드 중...';
+        exportBtn.style.opacity = '0.7';
+        
+        // 현재 검색 조건을 유지하면서 엑셀 다운로드
+        const params = new URLSearchParams(window.location.search);
+        params.set('export', 'excel');
+        
+        console.log('📋 엑셀 다운로드 URL:', '/logistics/direct-return/export?' + params.toString());
+        
+        // 다운로드 실행
+        const downloadUrl = '/logistics/direct-return/export?' + params.toString();
+        
+        // iframe을 이용한 파일 다운로드 (페이지 새로고침 방지)
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = downloadUrl;
+        document.body.appendChild(iframe);
+        
+        // 3초 후 iframe 제거 및 버튼 상태 복원
+        setTimeout(() => {
+            document.body.removeChild(iframe);
+            exportBtn.disabled = false;
+            exportBtn.innerHTML = originalText;
+            exportBtn.style.opacity = '1';
+            console.log('✅ 엑셀 다운로드 완료');
+        }, 3000);
+        
+        // 사용자에게 다운로드 시작 알림
+        setTimeout(() => {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #10b981;
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                z-index: 10000;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                font-weight: 500;
+                animation: slideIn 0.3s ease;
+            `;
+            notification.innerHTML = '📊 엑셀 파일 다운로드가 시작되었습니다.';
+            
+            // CSS 애니메이션 추가
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideOut {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.body.appendChild(notification);
+            
+            // 5초 후 알림 제거
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        document.body.removeChild(notification);
+                    }
+                    if (style.parentNode) {
+                        document.head.removeChild(style);
+                    }
+                }, 300);
+            }, 5000);
+        }, 500);
+        
+    } catch (error) {
+        console.error('🚨 엑셀 다운로드 오류:', error);
+        
+        // 오류 발생 시 버튼 상태 복원
+        exportBtn.disabled = false;
+        exportBtn.innerHTML = originalText;
+        exportBtn.style.opacity = '1';
+        
+        alert('엑셀 다운로드 중 오류가 발생했습니다: ' + error.message);
+    }
 }
 
 function bulkDeleteItems() {
@@ -2115,28 +2138,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    const callHistoryModal = document.getElementById('callHistoryModal');
-    if (callHistoryModal) {
-        callHistoryModal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeCallHistoryModal();
-            }
-        });
-    }
-    
     // ESC 키로 모달 닫기
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             const addModalEl = document.getElementById('addModal');
             const editModalEl = document.getElementById('editModal');
-            const callHistoryModalEl = document.getElementById('callHistoryModal');
             
             if (addModalEl && addModalEl.style.display === 'block') {
                 closeAddModal();
             } else if (editModalEl && editModalEl.style.display === 'block') {
                 closeEditModal();
-            } else if (callHistoryModalEl && callHistoryModalEl.style.display === 'block') {
-                closeCallHistoryModal();
             }
         }
     });
@@ -2243,220 +2254,6 @@ function closeMappingModal() {
         if (resultsDiv) {
             resultsDiv.innerHTML = '';
         }
-    }
-}
-
-// 통화내역 모달 관련 함수들
-function showCallHistory(customerPhone) {
-    console.log('📞 통화내역 모달 표시:', customerPhone);
-    
-    if (!customerPhone || customerPhone.trim() === '') {
-        alert('연락처 정보가 없어 통화내역을 조회할 수 없습니다.');
-        return;
-    }
-    
-    const modal = document.getElementById('callHistoryModal');
-    if (!modal) {
-        alert('통화내역 모달을 찾을 수 없습니다.');
-        return;
-    }
-    
-    // 모달 표시
-    modal.style.display = 'block';
-    
-    // 통화내역 로드
-    loadCallHistory(customerPhone);
-}
-
-function closeCallHistoryModal() {
-    console.log('통화내역 모달 닫기');
-    const modal = document.getElementById('callHistoryModal');
-    if (modal) {
-        modal.style.display = 'none';
-        
-        // 테이블 초기화
-        const tableBody = document.getElementById('callHistoryTableBody');
-        if (tableBody) {
-            tableBody.innerHTML = '';
-        }
-        
-        const noDataMessage = document.getElementById('noCallHistoryMessage');
-        if (noDataMessage) {
-            noDataMessage.style.display = 'none';
-        }
-    }
-}
-
-function loadCallHistory(customerPhone) {
-    console.log('📊 통화내역 로드 시작:', customerPhone);
-    
-    const tableBody = document.getElementById('callHistoryTableBody');
-    const noDataMessage = document.getElementById('noCallHistoryMessage');
-    
-    if (!tableBody || !noDataMessage) {
-        console.error('❌ 통화내역 테이블 요소를 찾을 수 없습니다');
-        return;
-    }
-    
-    // 로딩 표시
-    tableBody.innerHTML = `
-        <tr>
-            <td colspan="4" style="text-align: center; padding: 40px; color: #6b7280;">
-                🔄 통화내역을 불러오는 중...
-            </td>
-        </tr>
-    `;
-    noDataMessage.style.display = 'none';
-    
-    // CSRF 토큰 가져오기
-    const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
-    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content') || 'X-CSRF-TOKEN';
-    
-    // API 호출 (실제 API 엔드포인트에 맞게 수정 필요)
-    fetch(`/api/call-history?phone=${encodeURIComponent(customerPhone)}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            [csrfHeader]: csrfToken
-        }
-    })
-    .then(response => {
-        console.log('📡 통화내역 API 응답 상태:', response.status);
-        return response.json();
-    })
-    .then(data => {
-        console.log('📋 통화내역 조회 응답:', data);
-        
-        if (data.success && data.data && Array.isArray(data.data) && data.data.length > 0) {
-            // 통화내역 데이터 표시
-            displayCallHistoryData(data.data);
-        } else {
-            // 데이터가 없는 경우
-            showNoCallHistoryMessage();
-        }
-    })
-    .catch(error => {
-        console.error('🚨 통화내역 조회 오류:', error);
-        
-        // 샘플 데이터로 표시 (개발용 - 실제 운영 시 제거)
-        console.log('⚠️ 샘플 데이터로 표시');
-        const sampleData = [
-            {
-                callDate: '2025-07-17 10:53',
-                result: 'ANSWER',
-                direction: 'inbound',
-                memo: '배송 문의'
-            },
-            {
-                callDate: '2025-07-17 10:44', 
-                result: 'CANCEL',
-                direction: 'outbound',
-                memo: '고객 부재'
-            },
-            {
-                callDate: '2025-07-17 10:21',
-                result: 'BUSY',
-                direction: 'inbound', 
-                memo: '통화 중'
-            }
-        ];
-        displayCallHistoryData(sampleData);
-    });
-}
-
-function displayCallHistoryData(callHistoryData) {
-    console.log('📋 통화내역 데이터 표시:', callHistoryData);
-    
-    const tableBody = document.getElementById('callHistoryTableBody');
-    const noDataMessage = document.getElementById('noCallHistoryMessage');
-    
-    if (!tableBody || !noDataMessage) return;
-    
-    // 기존 내용 초기화
-    tableBody.innerHTML = '';
-    noDataMessage.style.display = 'none';
-    
-    // 각 통화내역 행 생성
-    callHistoryData.forEach((call, index) => {
-        const row = document.createElement('tr');
-        
-        // 통화일시
-        const callDateTime = call.callDate || call.callDateTime || '-';
-        
-        // 결과 매핑 (요청사항에 따라)
-        let resultText = '';
-        let resultClass = '';
-        switch (call.result || call.callResult) {
-            case 'ANSWER':
-            case 'answer':
-                resultText = '통화완료';
-                resultClass = 'badge-success';
-                break;
-            case 'CANCEL':
-            case 'cancel':
-                resultText = '부재';
-                resultClass = 'badge-warning';
-                break;
-            case 'BUSY':
-            case 'busy':
-                resultText = '부재';
-                resultClass = 'badge-warning';
-                break;
-            default:
-                resultText = call.result || call.callResult || '-';
-                resultClass = 'badge-secondary';
-        }
-        
-        // 내용 매핑 (요청사항에 따라)
-        let directionText = '';
-        let directionClass = '';
-        switch (call.direction || call.callDirection) {
-            case 'inbound':
-                directionText = '수신';
-                directionClass = 'badge-info';
-                break;
-            case 'outbound':
-                directionText = '발신';
-                directionClass = 'badge-primary';
-                break;
-            default:
-                directionText = call.direction || call.callDirection || '-';
-                directionClass = 'badge-secondary';
-        }
-        
-        // 비고
-        const memo = call.memo || call.remarks || call.note || '-';
-        
-        row.innerHTML = `
-            <td>${callDateTime}</td>
-            <td>
-                <span class="badge ${resultClass}">${resultText}</span>
-            </td>
-            <td>
-                <span class="badge ${directionClass}">${directionText}</span>
-            </td>
-            <td>${memo}</td>
-        `;
-        
-        tableBody.appendChild(row);
-        console.log(`➕ 통화내역 행 ${index + 1} 추가: ${callDateTime} - ${resultText} - ${directionText}`);
-    });
-    
-    console.log(`✅ 통화내역 표시 완료: ${callHistoryData.length}건`);
-}
-
-function showNoCallHistoryMessage() {
-    console.log('📵 통화내역 없음 메시지 표시');
-    
-    const tableBody = document.getElementById('callHistoryTableBody');
-    const noDataMessage = document.getElementById('noCallHistoryMessage');
-    
-    if (tableBody) {
-        tableBody.innerHTML = '';
-    }
-    
-    if (noDataMessage) {
-        noDataMessage.style.display = 'block';
     }
 }
 
