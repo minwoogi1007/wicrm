@@ -37,17 +37,22 @@ public class CustomSuccessHandler extends SavedRequestAwareAuthenticationSuccess
         String userId = "";
         String userName = "";
         String authority = "";
+        String custCode = ""; // 🆕 custCode 추가
+        
         if (userDetails.getTcntUserInfo() != null) {
             userId = userDetails.getTcntUserInfo().getUserId();
             userName = userDetails.getTcntUserInfo().getEmp_name();
             authority = userDetails.getTcntUserInfo().getAuthority();
+            custCode = userDetails.getTcntUserInfo().getCustCode(); // 🆕 custCode 가져오기
         } else {
             userId = userDetails.getTempUserInfo().getUserId();
             userName = userDetails.getTempUserInfo().getEmp_Name();
             authority = userDetails.getTempUserInfo().getPosition();
+            custCode = "INTERNAL"; // 🆕 내부 직원의 경우 INTERNAL로 설정
         }
 
         System.out.println("authority========"+authority);
+        System.out.println("custCode========"+custCode); // 🆕 custCode 로그 추가
         // 사용자 권한에 따른 메뉴 리스트 조회 및 세션 저장 로직
         List<Map<String, Object>> menuList;
         try {
@@ -73,8 +78,10 @@ public class CustomSuccessHandler extends SavedRequestAwareAuthenticationSuccess
         session.setAttribute("loginUserAuthority", authority);
         session.setAttribute("loginUserId", userId);
         session.setAttribute("loginUserName", userName);
+        session.setAttribute("custCode", custCode); // 🆕 custCode 세션에 저장
         System.out.println("sessionloginUserId============================================================"+session.getAttribute("loginUserId"));
         System.out.println("sessionuserName============================================================"+session.getAttribute("loginUserName"));
+        System.out.println("sessionCustCode============================================================"+session.getAttribute("custCode")); // 🆕 custCode 세션 확인
         // 마지막에 한 번만 호출하여 리다이렉트 처리
         super.onAuthenticationSuccess(request, response, authentication);
     }

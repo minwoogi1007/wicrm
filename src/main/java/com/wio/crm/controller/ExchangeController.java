@@ -1360,11 +1360,18 @@ public class ExchangeController {
      * 📝 교환/반품 등록 폼 (Sample에서 통합)
      */
     @GetMapping("/create")
-    public String createForm(Model model) {
+    public String createForm(Model model, Authentication authentication) {
         log.info("📝 교환/반품 등록 폼 접속");
         model.addAttribute("returnItem", new ReturnItemDTO());
         model.addAttribute("isEdit", false);
         model.addAttribute("pageTitle", "교환/반품 등록");
+        
+        // 🔐 로그인 사용자 정보 전달
+        if (authentication != null && authentication.getName() != null) {
+            model.addAttribute("currentUser", authentication.getName());
+            log.info("👤 등록 폼 접속자: {}", authentication.getName());
+        }
+        
         return "exchange/form";
     }
     
@@ -1374,7 +1381,8 @@ public class ExchangeController {
     @GetMapping("/edit/{id}")
     public String editForm(@PathVariable Long id, 
                           @RequestParam(required = false) String returnTo, 
-                          Model model) {
+                          Model model,
+                          Authentication authentication) {
         log.info("📝 교환/반품 수정 폼 접속 - ID: {}", id);
         
         try {
@@ -1383,6 +1391,12 @@ public class ExchangeController {
             model.addAttribute("isEdit", true);
             model.addAttribute("returnTo", returnTo);
             model.addAttribute("pageTitle", "교환/반품 수정");
+            
+            // 🔐 로그인 사용자 정보 전달
+            if (authentication != null && authentication.getName() != null) {
+                model.addAttribute("currentUser", authentication.getName());
+                log.info("👤 수정 폼 접속자: {}", authentication.getName());
+            }
             
             // 🌐 이미지 절대 URL 추가
             if (returnItem.getDefectPhotoUrl() != null && !returnItem.getDefectPhotoUrl().isEmpty()) {
@@ -1442,11 +1456,19 @@ public class ExchangeController {
                        @RequestParam(value = "attachmentPhoto", required = false) MultipartFile attachmentPhoto,
                        @RequestParam(value = "attachmentImageData", required = false) String attachmentImageData,
                        @RequestParam(value = "returnTo", required = false) String returnTo,
+                       Authentication authentication,
                        RedirectAttributes redirectAttributes) {
         
         log.info("💾 교환/반품 저장 처리 시작 - ID: {}", returnItemDTO.getId());
         
         try {
+            // 🔐 로그인 사용자 정보 설정
+            String currentUser = "SYSTEM"; // 기본값
+            if (authentication != null && authentication.getName() != null) {
+                currentUser = authentication.getName();
+                log.info("👤 로그인 사용자: {}", currentUser);
+            }
+            
             // 🖼️ 이미지 업로드 처리 (Sample에서 통합)
             String imagePath = processImageUpload(attachmentPhoto, attachmentImageData);
             if (imagePath != null) {
@@ -1457,14 +1479,17 @@ public class ExchangeController {
             ReturnItemDTO savedItem;
             
             if (returnItemDTO.getId() == null) {
-                // 신규 등록
+                // 신규 등록 - 등록자 설정
+                returnItemDTO.setCreatedBy(currentUser);
+                returnItemDTO.setUpdatedBy(currentUser);
                 savedItem = returnItemService.createReturnItem(returnItemDTO);
-                log.info("✅ 교환/반품 신규 등록 완료 - ID: {}", savedItem.getId());
+                log.info("✅ 교환/반품 신규 등록 완료 - ID: {}, 등록자: {}", savedItem.getId(), currentUser);
                 redirectAttributes.addFlashAttribute("message", "교환/반품이 성공적으로 등록되었습니다.");
             } else {
-                // 기존 항목 수정 (save 메소드 사용)
+                // 기존 항목 수정 - 수정자만 설정
+                returnItemDTO.setUpdatedBy(currentUser);
                 savedItem = returnItemService.save(returnItemDTO);
-                log.info("✅ 교환/반품 수정 완료 - ID: {}", savedItem.getId());
+                log.info("✅ 교환/반품 수정 완료 - ID: {}, 수정자: {}", savedItem.getId(), currentUser);
                 redirectAttributes.addFlashAttribute("message", "교환/반품이 성공적으로 수정되었습니다.");
             }
             

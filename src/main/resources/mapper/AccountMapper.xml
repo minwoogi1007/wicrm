@@ -3,11 +3,35 @@
 <mapper namespace="com.wio.crm.mapper.AccountMapper">
 
 
-    <select id="getAccount"  resultType="com.wio.crm.model.Tcnt01Emp">
+    <!-- 🔧 명시적 ResultMap 정의로 매핑 문제 해결 -->
+    <resultMap id="accountResultMap" type="com.wio.crm.model.Tcnt01Emp">
+        <result property="userId" column="userId"/>
+        <result property="custCode" column="custCode"/>
+        <result property="cust_name" column="cust_name"/>
+        <result property="empno" column="empno"/>
+        <result property="emp_name" column="emp_name"/>
+        <result property="depart" column="DEPART"/>
+        <result property="position" column="POSITION"/>
+        <result property="zip_no" column="ZIP_NO"/>
+        <result property="addr" column="ADDR"/>
+        <result property="tel_no" column="tel_no"/>
+        <result property="fex_no" column="FEX_NO"/>
+        <result property="hand_phone" column="hand_phone"/>
+        <result property="email" column="email"/>
+        <result property="rmk" column="RMK"/>
+        <result property="use_yn" column="use_yn"/>
+        <result property="admin" column="ADMIN"/>
+        <result property="homePage" column="homePage"/>
+        <result property="hasEmail" column="hasEmail"/>
+        <result property="hasPhone" column="hasPhone"/>
+        <result property="authority" column="authority"/>
+    </resultMap>
+
+    <select id="getAccount" resultMap="accountResultMap">
         SELECT
             A.USERID as userId,
             A.CUST_CODE as custCode,
-            B.CUST_NAME as cust_name,
+            T.CUST_NAME as cust_name,
             A.EMPNO  as  empno,
             A.EMP_NAME as  emp_name,
             A.DEPART  ,
@@ -21,13 +45,13 @@
             A.RMK  ,
             A.USE_YN as  use_yn,
             A.ADMIN ,
-            B.HOMEPAGE as  homePage,
+            T.HOMEPAGE as  homePage,
             A.HAS_EMAIL as  hasEmail,
             A.HAS_PHONE as hasPhone,
-            a.AUTHORITY as authority
-        FROM N_TCNT01_EMP A, TCNT01 B
-        WHERE A.CUST_CODE = B.CUST_CODE
-          AND USERID= #{custCode}
+            A.AUTHORITY as authority
+        FROM N_TCNT01_EMP A
+        LEFT JOIN TCNT01 T ON A.CUST_CODE = T.CUST_CODE
+        WHERE A.USERID = #{userId}
     </select>
 
     <update id="updateAccount">

@@ -21,6 +21,12 @@ public class DailySummaryStatsDto {
     private Double completionRate; // 완료율
     private Double inboundRate; // 수신 비율
     private Double outboundRate; // 발신 비율
+    
+    // 🆕 발신호/수신호 각각의 응답 건수 및 수신율 추가
+    private long inboundAnsweredCalls; // 수신호 중 응답한 건수 (CONTEXT = 'inbound' AND RESULT = 'ANSWER')
+    private long outboundAnsweredCalls; // 발신호 중 응답받은 건수 (CONTEXT = 'outbound' AND RESULT = 'ANSWER')
+    private Double inboundAnswerRate; // 수신호 수신율 (수신호 중 응답한 비율)
+    private Double outboundAnswerRate; // 발신호 수신율 (발신호 중 응답받은 비율)
 
     // 기본 생성자
     public DailySummaryStatsDto() {

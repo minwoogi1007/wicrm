@@ -107,6 +107,9 @@ public class ReturnItemServiceImpl implements ReturnItemService {
             
             // 수정 시점 정보 설정
             item.setUpdateDate(LocalDateTime.now());
+            if (item.getUpdatedBy() == null) {
+                item.setUpdatedBy("SYSTEM"); // 기본값 설정
+            }
             
             // 저장
             ReturnItem saved = returnItemRepository.save(item);
@@ -134,7 +137,10 @@ public class ReturnItemServiceImpl implements ReturnItemService {
             item.setCreateDate(LocalDateTime.now());
             item.setUpdateDate(LocalDateTime.now());
             if (item.getCreatedBy() == null) {
-                item.setCreatedBy("EXCEL_UPLOAD");
+                item.setCreatedBy("SYSTEM"); // 기본값을 SYSTEM으로 변경
+            }
+            if (item.getUpdatedBy() == null) {
+                item.setUpdatedBy(item.getCreatedBy()); // 수정자도 등록자와 동일하게 설정
             }
             
             // 저장

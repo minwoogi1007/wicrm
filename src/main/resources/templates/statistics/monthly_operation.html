@@ -271,7 +271,7 @@
         // 검색 버튼 이벤트
         document.getElementById('searchBtn').addEventListener('click', function() {
             var yearMonth = document.getElementById('monthly_datepicker').value;
-            console.log('검색 버튼 클릭됨: ' + yearMonth);
+            // console.log('검색 버튼 클릭됨: ' + yearMonth);
             
             if (yearMonth) {
                 fetchMonthlyOperationData(yearMonth);
@@ -305,11 +305,11 @@
                     xhr.setRequestHeader(csrfHeader, csrfToken);
                 },
                 success: function(response) {
-                    console.log('월간 데이터 수신 성공:', response);
+                    // console.log('월간 데이터 수신 성공:', response);
                     
                     // 디버깅: 주차별 데이터 확인
                     if (response && response.weeklyStatsList) {
-                        console.log('주차별 통계 데이터:', response.weeklyStatsList);
+                        // console.log('주차별 통계 데이터:', response.weeklyStatsList);
                     } else {
                         console.error('주차별 통계 데이터가 없습니다.');
                     }
@@ -357,11 +357,11 @@
                 // 백엔드 계산 로직과 일치: (응대호 / (총콜 - 포기호)) * 100
                 var totalCallsForRate = totalCalls - abandonedCalls;
                 answerRate = (totalCallsForRate > 0) ? ((answeredCalls / totalCallsForRate) * 100) : 0;
-                console.log('응대율 직접 계산:', answerRate.toFixed(1) + '%', 
-                           '응답 콜:', answeredCalls, 
-                           '총 콜:', totalCalls, 
-                           '포기호:', abandonedCalls,
-                           '계산용 총콜:', totalCallsForRate);
+                // console.log('응대율 직접 계산:', answerRate.toFixed(1) + '%', 
+                //            '응답 콜:', answeredCalls, 
+                //            '총 콜:', totalCalls, 
+                //            '포기호:', abandonedCalls,
+                //            '계산용 총콜:', totalCallsForRate);
             }
             $('.col-xl-3:eq(1) .fs-2hx').text((answerRate || 0).toFixed(1) + '%');
             
@@ -534,7 +534,7 @@
         
         // 3. 주차별 통계 테이블 업데이트 함수
         function updateWeeklyTable(weeklyStatsList) {
-            console.log('updateWeeklyTable 함수 호출됨. 데이터:', weeklyStatsList);
+            // console.log('updateWeeklyTable 함수 호출됨. 데이터:', weeklyStatsList);
             
             if (!weeklyStatsList || weeklyStatsList.length === 0) {
                 console.error('주차별 통계 데이터가 없거나 비어있습니다.');
@@ -556,7 +556,7 @@
             
             // 주차별 데이터 행 추가
             weeklyStatsList.forEach(function(stat, index) {
-                console.log('주차 데이터 처리 중:', index + 1, stat);
+                // console.log('주차 데이터 처리 중:', index + 1, stat);
                 
                 // 값 가져오기
                 var statTotalCalls = stat.totalCalls || 0;
@@ -634,7 +634,7 @@
             </tr>`;
             
             tbody.append(totalRow);
-            console.log('주차별 통계 테이블 업데이트 완료');
+            // console.log('주차별 통계 테이블 업데이트 완료');
         }
         
         // 4. 상담유형 분석 업데이트 함수
@@ -788,7 +788,7 @@
         // 월간 운영현황 엑셀 다운로드 함수
         async function downloadMonthlyOperationExcel() {
             try {
-                console.log('📥 월간 운영현황 이미지 포함 엑셀 다운로드 시작...');
+                // console.log('📥 월간 운영현황 이미지 포함 엑셀 다운로드 시작...');
                 showToast('차트와 테이블을 이미지로 변환 중입니다...', 'info');
                 
                 const images = {};
@@ -796,7 +796,7 @@
                 // 1. 월간 요약 통계 카드 섹션 이미지 생성
                 const summaryCards = document.querySelector('.row.g-5.g-xl-8.mb-6');
                 if (summaryCards) {
-                    console.log('📊 월간 요약 통계 카드 이미지 생성 중...');
+                    // console.log('📊 월간 요약 통계 카드 이미지 생성 중...');
                     const cardsCanvas = await html2canvas(summaryCards, {
                         backgroundColor: '#ffffff',
                         scale: 2,  // 적절한 해상도로 조정
@@ -813,7 +813,7 @@
                 
                 // 2. 월간 통계 추이 차트 이미지 생성 (ApexCharts - 원본 크기 비율 유지)
                 if (monthlyTrendChartInstance) {
-                    console.log('📈 월간 통계 추이 차트 이미지 생성 중...');
+                    // console.log('📈 월간 통계 추이 차트 이미지 생성 중...');
                     try {
                         images.monthlyTrendChartImage = await monthlyTrendChartInstance.dataURI({
                             type: 'png',
@@ -827,7 +827,7 @@
                 // 3. 주차별 통계 테이블 이미지 생성
                 const weeklyStatsTable = document.querySelector('#weekly-stats-card');
                 if (weeklyStatsTable) {
-                    console.log('📊 주차별 통계 테이블 이미지 생성 중...');
+                    // console.log('📊 주차별 통계 테이블 이미지 생성 중...');
                     const weeklyCanvas = await html2canvas(weeklyStatsTable, {
                         backgroundColor: '#ffffff',
                         scale: 2,  // 적절한 해상도로 조정
@@ -845,7 +845,7 @@
                 // 4. 상담유형 분석 섹션 이미지 생성
                 const counselingAnalysisSection = document.querySelector('.row.g-5.g-xl-8.mb-6:last-of-type');
                 if (counselingAnalysisSection) {
-                    console.log('📊 상담유형 분석 섹션 이미지 생성 중...');
+                    // console.log('📊 상담유형 분석 섹션 이미지 생성 중...');
                     const analysisCanvas = await html2canvas(counselingAnalysisSection, {
                         backgroundColor: '#ffffff',
                         scale: 2,  // 적절한 해상도로 조정
@@ -862,7 +862,7 @@
                 
                 // 5. 상담유형 차트 이미지 생성 (ApexCharts - 원본 크기 비율 유지)
                 if (counselingTypesChartInstance) {
-                    console.log('🍕 상담유형 차트 이미지 생성 중...');
+                    // console.log('🍕 상담유형 차트 이미지 생성 중...');
                     try {
                         images.counselingTypesChartImage = await counselingTypesChartInstance.dataURI({
                             type: 'png',
@@ -875,7 +875,7 @@
                 
                 // 6. 전월 대비 실적 비교 차트 이미지 생성 (ApexCharts - 원본 크기 비율 유지)
                 if (monthlyComparisonChartInstance) {
-                    console.log('📊 전월 대비 실적 비교 차트 이미지 생성 중...');
+                    // console.log('📊 전월 대비 실적 비교 차트 이미지 생성 중...');
                     try {
                         images.monthlyComparisonChartImage = await monthlyComparisonChartInstance.dataURI({
                             type: 'png',
@@ -886,7 +886,7 @@
                     }
                 }
                 
-                console.log('✅ 모든 이미지 생성 완료');
+                // console.log('✅ 모든 이미지 생성 완료');
                 
                 // 파라미터 준비
                 const yearMonth = document.getElementById('monthly_datepicker').value;

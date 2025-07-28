@@ -31,6 +31,7 @@ import org.apache.poi.xssf.usermodel.*;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class StatController {
@@ -52,7 +53,7 @@ public class StatController {
     }
 
     @GetMapping("/stat/weekly")
-    public String weeklyOperationStat(Model model) {
+    public String weeklyOperationStat(Model model, HttpSession session) {
         LocalDate today = LocalDate.now();
         LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - 1);
         LocalDate endOfWeek = startOfWeek.plusDays(6);
@@ -60,6 +61,9 @@ public class StatController {
         
         model.addAttribute("startDate", startOfWeek.format(formatter));
         model.addAttribute("endDate", endOfWeek.format(formatter));
+        
+        logger.info("📊 주간 통계 페이지 로드 - 총콜/완료콜/발신콜 3개 항목 표시");
+        
         return "statistics/weekly_operation";
     }
 

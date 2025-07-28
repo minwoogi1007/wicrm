@@ -224,7 +224,21 @@
             COALESCE(cl.busy_calls, 0) AS busyCalls,
             COALESCE(tc.completed_counseling_calls, 0) AS completedCounselingCalls,
             COALESCE(cl.inbound_calls, 0) AS inboundCalls,
-            COALESCE(cl.outbound_calls, 0) AS outboundCalls
+            COALESCE(cl.outbound_calls, 0) AS outboundCalls,
+            -- 🆕 발신호/수신호 각각의 응답 건수
+            COALESCE(cl.inbound_answered_calls, 0) AS inboundAnsweredCalls,
+            COALESCE(cl.outbound_answered_calls, 0) AS outboundAnsweredCalls,
+            -- 🆕 발신호/수신호 각각의 수신율 계산
+            CASE 
+                WHEN COALESCE(cl.inbound_calls, 0) > 0 
+                THEN ROUND((COALESCE(cl.inbound_answered_calls, 0) * 100.0 / cl.inbound_calls), 1)
+                ELSE 0.0 
+            END AS inboundAnswerRate,
+            CASE 
+                WHEN COALESCE(cl.outbound_calls, 0) > 0 
+                THEN ROUND((COALESCE(cl.outbound_answered_calls, 0) * 100.0 / cl.outbound_calls), 1)
+                ELSE 0.0 
+            END AS outboundAnswerRate
         FROM (
             SELECT
                 COUNT(*) AS total_calls,
@@ -233,7 +247,10 @@
                 COUNT(DISTINCT CLID) AS unique_inbound_calls,
                 SUM(CASE WHEN RESULT = 'BUSY' AND CONTEXT = 'inbound' THEN 1 ELSE 0 END) AS busy_calls,
                 SUM(CASE WHEN CONTEXT = 'inbound' THEN 1 ELSE 0 END) AS inbound_calls,
-                SUM(CASE WHEN CONTEXT = 'outbound' THEN 1 ELSE 0 END) AS outbound_calls
+                SUM(CASE WHEN CONTEXT = 'outbound' THEN 1 ELSE 0 END) AS outbound_calls,
+                -- 🆕 발신호/수신호 각각의 응답 건수 계산
+                SUM(CASE WHEN CONTEXT = 'inbound' AND RESULT = 'ANSWER' THEN 1 ELSE 0 END) AS inbound_answered_calls,
+                SUM(CASE WHEN CONTEXT = 'outbound' AND RESULT = 'ANSWER' THEN 1 ELSE 0 END) AS outbound_answered_calls
             FROM CALL_LOG_D
             WHERE SUBSTR(CALLDATE, 1, 10) = TO_CHAR(TO_DATE(#{date}, 'YYYYMMDD'), 'YYYY-MM-DD')
               AND CUST_CODE = #{custCode}
@@ -318,7 +335,21 @@
             COALESCE(CL.busy_calls, 0) AS busyCalls,
             COALESCE(TC.completed_counseling_calls, 0) AS completedCounselingCalls,
             COALESCE(CL.inbound_calls, 0) AS inboundCalls,
-            COALESCE(CL.outbound_calls, 0) AS outboundCalls
+            COALESCE(CL.outbound_calls, 0) AS outboundCalls,
+            -- 🆕 발신호/수신호 각각의 응답 건수
+            COALESCE(CL.inbound_answered_calls, 0) AS inboundAnsweredCalls,
+            COALESCE(CL.outbound_answered_calls, 0) AS outboundAnsweredCalls,
+            -- 🆕 발신호/수신호 각각의 수신율 계산
+            CASE 
+                WHEN COALESCE(CL.inbound_calls, 0) > 0 
+                THEN ROUND((COALESCE(CL.inbound_answered_calls, 0) * 100.0 / CL.inbound_calls), 1)
+                ELSE 0.0 
+            END AS inboundAnswerRate,
+            CASE 
+                WHEN COALESCE(CL.outbound_calls, 0) > 0 
+                THEN ROUND((COALESCE(CL.outbound_answered_calls, 0) * 100.0 / CL.outbound_calls), 1)
+                ELSE 0.0 
+            END AS outboundAnswerRate
         FROM DATE_RANGE DR
         LEFT JOIN (
             SELECT
@@ -329,7 +360,10 @@
                 COUNT(DISTINCT CLID) AS unique_inbound_calls,
                 SUM(CASE WHEN RESULT = 'BUSY' AND CONTEXT = 'inbound' THEN 1 ELSE 0 END) AS busy_calls,
                 SUM(CASE WHEN CONTEXT = 'inbound' THEN 1 ELSE 0 END) AS inbound_calls,
-                SUM(CASE WHEN CONTEXT = 'outbound' THEN 1 ELSE 0 END) AS outbound_calls
+                SUM(CASE WHEN CONTEXT = 'outbound' THEN 1 ELSE 0 END) AS outbound_calls,
+                -- 🆕 발신호/수신호 각각의 응답 건수 계산
+                SUM(CASE WHEN CONTEXT = 'inbound' AND RESULT = 'ANSWER' THEN 1 ELSE 0 END) AS inbound_answered_calls,
+                SUM(CASE WHEN CONTEXT = 'outbound' AND RESULT = 'ANSWER' THEN 1 ELSE 0 END) AS outbound_answered_calls
             FROM CALL_LOG_D
             WHERE SUBSTR(CALLDATE, 1, 10) BETWEEN TO_CHAR(TO_DATE(#{startDate}, 'YYYYMMDD'), 'YYYY-MM-DD')
                                           AND TO_CHAR(TO_DATE(#{endDate}, 'YYYYMMDD'), 'YYYY-MM-DD')
@@ -383,7 +417,21 @@
             COALESCE(cl.busy_calls, 0) AS busyCalls,
             COALESCE(tc.completed_counseling_calls, 0) AS completedCounselingCalls,
             COALESCE(cl.inbound_calls, 0) AS inboundCalls,
-            COALESCE(cl.outbound_calls, 0) AS outboundCalls
+            COALESCE(cl.outbound_calls, 0) AS outboundCalls,
+            -- 🆕 발신호/수신호 각각의 응답 건수
+            COALESCE(cl.inbound_answered_calls, 0) AS inboundAnsweredCalls,
+            COALESCE(cl.outbound_answered_calls, 0) AS outboundAnsweredCalls,
+            -- 🆕 발신호/수신호 각각의 수신율 계산
+            CASE 
+                WHEN COALESCE(cl.inbound_calls, 0) > 0 
+                THEN ROUND((COALESCE(cl.inbound_answered_calls, 0) * 100.0 / cl.inbound_calls), 1)
+                ELSE 0.0 
+            END AS inboundAnswerRate,
+            CASE 
+                WHEN COALESCE(cl.outbound_calls, 0) > 0 
+                THEN ROUND((COALESCE(cl.outbound_answered_calls, 0) * 100.0 / cl.outbound_calls), 1)
+                ELSE 0.0 
+            END AS outboundAnswerRate
         FROM DUAL
         LEFT JOIN (
             SELECT
@@ -393,7 +441,10 @@
                 COUNT(DISTINCT CLID) AS unique_inbound_calls,
                 SUM(CASE WHEN RESULT = 'BUSY' AND CONTEXT = 'inbound' THEN 1 ELSE 0 END) AS busy_calls,
                 SUM(CASE WHEN CONTEXT = 'inbound' THEN 1 ELSE 0 END) AS inbound_calls,
-                SUM(CASE WHEN CONTEXT = 'outbound' THEN 1 ELSE 0 END) AS outbound_calls
+                SUM(CASE WHEN CONTEXT = 'outbound' THEN 1 ELSE 0 END) AS outbound_calls,
+                -- 🆕 발신호/수신호 각각의 응답 건수 계산
+                SUM(CASE WHEN CONTEXT = 'inbound' AND RESULT = 'ANSWER' THEN 1 ELSE 0 END) AS inbound_answered_calls,
+                SUM(CASE WHEN CONTEXT = 'outbound' AND RESULT = 'ANSWER' THEN 1 ELSE 0 END) AS outbound_answered_calls
             FROM CALL_LOG_D
             WHERE SUBSTR(CALLDATE, 1, 10) BETWEEN TO_CHAR(TO_DATE(#{startDate}, 'YYYYMMDD'), 'YYYY-MM-DD')
                                           AND TO_CHAR(TO_DATE(#{endDate}, 'YYYYMMDD'), 'YYYY-MM-DD')
@@ -518,7 +569,10 @@
                 SUM(COALESCE(CL.busy_calls, 0)) AS busyCalls,
                 SUM(COALESCE(TC.completed_counseling_calls, 0)) AS completedCounselingCalls,
                 SUM(COALESCE(CL.inbound_calls, 0)) AS inboundCalls,
-                SUM(COALESCE(CL.outbound_calls, 0)) AS outboundCalls
+                SUM(COALESCE(CL.outbound_calls, 0)) AS outboundCalls,
+                -- 🆕 발신호/수신호 각각의 응답 건수 집계
+                SUM(COALESCE(CL.inbound_answered_calls, 0)) AS inboundAnsweredCalls,
+                SUM(COALESCE(CL.outbound_answered_calls, 0)) AS outboundAnsweredCalls
             FROM WEEK_DATA WD
             LEFT JOIN (
                 SELECT
@@ -529,7 +583,10 @@
                     COUNT(DISTINCT CLID) AS unique_inbound_calls,
                     SUM(CASE WHEN RESULT = 'BUSY' AND CONTEXT = 'inbound' THEN 1 ELSE 0 END) AS busy_calls,
                     SUM(CASE WHEN CONTEXT = 'inbound' THEN 1 ELSE 0 END) AS inbound_calls,
-                    SUM(CASE WHEN CONTEXT = 'outbound' THEN 1 ELSE 0 END) AS outbound_calls
+                    SUM(CASE WHEN CONTEXT = 'outbound' THEN 1 ELSE 0 END) AS outbound_calls,
+                    -- 🆕 발신호/수신호 각각의 응답 건수 계산
+                    SUM(CASE WHEN CONTEXT = 'inbound' AND RESULT = 'ANSWER' THEN 1 ELSE 0 END) AS inbound_answered_calls,
+                    SUM(CASE WHEN CONTEXT = 'outbound' AND RESULT = 'ANSWER' THEN 1 ELSE 0 END) AS outbound_answered_calls
                 FROM CALL_LOG_D
                 WHERE SUBSTR(CALLDATE, 1, 10) BETWEEN TO_CHAR(TO_DATE(#{startDate}, 'YYYYMMDD'), 'YYYY-MM-DD')
                                               AND TO_CHAR(TO_DATE(#{endDate}, 'YYYYMMDD'), 'YYYY-MM-DD')
@@ -559,10 +616,25 @@
             completedCounselingCalls,
             inboundCalls,
             outboundCalls,
+            -- 🆕 발신호/수신호 각각의 응답 건수
+            inboundAnsweredCalls,
+            outboundAnsweredCalls,
+            -- 기존 계산 필드들
             CASE WHEN totalCalls > 0 THEN ROUND((answeredCalls / totalCalls) * 100, 1) ELSE 0 END AS answerRate,
             CASE WHEN answeredCalls > 0 THEN ROUND((completedCounselingCalls / answeredCalls) * 100, 1) ELSE 0 END AS completionRate,
             CASE WHEN totalCalls > 0 THEN ROUND((inboundCalls / totalCalls) * 100, 1) ELSE 0 END AS inboundRate,
-            CASE WHEN totalCalls > 0 THEN ROUND((outboundCalls / totalCalls) * 100, 1) ELSE 0 END AS outboundRate
+            CASE WHEN totalCalls > 0 THEN ROUND((outboundCalls / totalCalls) * 100, 1) ELSE 0 END AS outboundRate,
+            -- 🆕 발신호/수신호 각각의 수신율 계산
+            CASE 
+                WHEN inboundCalls > 0 
+                THEN ROUND((inboundAnsweredCalls * 100.0 / inboundCalls), 1)
+                ELSE 0.0 
+            END AS inboundAnswerRate,
+            CASE 
+                WHEN outboundCalls > 0 
+                THEN ROUND((outboundAnsweredCalls * 100.0 / outboundCalls), 1)
+                ELSE 0.0 
+            END AS outboundAnswerRate
         FROM WEEKLY_AGGREGATION
         ORDER BY WEEK_NUM
     </select>

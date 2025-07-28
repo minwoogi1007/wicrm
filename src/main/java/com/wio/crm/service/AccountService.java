@@ -27,48 +27,76 @@ public class AccountService {
 
     private String getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        logger.info("🔍 [AccountService] Authentication 객체: {}", authentication != null ? "존재" : "null");
+        
         if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
+            logger.warn("❌ [AccountService] Authentication이 null이거나 CustomUserDetails가 아님");
             return ""; // Early return for null or incorrect type
         }
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-
-        // Using a ternary operator to simplify code
-        return userDetails.getTcntUserInfo() != null ? userDetails.getTcntUserInfo().getUserId() : "";
+        logger.info("🔍 [AccountService] CustomUserDetails: {}", userDetails);
+        
+        // tcntUserInfo와 tempUserInfo 상태 확인
+        if (userDetails.getTcntUserInfo() != null) {
+            String userId = userDetails.getTcntUserInfo().getUserId();
+            logger.info("✅ [AccountService] TCNT 사용자 ID: {}", userId);
+            return userId;
+        } else if (userDetails.getTempUserInfo() != null) {
+            String userId = userDetails.getTempUserInfo().getUserId();
+            logger.info("✅ [AccountService] TEMP 사용자 ID: {}", userId);
+            return userId;
+        } else {
+            logger.warn("❌ [AccountService] TcntUserInfo와 TempUserInfo 모두 null");
+            return "";
+        }
     }
 
     public Map<String, Object> getAccount() {
         Map<String, Object> data = new HashMap<>();
         String userId = getCurrentUserId();
-        logger.debug("Fetching account for custCode: {}", userId);
+        logger.info("🔍 [AccountService] 조회할 사용자 ID: '{}'", userId);
+
+        if (userId == null || userId.trim().isEmpty()) {
+            logger.error("❌ [AccountService] 사용자 ID가 null이거나 빈 값");
+            data.put("accountInfo", null);
+            return data;
+        }
 
         try {
+            logger.info("🔍 [AccountService] AccountMapper.getAccount 호출 시작 - userId: '{}'", userId);
             Tcnt01Emp accountInfo = accountMapper.getAccount(userId);
-            logger.debug("Account info retrieved: {}", accountInfo);
+            logger.info("🔍 [AccountService] AccountMapper.getAccount 결과: {}", accountInfo);
 
             if (accountInfo != null) {
-                logger.debug("Detailed Account Info: {}", accountInfo);
+                logger.info("✅ [AccountService] 계정 정보 조회 성공:");
+                logger.info("   - 사용자 ID: {}", accountInfo.getUserId());
+                logger.info("   - 직원명: {}", accountInfo.getEmp_name());
+                logger.info("   - 고객 코드: {}", accountInfo.getCustCode());
+                logger.info("   - 🏢 회사명: '{}'", accountInfo.getCust_name());
+                logger.info("   - 홈페이지: {}", accountInfo.getHomePage());
+                logger.info("   - 전화번호: {}", accountInfo.getTel_no());
+                logger.info("   - 주소: {}", accountInfo.getAddr());
             } else {
-                logger.debug("No account found for userId: {}", userId);
+                logger.error("❌ [AccountService] 계정 정보 조회 결과가 null - userId: '{}'", userId);
             }
 
             data.put("accountInfo", accountInfo);
         } catch (Exception e) {
-            logger.error("Error fetching account info for userId: {}", userId, e);
+            logger.error("💥 [AccountService] 계정 정보 조회 중 오류 발생 - userId: '{}', 오류: {}", userId, e.getMessage(), e);
+            data.put("accountInfo", null);
         }
 
         return data;
     }
+
     @Transactional
     public boolean updateAccount(Account account) {
-
         String userId = getCurrentUserId();
         account.setUserId(userId);
-        // Assuming AccountRepository extends JpaRepository
         logger.info("Updating account: {}", account);
         accountMapper.updateAccount(account);
         return accountMapper.updateAccount(account) > 0;
-
     }
 
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -76,17 +104,14 @@ public class AccountService {
     @Transactional
     public boolean checkCurrentPassword(String currentPassword) {
         String userId = getCurrentUserId();
-
         Account account = accountMapper.findUserByUsername(userId);
-        //System.out.println("user==========="+account.getPassword());
-
         return passwordEncoder.matches(currentPassword, account.getPassword());
     }
+    
     @Transactional
     public void changeUserPassword(String newPassword) {
         String userId = getCurrentUserId();
         String encodedPassword = passwordEncoder.encode(newPassword);
-
         accountMapper.updateUserPassword(userId, encodedPassword);
     }
 }

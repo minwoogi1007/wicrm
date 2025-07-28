@@ -444,7 +444,9 @@
             logisticsConfirmedDate: /*[[${returnItem?.logisticsConfirmedDate}]]*/ '',
             shippingDate: /*[[${returnItem?.shippingDate}]]*/ '',
             refundDate: /*[[${returnItem?.refundDate}]]*/ '',
-            isCompleted: /*[[${returnItem?.isCompleted}]]*/ ''
+            isCompleted: /*[[${returnItem?.isCompleted}]]*/ '',
+            // 🔐 로그인 사용자 정보
+            currentUser: /*[[${currentUser}]]*/ ''
         };
 
         //console.log(' 서버 데이터:', serverData);
@@ -896,7 +898,26 @@
 
         // 🎯 페이지 로드 시 초기화
         document.addEventListener('DOMContentLoaded', function() {
-            //console.log('페이지 로드 완료');
+            console.log('페이지 로드 완료');
+            console.log('👤 현재 로그인 사용자:', serverData.currentUser);
+
+            // 🔐 로그인 사용자 정보 설정 (폼 제출 시 사용)
+            if (serverData.currentUser) {
+                const createdByField = document.getElementById('createdBy');
+                const updatedByField = document.getElementById('updatedBy');
+                
+                if (!serverData.isEdit && createdByField && !createdByField.value) {
+                    // 신규 등록 시 등록자 설정
+                    createdByField.value = serverData.currentUser;
+                    console.log('✅ 등록자 설정:', serverData.currentUser);
+                }
+                
+                if (updatedByField) {
+                    // 항상 수정자는 현재 사용자로 설정
+                    updatedByField.value = serverData.currentUser;
+                    console.log('✅ 수정자 설정:', serverData.currentUser);
+                }
+            }
 
             // 수정 모드일 때 원본값 설정
             if (serverData.isEdit) {
@@ -1019,8 +1040,25 @@
                 return false;
             }
 
+            // 🔐 폼 제출 직전 로그인 사용자 정보 재확인 및 설정
+            if (serverData.currentUser) {
+                const createdByField = document.getElementById('createdBy');
+                const updatedByField = document.getElementById('updatedBy');
+                
+                if (!serverData.isEdit && createdByField) {
+                    createdByField.value = serverData.currentUser;
+                    console.log('🔄 폼 제출 직전 등록자 재설정:', serverData.currentUser);
+                }
+                
+                if (updatedByField) {
+                    updatedByField.value = serverData.currentUser;
+                    console.log('🔄 폼 제출 직전 수정자 재설정:', serverData.currentUser);
+                }
+            }
+
             const form = document.getElementById('exchangeForm');
             if (form) {
+                console.log('📋 폼 제출 시작 - 등록자:', document.getElementById('createdBy')?.value, '수정자:', document.getElementById('updatedBy')?.value);
                 form.submit();
             }
         }
@@ -1063,6 +1101,12 @@
                         <div class="page-header">
                             <h2 th:text="${isEdit ? '교환/반품 수정' : '교환/반품 등록'}">교환/반품 등록</h2>
                             <p th:text="${isEdit ? '기존 정보를 수정하고 저장하세요' : '브랜드, 사이트, 유형을 선택한 후 정보를 입력하세요'}">브랜드, 사이트, 유형을 선택한 후 정보를 입력하세요</p>
+                            <!-- 🔐 현재 로그인 사용자 표시 -->
+                            <div th:if="${currentUser}" class="mt-2 p-2 bg-light rounded border">
+                                <small class="text-muted">👤 현재 작업자: </small>
+                                <span class="text-primary fw-bold" th:text="${currentUser}">사용자명</span>
+                                <small class="text-muted"> | 이 정보가 등록자/수정자로 기록됩니다</small>
+                            </div>
                         </div>
 
                         <!-- 🎯 상단 선택 버튼들 -->
@@ -1114,6 +1158,9 @@
                                 <input type="hidden" id="siteName" name="siteName" th:field="*{siteName}" />
                                 <input type="hidden" id="returnTypeCode" name="returnTypeCode" th:field="*{returnTypeCode}" />
                                 <input type="hidden" id="returnReason" name="returnReason" th:field="*{returnReason}" />
+                                <!-- 🔐 등록자/수정자 정보 -->
+                                <input type="hidden" id="createdBy" name="createdBy" th:field="*{createdBy}" />
+                                <input type="hidden" id="updatedBy" name="updatedBy" th:field="*{updatedBy}" />
                             </div>
 
                             <!-- 주문 정보 -->
@@ -1233,6 +1280,13 @@
                                     <div class="form-group">
                                         <label for="processor">처리자</label>
                                         <input type="text" id="processor" name="processor" class="form-control" th:field="*{processor}" placeholder="담당자명">
+                                    </div>
+                                    
+                                    <!-- 🔐 로그인 사용자 정보 표시 -->
+                                    <div class="form-group" th:if="${currentUser}">
+                                        <label class="text-primary">현재 작업자</label>
+                                        <div class="form-control bg-light text-primary fw-bold" style="background-color: #e3f2fd !important;" th:text="${currentUser}">사용자명</div>
+                                        <small class="text-muted">👤 현재 로그인한 사용자가 등록자/수정자로 기록됩니다</small>
                                     </div>
                                     
                                     <div class="form-group">

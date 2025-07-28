@@ -102,6 +102,12 @@ public class SecurityConfig {
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID", "XSRF-TOKEN")
                         .permitAll())
+                .headers(headers -> headers
+                        .frameOptions().deny().contentTypeOptions().and()
+                        .httpStrictTransportSecurity(hstsConfig -> hstsConfig
+                                .maxAgeInSeconds(31536000)
+                                .includeSubDomains(true)
+                                .preload(true)))
                 .requestCache(cache -> cache
                         .requestCache(requestCache));
 
