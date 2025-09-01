@@ -70,7 +70,7 @@ public class ExchangeController {
             Model model, 
             @ModelAttribute ReturnItemSearchDTO searchDTO,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String sortBy,
             @RequestParam(required = false) String sortDir,
             @RequestParam(required = false) String filters) {
@@ -914,7 +914,7 @@ public class ExchangeController {
             @PathVariable String filterType,
             Model model,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String sortBy,
             @RequestParam(required = false) String sortDir) {
         
@@ -1113,7 +1113,7 @@ public class ExchangeController {
             Model model, 
             @ModelAttribute ReturnItemSearchDTO searchDTO,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String sortBy,
             @RequestParam(required = false) String sortDir,
             @RequestParam(required = false) String filters,

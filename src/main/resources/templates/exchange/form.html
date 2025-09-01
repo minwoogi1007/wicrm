@@ -278,27 +278,7 @@
             transform: translateY(-1px);
         }
 
-        /* 🖼️ 이미지 업로드 영역 */
-        .image-upload-area {
-            border: 2px dashed var(--border-color);
-            border-radius: var(--radius);
-            padding: 2rem;
-            text-align: center;
-            background: var(--gray-100);
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-
-        .image-upload-area:hover {
-            border-color: var(--primary-color);
-            background: rgba(67, 97, 238, 0.05);
-        }
-
-        .image-upload-area.dragover {
-            border-color: var(--success-color);
-            background: rgba(53, 178, 127, 0.1);
-        }
-
+        /* 기존 이미지 미리보기 (호환성용 유지) */
         .image-preview {
             max-width: 200px;
             max-height: 200px;
@@ -374,6 +354,56 @@
             font-size: 0.875rem;
         }
 
+        /* 🖼️ 이미지 모달 애니메이션 */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        @keyframes zoomIn {
+            from { 
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to { 
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* 이미지 미리보기 개선 스타일 */
+        .image-preview-enhanced {
+            border: 3px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .image-preview-enhanced:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 8px 16px rgba(67, 97, 238, 0.2) !important;
+        }
+
+        .image-preview-container {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .image-actions .btn {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+        }
+
+        .image-actions .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
         /* 반응형 */
         @media (max-width: 768px) {
             .form-container {
@@ -408,6 +438,22 @@
             #defectDetailGroup {
                 padding: 0.75rem;
                 margin-top: 0.75rem;
+            }
+
+            /* 🖼️ 모바일에서 이미지 미리보기 최적화 */
+            .image-preview-enhanced {
+                max-width: 250px !important;
+                max-height: 250px !important;
+            }
+
+            .image-actions {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .image-actions .btn {
+                width: 100%;
             }
         }
     </style>
@@ -1062,6 +1108,211 @@
                 form.submit();
             }
         }
+
+        // 🖼️ 이미지 모달 표시 함수
+        function showImageModal(imageSrc) {
+            // 기존 모달이 있다면 제거
+            const existingModal = document.getElementById('imageModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+
+            // 모달 HTML 생성
+            const modalHtml = `
+                <div id="imageModal" style="
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.8);
+                    z-index: 9999;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    animation: fadeIn 0.3s ease;
+                " onclick="closeImageModal()">
+                    <div style="
+                        position: relative;
+                        max-width: 90%;
+                        max-height: 90%;
+                        background: white;
+                        border-radius: 8px;
+                        padding: 20px;
+                        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+                        animation: zoomIn 0.3s ease;
+                    " onclick="event.stopPropagation()">
+                        <button onclick="closeImageModal()" style="
+                            position: absolute;
+                            top: 10px;
+                            right: 15px;
+                            background: none;
+                            border: none;
+                            font-size: 24px;
+                            color: #666;
+                            cursor: pointer;
+                            z-index: 10000;
+                        ">×</button>
+                        <img src="${imageSrc}" style="
+                            max-width: 100%;
+                            max-height: 80vh;
+                            display: block;
+                            margin: 0 auto;
+                            border-radius: 4px;
+                        " alt="확대 이미지">
+                        <div style="text-align: center; margin-top: 15px;">
+                            <button onclick="window.open('${imageSrc}', '_blank')" style="
+                                background: var(--primary-color);
+                                color: white;
+                                border: none;
+                                padding: 8px 16px;
+                                border-radius: 4px;
+                                cursor: pointer;
+                                margin-right: 10px;
+                            ">🔗 새 탭에서 열기</button>
+                            <a href="${imageSrc}" download style="
+                                background: var(--secondary-color);
+                                color: white;
+                                text-decoration: none;
+                                padding: 8px 16px;
+                                border-radius: 4px;
+                                display: inline-block;
+                            ">📥 다운로드</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // 모달을 페이지에 추가
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+            // ESC 키로 모달 닫기
+            document.addEventListener('keydown', function escKeyHandler(e) {
+                if (e.key === 'Escape') {
+                    closeImageModal();
+                    document.removeEventListener('keydown', escKeyHandler);
+                }
+            });
+        }
+
+        // 🖼️ 이미지 모달 닫기 함수
+        function closeImageModal() {
+            const modal = document.getElementById('imageModal');
+            if (modal) {
+                modal.style.animation = 'fadeOut 0.2s ease';
+                setTimeout(() => {
+                    modal.remove();
+                }, 200);
+            }
+        }
+
+        // 🖼️ 이미지 로드 에러 처리 함수 (프록시 폴백 포함)
+        function handleImageError(imgElement, fileName) {
+            console.error('🚨 이미지 로드 실패:', {
+                originalSrc: imgElement.src,
+                fileName: fileName,
+                isHttps: window.location.protocol === 'https:',
+                userAgent: navigator.userAgent
+            });
+            
+            // 프록시로 이미 시도했다면 직접 링크 시도
+            if (imgElement.src.includes('/api/image-proxy')) {
+                console.log('🔄 프록시 실패, HTTP 직접 시도');
+                imgElement.src = `http://175.119.224.45:8080/uploads/${fileName}`;
+                
+                imgElement.onerror = function() {
+                    console.error('❌ 모든 이미지 로드 방법 실패');
+                    showImageErrorMessage(this, fileName);
+                };
+            } else {
+                // 첫 번째 실패인 경우 프록시 시도
+                console.log('🔄 프록시로 재시도');
+                imgElement.src = `/api/image-proxy?path=${fileName}`;
+                
+                imgElement.onerror = function() {
+                    console.warn('🚨 프록시도 실패, 직접 링크 시도');
+                    this.src = `http://175.119.224.45:8080/uploads/${fileName}`;
+                    
+                    this.onerror = function() {
+                        console.error('❌ 모든 이미지 로드 방법 실패');
+                        showImageErrorMessage(this, fileName);
+                    };
+                };
+            }
+        }
+
+        // 🚫 이미지 에러 메시지 표시
+        function showImageErrorMessage(imgElement, fileName) {
+            imgElement.style.display = 'none';
+            
+            const directLink = `http://175.119.224.45:8080/uploads/${fileName}`;
+            const proxyLink = `/api/image-proxy?path=${fileName}`;
+            
+            imgElement.parentElement.innerHTML = `
+                <div style="
+                    padding: 30px; 
+                    text-align: center; 
+                    background: #fff3cd; 
+                    border: 2px solid #ffeaa7; 
+                    border-radius: 8px;
+                    color: #856404;
+                ">
+                    <div style="font-size: 48px; margin-bottom: 10px;">🚫</div>
+                    <div style="font-weight: 600; margin-bottom: 8px;">이미지를 불러올 수 없습니다</div>
+                    <div style="font-size: 13px; margin-bottom: 8px; word-break: break-all;">
+                        <strong>파일:</strong> ${fileName}
+                    </div>
+                    <div style="font-size: 12px; color: #dc3545; margin-bottom: 12px;">
+                        프록시 및 직접 연결 모두 실패했습니다
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <button onclick="window.open('${directLink}', '_blank')" style="
+                            padding: 8px 16px;
+                            background: #007bff;
+                            color: white;
+                            border: none;
+                            border-radius: 4px;
+                            font-size: 12px;
+                            cursor: pointer;
+                        ">🔗 직접 링크</button>
+                        <button onclick="window.open('${proxyLink}', '_blank')" style="
+                            padding: 8px 16px;
+                            background: #6f42c1;
+                            color: white;
+                            border: none;
+                            border-radius: 4px;
+                            font-size: 12px;
+                            cursor: pointer;
+                            margin-left: 5px;
+                        ">🔄 프록시 링크</button>
+                        <button onclick="copyToClipboard('${directLink}')" style="
+                            padding: 8px 16px;
+                            background: #28a745;
+                            color: white;
+                            border: none;
+                            border-radius: 4px;
+                            font-size: 12px;
+                            cursor: pointer;
+                            margin-left: 5px;
+                        ">📋 링크 복사</button>
+                    </div>
+                    <div style="font-size: 11px; color: #6c757d;">
+                        💡 위 링크들을 시도해보세요. 직접 링크가 일반적으로 더 잘 작동합니다.
+                    </div>
+                </div>
+            `;
+        }
+
+        // 📋 클립보드 복사 함수
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                alert('링크가 클립보드에 복사되었습니다!');
+            }).catch(function(err) {
+                console.error('클립보드 복사 실패:', err);
+                // 폴백: 수동 복사를 위한 프롬프트
+                prompt('아래 링크를 복사하세요:', text);
+            });
+        }
     </script>
 </head>
 
@@ -1151,7 +1402,7 @@
                         <div id="selectedInfo" class="selected-info" style="display: none;"></div>
 
                         <!-- 🎯 메인 폼 -->
-                        <form id="exchangeForm" th:action="@{/exchange/save}" method="post" enctype="multipart/form-data" th:object="${returnItem}">
+                        <form id="exchangeForm" th:action="@{/exchange/save}" method="post" th:object="${returnItem}">
                             <!-- Hidden 필드들 -->
                             <div class="hidden-fields">
                                 <input type="hidden" th:if="${isEdit}" th:field="*{id}" />
@@ -1311,31 +1562,33 @@
                                 </div>
                             </div>
 
-                            <!-- 이미지 첨부 -->
-                            <div class="form-card">
-                                <div class="form-section-header">🖼️ 이미지 첨부</div>
+                            <!-- 이미지 미리보기 -->
+                            <div class="form-card" th:if="${returnItem.defectPhotoUrl != null and !#strings.isEmpty(returnItem.defectPhotoUrl)}">
+                                <div class="form-section-header">🖼️ 첨부 이미지</div>
                                 <div class="form-group">
-                                    <label for="attachmentPhoto">이미지 파일</label>
-                                    <input type="file" id="attachmentPhoto" name="attachmentPhoto" class="form-control" accept="image/*">
-                                    <small class="text-muted">관련 이미지를 첨부해주세요 (선택사항)</small>
-                                    
-                                    <!-- 기존 이미지 표시 (수정 모드) -->
-                                    <div th:if="${isEdit and returnItem.defectPhotoUrl != null and !#strings.isEmpty(returnItem.defectPhotoUrl)}" class="mt-3">
-                                        <p class="text-primary"><strong>현재 등록된 이미지:</strong></p>
-                                        <img th:src="@{|http://175.119.224.45:8080/uploads/${returnItem.defectPhotoUrl}|}" class="image-preview" alt="현재 이미지" 
-                                             onerror="this.onerror=null; this.src='/uploads/' + '${returnItem.defectPhotoUrl}'; console.error('외부 이미지 로드 실패, 로컬 경로로 시도:', this.src);"
-                                             onclick="window.open(this.src, '_blank')" style="cursor: pointer;">
-                                        <br><small class="text-muted">새 이미지를 업로드하면 기존 이미지가 교체됩니다. (클릭하면 원본 크기로 보기)</small>
-                                        
-                                        <!-- 이미지 다운로드 링크 추가 -->
-                                        <div class="mt-2">
-                                            <a th:href="@{|http://175.119.224.45:8080/uploads/${returnItem.defectPhotoUrl}|}" 
-                                               class="btn btn-sm btn-light-primary" 
-                                               download th:download="${returnItem.defectPhotoUrl}" 
-                                               target="_blank">
-                                                📷 이미지 다운로드
+                                    <div class="image-preview-container">
+                                        <p class="text-primary mb-3"><strong>등록된 이미지:</strong></p>
+                                        <div class="image-preview-wrapper" style="text-align: center;">
+                                            <img th:src="@{|/api/image-proxy?path=${returnItem.defectPhotoUrl}|}" 
+                                                 class="image-preview-enhanced" 
+                                                 alt="첨부 이미지" 
+                                                 onerror="handleImageError(this, '${returnItem.defectPhotoUrl}')"
+                                                 onclick="showImageModal(this.src)" 
+                                                 style="cursor: pointer; max-width: 300px; max-height: 300px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); transition: transform 0.2s ease;"
+                                                 onmouseover="this.style.transform='scale(1.05)'"
+                                                 onmouseout="this.style.transform='scale(1)'">
+                                        </div>
+                                        <div class="image-actions mt-3" style="text-align: center;">
+                                            <button type="button" class="btn btn-sm btn-primary me-2" onclick="showImageModal(document.querySelector('.image-preview-enhanced').src)">
+                                                🔍 확대 보기
+                                            </button>
+                                            <a th:href="@{|/api/download?path=${returnItem.defectPhotoUrl}|}" 
+                                               class="btn btn-sm btn-secondary" 
+                                               download th:download="${returnItem.defectPhotoUrl}">
+                                                📥 다운로드
                                             </a>
                                         </div>
+                                        <small class="text-muted d-block text-center mt-2">💡 이미지를 클릭하거나 확대 보기 버튼을 눌러 원본 크기로 볼 수 있습니다</small>
                                     </div>
                                 </div>
                             </div>

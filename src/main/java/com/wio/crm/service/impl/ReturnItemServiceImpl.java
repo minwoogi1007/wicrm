@@ -529,34 +529,48 @@ public class ReturnItemServiceImpl implements ReturnItemService {
                     ReturnItem item = itemOpt.get();
                     boolean hasChanges = false;
                     
-                    // 🎯 변경된 필드만 선택적으로 업데이트 (프론트엔드에서 전송된 필드만)
+                    // 🔥 변경된 필드 로그 출력
+                    log.info("🎯 ID {} 처리 시작 - 변경된 필드: {}", update.getId(), update.getChangedFields());
+                    
+                    // 🎯 변경된 필드만 선택적으로 업데이트 (changedFields를 활용)
                     String updatedBy = update.getUpdatedBy() != null ? update.getUpdatedBy() : "SYSTEM";
                     LocalDateTime now = LocalDateTime.now();
                     
-                    // 프론트엔드에서 전송된 필드만 업데이트 (단순하게 처리)
-                    // JavaScript에서 undefined !== undefined 체크로 변경된 필드만 전송하므로
-                    // 모든 전송된 필드를 업데이트 (null 값 포함)
-                    
+                    // 회수완료일 업데이트 (변경된 경우에만)
+                    if (update.hasFieldChanged("collectionCompletedDate")) {
                         item.setCollectionCompletedDate(update.getCollectionCompletedDate());
-                    item.setCollectionUpdatedBy(updatedBy);
-                    item.setCollectionUpdatedDate(now);
-                    hasChanges = true;
-                    log.debug("회수완료일 업데이트: ID={}, 값={}", update.getId(), update.getCollectionCompletedDate());
+                        item.setCollectionUpdatedBy(updatedBy);
+                        item.setCollectionUpdatedDate(now);
+                        hasChanges = true;
+                        log.debug("회수완료일 업데이트: ID={}, 값={}", update.getId(), update.getCollectionCompletedDate());
+                    }
                     
+                    // 물류확인일 업데이트 (변경된 경우에만)
+                    if (update.hasFieldChanged("logisticsConfirmedDate")) {
                         item.setLogisticsConfirmedDate(update.getLogisticsConfirmedDate());
-                    item.setLogisticsUpdatedBy(updatedBy);
-                    item.setLogisticsUpdatedDate(now);
-                    log.debug("물류확인일 업데이트: ID={}, 값={}", update.getId(), update.getLogisticsConfirmedDate());
+                        item.setLogisticsUpdatedBy(updatedBy);
+                        item.setLogisticsUpdatedDate(now);
+                        hasChanges = true;
+                        log.debug("물류확인일 업데이트: ID={}, 값={}", update.getId(), update.getLogisticsConfirmedDate());
+                    }
                     
+                    // 출고일 업데이트 (변경된 경우에만)
+                    if (update.hasFieldChanged("shippingDate")) {
                         item.setShippingDate(update.getShippingDate());
-                    item.setShippingUpdatedBy(updatedBy);
-                    item.setShippingUpdatedDate(now);
-                    log.debug("출고일 업데이트: ID={}, 값={}", update.getId(), update.getShippingDate());
+                        item.setShippingUpdatedBy(updatedBy);
+                        item.setShippingUpdatedDate(now);
+                        hasChanges = true;
+                        log.debug("출고일 업데이트: ID={}, 값={}", update.getId(), update.getShippingDate());
+                    }
                     
+                    // 환불일 업데이트 (변경된 경우에만)
+                    if (update.hasFieldChanged("refundDate")) {
                         item.setRefundDate(update.getRefundDate());
-                    item.setRefundUpdatedBy(updatedBy);
-                    item.setRefundUpdatedDate(now);
-                    log.debug("환불일 업데이트: ID={}, 값={}", update.getId(), update.getRefundDate());
+                        item.setRefundUpdatedBy(updatedBy);
+                        item.setRefundUpdatedDate(now);
+                        hasChanges = true;
+                        log.debug("환불일 업데이트: ID={}, 값={}", update.getId(), update.getRefundDate());
+                    }
                     
                     // 🆕 비고 업데이트 로직 추가
                     if (update.getRemarks() != null) {
