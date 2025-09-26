@@ -572,11 +572,31 @@ public class ReturnItemServiceImpl implements ReturnItemService {
                         log.debug("환불일 업데이트: ID={}, 값={}", update.getId(), update.getRefundDate());
                     }
                     
-                    // 🆕 비고 업데이트 로직 추가
+                    // 🆕 비고 업데이트 로직 - 기존 내용에 추가 방식
                     if (update.getRemarks() != null) {
-                        item.setRemarks(update.getRemarks());
-                        hasChanges = true;
-                        log.debug("비고 업데이트: ID={}, 값={}", update.getId(), update.getRemarks());
+                        String inputRemarks = update.getRemarks().trim();
+                        
+                        if (!inputRemarks.isEmpty()) {
+                            // 새로운 비고 내용이 있는 경우에만 추가
+                            String existingRemarks = item.getRemarks();
+                            String newRemarks;
+                            
+                            if (existingRemarks == null || existingRemarks.trim().isEmpty()) {
+                                // 기존 비고가 없는 경우 - 새 비고만 설정
+                                newRemarks = inputRemarks;
+                            } else {
+                                // 기존 비고가 있는 경우 - "/" 구분자 추가 후 새 비고 추가
+                                newRemarks = existingRemarks.trim() + " / " + inputRemarks;
+                            }
+                            
+                            item.setRemarks(newRemarks);
+                            hasChanges = true;
+                            log.debug("비고 업데이트: ID={}, 기존=[{}], 새로운=[{}]", 
+                                      update.getId(), existingRemarks, newRemarks);
+                        } else {
+                            // 빈 비고인 경우 - 기존 비고 유지 (변경하지 않음)
+                            log.debug("비고 업데이트 스킵: ID={}, 빈 비고로 기존 내용 유지", update.getId());
+                        }
                     }
                     
                     // 변경사항이 있을 때만 저장
