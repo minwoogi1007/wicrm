@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+<head>
+    <title>포인트 사용 조회</title>
+    <meta name="_csrf" th:if="${_csrf}" th:content="${_csrf.token}"/>
+    <meta name="_csrf" th:unless="${_csrf}" content=""/>
+    <meta name="_csrf_header" th:if="${_csrf}" th:content="${_csrf.headerName}"/>
+    <meta name="_csrf_header" th:unless="${_csrf}" content="X-XSRF-TOKEN"/>
+</head>
+<div layout:fragment="content">
+    <div class="app-main flex-column flex-row-fluid" id="kt_app_main">
+        <div class="d-flex flex-column flex-column-fluid">
+            <!--begin::Toolbar-->
+            <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+                <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                    <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                        <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">포인트 사용 조회</h1>
+                        <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                            <li class="breadcrumb-item text-muted">
+                                <a href="/main" class="text-muted text-hover-primary">Home</a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                            </li>
+                            <li class="breadcrumb-item text-muted">마일리지</li>
+                            <li class="breadcrumb-item">
+                                <span class="bullet bg-gray-500 w-5px h-2px"></span>
+                            </li>
+                            <li class="breadcrumb-item text-muted">포인트 사용 조회</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!--end::Toolbar-->
+
+            <!--begin::Content-->
+            <div id="kt_app_content" class="app-content flex-column-fluid">
+                <div id="kt_app_content_container" class="app-container container-xxl">
+
+                    <!--begin::Search Card-->
+                    <div class="card mb-5">
+                        <div class="card-header border-0 pt-5 pb-3">
+                            <h3 class="card-title align-items-start flex-column">
+                                <span class="card-label fw-bold fs-4">검색 조건</span>
+                            </h3>
+                            <div class="card-toolbar">
+                                <div class="d-flex align-items-center">
+                                    <span class="fs-7 fw-semibold text-muted me-2">잔여 포인트</span>
+                                    <span id="remainingPoint" class="fs-4 fw-bolder text-primary" th:text="${remainingPoint}">0</span>
+                                    <span class="fs-7 text-muted ms-1">P</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body pt-0 pb-5">
+                            <div class="row align-items-end g-3">
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold fs-7 text-gray-600">프로젝트</label>
+                                    <select id="searchProject" class="form-select form-select-solid">
+                                        <option value="">전체</option>
+                                        <option th:each="p : ${projects}"
+                                                th:value="${p.PROJECT_CODE}"
+                                                th:text="${p.PROJECT_NAME}"></option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-semibold fs-7 text-gray-600">구분</label>
+                                    <select id="searchIoGubn" class="form-select form-select-solid">
+                                        <option value="">전체</option>
+                                        <option value="I">충전</option>
+                                        <option value="O">차감</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-semibold fs-7 text-gray-600">시작일</label>
+                                    <input type="date" id="searchStartDate" class="form-control form-control-solid" />
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-semibold fs-7 text-gray-600">종료일</label>
+                                    <input type="date" id="searchEndDate" class="form-control form-control-solid" />
+                                </div>
+                                <div class="col-md-3 d-flex gap-2">
+                                    <button type="button" class="btn btn-primary" onclick="doSearch()">
+                                        <i class="ki-duotone ki-magnifier fs-4"><span class="path1"></span><span class="path2"></span></i>
+                                        조회
+                                    </button>
+                                    <button type="button" class="btn btn-light-primary" onclick="resetSearch()">
+                                        <i class="ki-duotone ki-arrows-circle fs-4"><span class="path1"></span><span class="path2"></span></i>
+                                        초기화
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end::Search Card-->
+
+                    <!--begin::Table Card-->
+                    <div class="card">
+                        <div class="card-header border-0 pt-5">
+                            <h3 class="card-title align-items-start flex-column">
+                                <span class="card-label fw-bold fs-4">포인트 사용 내역</span>
+                                <span class="text-muted mt-1 fw-semibold fs-7" id="totalCountLabel">조회 버튼을 눌러주세요</span>
+                            </h3>
+                        </div>
+                        <div class="card-body pt-0 pb-5">
+                            <div class="table-responsive">
+                                <table class="table align-middle table-row-dashed gy-5" id="pointTable">
+                                    <thead class="border-bottom border-gray-200 fs-7 fw-bold">
+                                        <tr class="text-start text-muted text-uppercase gs-0">
+                                            <th class="text-center" style="width:50px;">No</th>
+                                            <th class="text-center" style="min-width:100px;">프로젝트</th>
+                                            <th class="text-center" style="min-width:80px;">상담유형</th>
+                                            <th style="min-width:200px;">상담내용</th>
+                                            <th class="text-center" style="width:70px;">구분</th>
+                                            <th class="text-center" style="width:90px;">포인트</th>
+                                            <th style="min-width:120px;">처리내용</th>
+                                            <th class="text-center" style="width:100px;">처리결과</th>
+                                            <th class="text-center" style="width:100px;">일자</th>
+                                            <th class="text-center" style="width:80px;">시간</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="pointTableBody" class="fs-6 fw-semibold text-gray-600">
+                                        <tr>
+                                            <td colspan="10" class="text-center text-muted py-10">조회 버튼을 눌러 데이터를 검색하세요.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end::Table Card-->
+
+                </div>
+            </div>
+            <!--end::Content-->
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        var today = [[${today}]];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var y = today.substring(0, 4);
+            var m = today.substring(4, 6);
+            var d = today.substring(6, 8);
+            var formatted = y + '-' + m + '-' + d;
+            document.getElementById('searchStartDate').value = formatted;
+            document.getElementById('searchEndDate').value = formatted;
+        });
+
+        function doSearch() {
+            var startDate = document.getElementById('searchStartDate').value.replace(/-/g, '');
+            var endDate = document.getElementById('searchEndDate').value.replace(/-/g, '');
+
+            if (!startDate || !endDate) {
+                alert('날짜를 입력하세요.');
+                return;
+            }
+
+            var projectCode = document.getElementById('searchProject').value;
+            var ioGubn = document.getElementById('searchIoGubn').value;
+
+            var params = 'startDate=' + startDate + '&endDate=' + endDate;
+            if (projectCode) params += '&projectCode=' + projectCode;
+            if (ioGubn) params += '&ioGubn=' + ioGubn;
+
+            $.ajax({
+                url: '/mileage/consume/search?' + params,
+                type: 'GET',
+                dataType: 'json',
+                success: function(res) {
+                    if (res.success) {
+                        renderTable(res.data);
+                        document.getElementById('remainingPoint').textContent = res.remainingPoint || '0';
+                        document.getElementById('totalCountLabel').textContent = '총 ' + res.totalCount + '건';
+                    } else {
+                        alert(res.message || '조회 실패');
+                    }
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    console.error('AJAX Error:', xhr.status, textStatus, errorThrown);
+                    console.error('Response:', xhr.responseText);
+                    if (xhr.status === 401) {
+                        alert('세션이 만료되었습니다. 다시 로그인합니다.');
+                        location.href = '/login';
+                    } else {
+                        alert('조회 오류 (HTTP ' + xhr.status + '): ' + (errorThrown || textStatus));
+                    }
+                }
+            });
+        }
+
+        function resetSearch() {
+            document.getElementById('searchProject').value = '';
+            document.getElementById('searchIoGubn').value = '';
+            var y = today.substring(0, 4);
+            var m = today.substring(4, 6);
+            var d = today.substring(6, 8);
+            var formatted = y + '-' + m + '-' + d;
+            document.getElementById('searchStartDate').value = formatted;
+            document.getElementById('searchEndDate').value = formatted;
+        }
+
+        function renderTable(list) {
+            var tbody = document.getElementById('pointTableBody');
+            if (!list || list.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted py-10">조회된 데이터가 없습니다.</td></tr>';
+                return;
+            }
+
+            var pointSum = 0;
+            var html = '';
+            for (var i = 0; i < list.length; i++) {
+                var item = list[i];
+                var point = item.POINT || 0;
+                pointSum += Number(point);
+
+                var ioBadge = '';
+                if (item.IO_GUBN === 'I') {
+                    ioBadge = '<span class="badge badge-light-success d-inline-flex align-items-center px-3 py-2">' +
+                              '<i class="ki-duotone ki-arrow-up fs-5 me-1 text-success"><span class="path1"></span><span class="path2"></span></i>충전</span>';
+                } else if (item.IO_GUBN === 'O') {
+                    ioBadge = '<span class="badge badge-light-danger d-inline-flex align-items-center px-3 py-2">' +
+                              '<i class="ki-duotone ki-arrow-down fs-5 me-1 text-danger"><span class="path1"></span><span class="path2"></span></i>차감</span>';
+                } else {
+                    ioBadge = item.IO_GUBN_NM || '-';
+                }
+
+                var pointClass = item.IO_GUBN === 'I' ? 'text-success' : 'text-danger';
+                var pointStr = Number(point).toLocaleString();
+
+                html += '<tr>' +
+                    '<td class="text-center">' + (i + 1) + '</td>' +
+                    '<td class="text-center">' + escapeHtml(item.PROJECT_NAME || '-') + '</td>' +
+                    '<td class="text-center">' + escapeHtml(item.CS_TYPE_NM || '-') + '</td>' +
+                    '<td>' + escapeHtml(item.CS_NOTE || '-') + '</td>' +
+                    '<td class="text-center">' + ioBadge + '</td>' +
+                    '<td class="text-end fw-bold ' + pointClass + '">' + pointStr + '</td>' +
+                    '<td>' + escapeHtml(item.PRC_NOTE || '-') + '</td>' +
+                    '<td class="text-center">' + escapeHtml(item.PRC_NAME || '-') + '</td>' +
+                    '<td class="text-center">' + (item.CON_DATE || '-') + '</td>' +
+                    '<td class="text-center">' + (item.CON_TIME || '-') + '</td>' +
+                    '</tr>';
+            }
+
+            html += '<tr class="bg-light fw-bold">' +
+                '<td colspan="5" class="text-end">합계</td>' +
+                '<td class="text-end text-primary">' + pointSum.toLocaleString() + '</td>' +
+                '<td colspan="4"></td>' +
+                '</tr>';
+
+            tbody.innerHTML = html;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            var div = document.createElement('div');
+            div.appendChild(document.createTextNode(str));
+            return div.innerHTML;
+        }
+    </script>
+</div>
+</html>

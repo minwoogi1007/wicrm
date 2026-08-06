@@ -149,7 +149,7 @@
                                         <tr th:each="list, iterStat : ${list}">
                                             <td class="comment-item mb-2 p-2" th:text="${list.IN_DATE}"></td>
                                             <td class="comment-item mb-2 p-2" th:text="${list.ID}"></td>
-                                            <td class="comment-item mb-2 p-2" th:utext="${list.CONTENT}"></td>
+                                            <td class="comment-item mb-2 p-2" th:text="${list.CONTENT}"></td>
                                         </tr>
                                         </tbody>
                                     </table>

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{main}">
+
+<div layout:fragment="content">
+    <style>
+        .admin-header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            color: white;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        
+        .stat-card .icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-card .icon.blue { background: #dbeafe; }
+        .stat-card .icon.green { background: #d1fae5; }
+        .stat-card .icon.purple { background: #ede9fe; }
+        .stat-card .icon.orange { background: #ffedd5; }
+        
+        .stat-card .value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        
+        .stat-card .label {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+        
+        .section-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin-bottom: 1.5rem;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+        
+        .table-custom th {
+            background: #f8fafc;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .status-badge.active { background: #d1fae5; color: #059669; }
+        .status-badge.expired { background: #fee2e2; color: #dc2626; }
+        .status-badge.pending { background: #fef3c7; color: #d97706; }
+        
+        .quick-action {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .quick-action-btn {
+            flex: 1;
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .quick-action-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .quick-action-btn.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .quick-action-btn.secondary {
+            background: #f1f5f9;
+            color: #475569;
+        }
+        
+        .quick-action-btn .icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+    </style>
+
+    <div class="d-flex flex-column flex-column-fluid">
+        <div id="kt_app_content" class="app-content flex-column-fluid">
+            <div id="kt_app_content_container" class="app-container container-xxl">
+                
+                <!-- 헤더 -->
+                <div class="admin-header">
+                    <h1 class="fw-bold mb-2">🤖 AI 리포트 관리</h1>
+                    <p class="mb-0 opacity-75">구독 및 리포트 현황을 관리합니다.</p>
+                </div>
+                
+                <!-- 통계 카드 -->
+                <div class="stat-row">
+                    <div class="stat-card">
+                        <div class="icon blue">📊</div>
+                        <div class="value" th:text="${activeSubscriptions}">0</div>
+                        <div class="label">활성 구독</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon green">📄</div>
+                        <div class="value" th:text="${monthlyReports}">0</div>
+                        <div class="label">이번달 리포트</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon purple">🎯</div>
+                        <div class="value" id="aiStatus">-</div>
+                        <div class="label">AI API 상태</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon orange">💰</div>
+                        <div class="value">₩0</div>
+                        <div class="label">이번달 매출</div>
+                    </div>
+                </div>
+                
+                <!-- 빠른 작업 -->
+                <div class="section-card">
+                    <div class="section-title mb-3">⚡ 빠른 작업</div>
+                    <div class="quick-action">
+                        <a href="/ai-report/admin/subscriptions" class="quick-action-btn secondary">
+                            <span class="icon">📋</span>
+                            구독 관리
+                        </a>
+                        <a href="/ai-report/admin/reports" class="quick-action-btn secondary">
+                            <span class="icon">📄</span>
+                            리포트 관리
+                        </a>
+                        <a href="#" class="quick-action-btn primary" onclick="testAiConnection()">
+                            <span class="icon">🔌</span>
+                            AI 연결 테스트
+                        </a>
+                        <a href="#" class="quick-action-btn secondary" data-bs-toggle="modal" data-bs-target="#generateModal">
+                            <span class="icon">🚀</span>
+                            리포트 수동 생성
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <!-- 최근 리포트 -->
+                    <div class="col-lg-8">
+                        <div class="section-card">
+                            <div class="section-header">
+                                <div class="section-title">📄 최근 리포트</div>
+                                <a href="/ai-report/admin/reports" class="btn btn-sm btn-light">전체 보기</a>
+                            </div>
+                            <table class="table table-custom">
+                                <thead>
+                                    <tr>
+                                        <th>업체명</th>
+                                        <th>대상월</th>
+                                        <th>상태</th>
+                                        <th>생성일</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="report, iter : ${recentReports}" th:if="${iter.index < 5}">
+                                        <td th:text="${report.custName ?: report.custCode}">업체명</td>
+                                        <td th:text="${report.formattedMonth}">2025년 12월</td>
+                                        <td>
+                                            <span class="status-badge" 
+                                                  th:classappend="${report.status.toLowerCase()}"
+                                                  th:text="${report.statusName}">완료</span>
+                                        </td>
+                                        <td th:text="${#dates.format(report.inDate, 'MM-dd HH:mm')}">12-17 15:00</td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(recentReports)}">
+                                        <td colspan="4" class="text-center text-muted">리포트가 없습니다.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- 활성 구독 -->
+                    <div class="col-lg-4">
+                        <div class="section-card">
+                            <div class="section-header">
+                                <div class="section-title">✨ 활성 구독</div>
+                                <a href="/ai-report/admin/subscriptions" class="btn btn-sm btn-light">관리</a>
+                            </div>
+                            <div th:each="sub, iter : ${subscriptions}" th:if="${iter.index < 5}" class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                <div>
+                                    <div class="fw-semibold" th:text="${sub.custName ?: sub.custCode}">업체명</div>
+                                    <small class="text-muted" th:text="${sub.planTypeName}">Basic</small>
+                                </div>
+                                <span class="status-badge active">활성</span>
+                            </div>
+                            <div th:if="${#lists.isEmpty(subscriptions)}" class="text-center text-muted py-3">
+                                활성 구독이 없습니다.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    
+    <!-- 리포트 수동 생성 모달 -->
+    <div class="modal fade" id="generateModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">🚀 리포트 수동 생성</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">업체 코드</label>
+                        <input type="text" id="genCustCode" class="form-control" placeholder="P000000001">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">대상 월</label>
+                        <input type="month" id="genReportMonth" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" onclick="generateReport()">생성</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 페이지 로드 시 AI 상태 확인
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAiStatus();
+        });
+        
+        function checkAiStatus() {
+            fetch('/ai-report/admin/test-ai')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('aiStatus').textContent = data.success ? '정상' : '오류';
+                    document.getElementById('aiStatus').style.color = data.success ? '#059669' : '#dc2626';
+                })
+                .catch(() => {
+                    document.getElementById('aiStatus').textContent = '확인불가';
+                });
+        }
+        
+        function testAiConnection() {
+            alert('AI 연결 테스트 중...');
+            fetch('/ai-report/admin/test-ai')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('✅ AI 연결 성공!\n\n응답: ' + (data.response || ''));
+                    } else {
+                        alert('❌ AI 연결 실패\n\n' + data.message);
+                    }
+                })
+                .catch(error => {
+                    alert('❌ 요청 실패: ' + error);
+                });
+        }
+        
+        function generateReport() {
+            var custCode = document.getElementById('genCustCode').value;
+            var reportMonth = document.getElementById('genReportMonth').value.replace('-', '');
+            
+            if (!custCode || !reportMonth) {
+                alert('업체 코드와 대상 월을 입력해주세요.');
+                return;
+            }
+            
+            fetch('/ai-report/admin/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'custCode=' + custCode + '&reportMonth=' + reportMonth
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✅ 리포트가 생성되었습니다.');
+                    location.reload();
+                } else {
+                    alert('❌ 생성 실패: ' + data.message);
+                }
+            });
+            
+            bootstrap.Modal.getInstance(document.getElementById('generateModal')).hide();
+        }
+    </script>
+</div>
+</html>
+

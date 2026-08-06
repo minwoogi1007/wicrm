@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WICRM Design 18 · Attio CRM Kanban</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; }
+
+        .att {
+            --bg: #fcfcfd;
+            --surface: #ffffff;
+            --surface-2: #f7f7f8;
+            --ink: #1a1a1a;
+            --ink-2: #444;
+            --muted: #8b8b8b;
+            --line: #ececec;
+            --line-soft: #f1f1f1;
+
+            --tag-purple-bg: #f3effe; --tag-purple: #6e3aff;
+            --tag-blue-bg: #e8f1ff;   --tag-blue: #2c6ecb;
+            --tag-green-bg: #e6f6ec;  --tag-green: #1a9a4d;
+            --tag-orange-bg: #fff0e1; --tag-orange: #d97917;
+            --tag-pink-bg: #ffe9f1;   --tag-pink: #d63b7c;
+            --tag-red-bg: #ffeaea;    --tag-red: #d83a3a;
+            --tag-teal-bg: #e2f6f3;   --tag-teal: #1a8e7a;
+            --tag-gray-bg: #efefef;   --tag-gray: #5b5b5b;
+
+            background: var(--bg);
+            color: var(--ink);
+            font-family: "Inter", "Pretendard", system-ui, sans-serif;
+            font-size: 13px;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 220px 1fr;
+        }
+
+        /* ============= SIDEBAR ============= */
+        .at-side {
+            border-right: 1px solid var(--line);
+            background: var(--surface);
+            padding: 14px 10px;
+            display: flex; flex-direction: column;
+            position: sticky; top: 0; height: 100vh;
+            overflow-y: auto;
+            font-size: 13px;
+        }
+        .at-ws {
+            display: flex; align-items: center; gap: 10px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        .at-ws .ico {
+            width: 24px; height: 24px; border-radius: 6px;
+            background: linear-gradient(135deg, #6e3aff, #d63b7c);
+            color: #fff; font-weight: 700; font-size: 11px;
+            display: grid; place-items: center;
+        }
+        .at-ws .nm { font-weight: 600; flex: 1; }
+        .at-ws .arr { color: var(--muted); }
+
+        .at-search {
+            display: flex; align-items: center; gap: 8px;
+            background: var(--surface-2);
+            padding: 5px 10px; border-radius: 6px;
+            color: var(--muted);
+            font-size: 12px;
+            margin-bottom: 14px;
+        }
+        .at-search .kbd {
+            margin-left: auto;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            padding: 1px 5px; border-radius: 3px;
+            font-family: "JetBrains Mono"; font-size: 10px;
+        }
+
+        .at-grp {
+            font-size: 10.5px; color: var(--muted);
+            text-transform: uppercase; letter-spacing: 0.06em;
+            font-weight: 600;
+            padding: 12px 10px 4px;
+        }
+        .at-nav { display: flex; flex-direction: column; gap: 1px; }
+        .at-nav a {
+            display: flex; align-items: center; gap: 9px;
+            padding: 5px 10px; border-radius: 5px;
+            text-decoration: none; color: var(--ink-2);
+            font-size: 13px;
+        }
+        .at-nav a:hover { background: var(--surface-2); color: var(--ink); }
+        .at-nav a.on { background: var(--surface-2); color: var(--ink); font-weight: 600; }
+        .at-nav a .ic { width: 16px; opacity: 0.6; text-align: center; }
+        .at-nav a.on .ic { opacity: 1; }
+        .at-nav a .cnt {
+            margin-left: auto;
+            font-family: "JetBrains Mono"; font-size: 10px;
+            color: var(--muted);
+        }
+
+        /* objects (CRM-style entities) */
+        .at-obj {
+            display: flex; align-items: center; gap: 9px;
+            padding: 5px 10px; border-radius: 5px;
+            font-size: 13px; color: var(--ink-2); cursor: pointer;
+        }
+        .at-obj:hover { background: var(--surface-2); color: var(--ink); }
+        .at-obj .em {
+            width: 18px; height: 18px; border-radius: 4px;
+            display: grid; place-items: center; font-size: 11px;
+        }
+
+        /* ============= MAIN ============= */
+        .at-main { min-width: 0; display: flex; flex-direction: column; }
+
+        .at-top {
+            background: var(--surface);
+            border-bottom: 1px solid var(--line);
+            padding: 10px 20px;
+            display: flex; align-items: center; gap: 12px;
+            position: sticky; top: 0; z-index: 10;
+        }
+        .at-top .back {
+            color: var(--muted); text-decoration: none;
+            border: 1px solid var(--line); padding: 4px 10px; border-radius: 6px;
+            font-size: 12px;
+        }
+        .at-top .crumb { font-size: 13px; color: var(--muted); }
+        .at-top .crumb b { color: var(--ink); font-weight: 600; }
+        .at-top .filler { flex: 1; }
+        .at-top .pill {
+            background: var(--tag-purple-bg); color: var(--tag-purple);
+            padding: 3px 10px; border-radius: 999px;
+            font-size: 11px; font-weight: 600;
+        }
+        .at-top .icon-btn {
+            width: 28px; height: 28px;
+            display: grid; place-items: center;
+            border-radius: 5px;
+            color: var(--muted); cursor: pointer;
+        }
+        .at-top .icon-btn:hover { background: var(--surface-2); color: var(--ink); }
+
+        /* page header */
+        .at-page-head {
+            padding: 18px 20px 10px;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 14px; flex-wrap: wrap;
+        }
+        .at-page-head h1 {
+            margin: 0; font-size: 19px; font-weight: 700; letter-spacing: -0.01em;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .at-page-head h1 .em {
+            width: 26px; height: 26px; border-radius: 7px;
+            background: linear-gradient(135deg, #6e3aff, #2c6ecb);
+            display: grid; place-items: center;
+            font-size: 14px;
+        }
+        .at-page-head h1 small {
+            font-family: "JetBrains Mono"; font-size: 11px;
+            color: var(--muted); font-weight: 500;
+            background: var(--surface-2);
+            padding: 2px 8px; border-radius: 4px;
+        }
+
+        /* view tabs */
+        .at-views {
+            display: flex; gap: 4px; align-items: center;
+            padding: 0 20px 8px;
+            border-bottom: 1px solid var(--line);
+            margin-bottom: 12px;
+        }
+        .at-views a {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 5px 10px; border-radius: 6px;
+            text-decoration: none; color: var(--muted);
+            font-size: 12px; font-weight: 500;
+        }
+        .at-views a:hover { background: var(--surface-2); color: var(--ink); }
+        .at-views a.on {
+            background: var(--surface-2); color: var(--ink);
+            border: 1px solid var(--line);
+        }
+        .at-views .add {
+            color: var(--muted); padding: 5px 10px;
+            border-radius: 6px; cursor: pointer;
+            font-size: 12px;
+        }
+        .at-views .add:hover { background: var(--surface-2); color: var(--ink); }
+        .at-views .filler { flex: 1; }
+        .at-views .right { display: flex; gap: 4px; }
+        .at-views .right .at-btn {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            color: var(--ink-2);
+            font-family: inherit; font-size: 12px;
+            padding: 5px 10px; border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex; align-items: center; gap: 5px;
+        }
+        .at-views .right .at-btn:hover { border-color: var(--ink-2); color: var(--ink); }
+        .at-views .right .at-btn.primary {
+            background: var(--ink); color: #fff; border-color: var(--ink);
+        }
+
+        /* filter pills */
+        .at-filter {
+            padding: 0 20px 14px;
+            display: flex; gap: 6px; flex-wrap: wrap;
+            font-size: 12px;
+        }
+        .at-filter .chip {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 3px 9px; border-radius: 6px;
+            background: var(--surface);
+            border: 1px dashed var(--line);
+            color: var(--muted);
+            cursor: pointer;
+        }
+        .at-filter .chip.active {
+            background: var(--surface-2);
+            border-style: solid; border-color: var(--line);
+            color: var(--ink);
+        }
+        .at-filter .chip .ico { font-size: 11px; opacity: 0.7; }
+        .at-filter .chip .x { color: var(--muted); margin-left: 4px; opacity: 0.7; }
+        .at-filter .grow { flex: 1; }
+        .at-filter .group {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 3px 9px; border-radius: 6px;
+            background: var(--surface);
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        /* board */
+        .at-board {
+            flex: 1;
+            padding: 0 20px 24px;
+            display: grid;
+            grid-template-columns: repeat(5, minmax(280px, 1fr));
+            gap: 12px;
+            overflow-x: auto;
+        }
+        .at-col {
+            background: var(--surface-2);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            display: flex; flex-direction: column;
+            min-height: 100%;
+            overflow: hidden;
+        }
+        .at-col-h {
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 12px;
+            font-size: 12px;
+        }
+        .at-col-h .dot { width: 8px; height: 8px; border-radius: 50%; }
+        .at-col-h .nm { font-weight: 600; color: var(--ink); }
+        .at-col-h .cnt {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            padding: 1px 6px; border-radius: 999px;
+            font-family: "JetBrains Mono"; font-size: 10px;
+            color: var(--muted);
+        }
+        .at-col-h .filler { flex: 1; }
+        .at-col-h .add {
+            color: var(--muted); cursor: pointer;
+            padding: 2px 6px; border-radius: 4px;
+        }
+        .at-col-h .add:hover { background: var(--surface); color: var(--ink); }
+
+        .at-col-sum {
+            padding: 0 12px 8px;
+            font-family: "JetBrains Mono"; font-size: 11px;
+            color: var(--muted);
+            display: flex; gap: 12px;
+        }
+        .at-col-sum b { color: var(--ink); font-weight: 600; }
+
+        .at-col-list {
+            padding: 4px 8px 12px;
+            display: flex; flex-direction: column; gap: 8px;
+        }
+
+        /* card */
+        .at-card {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 10px 12px;
+            cursor: grab;
+            transition: box-shadow 0.15s ease, transform 0.15s ease;
+        }
+        .at-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.06); border-color: #d4d4d4; }
+        .at-card .top {
+            display: flex; align-items: center; gap: 6px;
+            margin-bottom: 6px;
+        }
+        .at-card .id {
+            font-family: "JetBrains Mono"; font-size: 11px;
+            color: var(--muted);
+        }
+        .at-card .pri {
+            margin-left: auto;
+            font-size: 10px; padding: 1px 6px; border-radius: 4px;
+            font-weight: 600;
+        }
+        .at-card .pri.high { background: var(--tag-red-bg); color: var(--tag-red); }
+        .at-card .pri.mid { background: var(--tag-orange-bg); color: var(--tag-orange); }
+        .at-card .pri.low { background: var(--tag-gray-bg); color: var(--tag-gray); }
+        .at-card .title {
+            font-size: 13px; font-weight: 500; margin-bottom: 6px;
+            line-height: 1.35;
+        }
+        .at-card .cust {
+            display: flex; align-items: center; gap: 7px;
+            margin: 6px 0;
+        }
+        .at-card .cust .av {
+            width: 18px; height: 18px; border-radius: 50%;
+            font-size: 9px; font-weight: 700; color: #fff;
+            display: grid; place-items: center;
+        }
+        .at-card .cust .av.a1 { background: linear-gradient(135deg, #6e3aff, #d63b7c); }
+        .at-card .cust .av.a2 { background: linear-gradient(135deg, #2c6ecb, #1a9a4d); }
+        .at-card .cust .av.a3 { background: linear-gradient(135deg, #d97917, #d83a3a); }
+        .at-card .cust .av.a4 { background: linear-gradient(135deg, #1a8e7a, #2c6ecb); }
+        .at-card .cust .av.a5 { background: linear-gradient(135deg, #d63b7c, #d97917); }
+        .at-card .cust .nm { font-weight: 500; font-size: 12px; }
+        .at-card .cust .em { color: var(--muted); font-size: 11px; }
+
+        .at-tags {
+            display: flex; flex-wrap: wrap; gap: 4px;
+            margin-bottom: 8px;
+        }
+        .at-tag {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 1px 7px; border-radius: 4px;
+            font-size: 11px; font-weight: 500;
+        }
+        .at-tag::before {
+            content: ""; width: 5px; height: 5px; border-radius: 50%;
+            background: currentColor;
+        }
+        .at-tag.purple { background: var(--tag-purple-bg); color: var(--tag-purple); }
+        .at-tag.blue { background: var(--tag-blue-bg); color: var(--tag-blue); }
+        .at-tag.green { background: var(--tag-green-bg); color: var(--tag-green); }
+        .at-tag.orange { background: var(--tag-orange-bg); color: var(--tag-orange); }
+        .at-tag.pink { background: var(--tag-pink-bg); color: var(--tag-pink); }
+        .at-tag.red { background: var(--tag-red-bg); color: var(--tag-red); }
+        .at-tag.teal { background: var(--tag-teal-bg); color: var(--tag-teal); }
+        .at-tag.gray { background: var(--tag-gray-bg); color: var(--tag-gray); }
+
+        .at-card .foot {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 11px; color: var(--muted);
+            border-top: 1px solid var(--line-soft);
+            padding-top: 6px;
+            margin-top: 4px;
+        }
+        .at-card .foot .amt {
+            font-family: "JetBrains Mono"; font-weight: 600;
+            color: var(--ink);
+        }
+        .at-card .foot .filler { flex: 1; }
+        .at-card .foot .ico { display: inline-flex; align-items: center; gap: 3px; }
+
+        .at-add {
+            background: transparent;
+            border: 1px dashed var(--line);
+            border-radius: 8px;
+            padding: 8px;
+            color: var(--muted);
+            font-size: 12px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .at-add:hover { border-color: var(--ink-2); color: var(--ink); }
+
+        @media (max-width: 1100px) {
+            .att { grid-template-columns: 1fr; }
+            .at-side { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="att">
+
+    <!-- ============= SIDEBAR ============= -->
+    <aside class="at-side">
+        <div class="at-ws">
+            <div class="ico">W</div>
+            <div class="nm">WICRM</div>
+            <span class="arr">▾</span>
+        </div>
+        <div class="at-search">
+            <span>⌕</span>
+            <span>검색</span>
+            <span class="kbd">⌘K</span>
+        </div>
+
+        <div class="at-grp">Records</div>
+        <nav class="at-nav">
+            <a href="#"><span class="ic">◔</span> Customers <span class="cnt">42K</span></a>
+            <a href="#" class="on"><span class="ic">▤</span> Orders <span class="cnt">8.4K</span></a>
+            <a href="#"><span class="ic">↩</span> Refunds <span class="cnt">312</span></a>
+            <a href="#"><span class="ic">⇆</span> Exchanges</a>
+            <a href="#"><span class="ic">▢</span> Products</a>
+        </nav>
+
+        <div class="at-grp">Lists</div>
+        <nav class="at-nav">
+            <a href="#"><span class="ic">★</span> VIP 회원 (Q2)</a>
+            <a href="#"><span class="ic">⚠</span> SLA 위험 주문</a>
+            <a href="#"><span class="ic">↻</span> 재구매 캠페인</a>
+            <a href="#"><span class="ic">+</span> 새 리스트</a>
+        </nav>
+
+        <div class="at-grp">Workspaces</div>
+        <div class="at-obj"><span class="em" style="background:var(--tag-pink-bg); color:var(--tag-pink);">RN</span> Renoma</div>
+        <div class="at-obj"><span class="em" style="background:var(--tag-teal-bg); color:var(--tag-teal);">CO</span> Coralique</div>
+
+        <div class="at-grp">Settings</div>
+        <nav class="at-nav">
+            <a href="#"><span class="ic">⚙</span> Workspace</a>
+            <a href="#"><span class="ic">◍</span> Integrations</a>
+            <a href="#"><span class="ic">◔</span> Members</a>
+        </nav>
+    </aside>
+
+    <!-- ============= MAIN ============= -->
+    <main class="at-main">
+
+        <div class="at-top">
+            <a href="index.html" class="back">← index</a>
+            <span class="crumb">Records / <b>Orders</b></span>
+            <span class="filler"></span>
+            <span class="pill">Type 18 · Attio Kanban</span>
+            <div class="icon-btn">⌕</div>
+            <div class="icon-btn">⊕</div>
+            <div class="icon-btn">⌬</div>
+        </div>
+
+        <div class="at-page-head">
+            <h1>
+                <span class="em">▤</span>
+                Orders
+                <small>8,412 records</small>
+            </h1>
+        </div>
+
+        <nav class="at-views">
+            <a href="#"><span>▤</span> Table</a>
+            <a href="#" class="on"><span>▦</span> Order Pipeline</a>
+            <a href="#"><span>▥</span> By Site</a>
+            <a href="#"><span>📅</span> Calendar</a>
+            <span class="add">+ View</span>
+            <span class="filler"></span>
+            <div class="right">
+                <button class="at-btn">⇣ Sort</button>
+                <button class="at-btn">▥ Group: Stage</button>
+                <button class="at-btn">⚙ Properties</button>
+                <button class="at-btn primary">+ New order</button>
+            </div>
+        </nav>
+
+        <div class="at-filter">
+            <span class="chip active"><span class="ico">⊜</span>Site is <b>자사몰, 29CM</b><span class="x">×</span></span>
+            <span class="chip active"><span class="ico">⏱</span>Created <b>Today</b><span class="x">×</span></span>
+            <span class="chip active"><span class="ico">★</span>Customer is <b>VIP, Gold</b><span class="x">×</span></span>
+            <span class="chip"><span class="ico">+</span>Add filter</span>
+            <span class="grow"></span>
+            <span class="group">Showing <b style="color:var(--ink);">23</b> of 8,412 orders</span>
+        </div>
+
+        <section class="at-board">
+
+            <!-- COL 1: NEW -->
+            <div class="at-col">
+                <div class="at-col-h">
+                    <span class="dot" style="background:var(--tag-gray);"></span>
+                    <span class="nm">신규 / 결제 대기</span>
+                    <span class="cnt">5</span>
+                    <span class="filler"></span>
+                    <span class="add">+</span>
+                </div>
+                <div class="at-col-sum">
+                    <span><b>₩412K</b> · 합계</span>
+                    <span><b>5</b> · cards</span>
+                </div>
+                <div class="at-col-list">
+                    <div class="at-card">
+                        <div class="top"><span class="id">#WC-3128</span><span class="pri high">P1</span></div>
+                        <div class="title">RN-GSZD962 외 2건</div>
+                        <div class="cust"><span class="av a1">김</span><span class="nm">김민지</span><span class="em">· VIP</span></div>
+                        <div class="at-tags">
+                            <span class="at-tag pink">자사몰</span>
+                            <span class="at-tag purple">레노마</span>
+                            <span class="at-tag blue">네이버페이</span>
+                        </div>
+                        <div class="foot">
+                            <span class="amt">₩128,400</span>
+                            <span class="filler"></span>
+                            <span class="ico">⏱ 2m</span>
+                            <span class="ico">💬 0</span>
+                        </div>
+                    </div>
+                    <div class="at-card">
+                        <div class="top"><span class="id">#WC-3123</span><span class="pri mid">P2</span></div>
+                        <div class="title">CO-DR1042</div>
+                        <div class="cust"><span class="av a4">한</span><span class="nm">한지민</span></div>
+                        <div class="at-tags">
+                            <span class="at-tag pink">자사몰</span>
+                            <span class="at-tag teal">코랄리크</span>
+                            <span class="at-tag orange">검증중</span>
+                        </div>
+                        <div class="foot">
+                            <span class="amt">₩42,000</span>
+                            <span class="filler"></span>
+                            <span class="ico">⏱ 1h</span>
+                        </div>
+                    </div>
+                    <div class="at-card">
+                        <div class="top"><span class="id">#WC-3119</span><span class="pri low">P3</span></div>
+                        <div class="title">RN-SH3019</div>
+                        <div class="cust"><span class="av a2">송</span><span class="nm">송하은</span></div>
+                        <div class="at-tags">
+                            <span class="at-tag blue">29CM</span>
+                            <span class="at-tag purple">레노마</span>
+                        </div>
+                        <div class="foot"><span class="amt">₩68,400</span><span class="filler"></span><span class="ico">⏱ 2h</span></div>
+                    </div>
+                    <div class="at-card">
+                        <div class="top"><span class="id">#WC-3115</span></div>
+                        <div class="title">CO-BG2018 외 1건</div>
+                        <div class="cust"><span class="av a3">유</span><span class="nm">유재희</span></div>
+                        <div class="at-tags">
+                            <span class="at-tag pink">자사몰</span>
+                            <span class="at-tag teal">코랄리크</span>
+                        </div>
+                        <div class="foot"><span class="amt">₩98,000</span><span class="filler"></span><span class="ico">⏱ 3h</span></div>
+                    </div>
+                    <button class="at-add">+ 카드 추가</button>
+                </div>
+            </div>
+
+            <!-- COL 2: PAID -->
+            <div class="at-col">
+                <div class="at-col-h">
+                    <span class="dot" style="background:var(--tag-blue);"></span>
+                    <span class="nm">결제 완료</span>
+                    <span class="cnt">6</span>
+                    <span class="filler"></span>
+                    <span class="add">+</span>
+                </div>
+                <div class="at-col-sum">
+                    <span><b>₩684K</b> · 합계</span>
+                    <span><b>6</b> · cards</span>
+                </div>
+                <div class="at-col-list">
+                    <div class="at-card">
+                        <div class="top"><span class="id">#WC-3127</span><span class="pri mid">P2</span></div>
+                        <div class="title">CO-DR1042</div>
+                        <div class="cust"><span class="av a2">박</span><span class="nm">박서연</span><span class="em">· Gold</span></div>
+                        <div class="at-tags">
+                            <span class="at-tag blue">29CM</span>
+                            <span class="at-tag teal">코랄리크</span>
+                            <span class="at-tag green">카드</span>
+                        </div>
+                        <div class="foot"><span class="amt">₩42,000</span><span class="filler"></span><span class="ico">⏱ 23m</span></div>
+                    </div>
+                    <div class="at-card">
+                        <div class="top"><span class="id">#WC-3120</span></div>
+                        <div class="title">RN-PT2207</div>
+                        <div class="cust"><span class="av a1">강</span><span class="nm">강세영</span></div>
+                        <div class="at-tags">
+                            <span class="at-tag pink">자사몰</span>
+                            <span class="at-tag purple">레노마</span>
+                            <span class="at-tag green">토스</span>
+                        </div>
+                        <div class="foot"><span class="amt">₩86,400</span><span class="filler"></span><span class="ico">⏱ 1h</span></div>
+                    </div>
+                    <div class="at-card">
+                        <div class="top"><span class="id">#WC-3118</span></div>
+                        <div class="title">CO-BG2018</div>
+                        <div class="cust"><span class="av a4">서</span><span class="nm">서지원</span></div>
+                        <div class="at-tags">
+                            <span class="at-tag orange">SSG</span>
+                            <span class="at-tag teal">코랄리크</span>
+                        </div>
+                        <div class="foot"><span class="amt">₩214,000</span><span class="filler"></span><span class="ico">⏱ 2h</span></div>
+                    </div>
+                    <div class="at-card">
+                        <div class="top"><span class="id">#WC-3117</span></div>
+                        <div class="title">RN-GSZD962 외 4건</div>
+                        <div class="cust"><span class="av a5">남</span><span class="nm">남궁민</span></div>
+                        <div class="at-tags">
+                            <span class="at-tag pink">자사몰</span>
+                            <span class="at-tag purple">레노마</span>
+                        </div>
+                        <div class="foot"><span class="amt">₩342,800</span><span class="filler"></span><span class="ico">⏱ 2h</span></div>
+                    </div>
+                    <button class="at-add">+ 카드 추가</button>
+                </div>
+            </div>
+
+            <!-- COL 3: PACKING -->
+            <div class="at-col">
+                <div class="at-col-h">
+                    <span class="dot" style="background:var(--tag-orange);"></span>
+                    <span class="nm">출고 대기</span>
+                    <span class="cnt">7</span>
+                    <span class="filler"></span>
+                    <span class="add">+</span>
+                </div>
+                <div class="at-col-sum">
+                    <span><b>₩1.2M</b> · 합계</span>
+                    <span><b>2</b> · SLA 위험</span>
+                </div>
+                <div class="at-col-list">
+                    <div class="at-card">
+                        <div class="top"><span class="id">#WC-3112</span><span class="pri high">P1</span></div>
+                        <div class="title">RN-GSZD962 외 2건</div>
+                        <div class="cust"><span class="av a3">정</span><span class="nm">정현우</span><span class="em">· VIP</span></div>
+                        <div class="at-tags">
+                            <span class="at-tag red">SLA 위험</span>
+                            <span class="at-tag pink">자사몰</span>
+                            <span class="at-tag purple">레노마</span>
+                        </div>
+                        <div class="foot"><span class="amt">₩342,800</span><span class="filler"></span><span class="ico">⏱ 4h</span></div>
+                    </div>
+                    <div class="at-card">
+                        <div class="top"><span class="id">#WC-3110</span><span class="pri high">P1</span></div>
+                        <div class="title">CO-BG2018 외 1건</div>
+                        <div class="cust"><span class="av a4">윤</span><span class="nm">윤서희</span></div>
+                        <div class="at-tags">
+                            <span class="at-tag red">재고 부족</span>
+                            <span class="at-tag teal">코랄리크</span>
+                            <span class="at-tag blue">29CM</span>
+                        </div>
+                        <div class="foot"><span class="amt">₩162,000</span><span class="filler"></span><span class="ico">⏱ 5h</span></div>
+                    </div>
+                    <div class="at-card">
+                        <div class="top"><span class="id">#WC-3108</span></div>
+                        <div class="title">RN-PT2207</div>
+                        <div class="cust"><span class="av a2">최</span><span class="nm">최민서</span></div>
+                        <div class="at-tags">
+                            <span class="at-tag orange">지그재그</span>
+                            <span class="at-tag purple">레노마</span>
+                        </div>
+                        <div class="foot"><span class="amt">₩52,000</span><span class="filler"></span><span class="ico">⏱ 6h</span></div>
+                    </div>
+                    <div class="at-card">
+                        <div class="top"><span class="id">#WC-3105</span></div>
+                        <div class="title">RN-SH3019 외 2건</div>
+                        <div class="cust"><span class="av a5">조</span><span class="nm">조현지</span></div>
+                        <div class="at-tags">
+                            <span class="at-tag gray">무신사</span>
+                            <span class="at-tag purple">레노마</span>
+                        </div>
+                        <div class="foot"><span class="amt">₩158,000</span><span class="filler"></span><span class="ico">⏱ 8h</span></div>
+                    </div>
+                    <button class="at-add">+ 카드 추가</button>
+                </div>
+            </div>
+
+            <!-- COL 4: SHIPPING -->
+            <div class="at-col">
+                <div class="at-col-h">
+                    <span class="dot" style="background:var(--tag-purple);"></span>
+                    <span class="nm">배송중</span>
+                    <span class="cnt">4</span>
+                    <span class="filler"></span>
+                    <span class="add">+</span>
+                </div>
+                <div class="at-col-sum">
+                    <span><b>₩948K</b> · 합계</span>
+                    <span><b>2.4d</b> · 평균</span>
+                </div>
+                <div class="at-col-list">
+                    <div class="at-card">
+                        <div class="top"><span class="id">#WC-3098</span></div>
+                        <div class="title">CO-DR1042 외 1건</div>
+                        <div class="cust"><span class="av a1">이</span><span class="nm">이지훈</span></div>
+                        <div class="at-tags">
+                            <span class="at-tag green">CJ대한통운</span>
+                            <span class="at-tag teal">코랄리크</span>
+                        </div>
+                        <div class="foot"><span class="amt">₩86,400</span><span class="filler"></span><span class="ico">▶ 632049</span></div>
+                    </div>
+                    <div class="at-card">
+                        <div class="top"><span class="id">#WC-3096</span></div>
+                        <div class="title">RN-GSZD962</div>
+                        <div class="cust"><span class="av a2">오</span><span class="nm">오지수</span></div>
+                        <div class="at-tags">
+                            <span class="at-tag green">한진택배</span>
+                            <span class="at-tag purple">레노마</span>
+                        </div>
+                        <div class="foot"><span class="amt">₩68,000</span><span class="filler"></span><span class="ico">▶ 552108</span></div>
+                    </div>
+                    <div class="at-card">
+                        <div class="top"><span class="id">#WC-3094</span></div>
+                        <div class="title">CO-BG2018 외 3건</div>
+                        <div class="cust"><span class="av a3">백</span><span class="nm">백다연</span></div>
+                        <div class="at-tags">
+                            <span class="at-tag green">CJ대한통운</span>
+                            <span class="at-tag teal">코랄리크</span>
+                        </div>
+                        <div class="foot"><span class="amt">₩488,000</span><span class="filler"></span><span class="ico">▶ 632041</span></div>
+                    </div>
+                    <div class="at-card">
+                        <div class="top"><span class="id">#WC-3092</span></div>
+                        <div class="title">RN-PT2207 외 1건</div>
+                        <div class="cust"><span class="av a4">임</span><span class="nm">임수빈</span></div>
+                        <div class="at-tags">
+                            <span class="at-tag green">로젠택배</span>
+                            <span class="at-tag purple">레노마</span>
+                        </div>
+                        <div class="foot"><span class="amt">₩306,000</span><span class="filler"></span><span class="ico">▶ 880421</span></div>
+                    </div>
+                    <button class="at-add">+ 카드 추가</button>
+                </div>
+            </div>
+
+            <!-- COL 5: COMPLETED -->
+            <div class="at-col">
+                <div class="at-col-h">
+                    <span class="dot" style="background:var(--tag-green);"></span>
+                    <span class="nm">완료</span>
+                    <span class="cnt">128</span>
+                    <span class="filler"></span>
+                    <span class="add">+</span>
+                </div>
+                <div class="at-col-sum">
+                    <span><b>₩6.8M</b> · 24h</span>
+                    <span><b>4.78</b> · CSAT</span>
+                </div>
+                <div class="at-col-list">
+                    <div class="at-card">
+                        <div class="top"><span class="id">#WC-3088</span></div>
+                        <div class="title">RN-SH3019</div>
+                        <div class="cust"><span class="av a5">신</span><span class="nm">신예진</span></div>
+                        <div class="at-tags">
+                            <span class="at-tag green">완료</span>
+                            <span class="at-tag purple">레노마</span>
+                            <span class="at-tag pink">★ 5.0</span>
+                        </div>
+                        <div class="foot"><span class="amt">₩42,000</span><span class="filler"></span><span class="ico">✓ 어제</span></div>
+                    </div>
+                    <div class="at-card">
+                        <div class="top"><span class="id">#WC-3084</span></div>
+                        <div class="title">CO-DR1042 외 2건</div>
+                        <div class="cust"><span class="av a1">하</span><span class="nm">하나경</span></div>
+                        <div class="at-tags">
+                            <span class="at-tag green">완료</span>
+                            <span class="at-tag teal">코랄리크</span>
+                        </div>
+                        <div class="foot"><span class="amt">₩142,000</span><span class="filler"></span><span class="ico">✓ 어제</span></div>
+                    </div>
+                    <div class="at-card">
+                        <div class="top"><span class="id">#WC-3081</span></div>
+                        <div class="title">CO-BG2018</div>
+                        <div class="cust"><span class="av a2">권</span><span class="nm">권나라</span></div>
+                        <div class="at-tags">
+                            <span class="at-tag green">완료</span>
+                            <span class="at-tag teal">코랄리크</span>
+                            <span class="at-tag pink">★ 4.8</span>
+                        </div>
+                        <div class="foot"><span class="amt">₩214,000</span><span class="filler"></span><span class="ico">✓ 2d</span></div>
+                    </div>
+                    <div class="at-card">
+                        <div class="top"><span class="id">#WC-3079</span></div>
+                        <div class="title">RN-GSZD962 외 1건</div>
+                        <div class="cust"><span class="av a3">노</span><span class="nm">노아인</span></div>
+                        <div class="at-tags">
+                            <span class="at-tag green">완료</span>
+                            <span class="at-tag purple">레노마</span>
+                        </div>
+                        <div class="foot"><span class="amt">₩168,400</span><span class="filler"></span><span class="ico">✓ 2d</span></div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+</div>
+
+</body>
+</html>

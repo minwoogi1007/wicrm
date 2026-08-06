@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{design-samples/public-layout}">
+<body>
+<div layout:fragment="content">
+    <link href="/assets/css/design-samples/admin-modern.css" rel="stylesheet" type="text/css" />
+    <link href="/assets/css/design-samples/admin-pages.css" rel="stylesheet" type="text/css" />
+
+    <main class="admin-sample-page executive-page">
+        <header class="sample-page-header">
+            <a href="/design-samples/admin" class="back-link">샘플 목록</a>
+            <span class="sample-kicker">Executive Type</span>
+            <h1>대표/임원용 통합 대시보드</h1>
+            <p>핵심 지표를 큰 숫자, 다크 배경, 간결한 차트로 보여주는 고급형 관리자 화면입니다.</p>
+        </header>
+
+        <section class="executive-hero-board">
+            <article class="hero-stat wide">
+                <span>오늘 전체 처리량</span>
+                <strong>12,482</strong>
+                <p>상담, 주문, 물류, AI 리포트 통합 기준</p>
+                <div class="line-bars">
+                    <i style="height: 32%"></i><i style="height: 55%"></i><i style="height: 44%"></i><i style="height: 72%"></i>
+                    <i style="height: 64%"></i><i style="height: 90%"></i><i style="height: 78%"></i><i style="height: 96%"></i>
+                </div>
+            </article>
+            <article class="hero-stat"><span>매출</span><strong>3.48억</strong><em>+14.8%</em></article>
+            <article class="hero-stat"><span>SLA</span><strong>94.2%</strong><em>안정</em></article>
+            <article class="hero-stat"><span>긴급건</span><strong>17</strong><em>확인 필요</em></article>
+        </section>
+
+        <section class="sample-two-columns">
+            <article class="dark-panel">
+                <h2>오늘의 의사결정 포인트</h2>
+                <ul class="signal-list">
+                    <li><b>상담</b><span>이미지 첨부 문의가 전주 대비 21% 증가</span></li>
+                    <li><b>물류</b><span>직접 회수 지연 구간이 오후 3시에 집중</span></li>
+                    <li><b>AI</b><span>리포트 실패율 0.8%로 정상 범위 유지</span></li>
+                </ul>
+            </article>
+            <article class="dark-panel muted">
+                <h2>팀별 부하</h2>
+                <div class="load-row"><span>상담팀</span><i style="width: 84%"></i><b>84%</b></div>
+                <div class="load-row"><span>물류팀</span><i style="width: 61%"></i><b>61%</b></div>
+                <div class="load-row"><span>정산팀</span><i style="width: 42%"></i><b>42%</b></div>
+            </article>
+        </section>
+    </main>
+</div>
+</body>
+</html>

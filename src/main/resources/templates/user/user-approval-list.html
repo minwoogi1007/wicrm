@@ -46,9 +46,9 @@
               <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
                 <th class="min-w-125px">신청자</th>
                 <th class="min-w-125px">업체명</th>
-                <th class="min-w-125px">Status</th>
+                <th class="min-w-125px">상태</th>
                 <th class="min-w-125px">신청일</th>
-                <th class="text-end min-w-100px">Actions</th>
+                <th class="text-end min-w-100px">작업</th>
               </tr>
               </thead>
               <tbody class="text-gray-600 fw-semibold">
@@ -71,7 +71,7 @@
                 <td class="text-end">
                   <button class="btn btn-light btn-active-light-primary btn-sm"
                           th:attr="onclick=|openUserApprovalModal('${user.userid}', '${user.confirmYn}')|">
-                    View
+                    보기
                   </button>
 
                 </td>

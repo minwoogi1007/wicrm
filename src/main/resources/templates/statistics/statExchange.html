@@ -7,7 +7,7 @@
     <meta name="_csrf" th:if="${_csrf}" th:content="${_csrf.token}"/>
     <meta name="_csrf" th:unless="${_csrf}" content=""/>
     <meta name="_csrf_header" th:if="${_csrf}" th:content="${_csrf.headerName}"/>
-    <meta name="_csrf_header" th:unless="${_csrf}" content="X-CSRF-TOKEN"/>
+    <meta name="_csrf_header" th:unless="${_csrf}" content="X-XSRF-TOKEN"/>
     
     <style>
         /* 🎨 CSS 변수 정의 */
@@ -1840,7 +1840,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': window.csrfToken
+                        [window.csrfHeader]: window.csrfToken
                     },
                     body: JSON.stringify(params)
                 });

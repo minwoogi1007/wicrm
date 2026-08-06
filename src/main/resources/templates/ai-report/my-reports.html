@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{main}">
+
+<div layout:fragment="content">
+    <style>
+        .ai-hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            padding: 2.5rem;
+            color: white;
+            margin-bottom: 2rem;
+        }
+        
+        .ai-hero h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .ai-hero p {
+            opacity: 0.9;
+            margin-bottom: 1.5rem;
+        }
+        
+        .subscription-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: 500;
+        }
+        
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-box {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        
+        .stat-box .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-box .number {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        
+        .stat-box .label {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+        
+        .report-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .report-card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .report-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        .report-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .report-status.completed { background: #d1fae5; color: #059669; }
+        .report-status.processing { background: #dbeafe; color: #2563eb; }
+        .report-status.pending { background: #fef3c7; color: #d97706; }
+        .report-status.failed { background: #fee2e2; color: #dc2626; }
+        
+        .report-stats {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .report-stat {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .report-stat .value {
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        .report-stat .label {
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+        
+        .no-subscription {
+            background: #f8fafc;
+            border: 2px dashed #e2e8f0;
+            border-radius: 16px;
+            padding: 3rem;
+            text-align: center;
+        }
+        
+        .no-subscription h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .no-subscription p {
+            color: #64748b;
+            margin-bottom: 1.5rem;
+        }
+        
+        .plan-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .plan-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 2px solid #e2e8f0;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        
+        .plan-card:hover {
+            border-color: #667eea;
+        }
+        
+        .plan-card.recommended {
+            border-color: #667eea;
+            position: relative;
+        }
+        
+        .plan-card.recommended::before {
+            content: '추천';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #667eea;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .plan-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .plan-price {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+        
+        .plan-price span {
+            font-size: 0.875rem;
+            font-weight: 400;
+            color: #64748b;
+        }
+        
+        .plan-features {
+            text-align: left;
+            margin-bottom: 1.5rem;
+        }
+        
+        .plan-features li {
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .plan-features li::before {
+            content: '✓';
+            color: #059669;
+            font-weight: bold;
+        }
+        
+        .request-modal .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+    </style>
+
+    <div class="d-flex flex-column flex-column-fluid">
+        <div id="kt_app_content" class="app-content flex-column-fluid">
+            <div id="kt_app_content_container" class="app-container container-xxl">
+                
+                <!-- 히어로 섹션 -->
+                <div class="ai-hero">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h1>🤖 AI 상담 분석 리포트</h1>
+                            <p>매월 상담 데이터를 AI가 분석하여 비즈니스 인사이트를 제공합니다.</p>
+                            <div th:if="${hasSubscription}" class="subscription-badge">
+                                <span>✨</span>
+                                <span th:text="${subscription.planTypeName} + ' 플랜 구독 중'">베이직 플랜 구독 중</span>
+                            </div>
+                        </div>
+                        <div th:if="${hasSubscription}">
+                            <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#requestReportModal">
+                                📊 리포트 생성 요청
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 구독이 없는 경우 -->
+                <div th:if="${!hasSubscription}" class="no-subscription">
+                    <h3>🔒 AI 리포트 서비스를 이용하시려면 구독이 필요합니다</h3>
+                    <p>월간 상담 데이터를 AI가 분석하여 제품 개선, 고객 만족도, 트렌드 등<br>비즈니스에 도움이 되는 인사이트를 제공합니다.</p>
+                    
+                    <div class="plan-cards">
+                        <div class="plan-card">
+                            <div class="plan-name">Basic</div>
+                            <div class="plan-price">₩50,000 <span>/월</span></div>
+                            <ul class="plan-features list-unstyled">
+                                <li>월간 리포트 1회</li>
+                                <li>기본 통계 분석</li>
+                                <li>키워드 분석</li>
+                                <li>이메일 발송</li>
+                            </ul>
+                            <a th:href="@{/ai-report/subscribe}" class="btn btn-outline-primary w-100">시작하기</a>
+                        </div>
+                        
+                        <div class="plan-card recommended">
+                            <div class="plan-name">Premium</div>
+                            <div class="plan-price">₩100,000 <span>/월</span></div>
+                            <ul class="plan-features list-unstyled">
+                                <li>주간 + 월간 리포트</li>
+                                <li>상세 감정 분석</li>
+                                <li>제품별 분석</li>
+                                <li>AI 개선 제안</li>
+                                <li>PDF 다운로드</li>
+                            </ul>
+                            <a th:href="@{/ai-report/subscribe}?plan=PREMIUM" class="btn btn-primary w-100">시작하기</a>
+                        </div>
+                        
+                        <div class="plan-card">
+                            <div class="plan-name">Enterprise</div>
+                            <div class="plan-price">₩200,000 <span>/월</span></div>
+                            <ul class="plan-features list-unstyled">
+                                <li>실시간 분석</li>
+                                <li>맞춤형 리포트</li>
+                                <li>API 연동</li>
+                                <li>전담 매니저</li>
+                                <li>우선 지원</li>
+                            </ul>
+                            <a th:href="@{/ai-report/subscribe}?plan=ENTERPRISE" class="btn btn-outline-primary w-100">문의하기</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 구독이 있는 경우 - 리포트 목록 -->
+                <div th:if="${hasSubscription}">
+                    <!-- 통계 -->
+                    <div class="stat-grid">
+                        <div class="stat-box">
+                            <div class="icon">📊</div>
+                            <div class="number" th:text="${#lists.size(reports)}">0</div>
+                            <div class="label">총 리포트</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="icon">✅</div>
+                            <div class="number" th:text="${#lists.size(reports.?[status == 'COMPLETED'])}">0</div>
+                            <div class="label">분석 완료</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="icon">⏳</div>
+                            <div class="number" th:text="${#lists.size(reports.?[status == 'PROCESSING' or status == 'PENDING'])}">0</div>
+                            <div class="label">처리 중</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="icon">📅</div>
+                            <div class="number" th:text="${subscription.planTypeName}">Basic</div>
+                            <div class="label">현재 플랜</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 리포트 목록 -->
+                    <h3 class="fw-bold mb-3">📋 내 리포트</h3>
+                    
+                    <div th:if="${#lists.isEmpty(reports)}" class="text-center py-5">
+                        <div class="fs-1 mb-3">📭</div>
+                        <p class="text-muted">아직 생성된 리포트가 없습니다.<br>상단의 '리포트 생성 요청' 버튼을 클릭하여 첫 리포트를 생성해보세요.</p>
+                    </div>
+                    
+                    <div th:each="report : ${reports}" class="report-card" 
+                         th:onclick="'location.href=\'/ai-report/view/' + ${report.reportId} + '\''">
+                        <div class="report-header">
+                            <div class="report-title" th:text="${report.reportTitle}">2025년 12월 상담 분석 리포트</div>
+                            <span class="report-status" 
+                                  th:classappend="${report.status.toLowerCase()}"
+                                  th:text="${report.statusName}">완료</span>
+                        </div>
+                        <div class="report-stats">
+                            <div class="report-stat">
+                                <span class="value" th:text="${report.totalConsultations}">0</span>
+                                <span class="label">총 상담</span>
+                            </div>
+                            <div class="report-stat">
+                                <span class="value" th:text="${#numbers.formatDecimal(report.completionRate, 0, 1) + '%'}">0%</span>
+                                <span class="label">처리율</span>
+                            </div>
+                            <div class="report-stat">
+                                <span class="value" th:text="${report.urgentCount}">0</span>
+                                <span class="label">긴급</span>
+                            </div>
+                            <div class="report-stat">
+                                <span class="value" th:text="${#dates.format(report.inDate, 'yyyy-MM-dd')}">2025-12-17</span>
+                                <span class="label">생성일</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    
+    <!-- 리포트 생성 요청 모달 -->
+    <div class="modal fade request-modal" id="requestReportModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">📊 리포트 생성 요청</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">분석 대상 월</label>
+                        <input type="month" id="reportMonth" class="form-control" 
+                               th:value="${#dates.format(new java.util.Date(), 'yyyy-MM')}">
+                        <small class="text-muted">해당 월의 상담 데이터를 AI가 분석합니다.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" onclick="requestReport()">
+                        🚀 분석 시작
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function requestReport() {
+            var reportMonth = document.getElementById('reportMonth').value.replace('-', '');
+            
+            if (!reportMonth || reportMonth.length !== 6) {
+                alert('분석 대상 월을 선택해주세요.');
+                return;
+            }
+            
+            fetch('/ai-report/request', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'reportMonth=' + reportMonth
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert('오류: ' + data.message);
+                }
+            })
+            .catch(error => {
+                alert('요청 중 오류가 발생했습니다.');
+                console.error(error);
+            });
+            
+            bootstrap.Modal.getInstance(document.getElementById('requestReportModal')).hide();
+        }
+    </script>
+</div>
+</html>
+

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{design-samples/public-layout}">
+<body>
+<div layout:fragment="content">
+    <link href="/assets/css/design-samples/admin-modern.css" rel="stylesheet" type="text/css" />
+    <link href="/assets/css/design-samples/admin-pages.css" rel="stylesheet" type="text/css" />
+
+    <main class="admin-sample-page ai-page">
+        <header class="sample-page-header">
+            <a href="/design-samples/admin" class="back-link">샘플 목록</a>
+            <span class="sample-kicker">AI Workspace</span>
+            <h1>AI 리포트 생성/검수 화면</h1>
+            <p>AI 결과를 SaaS 제품처럼 깔끔하게 검수하고 재생성할 수 있는 워크스페이스형 UI입니다.</p>
+        </header>
+
+        <section class="ai-command">
+            <div>
+                <span>추천 분석 프롬프트</span>
+                <h2>지난 7일간 VOC 위험 신호를 요약하고 팀별 개선 액션을 제안해줘.</h2>
+            </div>
+            <button type="button">리포트 생성</button>
+        </section>
+
+        <section class="ai-grid">
+            <article class="ai-metric-card"><span>이번 주 리포트</span><strong>248</strong><small>평균 11.4초</small></article>
+            <article class="ai-metric-card"><span>성공률</span><strong>99.2%</strong><small>실패 2건</small></article>
+            <article class="ai-metric-card"><span>검수 대기</span><strong>14</strong><small>긴급 3건</small></article>
+        </section>
+
+        <section class="review-workbench">
+            <aside>
+                <button class="active" type="button">상담 요약</button>
+                <button type="button">매출 분석</button>
+                <button type="button">VOC 위험 탐지</button>
+                <button type="button">구독 리포트</button>
+            </aside>
+            <article>
+                <div class="report-preview-header"><b>상담 요약 리포트</b><span>검수 대기</span></div>
+                <p>이미지 첨부 오류 문의가 전체 VOC의 18%를 차지하며, 상담 상세 화면과 모바일 업로드 경로에서 반복 발생하고 있습니다.</p>
+                <div class="ai-actions"><button type="button">승인</button><button type="button">수정 요청</button><button type="button">재생성</button></div>
+            </article>
+        </section>
+    </main>
+</div>
+</body>
+</html>

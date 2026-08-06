@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WICRM Design 11 · Claymorphism Soft 3D</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; }
+
+        .clay-page {
+            --bg: #ece9ff;
+            --bg-2: #f4f1ff;
+            --ink: #2a2655;
+            --muted: #6b6890;
+            --pill: #ffffff;
+            --shadow-light: rgba(255,255,255,0.85);
+            --shadow-dark: rgba(75, 65, 145, 0.18);
+            --mint: #a6f0d4;
+            --peach: #ffc8b8;
+            --butter: #ffe89a;
+            --lilac: #d6cfff;
+            --sky: #b8e4ff;
+            --rose: #ffc2dd;
+
+            background:
+                radial-gradient(circle at 80% -10%, #e0d8ff 0%, transparent 50%),
+                radial-gradient(circle at 0% 90%, #c8e8ff 0%, transparent 45%),
+                var(--bg);
+            min-height: 100vh;
+            padding: 32px clamp(20px, 4vw, 56px) 80px;
+            color: var(--ink);
+            font-family: "Plus Jakarta Sans", "Pretendard", system-ui, sans-serif;
+        }
+        .clay-shell { max-width: 1240px; margin: 0 auto; }
+
+        /* universal clay shadow */
+        .clay {
+            background: var(--bg-2);
+            border-radius: 28px;
+            box-shadow:
+                -10px -10px 24px var(--shadow-light),
+                14px 14px 32px var(--shadow-dark),
+                inset 1px 1px 1px rgba(255,255,255,0.6);
+            padding: 22px 26px;
+        }
+        .clay-inset {
+            background: var(--bg);
+            border-radius: 18px;
+            box-shadow:
+                inset 4px 4px 10px var(--shadow-dark),
+                inset -4px -4px 10px var(--shadow-light);
+            padding: 14px 18px;
+        }
+
+        /* header */
+        .cl-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 28px; gap: 20px; flex-wrap: wrap;
+        }
+        .cl-header .back { color: var(--muted); text-decoration: none; font-size: 13px; font-weight: 600; }
+        .cl-header .back:hover { color: var(--ink); }
+        .cl-title h1 {
+            margin: 4px 0 4px;
+            font-size: clamp(28px, 4vw, 44px);
+            font-weight: 800; letter-spacing: -0.02em;
+            line-height: 1.05;
+        }
+        .cl-title .kicker {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(255,255,255,0.6); backdrop-filter: blur(8px);
+            padding: 6px 14px; border-radius: 999px;
+            font-size: 11px; font-weight: 700; letter-spacing: 0.14em;
+            text-transform: uppercase; color: var(--ink);
+            box-shadow: -3px -3px 6px var(--shadow-light), 4px 4px 10px var(--shadow-dark);
+        }
+        .cl-title p { margin: 6px 0 0; color: var(--muted); font-size: 14px; max-width: 540px; }
+        .cl-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+        .cl-btn {
+            border: none; cursor: pointer;
+            padding: 12px 20px; border-radius: 18px;
+            font-family: inherit; font-weight: 700; font-size: 13px;
+            background: var(--bg-2); color: var(--ink);
+            box-shadow: -4px -4px 10px var(--shadow-light), 6px 6px 14px var(--shadow-dark);
+            transition: all 0.15s ease;
+        }
+        .cl-btn:hover { transform: translateY(-1px); }
+        .cl-btn:active {
+            box-shadow:
+                inset -2px -2px 6px var(--shadow-light),
+                inset 4px 4px 8px var(--shadow-dark);
+        }
+        .cl-btn.primary { background: linear-gradient(135deg, #b69bff, #8a6bff); color: #fff; }
+
+        /* hero KPIs */
+        .cl-kpis {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px;
+            margin-bottom: 28px;
+        }
+        .cl-kpi {
+            position: relative; overflow: hidden;
+            min-height: 150px;
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .cl-kpi h4 {
+            margin: 0; font-size: 12px; font-weight: 700;
+            color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase;
+        }
+        .cl-kpi .blob {
+            position: absolute; right: -20px; top: -20px;
+            width: 80px; height: 80px; border-radius: 50%;
+            opacity: 0.6;
+            box-shadow: inset -6px -6px 14px rgba(0,0,0,0.08);
+        }
+        .cl-kpi.k1 .blob { background: var(--peach); }
+        .cl-kpi.k2 .blob { background: var(--mint); }
+        .cl-kpi.k3 .blob { background: var(--butter); }
+        .cl-kpi.k4 .blob { background: var(--rose); }
+        .cl-kpi .num {
+            font-size: 44px; font-weight: 800; letter-spacing: -0.03em;
+            line-height: 1;
+        }
+        .cl-kpi .num small { font-size: 14px; font-weight: 700; color: var(--muted); margin-left: 4px; }
+        .cl-kpi .delta {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(255,255,255,0.7);
+            padding: 5px 12px; border-radius: 999px;
+            font-size: 12px; font-weight: 700;
+            align-self: flex-start;
+            box-shadow: inset 1px 1px 3px var(--shadow-dark);
+        }
+        .cl-kpi .delta.up { color: #059669; }
+        .cl-kpi .delta.dn { color: #d04444; }
+
+        /* main grid */
+        .cl-main { display: grid; grid-template-columns: 1.4fr 1fr; gap: 22px; margin-bottom: 22px; }
+
+        /* mileage hero */
+        .cl-mileage h3 {
+            margin: 0 0 4px; font-size: 14px; color: var(--muted);
+            font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+        }
+        .cl-mileage .big {
+            font-size: clamp(56px, 7vw, 96px);
+            font-weight: 800; letter-spacing: -0.04em; line-height: 1;
+            background: linear-gradient(135deg, #6b5cff, #ff6cb6);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+            margin: 8px 0 16px;
+        }
+        .cl-mileage .row {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+            margin-top: 18px;
+        }
+        .cl-mileage .row .pill-stat {
+            border-radius: 18px;
+            padding: 14px 16px;
+            box-shadow: inset 2px 2px 6px var(--shadow-light), inset -3px -3px 8px var(--shadow-dark);
+        }
+        .cl-mileage .row .pill-stat:nth-child(1) { background: var(--mint); }
+        .cl-mileage .row .pill-stat:nth-child(2) { background: var(--peach); }
+        .cl-mileage .row .pill-stat:nth-child(3) { background: var(--butter); }
+        .cl-mileage .row strong { display: block; font-size: 22px; margin-top: 2px; }
+        .cl-mileage .row span { font-size: 11px; color: var(--ink); opacity: 0.7; font-weight: 600; }
+
+        /* segments donut */
+        .cl-segments h3 { margin: 0 0 14px; font-size: 14px; color: var(--muted); font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+        .cl-segments .donut-wrap { display: flex; gap: 18px; align-items: center; }
+        .cl-segments svg { width: 130px; height: 130px; flex-shrink: 0; filter: drop-shadow(0 6px 12px rgba(75,65,145,0.18)); }
+        .cl-segments .leg { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+        .cl-segments .leg .row { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+        .cl-segments .leg .dot { width: 14px; height: 14px; border-radius: 6px; box-shadow: inset -2px -2px 4px rgba(0,0,0,0.12); }
+        .cl-segments .leg strong { margin-left: auto; font-size: 13px; font-weight: 800; }
+
+        /* tracker / progress bars */
+        .cl-tracker h3 { margin: 0 0 14px; font-size: 14px; color: var(--muted); font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+        .cl-tracker .item {
+            display: grid; grid-template-columns: 1fr auto;
+            gap: 4px 14px;
+            margin-bottom: 18px;
+        }
+        .cl-tracker .item .name { font-weight: 700; font-size: 14px; }
+        .cl-tracker .item .val { font-weight: 800; font-size: 14px; color: var(--ink); }
+        .cl-tracker .bar {
+            grid-column: 1 / -1;
+            height: 14px;
+            background: var(--bg);
+            border-radius: 999px;
+            box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light);
+            position: relative; overflow: hidden;
+        }
+        .cl-tracker .bar i {
+            position: absolute; left: 0; top: 0; bottom: 0;
+            border-radius: 999px;
+            box-shadow: inset -2px -2px 4px rgba(0,0,0,0.15), 0 2px 4px rgba(75,65,145,0.2);
+        }
+        .cl-tracker .bar.b1 i { background: linear-gradient(135deg, #ffb6dc, #ff7eb3); }
+        .cl-tracker .bar.b2 i { background: linear-gradient(135deg, #b6ffce, #5cd9a6); }
+        .cl-tracker .bar.b3 i { background: linear-gradient(135deg, #ffe89a, #ffba6c); }
+        .cl-tracker .bar.b4 i { background: linear-gradient(135deg, #cdb8ff, #8c6bff); }
+
+        /* avatars row */
+        .cl-team { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+        .cl-member { text-align: center; padding: 18px 14px; }
+        .cl-member .av {
+            width: 72px; height: 72px; border-radius: 50%;
+            margin: 0 auto 10px;
+            display: grid; place-items: center;
+            font-weight: 800; font-size: 22px; color: #fff;
+            box-shadow: inset -4px -4px 10px rgba(0,0,0,0.18), 6px 6px 16px var(--shadow-dark);
+        }
+        .cl-member .av.a1 { background: linear-gradient(135deg, #ff89b6, #ff5e8e); }
+        .cl-member .av.a2 { background: linear-gradient(135deg, #8cd8ff, #4ea7ff); }
+        .cl-member .av.a3 { background: linear-gradient(135deg, #b8f0c4, #5fce7e); }
+        .cl-member .av.a4 { background: linear-gradient(135deg, #ffd56b, #ffa42d); }
+        .cl-member .name { font-weight: 700; font-size: 14px; margin: 0; }
+        .cl-member .role { font-size: 11px; color: var(--muted); margin: 2px 0 8px; }
+        .cl-member .stat {
+            display: inline-block;
+            background: var(--bg);
+            padding: 4px 12px; border-radius: 999px;
+            font-size: 11px; font-weight: 700;
+            box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light);
+        }
+
+        /* mileage activity feed */
+        .cl-activity { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+        .cl-activity .row {
+            display: grid; grid-template-columns: 44px 1fr auto; gap: 14px; align-items: center;
+            padding: 12px;
+            border-radius: 16px;
+            background: var(--bg);
+            box-shadow: inset 2px 2px 4px var(--shadow-light), inset -2px -2px 6px var(--shadow-dark);
+        }
+        .cl-activity .ic {
+            width: 44px; height: 44px; border-radius: 14px;
+            display: grid; place-items: center;
+            font-size: 18px; color: #fff; font-weight: 800;
+            box-shadow: -3px -3px 8px var(--shadow-light), 4px 4px 10px var(--shadow-dark);
+        }
+        .cl-activity .ic.add { background: linear-gradient(135deg, #76e6b1, #36c98a); }
+        .cl-activity .ic.use { background: linear-gradient(135deg, #ffa3c2, #f86691); }
+        .cl-activity .ic.exp { background: linear-gradient(135deg, #ffd56b, #ffa42d); }
+        .cl-activity .desc { font-size: 13px; }
+        .cl-activity .desc b { font-weight: 800; }
+        .cl-activity .desc small { display: block; color: var(--muted); font-size: 11px; margin-top: 2px; }
+        .cl-activity .amt { font-weight: 800; font-size: 14px; }
+        .cl-activity .amt.plus { color: #059669; }
+        .cl-activity .amt.minus { color: #d04444; }
+
+        @media (max-width: 1100px) {
+            .cl-kpis { grid-template-columns: repeat(2, 1fr); }
+            .cl-main { grid-template-columns: 1fr; }
+            .cl-team { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<main class="clay-page">
+    <div class="clay-shell">
+
+        <header class="cl-header">
+            <div class="cl-title">
+                <a href="index.html" class="back">← 디자인 샘플 인덱스</a>
+                <div style="margin:10px 0 0;"><span class="kicker">Type 11 · Claymorphism</span></div>
+                <h1>마일리지 &amp; 멤버십<br>운영 대시보드</h1>
+                <p>부드러운 입체감과 파스텔 팔레트로 친근한 톤. 회원·마일리지·로열티 영역에 적합합니다.</p>
+            </div>
+            <div class="cl-actions">
+                <button class="cl-btn">기간 · 이번 달</button>
+                <button class="cl-btn">멤버 그룹</button>
+                <button class="cl-btn primary">+ 신규 캠페인</button>
+            </div>
+        </header>
+
+        <section class="cl-kpis">
+            <div class="clay cl-kpi k1">
+                <span class="blob"></span>
+                <h4>활성 회원</h4>
+                <div class="num">42,318</div>
+                <span class="delta up">▲ 1,284 이번 달</span>
+            </div>
+            <div class="clay cl-kpi k2">
+                <span class="blob"></span>
+                <h4>적립 마일리지</h4>
+                <div class="num">8.42<small>M</small></div>
+                <span class="delta up">▲ 12.4% MoM</span>
+            </div>
+            <div class="clay cl-kpi k3">
+                <span class="blob"></span>
+                <h4>사용된 마일리지</h4>
+                <div class="num">3.18<small>M</small></div>
+                <span class="delta dn">▲ 사용률 38%</span>
+            </div>
+            <div class="clay cl-kpi k4">
+                <span class="blob"></span>
+                <h4>VIP 등급</h4>
+                <div class="num">1,082</div>
+                <span class="delta up">▲ 신규 +48</span>
+            </div>
+        </section>
+
+        <section class="cl-main">
+
+            <article class="clay cl-mileage">
+                <h3>이번 달 마일리지 흐름</h3>
+                <div class="big">+ 5.24M</div>
+                <p style="margin:0; color:var(--muted); font-size:14px;">
+                    적립이 사용보다 2.06M 많아 풀이 점진적으로 증가 중.
+                    만료 예정 0.42M 으로 적정 구간입니다.
+                </p>
+                <div class="row">
+                    <div class="pill-stat">
+                        <span>적립</span>
+                        <strong>+ 8.42M</strong>
+                    </div>
+                    <div class="pill-stat">
+                        <span>사용</span>
+                        <strong>− 3.18M</strong>
+                    </div>
+                    <div class="pill-stat">
+                        <span>만료 예정</span>
+                        <strong>0.42M</strong>
+                    </div>
+                </div>
+            </article>
+
+            <article class="clay cl-segments">
+                <h3>회원 등급 분포</h3>
+                <div class="donut-wrap">
+                    <svg viewBox="0 0 36 36">
+                        <defs>
+                            <linearGradient id="cl1" x1="0" x2="1" y1="0" y2="1"><stop offset="0%" stop-color="#ff89b6"/><stop offset="100%" stop-color="#ff5e8e"/></linearGradient>
+                            <linearGradient id="cl2" x1="0" x2="1" y1="0" y2="1"><stop offset="0%" stop-color="#8cd8ff"/><stop offset="100%" stop-color="#4ea7ff"/></linearGradient>
+                            <linearGradient id="cl3" x1="0" x2="1" y1="0" y2="1"><stop offset="0%" stop-color="#b8f0c4"/><stop offset="100%" stop-color="#5fce7e"/></linearGradient>
+                            <linearGradient id="cl4" x1="0" x2="1" y1="0" y2="1"><stop offset="0%" stop-color="#ffd56b"/><stop offset="100%" stop-color="#ffa42d"/></linearGradient>
+                        </defs>
+                        <circle cx="18" cy="18" r="15.915" fill="none" stroke="rgba(0,0,0,0.05)" stroke-width="4.5"/>
+                        <circle cx="18" cy="18" r="15.915" fill="none" stroke="url(#cl1)" stroke-width="4.5" stroke-dasharray="8 92" stroke-dashoffset="25" stroke-linecap="round"/>
+                        <circle cx="18" cy="18" r="15.915" fill="none" stroke="url(#cl2)" stroke-width="4.5" stroke-dasharray="22 78" stroke-dashoffset="17" stroke-linecap="round"/>
+                        <circle cx="18" cy="18" r="15.915" fill="none" stroke="url(#cl3)" stroke-width="4.5" stroke-dasharray="32 68" stroke-dashoffset="-5" stroke-linecap="round"/>
+                        <circle cx="18" cy="18" r="15.915" fill="none" stroke="url(#cl4)" stroke-width="4.5" stroke-dasharray="38 62" stroke-dashoffset="-37" stroke-linecap="round"/>
+                    </svg>
+                    <div class="leg">
+                        <div class="row"><span class="dot" style="background:linear-gradient(135deg,#ff89b6,#ff5e8e);"></span> VIP <strong>8%</strong></div>
+                        <div class="row"><span class="dot" style="background:linear-gradient(135deg,#8cd8ff,#4ea7ff);"></span> Gold <strong>22%</strong></div>
+                        <div class="row"><span class="dot" style="background:linear-gradient(135deg,#b8f0c4,#5fce7e);"></span> Silver <strong>32%</strong></div>
+                        <div class="row"><span class="dot" style="background:linear-gradient(135deg,#ffd56b,#ffa42d);"></span> Bronze <strong>38%</strong></div>
+                    </div>
+                </div>
+            </article>
+
+        </section>
+
+        <section class="cl-main">
+
+            <article class="clay cl-tracker">
+                <h3>등급별 목표 달성률</h3>
+
+                <div class="item">
+                    <span class="name">VIP — 누적 ₩300만</span>
+                    <span class="val">82%</span>
+                    <div class="bar b1"><i style="width:82%;"></i></div>
+                </div>
+                <div class="item">
+                    <span class="name">Gold — 누적 ₩100만</span>
+                    <span class="val">68%</span>
+                    <div class="bar b2"><i style="width:68%;"></i></div>
+                </div>
+                <div class="item">
+                    <span class="name">Silver — 누적 ₩30만</span>
+                    <span class="val">54%</span>
+                    <div class="bar b3"><i style="width:54%;"></i></div>
+                </div>
+                <div class="item">
+                    <span class="name">Bronze — 첫 구매</span>
+                    <span class="val">38%</span>
+                    <div class="bar b4"><i style="width:38%;"></i></div>
+                </div>
+            </article>
+
+            <article class="clay">
+                <h3 style="margin:0 0 14px; font-size:14px; color:var(--muted); font-weight:700; letter-spacing:0.04em; text-transform:uppercase;">최근 마일리지 활동</h3>
+                <div class="cl-activity">
+                    <div class="row">
+                        <div class="ic add">+</div>
+                        <div class="desc"><b>김** 님</b> 자사몰 주문 적립 <small>RN-GSZD962 외 2건 · 12:18</small></div>
+                        <div class="amt plus">+ 4,280</div>
+                    </div>
+                    <div class="row">
+                        <div class="ic use">-</div>
+                        <div class="desc"><b>이** 님</b> 결제 시 사용 <small>29CM 결제 · 12:09</small></div>
+                        <div class="amt minus">- 3,000</div>
+                    </div>
+                    <div class="row">
+                        <div class="ic exp">!</div>
+                        <div class="desc"><b>박** 님</b> 만료 30일 전 알림 <small>12,400 마일리지 · 12:00</small></div>
+                        <div class="amt">12,400</div>
+                    </div>
+                    <div class="row">
+                        <div class="ic add">+</div>
+                        <div class="desc"><b>최** 님</b> 리뷰 작성 보너스 <small>지그재그 · 11:52</small></div>
+                        <div class="amt plus">+ 500</div>
+                    </div>
+                </div>
+            </article>
+
+        </section>
+
+        <section class="clay" style="margin-top:22px;">
+            <h3 style="margin:0 0 18px; font-size:14px; color:var(--muted); font-weight:700; letter-spacing:0.04em; text-transform:uppercase;">이번 달 우수 상담사</h3>
+            <div class="cl-team">
+                <div class="cl-member">
+                    <div class="av a1">민</div>
+                    <p class="name">김민우</p>
+                    <p class="role">CS Lead</p>
+                    <span class="stat">+ 412 응대</span>
+                </div>
+                <div class="cl-member">
+                    <div class="av a2">지</div>
+                    <p class="name">오지수</p>
+                    <p class="role">Refund Specialist</p>
+                    <span class="stat">SLA 98.4%</span>
+                </div>
+                <div class="cl-member">
+                    <div class="av a3">민</div>
+                    <p class="name">한지민</p>
+                    <p class="role">VIP Manager</p>
+                    <span class="stat">만족도 4.92</span>
+                </div>
+                <div class="cl-member">
+                    <div class="av a4">우</div>
+                    <p class="name">이현우</p>
+                    <p class="role">Logistics</p>
+                    <span class="stat">회수 −0.6일</span>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</main>
+
+</body>
+</html>

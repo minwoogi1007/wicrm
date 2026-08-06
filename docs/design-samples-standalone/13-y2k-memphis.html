@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WICRM Design 13 · Y2K Memphis Pop</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; }
+
+        .y2k-page {
+            --bg: #fff5e1;
+            --ink: #0d0d12;
+            --line: #0d0d12;
+            --pink: #ff3eb5;
+            --blue: #2e7bff;
+            --cyan: #2af0ff;
+            --lime: #b5ff3a;
+            --butter: #ffe14a;
+            --orange: #ff7a2a;
+            --lilac: #c5a3ff;
+
+            background:
+                radial-gradient(circle at 90% -10%, rgba(255,62,181,0.18), transparent 40%),
+                radial-gradient(circle at -10% 100%, rgba(46,123,255,0.18), transparent 40%),
+                var(--bg);
+            min-height: 100vh;
+            padding: 28px clamp(20px, 4vw, 56px) 80px;
+            color: var(--ink);
+            font-family: "Space Grotesk", "Pretendard", sans-serif;
+            position: relative;
+            overflow-x: hidden;
+        }
+        /* dotted bg pattern */
+        .y2k-page::before {
+            content: "";
+            position: fixed; inset: 0; pointer-events: none; z-index: 0;
+            background-image: radial-gradient(rgba(13,13,18,0.16) 1.4px, transparent 1.4px);
+            background-size: 18px 18px;
+            opacity: 0.5;
+        }
+        .y2k-shell { max-width: 1320px; margin: 0 auto; position: relative; z-index: 1; }
+
+        /* shapes layer */
+        .shape {
+            position: absolute; pointer-events: none; z-index: 0;
+            border: 2.5px solid var(--ink);
+        }
+        .s1 { top: 80px; right: 12%; width: 60px; height: 60px; background: var(--cyan); border-radius: 50%; }
+        .s2 { top: 240px; right: 4%; width: 70px; height: 70px; background: var(--lime); transform: rotate(20deg); }
+        .s3 { top: 460px; left: -20px; width: 90px; height: 90px; background: var(--pink); border-radius: 50% 50% 50% 0; transform: rotate(-15deg); }
+        .s4 { bottom: 120px; right: 8%; width: 50px; height: 50px; background: var(--butter); transform: rotate(45deg); }
+
+        /* squiggle */
+        .squiggle { position: absolute; top: 70px; left: 36%; z-index: 0; pointer-events: none; }
+
+        /* header */
+        .y-header {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            gap: 24px; margin-bottom: 24px; flex-wrap: wrap;
+            position: relative; z-index: 2;
+        }
+        .y-header .back {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--ink); color: var(--bg);
+            padding: 6px 12px; border-radius: 999px;
+            text-decoration: none; font-size: 12px; font-weight: 700;
+            letter-spacing: 0.04em;
+        }
+        .y-title h1 {
+            font-family: "Archivo Black", sans-serif;
+            font-size: clamp(40px, 7vw, 88px);
+            line-height: 0.92; margin: 14px 0 6px;
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
+        }
+        .y-title h1 .a { color: var(--pink); }
+        .y-title h1 .b { color: var(--blue); }
+        .y-title h1 .c { color: var(--ink); background: var(--lime); padding: 0 10px; box-shadow: 6px 6px 0 var(--ink); display: inline-block; transform: rotate(-2deg); }
+        .y-title p { margin: 0; max-width: 540px; font-size: 14.5px; line-height: 1.55; }
+        .y-kicker {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--butter); color: var(--ink);
+            padding: 6px 14px; border-radius: 999px;
+            font-family: "Space Mono", monospace;
+            font-size: 11px; font-weight: 700; letter-spacing: 0.14em;
+            text-transform: uppercase;
+            border: 2px solid var(--ink);
+            box-shadow: 4px 4px 0 var(--ink);
+        }
+        .y-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .y-btn {
+            border: 2.5px solid var(--ink); background: #fff;
+            padding: 12px 18px; border-radius: 999px;
+            font-family: inherit; font-weight: 700; font-size: 13px;
+            cursor: pointer;
+            box-shadow: 4px 4px 0 var(--ink);
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
+        .y-btn:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--ink); }
+        .y-btn:active { transform: translate(2px,2px); box-shadow: 2px 2px 0 var(--ink); }
+        .y-btn.pink { background: var(--pink); color: #fff; }
+        .y-btn.blue { background: var(--blue); color: #fff; }
+
+        /* sticker */
+        .sticker {
+            border: 3px solid var(--ink);
+            border-radius: 28px;
+            padding: 22px 24px;
+            background: #fff;
+            box-shadow: 8px 8px 0 var(--ink);
+            position: relative;
+        }
+        .sticker.tilt-l { transform: rotate(-1deg); }
+        .sticker.tilt-r { transform: rotate(1deg); }
+
+        /* KPI marquee tiles */
+        .y-kpis {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+            margin-bottom: 22px;
+            position: relative; z-index: 2;
+        }
+        .y-kpi { position: relative; padding: 18px 20px 22px; }
+        .y-kpi.k1 { background: var(--pink); color: #fff; }
+        .y-kpi.k2 { background: var(--cyan); }
+        .y-kpi.k3 { background: var(--butter); }
+        .y-kpi.k4 { background: var(--lilac); }
+        .y-kpi h4 {
+            margin: 0; font-family: "Space Mono", monospace;
+            font-size: 11px; font-weight: 700; letter-spacing: 0.14em;
+            text-transform: uppercase; opacity: 0.85;
+        }
+        .y-kpi .num {
+            font-family: "Archivo Black", sans-serif;
+            font-size: 48px; line-height: 1; letter-spacing: -0.02em;
+            margin: 8px 0 6px;
+        }
+        .y-kpi .delta {
+            display: inline-block;
+            border: 2px solid var(--ink); background: #fff; color: var(--ink);
+            padding: 3px 10px; border-radius: 999px;
+            font-size: 11px; font-weight: 700;
+        }
+        .y-kpi .badge {
+            position: absolute; top: -10px; right: -10px;
+            width: 46px; height: 46px;
+            background: var(--ink); color: var(--butter);
+            border-radius: 50%;
+            display: grid; place-items: center;
+            font-family: "Archivo Black", sans-serif; font-size: 12px;
+            transform: rotate(-12deg);
+            border: 2.5px solid var(--ink);
+        }
+
+        /* main grid */
+        .y-main { display: grid; grid-template-columns: 1.6fr 1fr; gap: 22px; margin-bottom: 22px; position: relative; z-index: 2; }
+
+        /* poster style hero */
+        .y-poster { background: var(--lime); padding: 32px 32px 36px; }
+        .y-poster .tag {
+            display: inline-block;
+            background: var(--ink); color: var(--bg);
+            padding: 4px 12px; border-radius: 6px;
+            font-family: "Space Mono", monospace; font-size: 11px;
+            text-transform: uppercase; letter-spacing: 0.14em;
+        }
+        .y-poster h2 {
+            font-family: "Archivo Black", sans-serif;
+            font-size: clamp(34px, 4.5vw, 56px);
+            line-height: 0.95; margin: 14px 0 16px;
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
+        }
+        .y-poster h2 mark {
+            background: var(--pink); color: #fff;
+            padding: 0 8px; transform: rotate(-1deg); display: inline-block;
+            box-shadow: 5px 5px 0 var(--ink);
+        }
+        .y-poster .stats {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 14px; margin-top: 20px;
+        }
+        .y-poster .stats div {
+            background: #fff; border: 2.5px solid var(--ink);
+            padding: 14px; box-shadow: 4px 4px 0 var(--ink);
+        }
+        .y-poster .stats strong {
+            display: block;
+            font-family: "Archivo Black", sans-serif;
+            font-size: 26px; line-height: 1;
+        }
+        .y-poster .stats span {
+            font-family: "Space Mono", monospace; font-size: 10px;
+            text-transform: uppercase; letter-spacing: 0.12em;
+        }
+
+        /* leaderboard */
+        .y-board h3 {
+            font-family: "Archivo Black", sans-serif;
+            font-size: 22px; margin: 0 0 14px;
+            text-transform: uppercase;
+        }
+        .y-board ol { list-style: none; padding: 0; margin: 0; }
+        .y-board li {
+            display: grid; grid-template-columns: 38px 1fr auto;
+            align-items: center; gap: 14px;
+            padding: 10px 12px; border: 2px solid var(--ink); border-radius: 14px;
+            background: #fff; margin-bottom: 8px;
+            box-shadow: 3px 3px 0 var(--ink);
+        }
+        .y-board li .rank {
+            font-family: "Archivo Black", sans-serif; font-size: 18px;
+            background: var(--ink); color: var(--butter);
+            width: 32px; height: 32px; border-radius: 50%;
+            display: grid; place-items: center;
+        }
+        .y-board li:nth-child(1) .rank { background: var(--pink); color: #fff; }
+        .y-board li:nth-child(2) .rank { background: var(--blue); color: #fff; }
+        .y-board li:nth-child(3) .rank { background: var(--lime); color: var(--ink); }
+        .y-board li .nm { font-weight: 700; font-size: 14px; }
+        .y-board li .sub { font-family: "Space Mono", monospace; font-size: 11px; opacity: 0.65; }
+        .y-board li .val {
+            font-family: "Archivo Black", sans-serif; font-size: 18px;
+        }
+
+        /* category sticker grid */
+        .y-cats {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+            margin-bottom: 22px; position: relative; z-index: 2;
+        }
+        .y-cat {
+            border: 3px solid var(--ink); border-radius: 22px;
+            padding: 18px; box-shadow: 6px 6px 0 var(--ink);
+            position: relative; overflow: hidden;
+            min-height: 130px;
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .y-cat .lbl { font-family: "Space Mono", monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
+        .y-cat .v { font-family: "Archivo Black", sans-serif; font-size: 36px; line-height: 1; }
+        .y-cat.c1 { background: var(--pink); color: #fff; transform: rotate(-1.2deg); }
+        .y-cat.c2 { background: var(--cyan); transform: rotate(1deg); }
+        .y-cat.c3 { background: var(--butter); transform: rotate(-0.8deg); }
+        .y-cat.c4 { background: var(--blue); color: #fff; transform: rotate(0.8deg); }
+        .y-cat .icon {
+            position: absolute; right: -10px; bottom: -14px;
+            font-family: "Archivo Black", sans-serif;
+            font-size: 80px; opacity: 0.18; line-height: 1;
+        }
+
+        /* timeline strip */
+        .y-strip { position: relative; z-index: 2; padding: 26px 30px; }
+        .y-strip h3 {
+            font-family: "Archivo Black", sans-serif;
+            font-size: 22px; margin: 0 0 18px; text-transform: uppercase;
+        }
+        .y-strip .timeline { position: relative; padding-left: 30px; border-left: 3px dashed var(--ink); }
+        .y-strip .timeline .ev { padding: 10px 0; }
+        .y-strip .timeline .ev::before {
+            content: ""; position: absolute; left: -8px;
+            width: 14px; height: 14px; border-radius: 50%;
+            background: var(--pink); border: 2.5px solid var(--ink);
+            margin-top: 6px;
+        }
+        .y-strip .timeline .ev .t {
+            font-family: "Space Mono", monospace; font-size: 11px;
+            opacity: 0.65; letter-spacing: 0.1em;
+        }
+        .y-strip .timeline .ev .d { font-weight: 700; font-size: 14px; margin-top: 2px; }
+        .y-strip .timeline .ev:nth-child(2)::before { background: var(--cyan); }
+        .y-strip .timeline .ev:nth-child(3)::before { background: var(--butter); }
+        .y-strip .timeline .ev:nth-child(4)::before { background: var(--blue); }
+
+        @media (max-width: 1100px) {
+            .y-kpis { grid-template-columns: repeat(2, 1fr); }
+            .y-main { grid-template-columns: 1fr; }
+            .y-cats { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<main class="y2k-page">
+
+    <span class="shape s1"></span>
+    <span class="shape s2"></span>
+    <span class="shape s3"></span>
+    <span class="shape s4"></span>
+    <svg class="squiggle" width="160" height="40" viewBox="0 0 160 40" fill="none">
+        <path d="M2 20 C 20 0, 30 40, 50 20 S 80 0, 100 20 S 130 40, 158 20" stroke="#0d0d12" stroke-width="3" stroke-linecap="round"/>
+    </svg>
+
+    <div class="y2k-shell">
+
+        <header class="y-header">
+            <div class="y-title">
+                <a href="index.html" class="back">← INDEX</a>
+                <div style="margin-top:14px;"><span class="y-kicker">Type 13 · Y2K Memphis Pop</span></div>
+                <h1>
+                    <span class="a">SUPER</span><br>
+                    <span class="b">CRM!</span> <span class="c">2026</span>
+                </h1>
+                <p>비비드 컬러 · 도형 · 두꺼운 라인 · 하드 섀도. 마케팅 캠페인, 신규 가입 이벤트, 고객 향 화면에 적합한 활기찬 톤.</p>
+            </div>
+            <div class="y-actions">
+                <button class="y-btn">필터</button>
+                <button class="y-btn pink">+ 캠페인</button>
+                <button class="y-btn blue">공유</button>
+            </div>
+        </header>
+
+        <section class="y-kpis">
+            <div class="sticker y-kpi k1">
+                <span class="badge">NEW!</span>
+                <h4>오늘 신규</h4>
+                <div class="num">128</div>
+                <span class="delta">▲ +21 vs avg</span>
+            </div>
+            <div class="sticker y-kpi k2">
+                <h4>활성 회원</h4>
+                <div class="num">42K</div>
+                <span class="delta">▲ +1.2K MoM</span>
+            </div>
+            <div class="sticker y-kpi k3">
+                <h4>이번 달 매출</h4>
+                <div class="num">₩384M</div>
+                <span class="delta">▲ 102% 목표</span>
+            </div>
+            <div class="sticker y-kpi k4">
+                <h4>VIP</h4>
+                <div class="num">1,082</div>
+                <span class="delta">▲ +48 신규</span>
+            </div>
+        </section>
+
+        <section class="y-main">
+
+            <article class="sticker y-poster tilt-l">
+                <span class="tag">Campaign · Spring Drop</span>
+                <h2>레노마 봄 컬렉션,<br><mark>3일 만에</mark><br>완판 임박!</h2>
+                <p style="margin:0 0 6px; font-size:15px; line-height:1.55;">
+                    27% 할인 + 무료배송 캠페인이 시작 72시간 만에 목표 매출의 138%를 달성했습니다.
+                    재고 알림 신청은 4,218건 — 추가 입고 검토를 권장합니다.
+                </p>
+                <div class="stats">
+                    <div>
+                        <strong>138%</strong>
+                        <span>목표 대비</span>
+                    </div>
+                    <div>
+                        <strong>4,218</strong>
+                        <span>알림 신청</span>
+                    </div>
+                    <div>
+                        <strong>₩84M</strong>
+                        <span>72h 매출</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="sticker y-board tilt-r">
+                <h3>이번 주 핫 사이트</h3>
+                <ol>
+                    <li>
+                        <span class="rank">1</span>
+                        <div>
+                            <div class="nm">29CM · 코랄리크</div>
+                            <div class="sub">+108% MoM</div>
+                        </div>
+                        <div class="val">₩94M</div>
+                    </li>
+                    <li>
+                        <span class="rank">2</span>
+                        <div>
+                            <div class="nm">자사몰 · 레노마</div>
+                            <div class="sub">+62% MoM</div>
+                        </div>
+                        <div class="val">₩88M</div>
+                    </li>
+                    <li>
+                        <span class="rank">3</span>
+                        <div>
+                            <div class="nm">지그재그 · 레노마</div>
+                            <div class="sub">+44% MoM</div>
+                        </div>
+                        <div class="val">₩52M</div>
+                    </li>
+                    <li>
+                        <span class="rank">4</span>
+                        <div>
+                            <div class="nm">SSG · 레노마</div>
+                            <div class="sub">+18% MoM</div>
+                        </div>
+                        <div class="val">₩38M</div>
+                    </li>
+                </ol>
+            </article>
+
+        </section>
+
+        <section class="y-cats">
+            <div class="y-cat c1">
+                <span class="icon">RT</span>
+                <div class="lbl">환불</div>
+                <div class="v">312</div>
+                <div class="lbl">건 / SLA 96%</div>
+            </div>
+            <div class="y-cat c2">
+                <span class="icon">EX</span>
+                <div class="lbl">교환</div>
+                <div class="v">184</div>
+                <div class="lbl">건 / 1.6일 평균</div>
+            </div>
+            <div class="y-cat c3">
+                <span class="icon">CS</span>
+                <div class="lbl">상담</div>
+                <div class="v">1.2K</div>
+                <div class="lbl">건 / 만족 4.8</div>
+            </div>
+            <div class="y-cat c4">
+                <span class="icon">SP</span>
+                <div class="lbl">출고</div>
+                <div class="v">873</div>
+                <div class="lbl">건 / 96% 목표</div>
+            </div>
+        </section>
+
+        <section class="sticker y-strip">
+            <h3>오늘의 타임라인</h3>
+            <div class="timeline">
+                <div class="ev"><div class="t">12:29</div><div class="d">Insight Agent · 환불 사유 클러스터링 완료</div></div>
+                <div class="ev"><div class="t">11:58</div><div class="d">자사몰 환불 +34% 이상 탐지 — 알림 발송</div></div>
+                <div class="ev"><div class="t">11:30</div><div class="d">일일 리포트 초안 생성</div></div>
+                <div class="ev"><div class="t">10:00</div><div class="d">봄 컬렉션 캠페인 1차 푸시 발송 (4.2만 건)</div></div>
+            </div>
+        </section>
+
+    </div>
+</main>
+
+</body>
+</html>

@@ -78,7 +78,6 @@ public class DashboardService {
         String custGrade = "";
 
         Map<String, Object> data = new HashMap<>();
-        //System.out.println("userDetails.getTcntUserInfo()===="+userDetails.getTcntUserInfo());
         
         // 현재 로그인한 유저 권한 확인
         ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
@@ -88,16 +87,13 @@ public class DashboardService {
         // 권한이 1인 경우 무조건 마일리지 데이터 표시
         if ("1".equals(loginUserAuthority)) {
             data.put("dataForA", true);
-            //System.out.println("권한 1 사용자에게 마일리지 데이터 표시");
         }
         
         if(userDetails.getTempUserInfo()!= null){
             tempUserGrade = userDetails.getTempUserInfo().getPosition();
-            //System.out.println("내부 직원");
             data.put("dataForA", true);
         }else{
              custGrade = userDetails.getTcntUserInfo().getCust_grade();
-            //System.out.println("외부 직원");
         }
 
         // 거래처 직원 정보 접근
@@ -105,10 +101,8 @@ public class DashboardService {
             data.put("dataForA", true);
         }        // 내부 직원 정보 접근
         else if ("B".equals(custGrade)) {
-            // 여기에 B 등급 사용자를 위한 데이터 준비 로직 추가
             data.put("dataForB", "B 등급 사용자에 대한 데이터");
         }
-        //System.out.println("datadatadatadata===="+data);
         return data;
     }
     public Map<String, Object> getDashboardData(String username) {
@@ -271,8 +265,7 @@ public class DashboardService {
             // custCode가 null인지 확인
             String custCode = userDetails.getTcntUserInfo().getCustCode();
             if (custCode == null || custCode.isEmpty()) {
-                //System.out.println("WARNING: getTcntUserInfo().getCustCode() is null or empty.");
-                return "P000000011"; // 기본값 설정 - 실제 가능한 코드로 변경 필요
+                return "P000000011";
             }
             return custCode;
         }
@@ -280,8 +273,6 @@ public class DashboardService {
         // 내부 직원 정보 접근
         if (userDetails.getTempUserInfo() != null) {
             // 내부 직원에 대한 처리가 필요한 경우 여기에 로직 추가
-            //System.out.println("Accessing Temp01 UserInfo");
-            // 예: return userDetails.getTempUserInfo().getSomeOtherInfo();
         }
 
         return "";
@@ -326,7 +317,6 @@ public class DashboardService {
             data.put("error", e.getMessage());
         }
 
-        //System.out.println("data===="+data);
         return data;
     }
 
@@ -412,15 +402,11 @@ public class DashboardService {
     }
 
     public void checkUserRole() {
-        // 현재 인증된 사용자의 Authentication 객체 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
         if (authentication == null) {
-            //System.out.println("사용자가 로그인하지 않았습니다.");
             return;
         }
 
-        // 사용자의 권한 정보를 추출하고, ROLE_EMPLOYEE 또는 ROLE_USER 인지 확인
         boolean isEmployee = false;
         boolean isUser = false;
 
@@ -434,42 +420,18 @@ public class DashboardService {
 
         // 권한에 따라 다른 로직 수행
         if (isEmployee) {
-            //System.out.println("사용자는 직원(EMPLOYEE)입니다.");
+            logger.debug("사용자는 직원(EMPLOYEE)입니다.");
         } else if (isUser) {
-            //System.out.println("사용자는 거래처(USER)입니다.");
+            logger.debug("사용자는 거래처(USER)입니다.");
         } else {
-            //System.out.println("사용자는 알려진 권한이 없습니다.");
+            logger.debug("사용자는 알려진 권한이 없습니다.");
         }
     }
 
     public void printUserDetails() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
         if (authentication != null) {
-            // 사용자의 기본 인증 정보 출력
-            //System.out.println("Username: " + authentication.getName());
-            //System.out.println("Credentials: " + authentication.getCredentials());
-            //System.out.println("Authorities: " + authentication.getAuthorities());
-
-            // UserDetails 객체에서 추가적인 사용자 정보를 조회
-            if (authentication.getPrincipal() instanceof UserDetails) {
-                UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-                //System.out.println("Username: " + userDetails.getUsername());
-                //System.out.println("Password: " + userDetails.getPassword());
-                //System.out.println("Authorities: " + userDetails.getAuthorities());
-            }
-
-            // 세션 ID와 세션에 저장된 모든 속성 출력
-            ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-            HttpSession session = attr.getRequest().getSession(false); // false: 기존 세션이 있을 경우에만 가져옴
-            if (session != null) {
-                //System.out.println("Session ID: " + session.getId());
-                java.util.Enumeration<String> attributeNames = session.getAttributeNames();
-                while (attributeNames.hasMoreElements()) {
-                    String attributeName = attributeNames.nextElement();
-                    //System.out.println("Session attribute Name: " + attributeName + ", Value: " + session.getAttribute(attributeName));
-                }
-            }
+            logger.debug("Username: {}, Authorities: {}", authentication.getName(), authentication.getAuthorities());
         }
     }
     @Transactional

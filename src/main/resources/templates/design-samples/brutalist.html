@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{design-samples/public-layout}">
+<body>
+<div layout:fragment="content">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="/assets/css/design-samples/brutalist.css" rel="stylesheet" type="text/css" />
+
+    <main class="brutalist-page">
+        <div class="brutalist-shell">
+
+            <header class="br-header">
+                <div>
+                    <a href="/design-samples/admin" class="back-link">&larr; SAMPLE LIST</a>
+                    <div style="margin:10px 0;"><span class="br-tag">Type 08 // Neo-Brutalist Ops</span></div>
+                    <h1>OPS <span>CONSOLE</span> / 운영 관제</h1>
+                    <p>물류 · 결제 · 외부 연동 상태를 모노스페이스 기반 그리드로 노출. 노이즈 없이 “지금 이 순간 무엇이 깨졌는가”를 즉시 식별합니다.</p>
+                </div>
+                <div class="meta">
+                    <div>SYSTEM TIME</div>
+                    <strong>2026-04-28 12:29</strong>
+                    <div>BUILD #4f9c2a · v3.18.2</div>
+                    <div style="margin-top:4px; color:var(--br-green);">● ALL CORE SYSTEMS NOMINAL</div>
+                </div>
+            </header>
+
+            <!-- TOP STATUS BANNER -->
+            <section class="br-banner">
+                <div>
+                    <div class="label">QUEUED ORDERS</div>
+                    <div class="num">1,284</div>
+                    <div class="delta up">▲ +3.2% / 1h</div>
+                </div>
+                <div>
+                    <div class="label">SHIPMENTS / DAY</div>
+                    <div class="num">873</div>
+                    <div class="delta up">▲ TARGET 96.0%</div>
+                </div>
+                <div>
+                    <div class="label">REFUND SLA</div>
+                    <div class="num">97.6%</div>
+                    <div class="delta dn">▼ -0.4% vs YDA</div>
+                </div>
+                <div class="alert">
+                    <div class="label">ACTIVE INCIDENTS</div>
+                    <div class="num">02</div>
+                    <div class="delta">▲ ACK REQUIRED</div>
+                </div>
+            </section>
+
+            <section class="br-grid">
+
+                <!-- LEFT : INCIDENT TABLE -->
+                <article class="br-card">
+                    <h3>ACTIVE INCIDENTS / 24H <span class="chip">LIVE</span></h3>
+                    <table class="br-table">
+                        <thead>
+                            <tr><th>ID</th><th>SOURCE</th><th>EVENT</th><th>SEVERITY</th><th>OWNER</th><th>STATE</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>INC-2026-0428-031</td>
+                                <td>logistics.cj</td>
+                                <td>회수 API 응답 지연 / 평균 4.2s</td>
+                                <td><span class="pill err">P1</span></td>
+                                <td><b>김민우</b></td>
+                                <td><span class="pill run">투입</span></td>
+                            </tr>
+                            <tr>
+                                <td>INC-2026-0428-029</td>
+                                <td>payment.naver</td>
+                                <td>환불 콜백 누락 12건</td>
+                                <td><span class="pill wait">P2</span></td>
+                                <td><b>오지수</b></td>
+                                <td><span class="pill run">조사</span></td>
+                            </tr>
+                            <tr>
+                                <td>INC-2026-0428-024</td>
+                                <td>crm.consult</td>
+                                <td>채널톡 상담 라우팅 실패</td>
+                                <td><span class="pill wait">P2</span></td>
+                                <td><b>한지민</b></td>
+                                <td><span class="pill ok">해소</span></td>
+                            </tr>
+                            <tr>
+                                <td>INC-2026-0428-018</td>
+                                <td>file.upload</td>
+                                <td>이미지 업로드 5xx 1.4%</td>
+                                <td><span class="pill wait">P3</span></td>
+                                <td><b>이현우</b></td>
+                                <td><span class="pill ok">해소</span></td>
+                            </tr>
+                            <tr>
+                                <td>INC-2026-0428-009</td>
+                                <td>db.oracle</td>
+                                <td>Long Query &gt; 8s detected</td>
+                                <td><span class="pill err">P1</span></td>
+                                <td><b>system</b></td>
+                                <td><span class="pill ok">해소</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </article>
+
+                <!-- RIGHT : TERMINAL LOG -->
+                <article class="br-card" style="background:transparent; border:none; box-shadow:none; padding:0;">
+                    <div class="br-terminal">
+                        <div class="line"><span class="ts">[12:29:14]</span> <span class="ok">OK</span> &nbsp;shipping.batch executed (873 / 873)</div>
+                        <div class="line"><span class="ts">[12:29:02]</span> <span class="warn">WRN</span> payment.naver retry #2 succeeded</div>
+                        <div class="line"><span class="ts">[12:28:41]</span> <span class="err">ERR</span> logistics.cj timeout after 5000ms</div>
+                        <div class="line"><span class="ts">[12:28:33]</span> <span class="ok">OK</span> &nbsp;ai.report scheduled for 09:00 KST</div>
+                        <div class="line"><span class="ts">[12:28:09]</span> <span class="ok">OK</span> &nbsp;auth.session refresh completed (412 users)</div>
+                        <div class="line"><span class="ts">[12:27:55]</span> <span class="warn">WRN</span> consult.queue size=17 above threshold (15)</div>
+                        <div class="line"><span class="ts">[12:27:30]</span> <span class="ok">OK</span> &nbsp;exchange.save accepted (id=ret-2026-3128)</div>
+                        <div class="line"><span class="prompt">$&nbsp;</span>tail -f /var/log/wicrm/*.log<span style="animation:blink 1s step-end infinite;">_</span></div>
+                    </div>
+                </article>
+
+                <!-- LEFT : THROUGHPUT BARS -->
+                <article class="br-card">
+                    <h3>BRAND THROUGHPUT / TODAY <span class="chip">UPDATED 12:29</span></h3>
+                    <div class="br-bars">
+                        <div class="row ok">
+                            <div>RENOMA · 자사몰</div>
+                            <div class="track"><div class="fill" style="width:88%;"></div></div>
+                            <div class="val">88%</div>
+                        </div>
+                        <div class="row ok">
+                            <div>RENOMA · 29CM</div>
+                            <div class="track"><div class="fill" style="width:74%;"></div></div>
+                            <div class="val">74%</div>
+                        </div>
+                        <div class="row warn">
+                            <div>RENOMA · ZIGZAG</div>
+                            <div class="track"><div class="fill" style="width:58%;"></div></div>
+                            <div class="val">58%</div>
+                        </div>
+                        <div class="row alert">
+                            <div>CORALIQUE · 무신사</div>
+                            <div class="track"><div class="fill" style="width:34%;"></div></div>
+                            <div class="val">34%</div>
+                        </div>
+                        <div class="row warn">
+                            <div>CORALIQUE · CJ</div>
+                            <div class="track"><div class="fill" style="width:62%;"></div></div>
+                            <div class="val">62%</div>
+                        </div>
+                        <div class="row ok">
+                            <div>CORALIQUE · LF</div>
+                            <div class="track"><div class="fill" style="width:81%;"></div></div>
+                            <div class="val">81%</div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- RIGHT : SERVICE STATUS GRID -->
+                <article class="br-card">
+                    <h3>EXTERNAL SERVICES <span class="chip">PROBE 30s</span></h3>
+                    <div class="br-status-grid">
+                        <div class="ok"><div class="name">CJ대한통운</div>OK · 124ms</div>
+                        <div class="ok"><div class="name">한진택배</div>OK · 88ms</div>
+                        <div class="warn"><div class="name">로젠택배</div>SLOW · 612ms</div>
+                        <div class="err"><div class="name">우체국</div>FAIL · 5/5</div>
+
+                        <div class="ok"><div class="name">네이버페이</div>OK · 142ms</div>
+                        <div class="ok"><div class="name">카카오페이</div>OK · 96ms</div>
+                        <div class="ok"><div class="name">토스페이</div>OK · 110ms</div>
+                        <div class="ok"><div class="name">PG-INICIS</div>OK · 88ms</div>
+
+                        <div class="ok"><div class="name">채널톡</div>OK · 64ms</div>
+                        <div class="warn"><div class="name">SMS-Aligo</div>SLOW · 480ms</div>
+                        <div class="ok"><div class="name">메일-AWS</div>OK · 102ms</div>
+                        <div class="ok"><div class="name">OpenAI API</div>OK · 318ms</div>
+                    </div>
+                </article>
+
+            </section>
+        </div>
+    </main>
+</div>
+</body>
+</html>

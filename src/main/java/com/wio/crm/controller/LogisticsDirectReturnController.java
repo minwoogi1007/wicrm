@@ -127,7 +127,7 @@ public class LogisticsDirectReturnController {
      */
     @GetMapping("/api/{id}")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> getDetail(@PathVariable Long id) {
+    public ResponseEntity<Map<String, Object>> getDetail(@PathVariable("id") Long id) {
         log.debug("물류 직접입고 상세 조회 - ID: {}", id);
         
         try {
@@ -185,7 +185,7 @@ public class LogisticsDirectReturnController {
      */
     @PutMapping("/api/{id}")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> update(@PathVariable Long id, 
+    public ResponseEntity<Map<String, Object>> update(@PathVariable("id") Long id, 
                                                      @RequestBody LogisticsDirectReturn logisticsDirectReturn) {
         log.debug("물류 직접입고 수정 - ID: {}, 데이터: {}", id, logisticsDirectReturn);
         
@@ -217,7 +217,7 @@ public class LogisticsDirectReturnController {
      */
     @PutMapping("/api/{id}/bulk")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> updateBulkItems(@PathVariable Long id, 
+    public ResponseEntity<Map<String, Object>> updateBulkItems(@PathVariable("id") Long id, 
                                                               @RequestBody DirectReturnBulkRequestDTO request) {
         log.debug("물류 직접입고 수정 일괄 처리 - 기존 ID: {}, 새 데이터: {}", id, request);
         
@@ -263,7 +263,7 @@ public class LogisticsDirectReturnController {
      */
     @DeleteMapping("/api/{id}")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> delete(@PathVariable Long id) {
+    public ResponseEntity<Map<String, Object>> delete(@PathVariable("id") Long id) {
         log.debug("물류 직접입고 삭제 - ID: {}", id);
         
         try {
@@ -324,8 +324,8 @@ public class LogisticsDirectReturnController {
      */
     @PostMapping("/api/{id}/mapping")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> updateMapping(@PathVariable Long id, 
-                                                            @RequestParam Long matchedReturnId) {
+    public ResponseEntity<Map<String, Object>> updateMapping(@PathVariable("id") Long id, 
+                                                            @RequestParam(value = "matchedReturnId") Long matchedReturnId) {
         log.debug("매핑 처리 - 직접입고 ID: {}, 교환반품 ID: {}", id, matchedReturnId);
         
         try {
@@ -354,7 +354,7 @@ public class LogisticsDirectReturnController {
      */
     @DeleteMapping("/api/{id}/mapping")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> clearMapping(@PathVariable Long id) {
+    public ResponseEntity<Map<String, Object>> clearMapping(@PathVariable("id") Long id) {
         log.debug("매핑 해제 - 직접입고 ID: {}", id);
         
         try {

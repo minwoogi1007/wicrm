@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WICRM Design 08 · Neo-Brutalism Ops Console</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; }
+
+        .brutalist-page {
+            --br-bg: #f1efe8;
+            --br-paper: #fffefa;
+            --br-ink: #0d0d0d;
+            --br-line: #0d0d0d;
+            --br-muted: #6b6b6b;
+            --br-accent: #ff3d2e;
+            --br-amber: #ffd23f;
+            --br-blue: #1d4ed8;
+            --br-green: #047857;
+            --br-mono: "JetBrains Mono", "Fira Code", "D2Coding", "Courier New", monospace;
+
+            background:
+                repeating-linear-gradient(0deg, transparent 0 39px, rgba(13,13,13,0.05) 39px 40px),
+                repeating-linear-gradient(90deg, transparent 0 39px, rgba(13,13,13,0.05) 39px 40px),
+                var(--br-bg);
+            min-height: 100vh;
+            padding: 32px clamp(16px, 3vw, 56px) 80px;
+            color: var(--br-ink);
+            font-family: "Inter", "Pretendard", system-ui, sans-serif;
+        }
+        .brutalist-page * { box-sizing: border-box; }
+        .brutalist-shell { max-width: 1380px; margin: 0 auto; }
+
+        .br-header { border: 2px solid var(--br-line); background: var(--br-paper); padding: 18px 22px; display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; flex-wrap: wrap; box-shadow: 8px 8px 0 var(--br-line); margin-bottom: 28px; }
+        .br-header .back-link { color: var(--br-ink); font-family: var(--br-mono); font-size: 12px; text-decoration: underline; }
+        .br-header h1 { margin: 8px 0 6px; font-size: clamp(26px, 3.6vw, 44px); font-weight: 900; letter-spacing: -0.02em; line-height: 1; text-transform: uppercase; }
+        .br-header h1 span { background: var(--br-amber); padding: 0 10px; }
+        .br-header p { margin: 0; color: var(--br-muted); font-size: 13px; max-width: 520px; }
+        .br-tag { display: inline-block; border: 2px solid var(--br-line); background: var(--br-ink); color: var(--br-paper); font-family: var(--br-mono); font-size: 11px; padding: 4px 10px; text-transform: uppercase; letter-spacing: 0.1em; }
+        .br-header .meta { font-family: var(--br-mono); font-size: 12px; color: var(--br-muted); text-align: right; }
+        .br-header .meta strong { color: var(--br-ink); display: block; font-size: 22px; }
+
+        .br-banner { display: grid; grid-template-columns: repeat(4, 1fr); border: 2px solid var(--br-line); margin-bottom: 24px; background: var(--br-paper); box-shadow: 6px 6px 0 var(--br-line); }
+        .br-banner > div { padding: 18px 20px; border-right: 2px solid var(--br-line); font-family: var(--br-mono); }
+        .br-banner > div:last-child { border-right: none; }
+        .br-banner .label { font-size: 11px; text-transform: uppercase; color: var(--br-muted); }
+        .br-banner .num { font-size: 36px; font-weight: 800; letter-spacing: -0.02em; margin: 4px 0; font-family: "Inter", system-ui, sans-serif; }
+        .br-banner .delta { font-size: 12px; }
+        .br-banner .delta.up { color: var(--br-green); }
+        .br-banner .delta.dn { color: var(--br-accent); }
+        .br-banner .alert { background: var(--br-accent); color: #fff; }
+        .br-banner .alert .label, .br-banner .alert .delta { color: rgba(255,255,255,0.85); }
+
+        .br-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+        .br-card { border: 2px solid var(--br-line); background: var(--br-paper); padding: 18px 20px; box-shadow: 6px 6px 0 var(--br-line); }
+        .br-card h3 { margin: 0 0 12px; font-size: 13px; font-family: var(--br-mono); text-transform: uppercase; letter-spacing: 0.12em; display: flex; justify-content: space-between; align-items: center; }
+        .br-card h3 .chip { background: var(--br-ink); color: var(--br-paper); font-size: 10px; padding: 2px 8px; letter-spacing: 0.2em; }
+
+        .br-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .br-table th, .br-table td { text-align: left; padding: 10px 6px; border-bottom: 1px dashed var(--br-line); font-family: var(--br-mono); }
+        .br-table th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--br-muted); border-bottom: 2px solid var(--br-line); }
+        .br-table td b { font-family: "Inter", sans-serif; font-weight: 700; }
+        .br-table .pill { display: inline-block; padding: 2px 8px; border: 1.5px solid var(--br-line); font-size: 11px; text-transform: uppercase; }
+        .br-table .pill.ok { background: var(--br-green); color: #fff; border-color: var(--br-green); }
+        .br-table .pill.wait { background: var(--br-amber); }
+        .br-table .pill.err { background: var(--br-accent); color: #fff; border-color: var(--br-accent); }
+        .br-table .pill.run { background: var(--br-blue); color: #fff; border-color: var(--br-blue); }
+
+        .br-bars { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+        .br-bars .row { display: grid; grid-template-columns: 110px 1fr 60px; align-items: center; gap: 12px; font-family: var(--br-mono); font-size: 12px; }
+        .br-bars .track { height: 18px; border: 1.5px solid var(--br-line); background: repeating-linear-gradient(45deg, transparent 0 6px, rgba(13,13,13,0.06) 6px 8px); position: relative; }
+        .br-bars .fill { position: absolute; inset: 0; background: var(--br-ink); width: 0; }
+        .br-bars .row.alert .fill { background: var(--br-accent); }
+        .br-bars .row.warn .fill { background: var(--br-amber); }
+        .br-bars .row.ok .fill { background: var(--br-green); }
+        .br-bars .val { text-align: right; }
+
+        .br-terminal { background: var(--br-ink); color: #f3f3f3; font-family: var(--br-mono); font-size: 12px; padding: 16px 18px; border: 2px solid var(--br-line); box-shadow: 6px 6px 0 var(--br-amber); line-height: 1.7; max-height: 280px; overflow: hidden; }
+        .br-terminal .line .ts { color: #888; }
+        .br-terminal .line .ok { color: #4ade80; }
+        .br-terminal .line .warn { color: var(--br-amber); }
+        .br-terminal .line .err { color: #ff6b6b; }
+        .br-terminal .prompt { color: var(--br-amber); }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        .br-status-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border: 2px solid var(--br-line); }
+        .br-status-grid div { padding: 12px; border-right: 1.5px solid var(--br-line); border-bottom: 1.5px solid var(--br-line); font-family: var(--br-mono); font-size: 11px; }
+        .br-status-grid div:nth-child(4n) { border-right: none; }
+        .br-status-grid .name { font-size: 13px; color: var(--br-ink); margin-bottom: 4px; font-weight: 700; }
+        .br-status-grid .ok { background: rgba(4,120,87,0.12); }
+        .br-status-grid .warn { background: rgba(255,210,63,0.25); }
+        .br-status-grid .err { background: rgba(255,61,46,0.18); }
+
+        @media (max-width: 1024px) {
+            .br-grid { grid-template-columns: 1fr; }
+            .br-banner { grid-template-columns: repeat(2, 1fr); }
+            .br-banner > div:nth-child(2n) { border-right: none; }
+            .br-banner > div:nth-child(-n+2) { border-bottom: 2px solid var(--br-line); }
+        }
+        @media (max-width: 600px) {
+            .br-status-grid { grid-template-columns: repeat(2, 1fr); }
+            .br-status-grid div:nth-child(4n) { border-right: 1.5px solid var(--br-line); }
+            .br-status-grid div:nth-child(2n) { border-right: none; }
+        }
+    </style>
+</head>
+<body>
+
+<main class="brutalist-page">
+    <div class="brutalist-shell">
+
+        <header class="br-header">
+            <div>
+                <a href="index.html" class="back-link">&larr; SAMPLE INDEX</a>
+                <div style="margin:10px 0;"><span class="br-tag">Type 08 // Neo-Brutalist Ops</span></div>
+                <h1>OPS <span>CONSOLE</span> / 운영 관제</h1>
+                <p>물류 · 결제 · 외부 연동 상태를 모노스페이스 기반 그리드로 노출. 노이즈 없이 "지금 이 순간 무엇이 깨졌는가"를 즉시 식별합니다.</p>
+            </div>
+            <div class="meta">
+                <div>SYSTEM TIME</div>
+                <strong>2026-04-28 12:29</strong>
+                <div>BUILD #4f9c2a · v3.18.2</div>
+                <div style="margin-top:4px; color:var(--br-green);">● ALL CORE SYSTEMS NOMINAL</div>
+            </div>
+        </header>
+
+        <section class="br-banner">
+            <div>
+                <div class="label">QUEUED ORDERS</div>
+                <div class="num">1,284</div>
+                <div class="delta up">▲ +3.2% / 1h</div>
+            </div>
+            <div>
+                <div class="label">SHIPMENTS / DAY</div>
+                <div class="num">873</div>
+                <div class="delta up">▲ TARGET 96.0%</div>
+            </div>
+            <div>
+                <div class="label">REFUND SLA</div>
+                <div class="num">97.6%</div>
+                <div class="delta dn">▼ -0.4% vs YDA</div>
+            </div>
+            <div class="alert">
+                <div class="label">ACTIVE INCIDENTS</div>
+                <div class="num">02</div>
+                <div class="delta">▲ ACK REQUIRED</div>
+            </div>
+        </section>
+
+        <section class="br-grid">
+
+            <article class="br-card">
+                <h3>ACTIVE INCIDENTS / 24H <span class="chip">LIVE</span></h3>
+                <table class="br-table">
+                    <thead>
+                        <tr><th>ID</th><th>SOURCE</th><th>EVENT</th><th>SEVERITY</th><th>OWNER</th><th>STATE</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>INC-2026-0428-031</td><td>logistics.cj</td><td>회수 API 응답 지연 / 평균 4.2s</td><td><span class="pill err">P1</span></td><td><b>김민우</b></td><td><span class="pill run">투입</span></td></tr>
+                        <tr><td>INC-2026-0428-029</td><td>payment.naver</td><td>환불 콜백 누락 12건</td><td><span class="pill wait">P2</span></td><td><b>오지수</b></td><td><span class="pill run">조사</span></td></tr>
+                        <tr><td>INC-2026-0428-024</td><td>crm.consult</td><td>채널톡 상담 라우팅 실패</td><td><span class="pill wait">P2</span></td><td><b>한지민</b></td><td><span class="pill ok">해소</span></td></tr>
+                        <tr><td>INC-2026-0428-018</td><td>file.upload</td><td>이미지 업로드 5xx 1.4%</td><td><span class="pill wait">P3</span></td><td><b>이현우</b></td><td><span class="pill ok">해소</span></td></tr>
+                        <tr><td>INC-2026-0428-009</td><td>db.oracle</td><td>Long Query &gt; 8s detected</td><td><span class="pill err">P1</span></td><td><b>system</b></td><td><span class="pill ok">해소</span></td></tr>
+                    </tbody>
+                </table>
+            </article>
+
+            <article style="background:transparent; border:none; box-shadow:none; padding:0;">
+                <div class="br-terminal">
+                    <div class="line"><span class="ts">[12:29:14]</span> <span class="ok">OK</span> &nbsp;shipping.batch executed (873 / 873)</div>
+                    <div class="line"><span class="ts">[12:29:02]</span> <span class="warn">WRN</span> payment.naver retry #2 succeeded</div>
+                    <div class="line"><span class="ts">[12:28:41]</span> <span class="err">ERR</span> logistics.cj timeout after 5000ms</div>
+                    <div class="line"><span class="ts">[12:28:33]</span> <span class="ok">OK</span> &nbsp;ai.report scheduled for 09:00 KST</div>
+                    <div class="line"><span class="ts">[12:28:09]</span> <span class="ok">OK</span> &nbsp;auth.session refresh completed (412 users)</div>
+                    <div class="line"><span class="ts">[12:27:55]</span> <span class="warn">WRN</span> consult.queue size=17 above threshold (15)</div>
+                    <div class="line"><span class="ts">[12:27:30]</span> <span class="ok">OK</span> &nbsp;exchange.save accepted (id=ret-2026-3128)</div>
+                    <div class="line"><span class="prompt">$&nbsp;</span>tail -f /var/log/wicrm/*.log<span style="animation:blink 1s step-end infinite;">_</span></div>
+                </div>
+            </article>
+
+            <article class="br-card">
+                <h3>BRAND THROUGHPUT / TODAY <span class="chip">UPDATED 12:29</span></h3>
+                <div class="br-bars">
+                    <div class="row ok"><div>RENOMA · 자사몰</div><div class="track"><div class="fill" style="width:88%;"></div></div><div class="val">88%</div></div>
+                    <div class="row ok"><div>RENOMA · 29CM</div><div class="track"><div class="fill" style="width:74%;"></div></div><div class="val">74%</div></div>
+                    <div class="row warn"><div>RENOMA · ZIGZAG</div><div class="track"><div class="fill" style="width:58%;"></div></div><div class="val">58%</div></div>
+                    <div class="row alert"><div>CORALIQUE · 무신사</div><div class="track"><div class="fill" style="width:34%;"></div></div><div class="val">34%</div></div>
+                    <div class="row warn"><div>CORALIQUE · CJ</div><div class="track"><div class="fill" style="width:62%;"></div></div><div class="val">62%</div></div>
+                    <div class="row ok"><div>CORALIQUE · LF</div><div class="track"><div class="fill" style="width:81%;"></div></div><div class="val">81%</div></div>
+                </div>
+            </article>
+
+            <article class="br-card">
+                <h3>EXTERNAL SERVICES <span class="chip">PROBE 30s</span></h3>
+                <div class="br-status-grid">
+                    <div class="ok"><div class="name">CJ대한통운</div>OK · 124ms</div>
+                    <div class="ok"><div class="name">한진택배</div>OK · 88ms</div>
+                    <div class="warn"><div class="name">로젠택배</div>SLOW · 612ms</div>
+                    <div class="err"><div class="name">우체국</div>FAIL · 5/5</div>
+                    <div class="ok"><div class="name">네이버페이</div>OK · 142ms</div>
+                    <div class="ok"><div class="name">카카오페이</div>OK · 96ms</div>
+                    <div class="ok"><div class="name">토스페이</div>OK · 110ms</div>
+                    <div class="ok"><div class="name">PG-INICIS</div>OK · 88ms</div>
+                    <div class="ok"><div class="name">채널톡</div>OK · 64ms</div>
+                    <div class="warn"><div class="name">SMS-Aligo</div>SLOW · 480ms</div>
+                    <div class="ok"><div class="name">메일-AWS</div>OK · 102ms</div>
+                    <div class="ok"><div class="name">OpenAI API</div>OK · 318ms</div>
+                </div>
+            </article>
+
+        </section>
+    </div>
+</main>
+
+</body>
+</html>

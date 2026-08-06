@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{design-samples/public-layout}">
+<body>
+<div layout:fragment="content">
+    <link href="/assets/css/design-samples/admin-modern.css" rel="stylesheet" type="text/css" />
+
+    <div class="design-sample-shell">
+        <section class="sample-hero">
+            <div>
+                <span class="sample-eyebrow">WICRM Admin Concept</span>
+                <h1>세련되고 심플한 최신 어드민 디자인 샘플</h1>
+                <p>
+                    현재 WICRM 업무 흐름에 맞춰 대시보드, 상담 CRM, 물류, AI 리포트,
+                    데이터 테이블 중심 화면을 서로 다른 톤으로 비교할 수 있게 구성했습니다.
+                </p>
+            </div>
+            <div class="sample-hero-actions">
+                <a href="#sample-pages" class="sample-btn sample-btn-primary">페이지 샘플 보기</a>
+                <a href="#executive" class="sample-btn sample-btn-ghost">통합 미리보기</a>
+            </div>
+        </section>
+
+        <section id="sample-pages" class="sample-launcher">
+            <a href="/design-samples/admin/executive" class="launcher-card dark">
+                <span>01</span>
+                <strong>Executive Dashboard</strong>
+                <p>임원/대표용 다크 대시보드</p>
+            </a>
+            <a href="/design-samples/admin/crm" class="launcher-card blue">
+                <span>02</span>
+                <strong>CRM Kanban</strong>
+                <p>상담 운영 칸반형 화면</p>
+            </a>
+            <a href="/design-samples/admin/commerce" class="launcher-card green">
+                <span>03</span>
+                <strong>Commerce Control</strong>
+                <p>교환/반품 물류 관제 화면</p>
+            </a>
+            <a href="/design-samples/admin/ai" class="launcher-card purple">
+                <span>04</span>
+                <strong>AI Workspace</strong>
+                <p>AI 리포트 생성/검수 화면</p>
+            </a>
+            <a href="/design-samples/admin/minimal" class="launcher-card white">
+                <span>05</span>
+                <strong>Minimal Table</strong>
+                <p>검색/필터 중심 목록 화면</p>
+            </a>
+            <a href="/design-samples/admin/mobile" class="launcher-card orange">
+                <span>06</span>
+                <strong>Mobile First</strong>
+                <p>모바일 우선 카드형 화면</p>
+            </a>
+            <a href="/design-samples/admin/bento" class="launcher-card white">
+                <span>07</span>
+                <strong>Bento Grid 2026</strong>
+                <p>모듈형 가변 카드 통합 대시보드</p>
+            </a>
+            <a href="/design-samples/admin/brutalist" class="launcher-card dark">
+                <span>08</span>
+                <strong>Neo-Brutalist Ops</strong>
+                <p>모노스페이스 운영/관제 콘솔</p>
+            </a>
+            <a href="/design-samples/admin/glass" class="launcher-card purple">
+                <span>09</span>
+                <strong>Glass + Cyber AI</strong>
+                <p>글래스모피즘 AI 인사이트 화면</p>
+            </a>
+        </section>
+
+        <nav class="sample-tabs" aria-label="design sample shortcuts">
+            <a href="#executive">01 Executive</a>
+            <a href="#crm">02 CRM Ops</a>
+            <a href="#commerce">03 Commerce</a>
+            <a href="#ai">04 AI Report</a>
+            <a href="#minimal">05 Minimal</a>
+        </nav>
+
+        <section id="executive" class="sample-section sample-section-dark">
+            <div class="sample-section-heading">
+                <div>
+                    <span class="sample-kicker">Type 01</span>
+                    <h2>Executive Dark Dashboard</h2>
+                    <p>대표/관리자용 요약 화면에 어울리는 고급스러운 다크 톤입니다.</p>
+                </div>
+                <button type="button" class="sample-chip">오늘 기준</button>
+            </div>
+
+            <div class="executive-grid">
+                <article class="glass-card executive-main-card">
+                    <div class="card-topline">
+                        <span>전체 운영 현황</span>
+                        <strong>+18.4%</strong>
+                    </div>
+                    <div class="metric-xl">12,482</div>
+                    <p>상담, 주문, 교환/반품, AI 리포트를 통합한 주간 처리량</p>
+                    <div class="wave-chart" aria-hidden="true">
+                        <span style="height: 38%"></span>
+                        <span style="height: 56%"></span>
+                        <span style="height: 44%"></span>
+                        <span style="height: 72%"></span>
+                        <span style="height: 61%"></span>
+                        <span style="height: 85%"></span>
+                        <span style="height: 74%"></span>
+                        <span style="height: 92%"></span>
+                    </div>
+                </article>
+
+                <article class="glass-card">
+                    <span class="card-label">응답 SLA</span>
+                    <div class="metric-lg">94.2%</div>
+                    <div class="progress-track"><span style="width: 94%"></span></div>
+                    <p>목표 대비 안정권</p>
+                </article>
+
+                <article class="glass-card">
+                    <span class="card-label">미처리 상담</span>
+                    <div class="metric-lg">37건</div>
+                    <div class="progress-track progress-warn"><span style="width: 42%"></span></div>
+                    <p>오전 대비 11건 감소</p>
+                </article>
+
+                <article class="glass-card executive-feed">
+                    <span class="card-label">실시간 알림</span>
+                    <ul>
+                        <li><strong>긴급</strong> 교환 요청 3건이 24시간 초과 예정</li>
+                        <li><strong>확인</strong> AI 리포트 생성 실패 1건 재시도 필요</li>
+                        <li><strong>정상</strong> 상담 처리율 목표 구간 유지</li>
+                    </ul>
+                </article>
+            </div>
+        </section>
+
+        <section id="crm" class="sample-section sample-section-light">
+            <div class="sample-section-heading">
+                <div>
+                    <span class="sample-kicker">Type 02</span>
+                    <h2>Clean CRM Operations</h2>
+                    <p>상담팀/CS팀이 매일 쓰기 좋은 밝고 읽기 쉬운 운영 화면입니다.</p>
+                </div>
+                <button type="button" class="sample-btn sample-btn-light">상담 배정</button>
+            </div>
+
+            <div class="crm-layout">
+                <aside class="crm-panel">
+                    <div class="operator-card">
+                        <div class="avatar-ring">KM</div>
+                        <div>
+                            <strong>김민우 매니저</strong>
+                            <span>상담 품질 98점</span>
+                        </div>
+                    </div>
+                    <div class="task-stack">
+                        <button class="task-item active" type="button">
+                            <span>신규 상담</span>
+                            <strong>28</strong>
+                        </button>
+                        <button class="task-item" type="button">
+                            <span>답변 대기</span>
+                            <strong>14</strong>
+                        </button>
+                        <button class="task-item" type="button">
+                            <span>고객 확인</span>
+                            <strong>9</strong>
+                        </button>
+                    </div>
+                </aside>
+
+                <div class="crm-board">
+                    <article class="ticket-card urgent">
+                        <div>
+                            <span class="status-dot"></span>
+                            <strong>이미지 첨부 오류 문의</strong>
+                        </div>
+                        <p>상담 상세에서 첨부 이미지가 보이지 않는다는 고객 문의</p>
+                        <footer><span>우선순위 높음</span><span>12분 전</span></footer>
+                    </article>
+                    <article class="ticket-card">
+                        <div>
+                            <span class="status-dot"></span>
+                            <strong>배송지 변경 요청</strong>
+                        </div>
+                        <p>출고 전 주소 변경 가능 여부 확인 필요</p>
+                        <footer><span>일반</span><span>24분 전</span></footer>
+                    </article>
+                    <article class="ticket-card success">
+                        <div>
+                            <span class="status-dot"></span>
+                            <strong>포인트 사용 안내</strong>
+                        </div>
+                        <p>마일리지 차감 내역 안내 완료, 고객 확인 대기</p>
+                        <footer><span>해결 임박</span><span>41분 전</span></footer>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section id="commerce" class="sample-section sample-section-commerce">
+            <div class="sample-section-heading">
+                <div>
+                    <span class="sample-kicker">Type 03</span>
+                    <h2>Commerce & Logistics Control</h2>
+                    <p>교환/반품, 직접 회수, 입금 관리처럼 처리 상태가 중요한 화면에 맞춘 타입입니다.</p>
+                </div>
+                <button type="button" class="sample-chip commerce">자동 동기화 중</button>
+            </div>
+
+            <div class="commerce-grid">
+                <article class="commerce-card">
+                    <span>오늘 출고</span>
+                    <strong>1,284</strong>
+                    <small>전일 대비 +7.2%</small>
+                </article>
+                <article class="commerce-card">
+                    <span>교환 접수</span>
+                    <strong>86</strong>
+                    <small>처리 대기 18건</small>
+                </article>
+                <article class="commerce-card">
+                    <span>직접 회수</span>
+                    <strong>31</strong>
+                    <small>기사 배정 24건</small>
+                </article>
+                <article class="commerce-card">
+                    <span>입금 확인</span>
+                    <strong>98.5%</strong>
+                    <small>미확인 4건</small>
+                </article>
+            </div>
+
+            <div class="pipeline">
+                <div class="pipeline-step done">
+                    <span>접수</span>
+                    <strong>152</strong>
+                </div>
+                <div class="pipeline-step active">
+                    <span>검수</span>
+                    <strong>74</strong>
+                </div>
+                <div class="pipeline-step">
+                    <span>회수</span>
+                    <strong>31</strong>
+                </div>
+                <div class="pipeline-step">
+                    <span>정산</span>
+                    <strong>19</strong>
+                </div>
+            </div>
+        </section>
+
+        <section id="ai" class="sample-section sample-section-ai">
+            <div class="sample-section-heading">
+                <div>
+                    <span class="sample-kicker">Type 04</span>
+                    <h2>AI Report Workspace</h2>
+                    <p>AI 리포트 생성/검수/구독 현황을 제품형 SaaS 느낌으로 보여주는 디자인입니다.</p>
+                </div>
+                <button type="button" class="sample-btn sample-btn-primary">리포트 생성</button>
+            </div>
+
+            <div class="ai-layout">
+                <article class="ai-card ai-summary">
+                    <span>이번 주 생성 리포트</span>
+                    <strong>248</strong>
+                    <p>실패율 0.8%, 평균 생성 시간 11.4초</p>
+                    <div class="donut" aria-hidden="true"></div>
+                </article>
+                <article class="ai-card">
+                    <span class="card-label">품질 점검 큐</span>
+                    <div class="review-row">
+                        <strong>상담 요약 리포트</strong>
+                        <span class="pill green">검수 완료</span>
+                    </div>
+                    <div class="review-row">
+                        <strong>월간 매출 분석</strong>
+                        <span class="pill purple">생성 중</span>
+                    </div>
+                    <div class="review-row">
+                        <strong>VOC 위험 탐지</strong>
+                        <span class="pill amber">확인 필요</span>
+                    </div>
+                </article>
+                <article class="ai-card prompt-card">
+                    <span class="card-label">추천 프롬프트</span>
+                    <p>지난 7일간 미처리 상담의 주요 원인을 3가지로 요약하고, 담당 부서별 개선 액션을 제안해줘.</p>
+                </article>
+            </div>
+        </section>
+
+        <section id="minimal" class="sample-section sample-section-minimal">
+            <div class="sample-section-heading">
+                <div>
+                    <span class="sample-kicker">Type 05</span>
+                    <h2>Minimal Data Table</h2>
+                    <p>실무 목록 화면을 현대적인 검색, 필터, 상태 배지 중심으로 정리한 샘플입니다.</p>
+                </div>
+                <div class="sample-filter">
+                    <input type="text" value="고객명, 주문번호 검색" aria-label="sample search" readonly>
+                    <button type="button">필터</button>
+                </div>
+            </div>
+
+            <div class="modern-table-card">
+                <table class="modern-table">
+                    <thead>
+                    <tr>
+                        <th>고객</th>
+                        <th>업무 유형</th>
+                        <th>담당자</th>
+                        <th>상태</th>
+                        <th>최근 업데이트</th>
+                        <th>액션</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>
+                            <strong>박서연</strong>
+                            <span>ORD-20260425-001</span>
+                        </td>
+                        <td>교환 요청</td>
+                        <td>이현우</td>
+                        <td><span class="pill amber">처리 중</span></td>
+                        <td>5분 전</td>
+                        <td><button type="button" class="row-action">열기</button></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>최지훈</strong>
+                            <span>VOC-88421</span>
+                        </td>
+                        <td>상담 문의</td>
+                        <td>김민우</td>
+                        <td><span class="pill green">완료</span></td>
+                        <td>18분 전</td>
+                        <td><button type="button" class="row-action">열기</button></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>정하린</strong>
+                            <span>PAY-73492</span>
+                        </td>
+                        <td>입금 확인</td>
+                        <td>오지수</td>
+                        <td><span class="pill purple">검토</span></td>
+                        <td>32분 전</td>
+                        <td><button type="button" class="row-action">열기</button></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</div>
+</body>
+</html>

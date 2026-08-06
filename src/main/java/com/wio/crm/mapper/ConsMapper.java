@@ -32,7 +32,8 @@ public interface ConsMapper {
 
     void insertComment(@Param("comment") Comment comment);
 
-    void updateCompletionCode(@Param("completionCode") CompletionCode completionCode);
+    int updateCompletionCode(@Param("completionCode") CompletionCode completionCode);
 
+    Map<String, Object> getConsultationStats(@Param("params") Map<String, Object> params);
 
 }

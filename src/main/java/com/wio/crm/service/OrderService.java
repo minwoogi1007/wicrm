@@ -12,12 +12,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.InputStream;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
+
+    private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
 
     @Autowired
     private OrderMapper orderMapper;
@@ -67,7 +72,8 @@ public class OrderService {
                 orderMapper.insertOrder(order);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("주문서 파일 처리 중 오류 발생: {}", file.getOriginalFilename(), e);
+            throw new RuntimeException("주문서 처리 실패", e);
         }
     }
 

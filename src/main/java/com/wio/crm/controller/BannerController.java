@@ -61,7 +61,7 @@ public class BannerController {
 
     // 배너 수정 폼
     @GetMapping("/edit/{id}")
-    public String editBannerForm(@PathVariable Long id, Model model) {
+    public String editBannerForm(@PathVariable("id") Long id, Model model) {
         Banner banner = bannerService.getBannerById(id);
         model.addAttribute("banner", banner);
         return "admin/banners/form";
@@ -70,15 +70,15 @@ public class BannerController {
     // 배너 저장 처리
     @PostMapping("/save")
     public String saveBanner(
-            @RequestParam(required = false) Long id,
-            @RequestParam String name,
-            @RequestParam(required = false) MultipartFile imageFile,
-            @RequestParam String linkUrl,
-            @RequestParam String position,
-            @RequestParam(defaultValue = "true") boolean active,
-            @RequestParam(defaultValue = "0") int displayOrder,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,
+            @RequestParam(value = "id", required = false) Long id,
+            @RequestParam(value = "name") String name,
+            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+            @RequestParam(value = "linkUrl") String linkUrl,
+            @RequestParam(value = "position") String position,
+            @RequestParam(value = "active", defaultValue = "true") boolean active,
+            @RequestParam(value = "displayOrder", defaultValue = "0") int displayOrder,
+            @RequestParam(value = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+            @RequestParam(value = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,
             RedirectAttributes redirectAttributes) {
 
         Banner banner = id != null ? bannerService.getBannerById(id) : new Banner();
@@ -117,7 +117,7 @@ public class BannerController {
 
     // 배너 삭제
     @GetMapping("/delete/{id}")
-    public String deleteBanner(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String deleteBanner(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
         bannerService.deleteBanner(id);
         redirectAttributes.addFlashAttribute("success", "배너가 성공적으로 삭제되었습니다.");
         return "redirect:/admin/banners";

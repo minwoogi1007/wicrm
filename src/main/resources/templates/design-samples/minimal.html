@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{design-samples/public-layout}">
+<body>
+<div layout:fragment="content">
+    <link href="/assets/css/design-samples/admin-modern.css" rel="stylesheet" type="text/css" />
+    <link href="/assets/css/design-samples/admin-pages.css" rel="stylesheet" type="text/css" />
+
+    <main class="admin-sample-page minimal-page">
+        <header class="sample-page-header compact">
+            <a href="/design-samples/admin" class="back-link">샘플 목록</a>
+            <span class="sample-kicker">Minimal Data</span>
+            <h1>미니멀 테이블/검색형 화면</h1>
+            <p>대량 목록을 많이 보는 관리자가 빠르게 검색하고 상태를 판단하기 좋은 심플한 UI입니다.</p>
+        </header>
+
+        <section class="minimal-toolbar">
+            <input type="text" value="고객명, 주문번호, 전화번호 검색" readonly>
+            <button type="button">상태</button>
+            <button type="button">담당자</button>
+            <button type="button" class="primary">신규 등록</button>
+        </section>
+
+        <section class="data-table-wrap">
+            <table class="sample-data-table">
+                <thead>
+                <tr><th>고객</th><th>업무</th><th>담당자</th><th>상태</th><th>업데이트</th><th></th></tr>
+                </thead>
+                <tbody>
+                <tr><td><b>박서연</b><span>ORD-20260425-001</span></td><td>교환 요청</td><td>이현우</td><td><em class="status progress">처리 중</em></td><td>5분 전</td><td><button>열기</button></td></tr>
+                <tr><td><b>최지훈</b><span>VOC-88421</span></td><td>상담 문의</td><td>김민우</td><td><em class="status done">완료</em></td><td>18분 전</td><td><button>열기</button></td></tr>
+                <tr><td><b>정하린</b><span>PAY-73492</span></td><td>입금 확인</td><td>오지수</td><td><em class="status review">검토</em></td><td>32분 전</td><td><button>열기</button></td></tr>
+                <tr><td><b>문도윤</b><span>RET-55328</span></td><td>직접 회수</td><td>한지민</td><td><em class="status wait">대기</em></td><td>1시간 전</td><td><button>열기</button></td></tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+</div>
+</body>
+</html>

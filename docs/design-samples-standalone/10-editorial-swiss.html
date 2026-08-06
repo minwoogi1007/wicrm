@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WICRM Design 10 · Editorial Swiss</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,700;9..144,900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; }
+
+        .ed-page {
+            --paper: #f7f3ea;
+            --ink: #1a1715;
+            --muted: #6f6863;
+            --rule: #1a1715;
+            --accent: #c8341e;
+            --accent-soft: #f4d8d2;
+            background: var(--paper);
+            color: var(--ink);
+            font-family: "Inter", "Pretendard", system-ui, sans-serif;
+            min-height: 100vh;
+            padding: 32px clamp(20px, 4vw, 64px) 80px;
+            -webkit-font-smoothing: antialiased;
+        }
+        .ed-shell { max-width: 1280px; margin: 0 auto; }
+
+        /* masthead */
+        .ed-masthead {
+            border-top: 4px double var(--rule);
+            border-bottom: 1px solid var(--rule);
+            padding: 14px 0;
+            display: flex; justify-content: space-between; align-items: baseline;
+            font-family: "JetBrains Mono", monospace; font-size: 11px;
+            letter-spacing: 0.18em; text-transform: uppercase;
+            color: var(--muted);
+        }
+        .ed-masthead .left a { color: var(--ink); text-decoration: none; border-bottom: 1px solid currentColor; }
+        .ed-masthead .center { color: var(--ink); font-weight: 700; }
+        .ed-back { font-family: "JetBrains Mono", monospace; font-size: 11px; }
+
+        /* hero */
+        .ed-hero {
+            padding: 60px 0 36px;
+            border-bottom: 1px solid var(--rule);
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 48px;
+            align-items: end;
+        }
+        .ed-hero .kicker {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 18px;
+        }
+        .ed-hero h1 {
+            font-family: "Fraunces", "Times New Roman", serif;
+            font-weight: 900;
+            font-size: clamp(48px, 7vw, 104px);
+            line-height: 0.92;
+            letter-spacing: -0.03em;
+            margin: 0 0 12px;
+            font-style: italic;
+        }
+        .ed-hero h1 b { font-style: normal; font-weight: 900; }
+        .ed-hero .deck {
+            font-family: "Fraunces", serif;
+            font-size: 22px; line-height: 1.35; font-weight: 400;
+            color: var(--ink); margin: 0;
+            max-width: 720px;
+            text-wrap: balance;
+        }
+        .ed-hero aside {
+            border-left: 1px solid var(--rule);
+            padding-left: 28px;
+            font-size: 13px; color: var(--muted); line-height: 1.6;
+        }
+        .ed-hero aside h4 {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+            color: var(--ink); margin: 0 0 10px;
+        }
+        .ed-hero aside dl { margin: 0; display: grid; grid-template-columns: 110px 1fr; gap: 6px 14px; }
+        .ed-hero aside dt { color: var(--muted); }
+        .ed-hero aside dd { margin: 0; color: var(--ink); font-weight: 500; }
+
+        /* big numerals strip */
+        .ed-strip {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            border-bottom: 1px solid var(--rule);
+        }
+        .ed-strip > div {
+            padding: 32px 24px;
+            border-right: 1px solid var(--rule);
+        }
+        .ed-strip > div:last-child { border-right: none; }
+        .ed-strip .label {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+            color: var(--muted); margin-bottom: 6px;
+        }
+        .ed-strip .num {
+            font-family: "Fraunces", serif;
+            font-size: clamp(40px, 5vw, 72px);
+            font-weight: 900;
+            line-height: 1;
+            letter-spacing: -0.03em;
+        }
+        .ed-strip .delta {
+            font-size: 12px; color: var(--muted); margin-top: 6px;
+            font-family: "JetBrains Mono", monospace;
+        }
+        .ed-strip .delta.up { color: #1f7a3a; }
+        .ed-strip .delta.dn { color: var(--accent); }
+        .ed-strip > div.feature .num { color: var(--accent); }
+
+        /* article body — multicolumn */
+        .ed-body {
+            padding: 56px 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 36px;
+            border-bottom: 1px solid var(--rule);
+        }
+        .ed-body article h2 {
+            font-family: "Fraunces", serif;
+            font-size: 28px; font-weight: 700; letter-spacing: -0.01em;
+            margin: 0 0 14px; line-height: 1.1;
+        }
+        .ed-body article .byline {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+            color: var(--muted); margin-bottom: 8px;
+        }
+        .ed-body article p { margin: 0 0 12px; line-height: 1.65; font-size: 14.5px; }
+        .ed-body article p:first-of-type::first-letter {
+            font-family: "Fraunces", serif;
+            font-size: 56px; font-weight: 900; float: left;
+            line-height: 0.85; padding: 6px 8px 0 0; color: var(--accent);
+        }
+        .ed-body article .pull {
+            font-family: "Fraunces", serif;
+            font-size: 22px; font-weight: 500; font-style: italic;
+            line-height: 1.3;
+            padding: 14px 0; margin: 14px 0;
+            border-top: 1px solid var(--rule);
+            border-bottom: 1px solid var(--rule);
+        }
+        .ed-body article ol {
+            margin: 12px 0; padding-left: 0; list-style: none;
+            counter-reset: itm;
+        }
+        .ed-body article ol li {
+            counter-increment: itm;
+            padding: 8px 0 8px 36px;
+            border-bottom: 1px dotted var(--rule);
+            position: relative;
+            font-size: 14px;
+        }
+        .ed-body article ol li::before {
+            content: counter(itm, decimal-leading-zero);
+            position: absolute; left: 0; top: 8px;
+            font-family: "JetBrains Mono", monospace; font-size: 12px;
+            color: var(--accent); font-weight: 700;
+        }
+
+        /* portrait + caption */
+        .ed-feature {
+            padding: 48px 0;
+            display: grid;
+            grid-template-columns: 5fr 7fr;
+            gap: 48px;
+            border-bottom: 1px solid var(--rule);
+        }
+        .ed-feature .portrait {
+            background: var(--accent-soft);
+            border: 1px solid var(--rule);
+            aspect-ratio: 4/5;
+            position: relative;
+            overflow: hidden;
+            display: flex; align-items: flex-end; justify-content: center;
+        }
+        .ed-feature .portrait .glyph {
+            font-family: "Fraunces", serif;
+            font-size: clamp(180px, 28vw, 380px);
+            font-weight: 900; font-style: italic;
+            color: var(--accent);
+            line-height: 0.7;
+            margin-bottom: -30px;
+            letter-spacing: -0.05em;
+        }
+        .ed-feature .portrait .caption {
+            position: absolute; top: 18px; left: 18px; right: 18px;
+            font-family: "JetBrains Mono", monospace;
+            font-size: 10px; color: var(--ink);
+            letter-spacing: 0.16em; text-transform: uppercase;
+            display: flex; justify-content: space-between;
+        }
+        .ed-feature .text h2 {
+            font-family: "Fraunces", serif;
+            font-size: clamp(32px, 4vw, 56px);
+            font-weight: 700; line-height: 1.05; letter-spacing: -0.02em;
+            margin: 0 0 20px;
+        }
+        .ed-feature .text h2 i { color: var(--accent); font-style: italic; }
+        .ed-feature .text p { font-size: 16px; line-height: 1.6; margin: 0 0 12px; max-width: 540px; }
+        .ed-feature .text .footnote {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 11px; color: var(--muted); margin-top: 24px;
+            border-top: 1px solid var(--rule);
+            padding-top: 12px;
+        }
+
+        /* table — list of consultations */
+        .ed-list { padding: 48px 0 16px; }
+        .ed-list h3 {
+            font-family: "Fraunces", serif;
+            font-size: 24px; font-weight: 700; margin: 0 0 18px;
+            border-bottom: 1px solid var(--rule); padding-bottom: 12px;
+            display: flex; justify-content: space-between; align-items: baseline;
+        }
+        .ed-list h3 span {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 11px; color: var(--muted); letter-spacing: 0.16em;
+            text-transform: uppercase;
+        }
+        .ed-list table { width: 100%; border-collapse: collapse; }
+        .ed-list th, .ed-list td {
+            text-align: left; padding: 14px 6px;
+            border-bottom: 1px dotted var(--rule);
+            font-size: 14px;
+        }
+        .ed-list th {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 10px; color: var(--muted);
+            letter-spacing: 0.18em; text-transform: uppercase;
+            font-weight: 500;
+        }
+        .ed-list td.title { font-family: "Fraunces", serif; font-size: 17px; font-weight: 500; }
+        .ed-list td.num { font-family: "JetBrains Mono", monospace; text-align: right; }
+        .ed-list td.cat { color: var(--accent); font-weight: 600; font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; }
+
+        /* colophon */
+        .ed-colophon {
+            margin-top: 48px;
+            border-top: 4px double var(--rule);
+            padding-top: 18px;
+            display: flex; justify-content: space-between;
+            font-family: "JetBrains Mono", monospace;
+            font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        @media (max-width: 1024px) {
+            .ed-hero { grid-template-columns: 1fr; gap: 32px; }
+            .ed-strip { grid-template-columns: repeat(2, 1fr); }
+            .ed-strip > div:nth-child(2n) { border-right: none; }
+            .ed-strip > div:nth-child(-n+2) { border-bottom: 1px solid var(--rule); }
+            .ed-body { grid-template-columns: 1fr; gap: 24px; }
+            .ed-feature { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<main class="ed-page">
+    <div class="ed-shell">
+
+        <div class="ed-masthead">
+            <div class="left"><a href="index.html" class="ed-back">← back to index</a></div>
+            <div class="center">WICRM · Monthly Operations Review</div>
+            <div class="right">Vol. III · No. 04 · 2026.04</div>
+        </div>
+
+        <header class="ed-hero">
+            <div>
+                <div class="kicker">Type 10 — Editorial Swiss</div>
+                <h1>The Quiet<br><b>Quarter</b><br>of Returns.</h1>
+                <p class="deck">
+                    1분기 환불률은 안정세였지만, 4월 첫 주에 들어 자사몰 한 곳에서 사이즈 불만족 사유 환불이 34% 급증했다.
+                    숫자보다 빠르게 움직이는 건 언제나 고객의 경험이다.
+                </p>
+            </div>
+            <aside>
+                <h4>Issue Brief</h4>
+                <dl>
+                    <dt>Period</dt><dd>2026.04.01 – 04.28</dd>
+                    <dt>Channels</dt><dd>11개 사이트 · 2개 브랜드</dd>
+                    <dt>Sample</dt><dd>1,238 환불 / 8,412 주문</dd>
+                    <dt>Editor</dt><dd>WICRM Insight Desk</dd>
+                    <dt>Confidence</dt><dd>92.4%</dd>
+                </dl>
+            </aside>
+        </header>
+
+        <section class="ed-strip">
+            <div>
+                <div class="label">Orders Shipped</div>
+                <div class="num">8,412</div>
+                <div class="delta up">▲ +6.2% vs Mar</div>
+            </div>
+            <div class="feature">
+                <div class="label">Refund Rate</div>
+                <div class="num">14.7%</div>
+                <div class="delta dn">▼ +1.8pt this week</div>
+            </div>
+            <div>
+                <div class="label">Consult / Day</div>
+                <div class="num">1,284</div>
+                <div class="delta up">▲ within target</div>
+            </div>
+            <div>
+                <div class="label">SLA Met</div>
+                <div class="num">97.6%</div>
+                <div class="delta">— stable</div>
+            </div>
+        </section>
+
+        <section class="ed-body">
+            <article>
+                <div class="byline">Story 01 · Anomaly</div>
+                <h2>한 사이트가 균형을 흔들었다.</h2>
+                <p>
+                    레노마 자사몰의 4월 셋째 주 사이즈 관련 환불은 전주 대비 +34%를 기록했다.
+                    품번을 좁혀 보면 단 두 SKU(RN-GSZD962, RN-PT2207)에 절반 이상이 집중되어 있었다.
+                </p>
+                <p class="pull">
+                    "환불의 절반은 두 품번에서 나왔다."
+                </p>
+                <p>
+                    상세페이지 사이즈 가이드의 모델 신장과 실측 차이가 원인으로 추정된다.
+                    가이드 보완만으로 월 환불 1,420만 원의 절감이 가능하다는 추정이다.
+                </p>
+            </article>
+
+            <article>
+                <div class="byline">Story 02 · Logistics</div>
+                <h2>회수가 길어지면, 신뢰도 길어진다.</h2>
+                <p>
+                    CJ대한통운 회수 평균 소요는 3.2일. 동일 권역 한진은 2.4일이다.
+                    회수 지연이 길어질수록 환불 처리 SLA가 떨어지고, 이는 다시 재구매 의향에 영향을 준다.
+                </p>
+                <ol>
+                    <li>회수 픽업 슬롯 옵션 확장</li>
+                    <li>지연 알림을 24h → 12h 주기로 단축</li>
+                    <li>고객 셀프 회수 신청 UX 단순화</li>
+                </ol>
+                <p>
+                    위 세 가지를 조합하면 SLA를 +1.5pt 개선할 여지가 있다.
+                </p>
+            </article>
+
+            <article>
+                <div class="byline">Story 03 · People</div>
+                <h2>15시, 어느 평일.</h2>
+                <p>
+                    상담 인입은 오후 3시에 매일 피크를 친다. 평균 17건의 대기가 임계치를 넘는다.
+                    같은 시간대에 상담사가 2명 더 배치된 주간엔 만족도 점수가 +6%p 상승했다.
+                </p>
+                <p class="pull">
+                    같은 시간, 같은 손, 다른 결과.
+                </p>
+                <p>
+                    인력 일정의 단순한 재배치가 가장 비싼 시스템 개선보다 빠른 효과를 낸다.
+                </p>
+            </article>
+        </section>
+
+        <section class="ed-feature">
+            <div class="portrait">
+                <div class="caption"><span>Plate I</span><span>Refunds, Apr</span></div>
+                <div class="glyph">+34</div>
+            </div>
+            <div class="text">
+                <h2>왜 어떤 숫자는<br>다른 숫자보다 <i>크게</i><br>보이는가.</h2>
+                <p>
+                    같은 한 자릿수 변동이라도 그것이 어떤 영역에서, 어떤 맥락에서 일어났는가에 따라 의미는 완전히 달라진다.
+                    이번 달의 +34%는 하나의 사이트, 하나의 카테고리, 그리고 두 개의 SKU에 응축되어 있다.
+                </p>
+                <p>
+                    리포트의 역할은 '전체 평균'을 보여주는 것이 아니라, 평균 뒤에 숨은 작고 또렷한 신호를 골라내 보여주는 것이다.
+                </p>
+                <div class="footnote">
+                    Plate I — 사이즈 불만족 환불 (자사몰 / 4월 22일–28일)
+                </div>
+            </div>
+        </section>
+
+        <section class="ed-list">
+            <h3>This Week's Movers <span>04.22 – 04.28</span></h3>
+            <table>
+                <thead>
+                    <tr><th>#</th><th>Site</th><th>Category</th><th>Headline</th><th>Δ</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td class="num">01</td><td>자사몰 · 레노마</td><td class="cat">Returns</td><td class="title">사이즈 불만족 사유 +34% 급증</td><td class="num">+412</td></tr>
+                    <tr><td class="num">02</td><td>29CM · 코랄리크</td><td class="cat">Sales</td><td class="title">신상품 컬렉션 매출 두 배 돌파</td><td class="num">+108%</td></tr>
+                    <tr><td class="num">03</td><td>지그재그 · 레노마</td><td class="cat">Logistics</td><td class="title">회수 평균 3.2일 → 2.6일 단축</td><td class="num">−0.6d</td></tr>
+                    <tr><td class="num">04</td><td>SSG · 레노마</td><td class="cat">Consult</td><td class="title">상담 평균 응대시간 −18% 개선</td><td class="num">−18%</td></tr>
+                    <tr><td class="num">05</td><td>무신사 · 코랄리크</td><td class="cat">Incident</td><td class="title">결제 콜백 누락 12건 감지·복구</td><td class="num">12</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <div class="ed-colophon">
+            <span>WICRM Insight Desk · Set in Fraunces &amp; Inter</span>
+            <span>Printed (digitally) on 2026.04.28</span>
+        </div>
+
+    </div>
+</main>
+
+</body>
+</html>

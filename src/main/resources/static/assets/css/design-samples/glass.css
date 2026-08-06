@@ -1,0 +1,254 @@
+/* ============================================================
+   Design Sample 09 — Glassmorphism 2.0 / Cyber Neon
+   - AI insight workspace with frosted glass + electric accents
+   - Deep dark base (not pure black) with vibrant gradients
+   ============================================================ */
+.glass-page {
+    --gl-base: #0b0d18;
+    --gl-deep: #06070f;
+    --gl-ink: #f4f7ff;
+    --gl-muted: #8e94b3;
+    --gl-line: rgba(255, 255, 255, 0.08);
+    --gl-cyan: #38e6ff;
+    --gl-magenta: #ff45c8;
+    --gl-lime: #c8ff45;
+    --gl-blue: #6c7bff;
+    --gl-card: rgba(255, 255, 255, 0.06);
+    --gl-card-strong: rgba(255, 255, 255, 0.10);
+
+    background:
+        radial-gradient(circle at 12% 10%,  rgba(56,230,255,0.20), transparent 32%),
+        radial-gradient(circle at 92% 8%,   rgba(255,69,200,0.18), transparent 32%),
+        radial-gradient(circle at 80% 110%, rgba(108,123,255,0.22), transparent 36%),
+        var(--gl-base);
+    min-height: 100vh;
+    padding: 32px clamp(20px, 4vw, 64px) 80px;
+    color: var(--gl-ink);
+    font-family: "Inter", "Pretendard", system-ui, sans-serif;
+    overflow-x: hidden;
+}
+
+.glass-page * { box-sizing: border-box; }
+.glass-page::before {
+    content: "";
+    position: fixed; inset: 0;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    mask-image: radial-gradient(circle at center, #000 30%, transparent 80%);
+}
+.glass-shell { max-width: 1380px; margin: 0 auto; position: relative; }
+
+/* ---------- Header ---------- */
+.gl-header {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    flex-wrap: wrap; gap: 24px; margin-bottom: 26px;
+}
+.gl-header .back-link {
+    color: var(--gl-muted); text-decoration: none; font-size: 13px;
+    display: inline-flex; align-items: center; gap: 6px;
+}
+.gl-header .back-link:hover { color: var(--gl-cyan); }
+.gl-header h1 {
+    margin: 14px 0 6px;
+    font-size: clamp(30px, 4.5vw, 54px);
+    font-weight: 800; letter-spacing: -0.02em; line-height: 1.05;
+}
+.gl-header h1 em {
+    font-style: normal;
+    background: linear-gradient(135deg, var(--gl-cyan), var(--gl-magenta));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+.gl-header p { margin: 0; color: var(--gl-muted); font-size: 14px; max-width: 540px; }
+
+.gl-kicker {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 12px; border-radius: 999px;
+    background: var(--gl-card);
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    border: 1px solid var(--gl-line);
+    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--gl-cyan);
+}
+.gl-kicker::before {
+    content: ""; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--gl-cyan);
+    box-shadow: 0 0 10px var(--gl-cyan);
+    animation: pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse { 50% { opacity: 0.4; transform: scale(0.8); } }
+
+.gl-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.gl-actions button {
+    padding: 11px 18px; border-radius: 14px; cursor: pointer;
+    background: var(--gl-card);
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    border: 1px solid var(--gl-line);
+    color: var(--gl-ink); font-weight: 600; font-size: 13px;
+}
+.gl-actions button.primary {
+    background: linear-gradient(135deg, var(--gl-cyan), var(--gl-blue));
+    color: #0a0c18; border-color: transparent;
+    box-shadow: 0 8px 30px rgba(56,230,255,0.35);
+}
+
+/* ---------- Glass card ---------- */
+.glass-card {
+    background: var(--gl-card);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid var(--gl-line);
+    border-radius: 22px;
+    padding: 22px;
+    position: relative;
+    overflow: hidden;
+}
+.glass-card::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.08), transparent 40%);
+    pointer-events: none;
+}
+.glass-card h3 {
+    margin: 0 0 4px;
+    font-size: 12px; font-weight: 600;
+    color: var(--gl-muted); text-transform: uppercase; letter-spacing: 0.12em;
+}
+
+/* ---------- Layout ---------- */
+.gl-grid {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 20px;
+}
+.gl-col { display: flex; flex-direction: column; gap: 20px; }
+
+/* ---------- AI hero ---------- */
+.gl-hero {
+    padding: 32px;
+    background:
+        linear-gradient(135deg, rgba(56,230,255,0.12), rgba(108,123,255,0.10)),
+        var(--gl-card-strong);
+}
+.gl-hero .ai-bubble {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 12px; border-radius: 999px;
+    background: rgba(56,230,255,0.12);
+    border: 1px solid rgba(56,230,255,0.30);
+    color: var(--gl-cyan);
+    font-size: 11px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
+    margin-bottom: 16px;
+}
+.gl-hero .ai-bubble::before {
+    content: ""; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--gl-cyan); box-shadow: 0 0 12px var(--gl-cyan);
+}
+.gl-hero h2 {
+    margin: 0 0 18px;
+    font-size: clamp(24px, 3vw, 32px); line-height: 1.3; font-weight: 700;
+    letter-spacing: -0.01em;
+}
+.gl-hero h2 mark {
+    background: linear-gradient(120deg, transparent 0% 60%, rgba(255,69,200,0.35) 60% 100%);
+    color: inherit; padding: 0 4px;
+}
+.gl-hero .hero-meta {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 22px;
+}
+.gl-hero .hero-meta div {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--gl-line);
+    border-radius: 14px;
+    padding: 14px 16px;
+}
+.gl-hero .hero-meta strong {
+    display: block; font-size: 22px; margin-top: 4px;
+    background: linear-gradient(135deg, var(--gl-cyan), var(--gl-lime));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.gl-hero .hero-meta span { color: var(--gl-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; }
+
+/* ---------- Donut + segments ---------- */
+.gl-donut {
+    display: grid; grid-template-columns: 180px 1fr; gap: 24px;
+    align-items: center;
+}
+.gl-donut svg { width: 180px; height: 180px; }
+.gl-donut .legend { display: flex; flex-direction: column; gap: 12px; }
+.gl-donut .legend .row {
+    display: grid; grid-template-columns: 14px 1fr auto; gap: 10px;
+    align-items: center; font-size: 13px;
+}
+.gl-donut .legend .dot { width: 12px; height: 12px; border-radius: 4px; }
+.gl-donut .legend strong { color: var(--gl-ink); }
+.gl-donut .legend span { color: var(--gl-muted); font-size: 12px; }
+
+/* ---------- Forecast line ---------- */
+.gl-forecast svg { width: 100%; height: 180px; }
+.gl-forecast .axis {
+    display: flex; justify-content: space-between;
+    color: var(--gl-muted); font-size: 11px; margin-top: 6px;
+}
+
+/* ---------- Recommendation list ---------- */
+.gl-reco ul { list-style: none; padding: 0; margin: 12px 0 0; }
+.gl-reco li {
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--gl-line);
+    margin-bottom: 10px;
+    display: grid; grid-template-columns: 36px 1fr auto; align-items: center; gap: 12px;
+    transition: transform 0.18s ease, border-color 0.18s ease;
+}
+.gl-reco li:hover { transform: translateY(-1px); border-color: rgba(56,230,255,0.4); }
+.gl-reco .icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: grid; place-items: center; font-size: 16px; font-weight: 700;
+    color: #0a0c18;
+}
+.gl-reco li.high .icon { background: var(--gl-magenta); }
+.gl-reco li.mid  .icon { background: var(--gl-cyan); }
+.gl-reco li.low  .icon { background: var(--gl-lime); }
+.gl-reco .title { font-weight: 600; font-size: 14px; }
+.gl-reco .sub   { color: var(--gl-muted); font-size: 12px; margin-top: 2px; }
+.gl-reco .impact {
+    font-size: 11px; padding: 4px 10px; border-radius: 999px;
+    background: rgba(255,255,255,0.06); color: var(--gl-cyan); font-weight: 600;
+    border: 1px solid var(--gl-line);
+}
+
+/* ---------- Activity chips ---------- */
+.gl-activity {
+    display: flex; flex-direction: column; gap: 12px; margin-top: 12px;
+}
+.gl-activity .item {
+    display: grid; grid-template-columns: 60px 1fr auto; gap: 12px; align-items: center;
+    font-size: 13px;
+}
+.gl-activity .ts {
+    color: var(--gl-cyan); font-family: "JetBrains Mono", monospace; font-size: 11px;
+}
+.gl-activity .desc { color: rgba(255,255,255,0.85); }
+.gl-activity .desc b { color: var(--gl-ink); }
+.gl-activity .tag {
+    font-size: 10px; padding: 3px 8px; border-radius: 6px;
+    background: rgba(56,230,255,0.12); color: var(--gl-cyan); border: 1px solid rgba(56,230,255,0.25);
+    text-transform: uppercase; letter-spacing: 0.1em;
+}
+.gl-activity .tag.warn { background: rgba(255,69,200,0.12); color: var(--gl-magenta); border-color: rgba(255,69,200,0.3); }
+
+/* responsive */
+@media (max-width: 1024px) {
+    .gl-grid { grid-template-columns: 1fr; }
+    .gl-donut { grid-template-columns: 1fr; }
+    .gl-donut svg { margin: 0 auto; }
+    .gl-hero .hero-meta { grid-template-columns: 1fr 1fr; }
+}

@@ -14,7 +14,7 @@ public interface BoardMapper {
     List<Board> findAllPosts();
     List<Board> noticeBoardList();
 
-    Board selectPostById(String id,String category);
+    Board selectPostById(@Param("id") String id, @Param("category") String category);
     List<Board> selectComment(@Param("category") String category, @Param("id") Integer id);
 
     void insertComment(Board board);

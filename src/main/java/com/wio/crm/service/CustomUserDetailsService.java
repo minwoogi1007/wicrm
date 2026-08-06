@@ -63,7 +63,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     // 사용자의 승인 상태 확인
     private void verifyUserConfirmationStatus(Tipdw user) {
-        //System.out.println("user.getConfirmYn() : " + user.getConfirmYn());
         if ("N".equals(user.getConfirmYn())) {
             throw new UserNotConfirmedException("아직 승인되지 않은 사용자입니다: " + user.getUserid());
         }
@@ -121,7 +120,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (tcntUser != null) {
             logger.debug("tcntUser 정보: custCode={}, cust_grade={}, emp_name={}", 
                 tcntUser.getCustCode(), tcntUser.getCust_grade(), tcntUser.getEmp_name());
-            //System.out.println("tcntUser 정보: custCode=" + tcntUser.getCustCode() + ", cust_grade=" + tcntUser.getCust_grade() + ", emp_name=" + tcntUser.getEmp_name());
         }
         
         return new CustomUserDetails(user.getUserid(), user.getPw(), authorities, custCode, tempUser, tcntUser);

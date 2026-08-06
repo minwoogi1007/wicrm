@@ -123,7 +123,10 @@
                         <when test="search.sort == 'processingStatus'">ldr.PROCESSING_STATUS</when>
                         <otherwise>ldr.DIRECT_RETURN_ID</otherwise>
                     </choose>
-                    ${search.sortDirection}
+                    <choose>
+                        <when test="search.sortDirection == 'ASC'">ASC</when>
+                        <otherwise>DESC</otherwise>
+                    </choose>
             ) a WHERE ROWNUM &lt;= #{search.endRow}
         ) WHERE rnum &gt; #{search.offset}
     </select>

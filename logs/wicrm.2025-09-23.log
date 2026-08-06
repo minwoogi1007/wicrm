@@ -1,0 +1,1023 @@
+2025-09-23 15:44:39.896 [restartedMain] INFO  com.wio.crm.CrmApplication - Starting CrmApplication using Java 17.0.16 with PID 48312 (C:\Users\minwo\IdeaProjects\wicrm\out\production\classes started by minwo in C:\Users\minwo\IdeaProjects\wicrm)
+2025-09-23 15:44:39.900 [restartedMain] INFO  com.wio.crm.CrmApplication - No active profile set, falling back to 1 default profile: "default"
+2025-09-23 15:44:40.045 [restartedMain] INFO  o.s.b.d.restart.ChangeableUrls - The Class-Path manifest attribute in C:\Users\minwo\.gradle\caches\modules-2\files-2.1\com.oracle.database.jdbc\ojdbc8\21.5.0.0\eb13f0948ca8675f71d59b5e8a1129d4c6189e7a\ojdbc8-21.5.0.0.jar referenced one or more files that do not exist: file:/C:/Users/minwo/.gradle/caches/modules-2/files-2.1/com.oracle.database.jdbc/ojdbc8/21.5.0.0/eb13f0948ca8675f71d59b5e8a1129d4c6189e7a/oraclepki.jar
+2025-09-23 15:44:40.048 [restartedMain] INFO  o.s.b.d.restart.ChangeableUrls - The Class-Path manifest attribute in C:\Users\minwo\.gradle\caches\modules-2\files-2.1\com.oracle.ojdbc\orai18n\19.3.0.0\a6960d6c18840e07dbc5b6afe760d099e47517bb\orai18n-19.3.0.0.jar referenced one or more files that do not exist: file:/C:/Users/minwo/.gradle/caches/modules-2/files-2.1/com.oracle.ojdbc/orai18n/19.3.0.0/a6960d6c18840e07dbc5b6afe760d099e47517bb/orai18n-mapping.jar,file:/C:/Users/minwo/.gradle/caches/modules-2/files-2.1/com.oracle.ojdbc/orai18n/19.3.0.0/a6960d6c18840e07dbc5b6afe760d099e47517bb/orai18n-utility.jar,file:/C:/Users/minwo/.gradle/caches/modules-2/files-2.1/com.oracle.ojdbc/orai18n/19.3.0.0/a6960d6c18840e07dbc5b6afe760d099e47517bb/orai18n-collation.jar,file:/C:/Users/minwo/.gradle/caches/modules-2/files-2.1/com.oracle.ojdbc/orai18n/19.3.0.0/a6960d6c18840e07dbc5b6afe760d099e47517bb/orai18n-translation.jar,file:/C:/Users/minwo/.gradle/caches/modules-2/files-2.1/com.oracle.ojdbc/orai18n/19.3.0.0/a6960d6c18840e07dbc5b6afe760d099e47517bb/orai18n-net.jar,file:/C:/Users/minwo/.gradle/caches/modules-2/files-2.1/com.oracle.ojdbc/orai18n/19.3.0.0/a6960d6c18840e07dbc5b6afe760d099e47517bb/orai18n-servlet.jar,file:/C:/Users/minwo/.gradle/caches/modules-2/files-2.1/com.oracle.ojdbc/orai18n/19.3.0.0/a6960d6c18840e07dbc5b6afe760d099e47517bb/orai18n-lcsd.jar,file:/C:/Users/minwo/.gradle/caches/modules-2/files-2.1/com.oracle.ojdbc/orai18n/19.3.0.0/a6960d6c18840e07dbc5b6afe760d099e47517bb/orai18n-tools.jar,file:/C:/Users/minwo/.gradle/caches/modules-2/files-2.1/com.oracle.ojdbc/orai18n/19.3.0.0/a6960d6c18840e07dbc5b6afe760d099e47517bb/gdk_custom.jar
+2025-09-23 15:44:40.048 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-09-23 15:44:40.048 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-09-23 15:44:41.037 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-09-23 15:44:41.142 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 99 ms. Found 3 JPA repository interfaces.
+2025-09-23 15:44:41.210 [restartedMain] DEBUG o.apache.ibatis.logging.LogFactory - Logging initialized using 'class org.apache.ibatis.logging.slf4j.Slf4jImpl' adapter.
+2025-09-23 15:44:41.212 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\AccountMapper.class]
+2025-09-23 15:44:41.212 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\AdminCodeMapper.class]
+2025-09-23 15:44:41.212 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\BannerMapper.class]
+2025-09-23 15:44:41.212 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\BoardMapper.class]
+2025-09-23 15:44:41.212 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\ConsMapper.class]
+2025-09-23 15:44:41.212 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\ConsultingMapper.class]
+2025-09-23 15:44:41.212 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\DashboardMapper.class]
+2025-09-23 15:44:41.212 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\ExchangeStatsMapper.class]
+2025-09-23 15:44:41.212 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\InvoiceMapper.class]
+2025-09-23 15:44:41.212 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\LmsTrackingMapper.class]
+2025-09-23 15:44:41.212 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\LoginHistoryMapper.class]
+2025-09-23 15:44:41.213 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\LogisticsDirectReturnMapper.class]
+2025-09-23 15:44:41.213 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\MenuMapper.class]
+2025-09-23 15:44:41.213 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\MileageMapper.class]
+2025-09-23 15:44:41.213 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\OrderMapper.class]
+2025-09-23 15:44:41.213 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\ReturnItemMapper.class]
+2025-09-23 15:44:41.213 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\ShippingPaymentMapper.class]
+2025-09-23 15:44:41.213 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\StaticsMapper.class]
+2025-09-23 15:44:41.213 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\Tcnt01EmpMapper.class]
+2025-09-23 15:44:41.213 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\Temp01Mapper.class]
+2025-09-23 15:44:41.213 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\TipdwMapper.class]
+2025-09-23 15:44:41.213 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\UserApprovalMapper.class]
+2025-09-23 15:44:41.213 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\UserMapper.class]
+2025-09-23 15:44:41.214 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'accountMapper' and 'com.wio.crm.mapper.AccountMapper' mapperInterface
+2025-09-23 15:44:41.215 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'accountMapper'.
+2025-09-23 15:44:41.215 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'adminCodeMapper' and 'com.wio.crm.mapper.AdminCodeMapper' mapperInterface
+2025-09-23 15:44:41.215 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'adminCodeMapper'.
+2025-09-23 15:44:41.215 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'bannerMapper' and 'com.wio.crm.mapper.BannerMapper' mapperInterface
+2025-09-23 15:44:41.216 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'bannerMapper'.
+2025-09-23 15:44:41.216 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'boardMapper' and 'com.wio.crm.mapper.BoardMapper' mapperInterface
+2025-09-23 15:44:41.216 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'boardMapper'.
+2025-09-23 15:44:41.216 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'consMapper' and 'com.wio.crm.mapper.ConsMapper' mapperInterface
+2025-09-23 15:44:41.217 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'consMapper'.
+2025-09-23 15:44:41.217 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'consultingMapper' and 'com.wio.crm.mapper.ConsultingMapper' mapperInterface
+2025-09-23 15:44:41.217 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'consultingMapper'.
+2025-09-23 15:44:41.217 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'dashboardMapper' and 'com.wio.crm.mapper.DashboardMapper' mapperInterface
+2025-09-23 15:44:41.218 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'dashboardMapper'.
+2025-09-23 15:44:41.218 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'exchangeStatsMapper' and 'com.wio.crm.mapper.ExchangeStatsMapper' mapperInterface
+2025-09-23 15:44:41.218 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'exchangeStatsMapper'.
+2025-09-23 15:44:41.218 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'invoiceMapper' and 'com.wio.crm.mapper.InvoiceMapper' mapperInterface
+2025-09-23 15:44:41.218 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'invoiceMapper'.
+2025-09-23 15:44:41.218 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'lmsTrackingMapper' and 'com.wio.crm.mapper.LmsTrackingMapper' mapperInterface
+2025-09-23 15:44:41.219 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'lmsTrackingMapper'.
+2025-09-23 15:44:41.219 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'loginHistoryMapper' and 'com.wio.crm.mapper.LoginHistoryMapper' mapperInterface
+2025-09-23 15:44:41.219 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'loginHistoryMapper'.
+2025-09-23 15:44:41.219 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'logisticsDirectReturnMapper' and 'com.wio.crm.mapper.LogisticsDirectReturnMapper' mapperInterface
+2025-09-23 15:44:41.219 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'logisticsDirectReturnMapper'.
+2025-09-23 15:44:41.219 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'menuMapper' and 'com.wio.crm.mapper.MenuMapper' mapperInterface
+2025-09-23 15:44:41.220 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'menuMapper'.
+2025-09-23 15:44:41.220 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'mileageMapper' and 'com.wio.crm.mapper.MileageMapper' mapperInterface
+2025-09-23 15:44:41.220 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'mileageMapper'.
+2025-09-23 15:44:41.220 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'orderMapper' and 'com.wio.crm.mapper.OrderMapper' mapperInterface
+2025-09-23 15:44:41.220 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'orderMapper'.
+2025-09-23 15:44:41.220 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'returnItemMapper' and 'com.wio.crm.mapper.ReturnItemMapper' mapperInterface
+2025-09-23 15:44:41.221 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'returnItemMapper'.
+2025-09-23 15:44:41.221 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'shippingPaymentMapper' and 'com.wio.crm.mapper.ShippingPaymentMapper' mapperInterface
+2025-09-23 15:44:41.221 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'shippingPaymentMapper'.
+2025-09-23 15:44:41.221 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'staticsMapper' and 'com.wio.crm.mapper.StaticsMapper' mapperInterface
+2025-09-23 15:44:41.222 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'staticsMapper'.
+2025-09-23 15:44:41.222 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'tcnt01EmpMapper' and 'com.wio.crm.mapper.Tcnt01EmpMapper' mapperInterface
+2025-09-23 15:44:41.222 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'tcnt01EmpMapper'.
+2025-09-23 15:44:41.222 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'temp01Mapper' and 'com.wio.crm.mapper.Temp01Mapper' mapperInterface
+2025-09-23 15:44:41.222 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'temp01Mapper'.
+2025-09-23 15:44:41.223 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'tipdwMapper' and 'com.wio.crm.mapper.TipdwMapper' mapperInterface
+2025-09-23 15:44:41.223 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'tipdwMapper'.
+2025-09-23 15:44:41.223 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'userApprovalMapper' and 'com.wio.crm.mapper.UserApprovalMapper' mapperInterface
+2025-09-23 15:44:41.223 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'userApprovalMapper'.
+2025-09-23 15:44:41.223 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'userMapper' and 'com.wio.crm.mapper.UserMapper' mapperInterface
+2025-09-23 15:44:41.223 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'userMapper'.
+2025-09-23 15:44:41.626 [restartedMain] WARN  o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Unable to start web server
+2025-09-23 15:44:41.633 [restartedMain] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2025-09-23 15:44:41.650 [restartedMain] ERROR o.s.boot.SpringApplication - Application run failed
+org.springframework.context.ApplicationContextException: Unable to start web server
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.onRefresh(ServletWebServerApplicationContext.java:165)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:619)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:762)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:464)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:334)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1358)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1347)
+	at com.wio.crm.CrmApplication.main(CrmApplication.java:13)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:50)
+Caused by: java.lang.IllegalStateException: Unable to create key store: Could not load store from 'classpath:keystore.p12'
+	at org.springframework.boot.ssl.jks.JksSslStoreBundle.createKeyStore(JksSslStoreBundle.java:93)
+	at org.springframework.boot.ssl.jks.JksSslStoreBundle.<init>(JksSslStoreBundle.java:56)
+	at org.springframework.boot.web.server.WebServerSslBundle.createJksStoreBundle(WebServerSslBundle.java:77)
+	at org.springframework.boot.web.server.WebServerSslBundle.createStoreBundle(WebServerSslBundle.java:164)
+	at org.springframework.boot.web.server.WebServerSslBundle.get(WebServerSslBundle.java:155)
+	at org.springframework.boot.web.server.AbstractConfigurableWebServerFactory.getSslBundle(AbstractConfigurableWebServerFactory.java:225)
+	at org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory.customizeSsl(TomcatServletWebServerFactory.java:373)
+	at org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory.customizeConnector(TomcatServletWebServerFactory.java:349)
+	at org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory.getWebServer(TomcatServletWebServerFactory.java:210)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.createWebServer(ServletWebServerApplicationContext.java:188)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.onRefresh(ServletWebServerApplicationContext.java:162)
+	... 13 common frames omitted
+Caused by: java.lang.IllegalStateException: Could not load store from 'classpath:keystore.p12'
+	at org.springframework.boot.ssl.jks.JksSslStoreBundle.loadKeyStore(JksSslStoreBundle.java:122)
+	at org.springframework.boot.ssl.jks.JksSslStoreBundle.createKeyStore(JksSslStoreBundle.java:88)
+	... 23 common frames omitted
+Caused by: java.io.FileNotFoundException: class path resource [keystore.p12] cannot be resolved to URL because it does not exist
+	at org.springframework.util.ResourceUtils.getURL(ResourceUtils.java:138)
+	at org.springframework.boot.ssl.jks.JksSslStoreBundle.loadKeyStore(JksSslStoreBundle.java:116)
+	... 24 common frames omitted
+2025-09-23 15:46:59.687 [restartedMain] INFO  com.wio.crm.CrmApplication - Starting CrmApplication using Java 17.0.16 with PID 13580 (C:\Users\minwo\IdeaProjects\wicrm\out\production\classes started by minwo in C:\Users\minwo\IdeaProjects\wicrm)
+2025-09-23 15:46:59.688 [restartedMain] INFO  com.wio.crm.CrmApplication - No active profile set, falling back to 1 default profile: "default"
+2025-09-23 15:46:59.829 [restartedMain] INFO  o.s.b.d.restart.ChangeableUrls - The Class-Path manifest attribute in C:\Users\minwo\.gradle\caches\modules-2\files-2.1\com.oracle.database.jdbc\ojdbc8\21.5.0.0\eb13f0948ca8675f71d59b5e8a1129d4c6189e7a\ojdbc8-21.5.0.0.jar referenced one or more files that do not exist: file:/C:/Users/minwo/.gradle/caches/modules-2/files-2.1/com.oracle.database.jdbc/ojdbc8/21.5.0.0/eb13f0948ca8675f71d59b5e8a1129d4c6189e7a/oraclepki.jar
+2025-09-23 15:46:59.829 [restartedMain] INFO  o.s.b.d.restart.ChangeableUrls - The Class-Path manifest attribute in C:\Users\minwo\.gradle\caches\modules-2\files-2.1\com.oracle.ojdbc\orai18n\19.3.0.0\a6960d6c18840e07dbc5b6afe760d099e47517bb\orai18n-19.3.0.0.jar referenced one or more files that do not exist: file:/C:/Users/minwo/.gradle/caches/modules-2/files-2.1/com.oracle.ojdbc/orai18n/19.3.0.0/a6960d6c18840e07dbc5b6afe760d099e47517bb/orai18n-mapping.jar,file:/C:/Users/minwo/.gradle/caches/modules-2/files-2.1/com.oracle.ojdbc/orai18n/19.3.0.0/a6960d6c18840e07dbc5b6afe760d099e47517bb/orai18n-utility.jar,file:/C:/Users/minwo/.gradle/caches/modules-2/files-2.1/com.oracle.ojdbc/orai18n/19.3.0.0/a6960d6c18840e07dbc5b6afe760d099e47517bb/orai18n-collation.jar,file:/C:/Users/minwo/.gradle/caches/modules-2/files-2.1/com.oracle.ojdbc/orai18n/19.3.0.0/a6960d6c18840e07dbc5b6afe760d099e47517bb/orai18n-translation.jar,file:/C:/Users/minwo/.gradle/caches/modules-2/files-2.1/com.oracle.ojdbc/orai18n/19.3.0.0/a6960d6c18840e07dbc5b6afe760d099e47517bb/orai18n-net.jar,file:/C:/Users/minwo/.gradle/caches/modules-2/files-2.1/com.oracle.ojdbc/orai18n/19.3.0.0/a6960d6c18840e07dbc5b6afe760d099e47517bb/orai18n-servlet.jar,file:/C:/Users/minwo/.gradle/caches/modules-2/files-2.1/com.oracle.ojdbc/orai18n/19.3.0.0/a6960d6c18840e07dbc5b6afe760d099e47517bb/orai18n-lcsd.jar,file:/C:/Users/minwo/.gradle/caches/modules-2/files-2.1/com.oracle.ojdbc/orai18n/19.3.0.0/a6960d6c18840e07dbc5b6afe760d099e47517bb/orai18n-tools.jar,file:/C:/Users/minwo/.gradle/caches/modules-2/files-2.1/com.oracle.ojdbc/orai18n/19.3.0.0/a6960d6c18840e07dbc5b6afe760d099e47517bb/gdk_custom.jar
+2025-09-23 15:46:59.829 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-09-23 15:46:59.829 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-09-23 15:47:00.586 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-09-23 15:47:00.686 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 95 ms. Found 3 JPA repository interfaces.
+2025-09-23 15:47:00.756 [restartedMain] DEBUG o.apache.ibatis.logging.LogFactory - Logging initialized using 'class org.apache.ibatis.logging.slf4j.Slf4jImpl' adapter.
+2025-09-23 15:47:00.758 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\AccountMapper.class]
+2025-09-23 15:47:00.758 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\AdminCodeMapper.class]
+2025-09-23 15:47:00.758 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\BannerMapper.class]
+2025-09-23 15:47:00.758 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\BoardMapper.class]
+2025-09-23 15:47:00.758 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\ConsMapper.class]
+2025-09-23 15:47:00.758 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\ConsultingMapper.class]
+2025-09-23 15:47:00.758 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\DashboardMapper.class]
+2025-09-23 15:47:00.758 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\ExchangeStatsMapper.class]
+2025-09-23 15:47:00.758 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\InvoiceMapper.class]
+2025-09-23 15:47:00.758 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\LmsTrackingMapper.class]
+2025-09-23 15:47:00.758 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\LoginHistoryMapper.class]
+2025-09-23 15:47:00.758 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\LogisticsDirectReturnMapper.class]
+2025-09-23 15:47:00.758 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\MenuMapper.class]
+2025-09-23 15:47:00.758 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\MileageMapper.class]
+2025-09-23 15:47:00.758 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\OrderMapper.class]
+2025-09-23 15:47:00.758 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\ReturnItemMapper.class]
+2025-09-23 15:47:00.758 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\ShippingPaymentMapper.class]
+2025-09-23 15:47:00.758 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\StaticsMapper.class]
+2025-09-23 15:47:00.758 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\Tcnt01EmpMapper.class]
+2025-09-23 15:47:00.758 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\Temp01Mapper.class]
+2025-09-23 15:47:00.758 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\TipdwMapper.class]
+2025-09-23 15:47:00.759 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\UserApprovalMapper.class]
+2025-09-23 15:47:00.759 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [C:\Users\minwo\IdeaProjects\wicrm\out\production\classes\com\wio\crm\mapper\UserMapper.class]
+2025-09-23 15:47:00.759 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'accountMapper' and 'com.wio.crm.mapper.AccountMapper' mapperInterface
+2025-09-23 15:47:00.761 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'accountMapper'.
+2025-09-23 15:47:00.761 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'adminCodeMapper' and 'com.wio.crm.mapper.AdminCodeMapper' mapperInterface
+2025-09-23 15:47:00.761 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'adminCodeMapper'.
+2025-09-23 15:47:00.761 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'bannerMapper' and 'com.wio.crm.mapper.BannerMapper' mapperInterface
+2025-09-23 15:47:00.761 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'bannerMapper'.
+2025-09-23 15:47:00.761 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'boardMapper' and 'com.wio.crm.mapper.BoardMapper' mapperInterface
+2025-09-23 15:47:00.762 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'boardMapper'.
+2025-09-23 15:47:00.762 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'consMapper' and 'com.wio.crm.mapper.ConsMapper' mapperInterface
+2025-09-23 15:47:00.762 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'consMapper'.
+2025-09-23 15:47:00.762 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'consultingMapper' and 'com.wio.crm.mapper.ConsultingMapper' mapperInterface
+2025-09-23 15:47:00.762 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'consultingMapper'.
+2025-09-23 15:47:00.762 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'dashboardMapper' and 'com.wio.crm.mapper.DashboardMapper' mapperInterface
+2025-09-23 15:47:00.763 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'dashboardMapper'.
+2025-09-23 15:47:00.763 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'exchangeStatsMapper' and 'com.wio.crm.mapper.ExchangeStatsMapper' mapperInterface
+2025-09-23 15:47:00.763 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'exchangeStatsMapper'.
+2025-09-23 15:47:00.763 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'invoiceMapper' and 'com.wio.crm.mapper.InvoiceMapper' mapperInterface
+2025-09-23 15:47:00.763 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'invoiceMapper'.
+2025-09-23 15:47:00.763 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'lmsTrackingMapper' and 'com.wio.crm.mapper.LmsTrackingMapper' mapperInterface
+2025-09-23 15:47:00.764 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'lmsTrackingMapper'.
+2025-09-23 15:47:00.764 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'loginHistoryMapper' and 'com.wio.crm.mapper.LoginHistoryMapper' mapperInterface
+2025-09-23 15:47:00.764 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'loginHistoryMapper'.
+2025-09-23 15:47:00.764 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'logisticsDirectReturnMapper' and 'com.wio.crm.mapper.LogisticsDirectReturnMapper' mapperInterface
+2025-09-23 15:47:00.764 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'logisticsDirectReturnMapper'.
+2025-09-23 15:47:00.765 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'menuMapper' and 'com.wio.crm.mapper.MenuMapper' mapperInterface
+2025-09-23 15:47:00.765 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'menuMapper'.
+2025-09-23 15:47:00.765 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'mileageMapper' and 'com.wio.crm.mapper.MileageMapper' mapperInterface
+2025-09-23 15:47:00.765 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'mileageMapper'.
+2025-09-23 15:47:00.765 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'orderMapper' and 'com.wio.crm.mapper.OrderMapper' mapperInterface
+2025-09-23 15:47:00.765 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'orderMapper'.
+2025-09-23 15:47:00.765 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'returnItemMapper' and 'com.wio.crm.mapper.ReturnItemMapper' mapperInterface
+2025-09-23 15:47:00.766 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'returnItemMapper'.
+2025-09-23 15:47:00.766 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'shippingPaymentMapper' and 'com.wio.crm.mapper.ShippingPaymentMapper' mapperInterface
+2025-09-23 15:47:00.766 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'shippingPaymentMapper'.
+2025-09-23 15:47:00.766 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'staticsMapper' and 'com.wio.crm.mapper.StaticsMapper' mapperInterface
+2025-09-23 15:47:00.767 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'staticsMapper'.
+2025-09-23 15:47:00.767 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'tcnt01EmpMapper' and 'com.wio.crm.mapper.Tcnt01EmpMapper' mapperInterface
+2025-09-23 15:47:00.767 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'tcnt01EmpMapper'.
+2025-09-23 15:47:00.767 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'temp01Mapper' and 'com.wio.crm.mapper.Temp01Mapper' mapperInterface
+2025-09-23 15:47:00.767 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'temp01Mapper'.
+2025-09-23 15:47:00.768 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'tipdwMapper' and 'com.wio.crm.mapper.TipdwMapper' mapperInterface
+2025-09-23 15:47:00.768 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'tipdwMapper'.
+2025-09-23 15:47:00.768 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'userApprovalMapper' and 'com.wio.crm.mapper.UserApprovalMapper' mapperInterface
+2025-09-23 15:47:00.768 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'userApprovalMapper'.
+2025-09-23 15:47:00.768 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'userMapper' and 'com.wio.crm.mapper.UserMapper' mapperInterface
+2025-09-23 15:47:00.768 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Enabling autowire by type for MapperFactoryBean with name 'userMapper'.
+2025-09-23 15:47:01.225 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2025-09-23 15:47:01.232 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2025-09-23 15:47:01.233 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-09-23 15:47:01.234 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.17]
+2025-09-23 15:47:01.289 [restartedMain] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-09-23 15:47:01.289 [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1460 ms
+2025-09-23 15:47:01.516 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-09-23 15:47:01.795 [restartedMain] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection oracle.jdbc.driver.T4CConnection@1715280d
+2025-09-23 15:47:01.798 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-09-23 15:47:01.820 [restartedMain] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-09-23 15:47:01.858 [restartedMain] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.4.1.Final
+2025-09-23 15:47:01.882 [restartedMain] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2025-09-23 15:47:02.047 [restartedMain] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-09-23 15:47:02.120 [restartedMain] WARN  org.hibernate.dialect.Dialect - HHH000511: The 11.2.0 version for [org.hibernate.dialect.OracleDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 19.0.0. Check the community dialects project for available legacy versions.
+2025-09-23 15:47:02.743 [restartedMain] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-09-23 15:47:02.745 [restartedMain] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-09-23 15:47:02.791 [restartedMain] DEBUG o.apache.ibatis.logging.LogFactory - Logging initialized using 'class org.apache.ibatis.logging.slf4j.Slf4jImpl' adapter.
+2025-09-23 15:47:02.848 [restartedMain] DEBUG o.m.spring.SqlSessionFactoryBean - Parsed mapper file: 'file [C:\Users\minwo\IdeaProjects\wicrm\out\production\resources\mapper\AccountMapper.xml]'
+2025-09-23 15:47:02.856 [restartedMain] DEBUG o.m.spring.SqlSessionFactoryBean - Parsed mapper file: 'file [C:\Users\minwo\IdeaProjects\wicrm\out\production\resources\mapper\BoardMapper.xml]'
+2025-09-23 15:47:02.869 [restartedMain] DEBUG o.m.spring.SqlSessionFactoryBean - Parsed mapper file: 'file [C:\Users\minwo\IdeaProjects\wicrm\out\production\resources\mapper\ConsMapper.xml]'
+2025-09-23 15:47:02.880 [restartedMain] DEBUG o.m.spring.SqlSessionFactoryBean - Parsed mapper file: 'file [C:\Users\minwo\IdeaProjects\wicrm\out\production\resources\mapper\ConsultingMapper.xml]'
+2025-09-23 15:47:02.892 [restartedMain] DEBUG o.m.spring.SqlSessionFactoryBean - Parsed mapper file: 'file [C:\Users\minwo\IdeaProjects\wicrm\out\production\resources\mapper\DashboardMapper.xml]'
+2025-09-23 15:47:02.902 [restartedMain] DEBUG o.m.spring.SqlSessionFactoryBean - Parsed mapper file: 'file [C:\Users\minwo\IdeaProjects\wicrm\out\production\resources\mapper\ExchangeStatsMapper.xml]'
+2025-09-23 15:47:02.906 [restartedMain] DEBUG o.m.spring.SqlSessionFactoryBean - Parsed mapper file: 'file [C:\Users\minwo\IdeaProjects\wicrm\out\production\resources\mapper\InvoiceMapper.xml]'
+2025-09-23 15:47:02.917 [restartedMain] DEBUG o.m.spring.SqlSessionFactoryBean - Parsed mapper file: 'file [C:\Users\minwo\IdeaProjects\wicrm\out\production\resources\mapper\LmsTrackingMapper.xml]'
+2025-09-23 15:47:02.926 [restartedMain] DEBUG o.m.spring.SqlSessionFactoryBean - Parsed mapper file: 'file [C:\Users\minwo\IdeaProjects\wicrm\out\production\resources\mapper\LogisticsDirectReturnMapper.xml]'
+2025-09-23 15:47:02.929 [restartedMain] DEBUG o.m.spring.SqlSessionFactoryBean - Parsed mapper file: 'file [C:\Users\minwo\IdeaProjects\wicrm\out\production\resources\mapper\menuMapper.xml]'
+2025-09-23 15:47:02.933 [restartedMain] DEBUG o.m.spring.SqlSessionFactoryBean - Parsed mapper file: 'file [C:\Users\minwo\IdeaProjects\wicrm\out\production\resources\mapper\MileageMapper.xml]'
+2025-09-23 15:47:02.937 [restartedMain] DEBUG o.m.spring.SqlSessionFactoryBean - Parsed mapper file: 'file [C:\Users\minwo\IdeaProjects\wicrm\out\production\resources\mapper\OrderMapper.xml]'
+2025-09-23 15:47:02.956 [restartedMain] DEBUG o.m.spring.SqlSessionFactoryBean - Parsed mapper file: 'file [C:\Users\minwo\IdeaProjects\wicrm\out\production\resources\mapper\ReturnItemMapper.xml]'
+2025-09-23 15:47:02.963 [restartedMain] DEBUG o.m.spring.SqlSessionFactoryBean - Parsed mapper file: 'file [C:\Users\minwo\IdeaProjects\wicrm\out\production\resources\mapper\ShippingPaymentMapper.xml]'
+2025-09-23 15:47:02.975 [restartedMain] DEBUG o.m.spring.SqlSessionFactoryBean - Parsed mapper file: 'file [C:\Users\minwo\IdeaProjects\wicrm\out\production\resources\mapper\StaticsMapper.xml]'
+2025-09-23 15:47:02.979 [restartedMain] DEBUG o.m.spring.SqlSessionFactoryBean - Parsed mapper file: 'file [C:\Users\minwo\IdeaProjects\wicrm\out\production\resources\mapper\Tcnt01EmpMapper.xml]'
+2025-09-23 15:47:02.985 [restartedMain] DEBUG o.m.spring.SqlSessionFactoryBean - Parsed mapper file: 'file [C:\Users\minwo\IdeaProjects\wicrm\out\production\resources\mapper\UserApprovalMapper.xml]'
+2025-09-23 15:47:03.303 [restartedMain] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-09-23 15:47:04.062 [restartedMain] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 1 endpoint(s) beneath base path '/actuator'
+2025-09-23 15:47:04.117 [restartedMain] INFO  o.s.s.web.DefaultSecurityFilterChain - Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@13e84ebb, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@735df778, org.springframework.security.web.context.SecurityContextHolderFilter@4d62efa8, org.springframework.security.web.header.HeaderWriterFilter@43e137e0, org.springframework.web.filter.CorsFilter@1dc1e7d3, org.springframework.security.web.csrf.CsrfFilter@766d1cbc, org.springframework.security.web.authentication.logout.LogoutFilter@3fe70480, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter@6768ab1c, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@dfda443, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@5373384c, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@3d3dc7ef, org.springframework.security.web.access.ExceptionTranslationFilter@60460920, org.springframework.security.web.access.intercept.AuthorizationFilter@4be182b8]
+2025-09-23 15:47:04.128 [restartedMain] WARN  o.s.s.c.a.web.builders.WebSecurity - You are asking Spring Security to ignore Mvc [pattern='/assets/**']. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2025-09-23 15:47:04.128 [restartedMain] INFO  o.s.s.web.DefaultSecurityFilterChain - Will not secure Mvc [pattern='/assets/**']
+2025-09-23 15:47:05.510 [restartedMain] INFO  o.s.b.d.a.OptionalLiveReloadServer - LiveReload server is running on port 35729
+2025-09-23 15:47:05.546 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2025-09-23 15:47:05.559 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path ''
+2025-09-23 15:47:05.566 [restartedMain] INFO  com.wio.crm.CrmApplication - Started CrmApplication in 6.19 seconds (process running for 6.628)
+2025-09-23 15:47:06.190 [RMI TCP Connection(2)-192.168.0.14] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-09-23 15:47:06.190 [RMI TCP Connection(2)-192.168.0.14] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-09-23 15:47:06.191 [RMI TCP Connection(2)-192.168.0.14] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2025-09-23 15:47:12.638 [http-nio-8080-exec-2] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:12.642 [http-nio-8080-exec-2] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@19a1e28f] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:12.656 [http-nio-8080-exec-2] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1510636765 wrapping oracle.jdbc.driver.T4CConnection@1715280d] will not be managed by Spring
+2025-09-23 15:47:12.687 [http-nio-8080-exec-2] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@19a1e28f]
+2025-09-23 15:47:12.689 [http-nio-8080-exec-2] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:12.689 [http-nio-8080-exec-2] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@130e1d6f] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:12.689 [http-nio-8080-exec-2] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@888227526 wrapping oracle.jdbc.driver.T4CConnection@1715280d] will not be managed by Spring
+2025-09-23 15:47:12.698 [http-nio-8080-exec-2] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@130e1d6f]
+2025-09-23 15:47:17.679 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:17.679 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3e4d59d4] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:17.688 [http-nio-8080-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1412059467 wrapping oracle.jdbc.driver.T4CConnection@1715280d] will not be managed by Spring
+2025-09-23 15:47:17.702 [http-nio-8080-exec-6] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.TipdwMapper.findByUserId' auto-mapping. Mapping parameters are [columnName=REPASS,propertyName=REPASS,propertyType=null]
+2025-09-23 15:47:17.703 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3e4d59d4]
+2025-09-23 15:47:17.703 [http-nio-8080-exec-6] INFO  c.w.c.s.CustomUserDetailsService - 거래처 직원 정보 조회: test11
+2025-09-23 15:47:17.703 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:17.703 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7411a26c] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:17.703 [http-nio-8080-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1072118855 wrapping oracle.jdbc.driver.T4CConnection@1715280d] will not be managed by Spring
+2025-09-23 15:47:17.712 [http-nio-8080-exec-6] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.Tcnt01EmpMapper.findByUserId' auto-mapping. Mapping parameters are [columnName=CUST_GRADE,propertyName=CUST_GRADE,propertyType=null]
+2025-09-23 15:47:17.712 [http-nio-8080-exec-6] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.Tcnt01EmpMapper.findByUserId' auto-mapping. Mapping parameters are [columnName=EMP_NAME,propertyName=EMP_NAME,propertyType=null]
+2025-09-23 15:47:17.712 [http-nio-8080-exec-6] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.Tcnt01EmpMapper.findByUserId' auto-mapping. Mapping parameters are [columnName=PW,propertyName=PW,propertyType=null]
+2025-09-23 15:47:17.712 [http-nio-8080-exec-6] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.Tcnt01EmpMapper.findByUserId' auto-mapping. Mapping parameters are [columnName=ZIP_NO,propertyName=ZIP_NO,propertyType=null]
+2025-09-23 15:47:17.712 [http-nio-8080-exec-6] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.Tcnt01EmpMapper.findByUserId' auto-mapping. Mapping parameters are [columnName=TEL_NO,propertyName=TEL_NO,propertyType=null]
+2025-09-23 15:47:17.712 [http-nio-8080-exec-6] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.Tcnt01EmpMapper.findByUserId' auto-mapping. Mapping parameters are [columnName=FEX_NO,propertyName=FEX_NO,propertyType=null]
+2025-09-23 15:47:17.712 [http-nio-8080-exec-6] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.Tcnt01EmpMapper.findByUserId' auto-mapping. Mapping parameters are [columnName=HAND_PHONE,propertyName=HAND_PHONE,propertyType=null]
+2025-09-23 15:47:17.712 [http-nio-8080-exec-6] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.Tcnt01EmpMapper.findByUserId' auto-mapping. Mapping parameters are [columnName=USE_YN,propertyName=USE_YN,propertyType=null]
+2025-09-23 15:47:17.712 [http-nio-8080-exec-6] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.Tcnt01EmpMapper.findByUserId' auto-mapping. Mapping parameters are [columnName=IN_DATE,propertyName=IN_DATE,propertyType=null]
+2025-09-23 15:47:17.712 [http-nio-8080-exec-6] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.Tcnt01EmpMapper.findByUserId' auto-mapping. Mapping parameters are [columnName=IN_EMPNO,propertyName=IN_EMPNO,propertyType=null]
+2025-09-23 15:47:17.712 [http-nio-8080-exec-6] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.Tcnt01EmpMapper.findByUserId' auto-mapping. Mapping parameters are [columnName=UP_DATE,propertyName=UP_DATE,propertyType=null]
+2025-09-23 15:47:17.712 [http-nio-8080-exec-6] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.Tcnt01EmpMapper.findByUserId' auto-mapping. Mapping parameters are [columnName=UP_EMPNO,propertyName=UP_EMPNO,propertyType=null]
+2025-09-23 15:47:17.712 [http-nio-8080-exec-6] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.Tcnt01EmpMapper.findByUserId' auto-mapping. Mapping parameters are [columnName=ADDR2,propertyName=ADDR2,propertyType=null]
+2025-09-23 15:47:17.712 [http-nio-8080-exec-6] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.Tcnt01EmpMapper.findByUserId' auto-mapping. Mapping parameters are [columnName=SUBID,propertyName=SUBID,propertyType=null]
+2025-09-23 15:47:17.712 [http-nio-8080-exec-6] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.Tcnt01EmpMapper.findByUserId' auto-mapping. Mapping parameters are [columnName=CUST_NAME,propertyName=CUST_NAME,propertyType=null]
+2025-09-23 15:47:17.713 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7411a26c]
+2025-09-23 15:47:17.713 [http-nio-8080-exec-6] INFO  c.w.c.s.CustomUserDetailsService - 거래처 직원 정보: userId=test11, custCode=P000000218, cust_grade=null, emp_name=null, authority=null
+2025-09-23 15:47:17.762 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:17.762 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@777bd3a6] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:17.774 [http-nio-8080-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1181847078 wrapping oracle.jdbc.driver.T4CConnection@1715280d] will not be managed by Spring
+2025-09-23 15:47:17.833 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@777bd3a6]
+2025-09-23 15:47:17.834 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:17.834 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@62c84b4d] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:17.835 [http-nio-8080-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1082788485 wrapping oracle.jdbc.driver.T4CConnection@1715280d] will not be managed by Spring
+2025-09-23 15:47:17.873 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@62c84b4d]
+2025-09-23 15:47:17.881 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:17.881 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3b9120ae] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:17.882 [http-nio-8080-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1445596837 wrapping oracle.jdbc.driver.T4CConnection@1715280d] will not be managed by Spring
+2025-09-23 15:47:17.889 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3b9120ae]
+2025-09-23 15:47:17.889 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:17.889 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6c4bab6] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:17.889 [http-nio-8080-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@913106311 wrapping oracle.jdbc.driver.T4CConnection@1715280d] will not be managed by Spring
+2025-09-23 15:47:17.896 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6c4bab6]
+2025-09-23 15:47:17.904 [http-nio-8080-exec-5] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:17.904 [http-nio-8080-exec-5] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2313de0f] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:17.904 [http-nio-8080-exec-5] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@2080330491 wrapping oracle.jdbc.driver.T4CConnection@1715280d] will not be managed by Spring
+2025-09-23 15:47:17.912 [http-nio-8080-exec-5] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2313de0f]
+2025-09-23 15:47:17.912 [http-nio-8080-exec-5] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:17.912 [http-nio-8080-exec-5] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@13dd5647] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:17.912 [http-nio-8080-exec-5] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@233938552 wrapping oracle.jdbc.driver.T4CConnection@1715280d] will not be managed by Spring
+2025-09-23 15:47:17.919 [http-nio-8080-exec-5] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@13dd5647]
+2025-09-23 15:47:17.951 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:17.951 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5728f495] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:17.951 [http-nio-8080-exec-3] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@407498267 wrapping oracle.jdbc.driver.T4CConnection@1715280d] will not be managed by Spring
+2025-09-23 15:47:17.962 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5728f495]
+2025-09-23 15:47:17.962 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:17.962 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@35ab270c] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:17.963 [http-nio-8080-exec-3] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1830365942 wrapping oracle.jdbc.driver.T4CConnection@1715280d] will not be managed by Spring
+2025-09-23 15:47:17.970 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@35ab270c]
+2025-09-23 15:47:17.970 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:17.970 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7d85f79c] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:17.970 [http-nio-8080-exec-3] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@720107265 wrapping oracle.jdbc.driver.T4CConnection@1715280d] will not be managed by Spring
+2025-09-23 15:47:17.978 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7d85f79c]
+2025-09-23 15:47:18.832 [http-nio-8080-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:18.832 [http-nio-8080-exec-2] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:18.833 [http-nio-8080-exec-2] DEBUG org.mybatis.spring.SqlSessionUtils - Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6739c3c1]
+2025-09-23 15:47:18.833 [http-nio-8080-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@475dec70]
+2025-09-23 15:47:18.833 [http-nio-8080-exec-9] INFO  c.wio.crm.service.DashboardService - getDashboardCallCount 호출됨 - username: test11, custCode: P000000218
+2025-09-23 15:47:18.833 [http-nio-8080-exec-9] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:18.833 [http-nio-8080-exec-9] DEBUG org.mybatis.spring.SqlSessionUtils - Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@54d49a17]
+2025-09-23 15:47:18.836 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:18.837 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1b284747]
+2025-09-23 15:47:18.840 [http-nio-8080-exec-4] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@990649570 wrapping oracle.jdbc.driver.T4CConnection@b634f00] will be managed by Spring
+2025-09-23 15:47:18.840 [http-nio-8080-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1438517816 wrapping oracle.jdbc.driver.T4CConnection@1715280d] will be managed by Spring
+2025-09-23 15:47:18.840 [http-nio-8080-exec-9] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@253343216 wrapping oracle.jdbc.driver.T4CConnection@69dd2a0a] will be managed by Spring
+2025-09-23 15:47:18.840 [http-nio-8080-exec-2] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@83683751 wrapping oracle.jdbc.driver.T4CConnection@7a4079b1] will be managed by Spring
+2025-09-23 15:47:18.840 [http-nio-8080-exec-10] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:18.840 [http-nio-8080-exec-10] DEBUG org.mybatis.spring.SqlSessionUtils - Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4ce0e9df]
+2025-09-23 15:47:18.841 [http-nio-8080-exec-10] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@873101321 wrapping oracle.jdbc.driver.T4CConnection@73f828a5] will be managed by Spring
+2025-09-23 15:47:18.858 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1b284747]
+2025-09-23 15:47:18.859 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1b284747]
+2025-09-23 15:47:18.859 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1b284747]
+2025-09-23 15:47:18.859 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1b284747]
+2025-09-23 15:47:18.860 [http-nio-8080-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@475dec70]
+2025-09-23 15:47:18.860 [http-nio-8080-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@475dec70]
+2025-09-23 15:47:18.860 [http-nio-8080-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@475dec70]
+2025-09-23 15:47:18.860 [http-nio-8080-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@475dec70]
+2025-09-23 15:47:18.864 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:18.864 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7cdfb11b]
+2025-09-23 15:47:18.865 [http-nio-8080-exec-7] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@2124135202 wrapping oracle.jdbc.driver.T4CConnection@b634f00] will be managed by Spring
+2025-09-23 15:47:18.875 [http-nio-8080-exec-1] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:18.875 [http-nio-8080-exec-1] DEBUG org.mybatis.spring.SqlSessionUtils - Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@68f0ac77]
+2025-09-23 15:47:18.875 [http-nio-8080-exec-1] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@2142003039 wrapping oracle.jdbc.driver.T4CConnection@1715280d] will be managed by Spring
+2025-09-23 15:47:18.883 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7cdfb11b]
+2025-09-23 15:47:18.884 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7cdfb11b] from current transaction
+2025-09-23 15:47:18.885 [http-nio-8080-exec-10] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4ce0e9df]
+2025-09-23 15:47:18.885 [http-nio-8080-exec-10] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4ce0e9df]
+2025-09-23 15:47:18.885 [http-nio-8080-exec-10] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4ce0e9df]
+2025-09-23 15:47:18.885 [http-nio-8080-exec-10] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4ce0e9df]
+2025-09-23 15:47:18.890 [http-nio-8080-exec-9] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@54d49a17]
+2025-09-23 15:47:18.890 [http-nio-8080-exec-9] INFO  c.wio.crm.service.DashboardService - SQL 쿼리 실행 후 callCountList size: 3
+2025-09-23 15:47:18.890 [http-nio-8080-exec-9] INFO  c.wio.crm.service.DashboardService - 첫 번째 항목 필드 확인: gubn=[3], prc_Date=[20250922], hour_09=[0], hour_10=[0], hour_11=[3], hour_12=[0], callSum=[11]
+2025-09-23 15:47:18.890 [http-nio-8080-exec-9] INFO  c.wio.crm.service.DashboardService - 항목 #1: gubn=[3], prc_Date=[20250922], hour_09=[0], hour_10=[0], hour_11=[3], hour_12=[0], callSum=[11]
+2025-09-23 15:47:18.890 [http-nio-8080-exec-9] INFO  c.wio.crm.service.DashboardService - 항목 #2: gubn=[1], prc_Date=[20250923], hour_09=[0], hour_10=[0], hour_11=[2], hour_12=[0], callSum=[6]
+2025-09-23 15:47:18.890 [http-nio-8080-exec-9] INFO  c.wio.crm.service.DashboardService - 항목 #3: gubn=[2], prc_Date=[20250923], hour_09=[0], hour_10=[1], hour_11=[2], hour_12=[0], callSum=[6]
+2025-09-23 15:47:18.890 [http-nio-8080-exec-9] INFO  c.wio.crm.service.DashboardService - data 맵에 callCountList 추가 완료. data 크기: 1
+2025-09-23 15:47:18.890 [http-nio-8080-exec-9] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@54d49a17]
+2025-09-23 15:47:18.890 [http-nio-8080-exec-9] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@54d49a17]
+2025-09-23 15:47:18.890 [http-nio-8080-exec-9] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@54d49a17]
+2025-09-23 15:47:18.891 [http-nio-8080-exec-7] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.DashboardMapper.findDataForCard2' auto-mapping. Mapping parameters are [columnName=PROCESSING_RATE,propertyName=PROCESSING_RATE,propertyType=null]
+2025-09-23 15:47:18.891 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7cdfb11b]
+2025-09-23 15:47:18.891 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7cdfb11b] from current transaction
+2025-09-23 15:47:18.891 [http-nio-8080-exec-5] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:18.891 [http-nio-8080-exec-5] DEBUG org.mybatis.spring.SqlSessionUtils - Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@49537c26]
+2025-09-23 15:47:18.892 [http-nio-8080-exec-5] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@476478819 wrapping oracle.jdbc.driver.T4CConnection@73f828a5] will be managed by Spring
+2025-09-23 15:47:18.903 [http-nio-8080-exec-1] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@68f0ac77]
+2025-09-23 15:47:18.903 [http-nio-8080-exec-1] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@68f0ac77]
+2025-09-23 15:47:18.903 [http-nio-8080-exec-1] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@68f0ac77]
+2025-09-23 15:47:18.903 [http-nio-8080-exec-1] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@68f0ac77]
+2025-09-23 15:47:18.915 [http-nio-8080-exec-5] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@49537c26]
+2025-09-23 15:47:18.915 [http-nio-8080-exec-5] DEBUG org.mybatis.spring.SqlSessionUtils - Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@49537c26] from current transaction
+2025-09-23 15:47:18.921 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7cdfb11b]
+2025-09-23 15:47:18.921 [http-nio-8080-exec-7] INFO  c.wio.crm.service.DashboardService - findPointList 조회 결과 - 항목 수: 2
+2025-09-23 15:47:18.921 [http-nio-8080-exec-7] INFO  c.wio.crm.service.DashboardService - 포인트 항목 [0] - CS_TYPE: '일반', dailyPoint:                7, dailyPointN: 7
+2025-09-23 15:47:18.921 [http-nio-8080-exec-7] INFO  c.wio.crm.service.DashboardService - 포인트 항목 [1] - CS_TYPE: '반품', dailyPoint:                1, dailyPointN: 1
+2025-09-23 15:47:18.922 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7cdfb11b] from current transaction
+2025-09-23 15:47:18.930 [http-nio-8080-exec-5] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@49537c26]
+2025-09-23 15:47:18.931 [http-nio-8080-exec-5] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@49537c26]
+2025-09-23 15:47:18.931 [http-nio-8080-exec-5] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@49537c26]
+2025-09-23 15:47:18.931 [http-nio-8080-exec-5] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@49537c26]
+2025-09-23 15:47:18.936 [http-nio-8080-exec-2] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6739c3c1]
+2025-09-23 15:47:18.936 [http-nio-8080-exec-2] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6739c3c1]
+2025-09-23 15:47:18.936 [http-nio-8080-exec-2] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6739c3c1]
+2025-09-23 15:47:18.936 [http-nio-8080-exec-2] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6739c3c1]
+2025-09-23 15:47:18.944 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7cdfb11b]
+2025-09-23 15:47:18.945 [http-nio-8080-exec-7] INFO  c.wio.crm.service.DashboardService - [원본 데이터 확인] card1Data 원래 상태: count_Com=[6](타입:java.lang.String), todayCom=[6](타입:java.lang.String), todayMiss=[6](타입:java.lang.String), todayEme=[20](타입:java.lang.String), processing_rate=[50](타입:java.lang.String)
+2025-09-23 15:47:18.945 [http-nio-8080-exec-7] INFO  c.wio.crm.service.DashboardService - [확인] SQL에서 계산된 processing_rate 값 사용: 50
+2025-09-23 15:47:18.945 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7cdfb11b] from current transaction
+2025-09-23 15:47:18.960 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7cdfb11b]
+2025-09-23 15:47:18.960 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7cdfb11b] from current transaction
+2025-09-23 15:47:18.982 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7cdfb11b]
+2025-09-23 15:47:18.983 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7cdfb11b] from current transaction
+2025-09-23 15:47:19.012 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7cdfb11b]
+2025-09-23 15:47:19.012 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7cdfb11b] from current transaction
+2025-09-23 15:47:19.018 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7cdfb11b]
+2025-09-23 15:47:19.018 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7cdfb11b] from current transaction
+2025-09-23 15:47:19.025 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7cdfb11b]
+2025-09-23 15:47:19.025 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7cdfb11b] from current transaction
+2025-09-23 15:47:19.032 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7cdfb11b]
+2025-09-23 15:47:19.032 [http-nio-8080-exec-7] INFO  c.wio.crm.service.DashboardService - [최종 확인] 카드1 데이터(수정 후): {count_Com=6, todayCom=6, todayMiss=6, todayEme=20, processing_rate=50, count_sum=12}
+2025-09-23 15:47:19.032 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7cdfb11b]
+2025-09-23 15:47:19.032 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7cdfb11b]
+2025-09-23 15:47:19.032 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7cdfb11b]
+2025-09-23 15:47:22.440 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:22.440 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4065d0b8] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:22.453 [http-nio-8080-exec-3] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1243981766 wrapping oracle.jdbc.driver.T4CConnection@1715280d] will not be managed by Spring
+2025-09-23 15:47:22.461 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4065d0b8]
+2025-09-23 15:47:22.461 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:22.461 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3cfcd142] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:22.461 [http-nio-8080-exec-3] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1327174117 wrapping oracle.jdbc.driver.T4CConnection@1715280d] will not be managed by Spring
+2025-09-23 15:47:22.501 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3cfcd142]
+2025-09-23 15:47:22.501 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:22.501 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39c3bb36] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:22.501 [http-nio-8080-exec-3] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1065595464 wrapping oracle.jdbc.driver.T4CConnection@1715280d] will not be managed by Spring
+2025-09-23 15:47:22.516 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39c3bb36]
+2025-09-23 15:47:22.516 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:22.516 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@258076] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:22.516 [http-nio-8080-exec-3] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1871924723 wrapping oracle.jdbc.driver.T4CConnection@1715280d] will not be managed by Spring
+2025-09-23 15:47:22.523 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@258076]
+2025-09-23 15:47:22.523 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:22.523 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@62751f00] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:22.523 [http-nio-8080-exec-3] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1483531721 wrapping oracle.jdbc.driver.T4CConnection@1715280d] will not be managed by Spring
+2025-09-23 15:47:22.531 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@62751f00]
+2025-09-23 15:47:22.531 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:22.531 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@122b6cdb] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:22.531 [http-nio-8080-exec-3] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@725007490 wrapping oracle.jdbc.driver.T4CConnection@1715280d] will not be managed by Spring
+2025-09-23 15:47:22.537 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@122b6cdb]
+2025-09-23 15:47:25.326 [http-nio-8080-exec-2] ERROR o.a.c.c.C.[.[.[.[dispatcherServlet] - Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed: java.lang.IllegalArgumentException: Name for argument of type [int] not specified, and parameter name information not available via reflection. Ensure that the compiler uses the '-parameters' flag.] with root cause
+java.lang.IllegalArgumentException: Name for argument of type [int] not specified, and parameter name information not available via reflection. Ensure that the compiler uses the '-parameters' flag.
+	at org.springframework.web.method.annotation.AbstractNamedValueMethodArgumentResolver.updateNamedValueInfo(AbstractNamedValueMethodArgumentResolver.java:185)
+	at org.springframework.web.method.annotation.AbstractNamedValueMethodArgumentResolver.getNamedValueInfo(AbstractNamedValueMethodArgumentResolver.java:160)
+	at org.springframework.web.method.annotation.AbstractNamedValueMethodArgumentResolver.resolveArgument(AbstractNamedValueMethodArgumentResolver.java:106)
+	at org.springframework.web.method.support.HandlerMethodArgumentResolverComposite.resolveArgument(HandlerMethodArgumentResolverComposite.java:122)
+	at org.springframework.web.method.support.InvocableHandlerMethod.getMethodArgumentValues(InvocableHandlerMethod.java:226)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:179)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:917)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:829)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
+	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:903)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:564)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:205)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108)
+	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:231)
+	at org.springframework.security.web.ObservationFilterChainDecorator$FilterObservation$SimpleFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:479)
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:340)
+	at org.springframework.security.web.ObservationFilterChainDecorator.lambda$wrapSecured$0(ObservationFilterChainDecorator.java:82)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:128)
+	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:100)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:179)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter.doFilter(AbstractAuthenticationProcessingFilter.java:227)
+	at org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter.doFilter(AbstractAuthenticationProcessingFilter.java:221)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:107)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:93)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.csrf.CsrfFilter.doFilterInternal(CsrfFilter.java:117)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.web.filter.CorsFilter.doFilterInternal(CorsFilter.java:91)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$0(ObservationFilterChainDecorator.java:323)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:224)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:233)
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:191)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.servlet.handler.HandlerMappingIntrospector.lambda$createCacheFilter$3(HandlerMappingIntrospector.java:195)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74)
+	at org.springframework.security.config.annotation.web.configuration.WebMvcSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebMvcSecurityConfiguration.java:225)
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:352)
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:268)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:109)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:340)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:391)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:896)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1744)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1191)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+2025-09-23 15:47:25.333 [http-nio-8080-exec-2] INFO  c.wio.crm.controller.LoginController - 에러 페이지 요청
+2025-09-23 15:47:25.333 [http-nio-8080-exec-2] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:25.333 [http-nio-8080-exec-2] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8996cbf] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:25.338 [http-nio-8080-exec-2] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1719269172 wrapping oracle.jdbc.driver.T4CConnection@7a4079b1] will not be managed by Spring
+2025-09-23 15:47:25.346 [http-nio-8080-exec-2] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8996cbf]
+2025-09-23 15:47:25.346 [http-nio-8080-exec-2] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:25.346 [http-nio-8080-exec-2] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@556ad09c] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:25.346 [http-nio-8080-exec-2] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1495891702 wrapping oracle.jdbc.driver.T4CConnection@7a4079b1] will not be managed by Spring
+2025-09-23 15:47:25.351 [http-nio-8080-exec-2] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@556ad09c]
+2025-09-23 15:47:26.306 [http-nio-8080-exec-10] ERROR o.a.c.c.C.[.[.[.[dispatcherServlet] - Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed: java.lang.IllegalArgumentException: Name for argument of type [int] not specified, and parameter name information not available via reflection. Ensure that the compiler uses the '-parameters' flag.] with root cause
+java.lang.IllegalArgumentException: Name for argument of type [int] not specified, and parameter name information not available via reflection. Ensure that the compiler uses the '-parameters' flag.
+	at org.springframework.web.method.annotation.AbstractNamedValueMethodArgumentResolver.updateNamedValueInfo(AbstractNamedValueMethodArgumentResolver.java:185)
+	at org.springframework.web.method.annotation.AbstractNamedValueMethodArgumentResolver.getNamedValueInfo(AbstractNamedValueMethodArgumentResolver.java:160)
+	at org.springframework.web.method.annotation.AbstractNamedValueMethodArgumentResolver.resolveArgument(AbstractNamedValueMethodArgumentResolver.java:106)
+	at org.springframework.web.method.support.HandlerMethodArgumentResolverComposite.resolveArgument(HandlerMethodArgumentResolverComposite.java:122)
+	at org.springframework.web.method.support.InvocableHandlerMethod.getMethodArgumentValues(InvocableHandlerMethod.java:226)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:179)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:917)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:829)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
+	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:903)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:564)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:205)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108)
+	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:231)
+	at org.springframework.security.web.ObservationFilterChainDecorator$FilterObservation$SimpleFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:479)
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:340)
+	at org.springframework.security.web.ObservationFilterChainDecorator.lambda$wrapSecured$0(ObservationFilterChainDecorator.java:82)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:128)
+	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:100)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:179)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter.doFilter(AbstractAuthenticationProcessingFilter.java:227)
+	at org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter.doFilter(AbstractAuthenticationProcessingFilter.java:221)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:107)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:93)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.csrf.CsrfFilter.doFilterInternal(CsrfFilter.java:117)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.web.filter.CorsFilter.doFilterInternal(CorsFilter.java:91)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$0(ObservationFilterChainDecorator.java:323)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:224)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:233)
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:191)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.servlet.handler.HandlerMappingIntrospector.lambda$createCacheFilter$3(HandlerMappingIntrospector.java:195)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74)
+	at org.springframework.security.config.annotation.web.configuration.WebMvcSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebMvcSecurityConfiguration.java:225)
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:352)
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:268)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:109)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:340)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:391)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:896)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1744)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1191)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+2025-09-23 15:47:26.317 [http-nio-8080-exec-10] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:26.317 [http-nio-8080-exec-10] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@e1c7dc0] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:26.321 [http-nio-8080-exec-10] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@546689678 wrapping oracle.jdbc.driver.T4CConnection@7a4079b1] will not be managed by Spring
+2025-09-23 15:47:26.326 [http-nio-8080-exec-10] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@e1c7dc0]
+2025-09-23 15:47:26.326 [http-nio-8080-exec-10] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:26.326 [http-nio-8080-exec-10] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@48df4750] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:26.326 [http-nio-8080-exec-10] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@106144198 wrapping oracle.jdbc.driver.T4CConnection@7a4079b1] will not be managed by Spring
+2025-09-23 15:47:26.331 [http-nio-8080-exec-10] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@48df4750]
+2025-09-23 15:47:31.735 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:31.735 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@60afe6d1] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:31.743 [http-nio-8080-exec-3] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1241717836 wrapping oracle.jdbc.driver.T4CConnection@1715280d] will not be managed by Spring
+2025-09-23 15:47:31.750 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@60afe6d1]
+2025-09-23 15:47:31.750 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:31.750 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3d5cfe12] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:31.750 [http-nio-8080-exec-3] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@2083240495 wrapping oracle.jdbc.driver.T4CConnection@1715280d] will not be managed by Spring
+2025-09-23 15:47:31.757 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3d5cfe12]
+2025-09-23 15:47:36.043 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:36.043 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@22616f34] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:36.050 [http-nio-8080-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@890041370 wrapping oracle.jdbc.driver.T4CConnection@1715280d] will not be managed by Spring
+2025-09-23 15:47:36.058 [http-nio-8080-exec-6] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.TipdwMapper.findByUserId' auto-mapping. Mapping parameters are [columnName=REPASS,propertyName=REPASS,propertyType=null]
+2025-09-23 15:47:36.058 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@22616f34]
+2025-09-23 15:47:36.058 [http-nio-8080-exec-6] INFO  c.w.c.s.CustomUserDetailsService - 거래처 직원 정보 조회: test11
+2025-09-23 15:47:36.058 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:36.058 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f25b611] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:36.058 [http-nio-8080-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1908570040 wrapping oracle.jdbc.driver.T4CConnection@1715280d] will not be managed by Spring
+2025-09-23 15:47:36.065 [http-nio-8080-exec-6] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.Tcnt01EmpMapper.findByUserId' auto-mapping. Mapping parameters are [columnName=CUST_GRADE,propertyName=CUST_GRADE,propertyType=null]
+2025-09-23 15:47:36.065 [http-nio-8080-exec-6] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.Tcnt01EmpMapper.findByUserId' auto-mapping. Mapping parameters are [columnName=EMP_NAME,propertyName=EMP_NAME,propertyType=null]
+2025-09-23 15:47:36.065 [http-nio-8080-exec-6] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.Tcnt01EmpMapper.findByUserId' auto-mapping. Mapping parameters are [columnName=PW,propertyName=PW,propertyType=null]
+2025-09-23 15:47:36.065 [http-nio-8080-exec-6] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.Tcnt01EmpMapper.findByUserId' auto-mapping. Mapping parameters are [columnName=ZIP_NO,propertyName=ZIP_NO,propertyType=null]
+2025-09-23 15:47:36.065 [http-nio-8080-exec-6] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.Tcnt01EmpMapper.findByUserId' auto-mapping. Mapping parameters are [columnName=TEL_NO,propertyName=TEL_NO,propertyType=null]
+2025-09-23 15:47:36.065 [http-nio-8080-exec-6] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.Tcnt01EmpMapper.findByUserId' auto-mapping. Mapping parameters are [columnName=FEX_NO,propertyName=FEX_NO,propertyType=null]
+2025-09-23 15:47:36.065 [http-nio-8080-exec-6] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.Tcnt01EmpMapper.findByUserId' auto-mapping. Mapping parameters are [columnName=HAND_PHONE,propertyName=HAND_PHONE,propertyType=null]
+2025-09-23 15:47:36.065 [http-nio-8080-exec-6] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.Tcnt01EmpMapper.findByUserId' auto-mapping. Mapping parameters are [columnName=USE_YN,propertyName=USE_YN,propertyType=null]
+2025-09-23 15:47:36.065 [http-nio-8080-exec-6] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.Tcnt01EmpMapper.findByUserId' auto-mapping. Mapping parameters are [columnName=IN_DATE,propertyName=IN_DATE,propertyType=null]
+2025-09-23 15:47:36.065 [http-nio-8080-exec-6] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.Tcnt01EmpMapper.findByUserId' auto-mapping. Mapping parameters are [columnName=IN_EMPNO,propertyName=IN_EMPNO,propertyType=null]
+2025-09-23 15:47:36.065 [http-nio-8080-exec-6] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.Tcnt01EmpMapper.findByUserId' auto-mapping. Mapping parameters are [columnName=UP_DATE,propertyName=UP_DATE,propertyType=null]
+2025-09-23 15:47:36.065 [http-nio-8080-exec-6] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.Tcnt01EmpMapper.findByUserId' auto-mapping. Mapping parameters are [columnName=UP_EMPNO,propertyName=UP_EMPNO,propertyType=null]
+2025-09-23 15:47:36.065 [http-nio-8080-exec-6] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.Tcnt01EmpMapper.findByUserId' auto-mapping. Mapping parameters are [columnName=ADDR2,propertyName=ADDR2,propertyType=null]
+2025-09-23 15:47:36.065 [http-nio-8080-exec-6] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.Tcnt01EmpMapper.findByUserId' auto-mapping. Mapping parameters are [columnName=SUBID,propertyName=SUBID,propertyType=null]
+2025-09-23 15:47:36.065 [http-nio-8080-exec-6] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.Tcnt01EmpMapper.findByUserId' auto-mapping. Mapping parameters are [columnName=CUST_NAME,propertyName=CUST_NAME,propertyType=null]
+2025-09-23 15:47:36.065 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f25b611]
+2025-09-23 15:47:36.065 [http-nio-8080-exec-6] INFO  c.w.c.s.CustomUserDetailsService - 거래처 직원 정보: userId=test11, custCode=P000000218, cust_grade=null, emp_name=null, authority=null
+2025-09-23 15:47:36.113 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:36.113 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2c45b473] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:36.114 [http-nio-8080-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@144987585 wrapping oracle.jdbc.driver.T4CConnection@1715280d] will not be managed by Spring
+2025-09-23 15:47:36.148 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2c45b473]
+2025-09-23 15:47:36.148 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:36.148 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8b535ac] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:36.148 [http-nio-8080-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@590975183 wrapping oracle.jdbc.driver.T4CConnection@1715280d] will not be managed by Spring
+2025-09-23 15:47:36.164 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8b535ac]
+2025-09-23 15:47:36.166 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:36.167 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3ef4c4ab] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:36.167 [http-nio-8080-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1089711973 wrapping oracle.jdbc.driver.T4CConnection@1715280d] will not be managed by Spring
+2025-09-23 15:47:36.175 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3ef4c4ab]
+2025-09-23 15:47:36.175 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:36.175 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@614aea82] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:36.175 [http-nio-8080-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@236626316 wrapping oracle.jdbc.driver.T4CConnection@1715280d] will not be managed by Spring
+2025-09-23 15:47:36.183 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@614aea82]
+2025-09-23 15:47:36.186 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:36.186 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2de4d9ec] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:36.192 [http-nio-8080-exec-7] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1278426356 wrapping oracle.jdbc.driver.T4CConnection@b634f00] will not be managed by Spring
+2025-09-23 15:47:36.196 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2de4d9ec]
+2025-09-23 15:47:36.197 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:36.197 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6651b775] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:36.197 [http-nio-8080-exec-7] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1870269665 wrapping oracle.jdbc.driver.T4CConnection@b634f00] will not be managed by Spring
+2025-09-23 15:47:36.201 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6651b775]
+2025-09-23 15:47:36.223 [http-nio-8080-exec-8] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:36.223 [http-nio-8080-exec-8] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6dd2d95c] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:36.223 [http-nio-8080-exec-8] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@701845032 wrapping oracle.jdbc.driver.T4CConnection@1715280d] will not be managed by Spring
+2025-09-23 15:47:36.230 [http-nio-8080-exec-8] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6dd2d95c]
+2025-09-23 15:47:36.230 [http-nio-8080-exec-8] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:36.230 [http-nio-8080-exec-8] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@36c546ec] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:36.231 [http-nio-8080-exec-8] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@2023452442 wrapping oracle.jdbc.driver.T4CConnection@1715280d] will not be managed by Spring
+2025-09-23 15:47:36.238 [http-nio-8080-exec-8] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@36c546ec]
+2025-09-23 15:47:36.238 [http-nio-8080-exec-8] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:36.238 [http-nio-8080-exec-8] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3f8516c] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:36.238 [http-nio-8080-exec-8] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@14674741 wrapping oracle.jdbc.driver.T4CConnection@1715280d] will not be managed by Spring
+2025-09-23 15:47:36.245 [http-nio-8080-exec-8] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3f8516c]
+2025-09-23 15:47:36.418 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:36.418 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@43877c26]
+2025-09-23 15:47:36.419 [http-nio-8080-exec-3] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@801082541 wrapping oracle.jdbc.driver.T4CConnection@b634f00] will be managed by Spring
+2025-09-23 15:47:36.422 [http-nio-8080-exec-2] INFO  c.wio.crm.service.DashboardService - getDashboardCallCount 호출됨 - username: test11, custCode: P000000218
+2025-09-23 15:47:36.422 [http-nio-8080-exec-2] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:36.422 [http-nio-8080-exec-2] DEBUG org.mybatis.spring.SqlSessionUtils - Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3986bea4]
+2025-09-23 15:47:36.423 [http-nio-8080-exec-2] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1011680991 wrapping oracle.jdbc.driver.T4CConnection@7a4079b1] will be managed by Spring
+2025-09-23 15:47:36.423 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@43877c26]
+2025-09-23 15:47:36.423 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@43877c26]
+2025-09-23 15:47:36.423 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@43877c26]
+2025-09-23 15:47:36.423 [http-nio-8080-exec-3] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@43877c26]
+2025-09-23 15:47:36.423 [http-nio-8080-exec-1] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:36.423 [http-nio-8080-exec-1] DEBUG org.mybatis.spring.SqlSessionUtils - Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1c4c841b]
+2025-09-23 15:47:36.423 [http-nio-8080-exec-1] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@63221534 wrapping oracle.jdbc.driver.T4CConnection@60b43115] will be managed by Spring
+2025-09-23 15:47:36.425 [http-nio-8080-exec-9] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:36.425 [http-nio-8080-exec-9] DEBUG org.mybatis.spring.SqlSessionUtils - Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@65124eb9]
+2025-09-23 15:47:36.425 [http-nio-8080-exec-9] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1579681991 wrapping oracle.jdbc.driver.T4CConnection@69dd2a0a] will be managed by Spring
+2025-09-23 15:47:36.425 [http-nio-8080-exec-10] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:36.425 [http-nio-8080-exec-10] DEBUG org.mybatis.spring.SqlSessionUtils - Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3b7ac6fe]
+2025-09-23 15:47:36.425 [http-nio-8080-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:36.425 [http-nio-8080-exec-10] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1939616030 wrapping oracle.jdbc.driver.T4CConnection@73f828a5] will be managed by Spring
+2025-09-23 15:47:36.425 [http-nio-8080-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@429457d0]
+2025-09-23 15:47:36.425 [http-nio-8080-exec-4] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1731741191 wrapping oracle.jdbc.driver.T4CConnection@1715280d] will be managed by Spring
+2025-09-23 15:47:36.429 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:36.429 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7d2e1d48]
+2025-09-23 15:47:36.429 [http-nio-8080-exec-6] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@802309161 wrapping oracle.jdbc.driver.T4CConnection@b634f00] will be managed by Spring
+2025-09-23 15:47:36.433 [http-nio-8080-exec-10] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3b7ac6fe]
+2025-09-23 15:47:36.433 [http-nio-8080-exec-10] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3b7ac6fe]
+2025-09-23 15:47:36.433 [http-nio-8080-exec-10] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3b7ac6fe]
+2025-09-23 15:47:36.433 [http-nio-8080-exec-10] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3b7ac6fe]
+2025-09-23 15:47:36.438 [http-nio-8080-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@429457d0]
+2025-09-23 15:47:36.438 [http-nio-8080-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@429457d0] from current transaction
+2025-09-23 15:47:36.441 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:36.441 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@65782657]
+2025-09-23 15:47:36.441 [http-nio-8080-exec-7] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@973196022 wrapping oracle.jdbc.driver.T4CConnection@73f828a5] will be managed by Spring
+2025-09-23 15:47:36.447 [http-nio-8080-exec-4] WARN  o.a.i.s.AutoMappingUnknownColumnBehavior - Unknown column is detected on 'com.wio.crm.mapper.DashboardMapper.findDataForCard2' auto-mapping. Mapping parameters are [columnName=PROCESSING_RATE,propertyName=PROCESSING_RATE,propertyType=null]
+2025-09-23 15:47:36.447 [http-nio-8080-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@429457d0]
+2025-09-23 15:47:36.447 [http-nio-8080-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@429457d0] from current transaction
+2025-09-23 15:47:36.449 [http-nio-8080-exec-2] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3986bea4]
+2025-09-23 15:47:36.449 [http-nio-8080-exec-2] INFO  c.wio.crm.service.DashboardService - SQL 쿼리 실행 후 callCountList size: 3
+2025-09-23 15:47:36.449 [http-nio-8080-exec-2] INFO  c.wio.crm.service.DashboardService - 첫 번째 항목 필드 확인: gubn=[3], prc_Date=[20250922], hour_09=[0], hour_10=[0], hour_11=[3], hour_12=[0], callSum=[11]
+2025-09-23 15:47:36.449 [http-nio-8080-exec-2] INFO  c.wio.crm.service.DashboardService - 항목 #1: gubn=[3], prc_Date=[20250922], hour_09=[0], hour_10=[0], hour_11=[3], hour_12=[0], callSum=[11]
+2025-09-23 15:47:36.449 [http-nio-8080-exec-2] INFO  c.wio.crm.service.DashboardService - 항목 #2: gubn=[1], prc_Date=[20250923], hour_09=[0], hour_10=[0], hour_11=[2], hour_12=[0], callSum=[6]
+2025-09-23 15:47:36.449 [http-nio-8080-exec-2] INFO  c.wio.crm.service.DashboardService - 항목 #3: gubn=[2], prc_Date=[20250923], hour_09=[0], hour_10=[1], hour_11=[2], hour_12=[0], callSum=[6]
+2025-09-23 15:47:36.449 [http-nio-8080-exec-2] INFO  c.wio.crm.service.DashboardService - data 맵에 callCountList 추가 완료. data 크기: 1
+2025-09-23 15:47:36.449 [http-nio-8080-exec-2] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3986bea4]
+2025-09-23 15:47:36.449 [http-nio-8080-exec-2] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3986bea4]
+2025-09-23 15:47:36.449 [http-nio-8080-exec-2] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3986bea4]
+2025-09-23 15:47:36.451 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@65782657]
+2025-09-23 15:47:36.451 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@65782657] from current transaction
+2025-09-23 15:47:36.459 [http-nio-8080-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@429457d0]
+2025-09-23 15:47:36.459 [http-nio-8080-exec-4] INFO  c.wio.crm.service.DashboardService - findPointList 조회 결과 - 항목 수: 2
+2025-09-23 15:47:36.459 [http-nio-8080-exec-4] INFO  c.wio.crm.service.DashboardService - 포인트 항목 [0] - CS_TYPE: '일반', dailyPoint:                7, dailyPointN: 7
+2025-09-23 15:47:36.459 [http-nio-8080-exec-4] INFO  c.wio.crm.service.DashboardService - 포인트 항목 [1] - CS_TYPE: '반품', dailyPoint:                1, dailyPointN: 1
+2025-09-23 15:47:36.459 [http-nio-8080-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@429457d0] from current transaction
+2025-09-23 15:47:36.462 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7d2e1d48]
+2025-09-23 15:47:36.462 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7d2e1d48]
+2025-09-23 15:47:36.462 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7d2e1d48]
+2025-09-23 15:47:36.462 [http-nio-8080-exec-6] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7d2e1d48]
+2025-09-23 15:47:36.464 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@65782657]
+2025-09-23 15:47:36.464 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@65782657]
+2025-09-23 15:47:36.464 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@65782657]
+2025-09-23 15:47:36.464 [http-nio-8080-exec-7] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@65782657]
+2025-09-23 15:47:36.474 [http-nio-8080-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@429457d0]
+2025-09-23 15:47:36.474 [http-nio-8080-exec-4] INFO  c.wio.crm.service.DashboardService - [원본 데이터 확인] card1Data 원래 상태: count_Com=[6](타입:java.lang.String), todayCom=[6](타입:java.lang.String), todayMiss=[6](타입:java.lang.String), todayEme=[20](타입:java.lang.String), processing_rate=[50](타입:java.lang.String)
+2025-09-23 15:47:36.474 [http-nio-8080-exec-4] INFO  c.wio.crm.service.DashboardService - [확인] SQL에서 계산된 processing_rate 값 사용: 50
+2025-09-23 15:47:36.474 [http-nio-8080-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@429457d0] from current transaction
+2025-09-23 15:47:36.477 [http-nio-8080-exec-9] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@65124eb9]
+2025-09-23 15:47:36.477 [http-nio-8080-exec-9] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@65124eb9]
+2025-09-23 15:47:36.477 [http-nio-8080-exec-9] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@65124eb9]
+2025-09-23 15:47:36.477 [http-nio-8080-exec-9] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@65124eb9]
+2025-09-23 15:47:36.486 [http-nio-8080-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@429457d0]
+2025-09-23 15:47:36.486 [http-nio-8080-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@429457d0] from current transaction
+2025-09-23 15:47:36.505 [http-nio-8080-exec-1] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1c4c841b]
+2025-09-23 15:47:36.505 [http-nio-8080-exec-1] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1c4c841b]
+2025-09-23 15:47:36.505 [http-nio-8080-exec-1] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1c4c841b]
+2025-09-23 15:47:36.505 [http-nio-8080-exec-1] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1c4c841b]
+2025-09-23 15:47:36.509 [http-nio-8080-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@429457d0]
+2025-09-23 15:47:36.509 [http-nio-8080-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@429457d0] from current transaction
+2025-09-23 15:47:36.536 [http-nio-8080-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@429457d0]
+2025-09-23 15:47:36.536 [http-nio-8080-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@429457d0] from current transaction
+2025-09-23 15:47:36.543 [http-nio-8080-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@429457d0]
+2025-09-23 15:47:36.544 [http-nio-8080-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@429457d0] from current transaction
+2025-09-23 15:47:36.552 [http-nio-8080-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@429457d0]
+2025-09-23 15:47:36.552 [http-nio-8080-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@429457d0] from current transaction
+2025-09-23 15:47:36.561 [http-nio-8080-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@429457d0]
+2025-09-23 15:47:36.561 [http-nio-8080-exec-4] INFO  c.wio.crm.service.DashboardService - [최종 확인] 카드1 데이터(수정 후): {count_Com=6, todayCom=6, todayMiss=6, todayEme=20, processing_rate=50, count_sum=12}
+2025-09-23 15:47:36.561 [http-nio-8080-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@429457d0]
+2025-09-23 15:47:36.561 [http-nio-8080-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@429457d0]
+2025-09-23 15:47:36.561 [http-nio-8080-exec-4] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@429457d0]
+2025-09-23 15:47:40.098 [http-nio-8080-exec-5] ERROR o.a.c.c.C.[.[.[.[dispatcherServlet] - Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed: java.lang.IllegalArgumentException: Name for argument of type [int] not specified, and parameter name information not available via reflection. Ensure that the compiler uses the '-parameters' flag.] with root cause
+java.lang.IllegalArgumentException: Name for argument of type [int] not specified, and parameter name information not available via reflection. Ensure that the compiler uses the '-parameters' flag.
+	at org.springframework.web.method.annotation.AbstractNamedValueMethodArgumentResolver.updateNamedValueInfo(AbstractNamedValueMethodArgumentResolver.java:185)
+	at org.springframework.web.method.annotation.AbstractNamedValueMethodArgumentResolver.getNamedValueInfo(AbstractNamedValueMethodArgumentResolver.java:160)
+	at org.springframework.web.method.annotation.AbstractNamedValueMethodArgumentResolver.resolveArgument(AbstractNamedValueMethodArgumentResolver.java:106)
+	at org.springframework.web.method.support.HandlerMethodArgumentResolverComposite.resolveArgument(HandlerMethodArgumentResolverComposite.java:122)
+	at org.springframework.web.method.support.InvocableHandlerMethod.getMethodArgumentValues(InvocableHandlerMethod.java:226)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:179)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:917)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:829)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
+	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:903)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:564)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:205)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108)
+	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:231)
+	at org.springframework.security.web.ObservationFilterChainDecorator$FilterObservation$SimpleFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:479)
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:340)
+	at org.springframework.security.web.ObservationFilterChainDecorator.lambda$wrapSecured$0(ObservationFilterChainDecorator.java:82)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:128)
+	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:100)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:179)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter.doFilter(AbstractAuthenticationProcessingFilter.java:227)
+	at org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter.doFilter(AbstractAuthenticationProcessingFilter.java:221)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:107)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:93)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.csrf.CsrfFilter.doFilterInternal(CsrfFilter.java:117)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.web.filter.CorsFilter.doFilterInternal(CorsFilter.java:91)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240)
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$0(ObservationFilterChainDecorator.java:323)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:224)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137)
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:233)
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:191)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.servlet.handler.HandlerMappingIntrospector.lambda$createCacheFilter$3(HandlerMappingIntrospector.java:195)
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74)
+	at org.springframework.security.config.annotation.web.configuration.WebMvcSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebMvcSecurityConfiguration.java:225)
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:352)
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:268)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:109)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:340)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:391)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:896)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1744)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1191)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+2025-09-23 15:47:40.111 [http-nio-8080-exec-5] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:40.111 [http-nio-8080-exec-5] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7837dd99] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:40.118 [http-nio-8080-exec-5] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@507001336 wrapping oracle.jdbc.driver.T4CConnection@73f828a5] will not be managed by Spring
+2025-09-23 15:47:40.124 [http-nio-8080-exec-5] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7837dd99]
+2025-09-23 15:47:40.124 [http-nio-8080-exec-5] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-09-23 15:47:40.124 [http-nio-8080-exec-5] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@566b5c30] was not registered for synchronization because synchronization is not active
+2025-09-23 15:47:40.124 [http-nio-8080-exec-5] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1548664395 wrapping oracle.jdbc.driver.T4CConnection@73f828a5] will not be managed by Spring
+2025-09-23 15:47:40.130 [http-nio-8080-exec-5] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@566b5c30]
+2025-09-23 15:48:40.646 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-09-23 15:48:40.647 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-09-23 15:48:40.706 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.

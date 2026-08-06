@@ -35,3 +35,28 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Cursor ###
+.cursor/
+
+### 민감 파일 (보안) ###
+src/main/resources/keystore.p12
+src/main/resources/application-prod.properties
+gradle.properties
+
+### 로그 파일 ###
+logs/
+*.log
+
+### 업로드 파일 ###
+uploads/
+
+### 배치 스크립트 (로컬 전용) ###
+*.bat
+
+### 작업 문서 (로컬 전용) ###
+PLAN.md
+CONTEXT.md
+CHECKLIST.md
+PERSONAS.md
+WICRM_URGENT_FIX_PLAN.md

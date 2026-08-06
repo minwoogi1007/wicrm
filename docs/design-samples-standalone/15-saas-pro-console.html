@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WICRM Design 15 · SaaS Pro Console</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; }
+
+        .saas {
+            --bg: #fafafa;
+            --panel: #ffffff;
+            --ink: #0a0a0a;
+            --ink-2: #404040;
+            --muted: #737373;
+            --line: #e5e5e5;
+            --line-soft: #f0f0f0;
+            --accent: #6366f1;
+            --accent-bg: #eef2ff;
+            --green: #10b981;
+            --green-bg: #ecfdf5;
+            --amber: #f59e0b;
+            --amber-bg: #fffbeb;
+            --red: #ef4444;
+            --red-bg: #fef2f2;
+            --mono: "JetBrains Mono", monospace;
+
+            background: var(--bg);
+            color: var(--ink);
+            font-family: "Inter", "Pretendard", system-ui, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            font-size: 13px;
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 224px 1fr;
+        }
+
+        /* ================ SIDEBAR ================ */
+        .sa-side {
+            border-right: 1px solid var(--line);
+            background: var(--panel);
+            padding: 12px;
+            display: flex; flex-direction: column;
+            gap: 4px;
+            position: sticky; top: 0; height: 100vh;
+            overflow-y: auto;
+        }
+        .sa-ws {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 10px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        .sa-ws .ws-logo {
+            width: 24px; height: 24px; border-radius: 6px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            display: grid; place-items: center;
+            color: #fff; font-weight: 700; font-size: 11px;
+        }
+        .sa-ws .ws-name { font-weight: 600; font-size: 13px; flex: 1; }
+        .sa-ws .ws-arrow { color: var(--muted); font-size: 11px; }
+
+        .sa-search {
+            display: flex; align-items: center; gap: 8px;
+            padding: 6px 10px;
+            background: var(--bg);
+            border: 1px solid var(--line-soft);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+        .sa-search .kbd {
+            margin-left: auto;
+            font-family: var(--mono);
+            font-size: 10px;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            padding: 1px 6px;
+            border-radius: 4px;
+        }
+
+        .sa-grp {
+            font-family: var(--mono); font-size: 10px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 12px 10px 4px;
+            font-weight: 500;
+        }
+        .sa-nav { display: flex; flex-direction: column; gap: 1px; }
+        .sa-nav a {
+            display: flex; align-items: center; gap: 10px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            text-decoration: none; color: var(--ink-2);
+            font-size: 13px;
+            position: relative;
+        }
+        .sa-nav a:hover { background: var(--bg); color: var(--ink); }
+        .sa-nav a.on { background: var(--bg); color: var(--ink); font-weight: 500; }
+        .sa-nav a .ic {
+            width: 14px; height: 14px;
+            display: grid; place-items: center;
+            color: var(--muted);
+            font-size: 13px;
+        }
+        .sa-nav a.on .ic { color: var(--accent); }
+        .sa-nav a .badge {
+            margin-left: auto;
+            font-size: 10px;
+            background: var(--accent-bg);
+            color: var(--accent);
+            padding: 1px 6px;
+            border-radius: 999px;
+            font-weight: 600;
+        }
+        .sa-nav a .badge.muted { background: var(--line-soft); color: var(--muted); }
+
+        .sa-foot {
+            margin-top: auto;
+            padding: 12px 8px 0;
+            border-top: 1px solid var(--line-soft);
+            display: flex; align-items: center; gap: 10px;
+        }
+        .sa-foot .av {
+            width: 28px; height: 28px; border-radius: 50%;
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            color: #fff; font-weight: 700; font-size: 11px;
+            display: grid; place-items: center;
+        }
+        .sa-foot .nm { font-size: 12px; font-weight: 600; line-height: 1.2; }
+        .sa-foot .em { font-size: 11px; color: var(--muted); }
+
+        /* ================ MAIN ================ */
+        .sa-main { min-width: 0; }
+        .sa-top {
+            display: flex; align-items: center;
+            padding: 10px 24px;
+            border-bottom: 1px solid var(--line);
+            gap: 12px;
+            background: var(--panel);
+            position: sticky; top: 0; z-index: 10;
+        }
+        .sa-top .crumb {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 12px; color: var(--muted);
+        }
+        .sa-top .crumb a { color: var(--muted); text-decoration: none; }
+        .sa-top .crumb a:first-child { color: var(--ink); font-weight: 600; }
+        .sa-top .crumb .sep { color: var(--line); }
+        .sa-top .filler { flex: 1; }
+        .sa-top .pill {
+            font-family: var(--mono); font-size: 11px;
+            background: var(--bg); border: 1px solid var(--line);
+            padding: 4px 10px; border-radius: 999px;
+            color: var(--muted);
+        }
+        .sa-top .icon-btn {
+            width: 28px; height: 28px;
+            display: grid; place-items: center;
+            border-radius: 6px; cursor: pointer;
+            color: var(--muted);
+        }
+        .sa-top .icon-btn:hover { background: var(--bg); color: var(--ink); }
+        .sa-top .back {
+            color: var(--muted); text-decoration: none; font-size: 12px;
+            border: 1px solid var(--line); padding: 4px 10px; border-radius: 6px;
+        }
+
+        /* Page header */
+        .sa-page { padding: 24px; max-width: 1400px; }
+        .sa-head {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            gap: 20px; flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .sa-head h1 {
+            font-size: 22px; font-weight: 600; letter-spacing: -0.01em;
+            margin: 0 0 4px;
+        }
+        .sa-head p { margin: 0; color: var(--muted); font-size: 13px; }
+        .sa-head .actions { display: flex; gap: 8px; }
+        .sa-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 12px; border-radius: 6px;
+            border: 1px solid var(--line); background: var(--panel);
+            color: var(--ink); font-family: inherit; font-size: 12px;
+            cursor: pointer; font-weight: 500;
+        }
+        .sa-btn:hover { background: var(--bg); }
+        .sa-btn.primary {
+            background: var(--ink); color: #fff; border-color: var(--ink);
+        }
+        .sa-btn.primary:hover { background: var(--ink-2); }
+        .sa-btn .kbd {
+            font-family: var(--mono); font-size: 10px;
+            background: rgba(255,255,255,0.15);
+            padding: 1px 5px; border-radius: 3px;
+            margin-left: 4px;
+        }
+        .sa-btn:not(.primary) .kbd { background: var(--bg); color: var(--muted); }
+
+        /* tabs */
+        .sa-tabs {
+            display: flex; gap: 4px;
+            border-bottom: 1px solid var(--line);
+            margin-bottom: 18px;
+            font-size: 13px;
+        }
+        .sa-tabs a {
+            padding: 8px 12px;
+            color: var(--muted); text-decoration: none;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+            font-weight: 500;
+        }
+        .sa-tabs a:hover { color: var(--ink); }
+        .sa-tabs a.on { color: var(--ink); border-bottom-color: var(--ink); }
+        .sa-tabs a .cnt {
+            font-family: var(--mono); font-size: 10px;
+            background: var(--bg); padding: 1px 6px;
+            border-radius: 999px; margin-left: 6px;
+            color: var(--muted);
+        }
+        .sa-tabs a.on .cnt { background: var(--accent-bg); color: var(--accent); }
+
+        /* stats row */
+        .sa-stats {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+        .sa-stat {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 14px 16px;
+        }
+        .sa-stat .lbl {
+            font-size: 11px; color: var(--muted); font-weight: 500;
+            margin-bottom: 6px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .sa-stat .lbl .dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: var(--accent);
+        }
+        .sa-stat .v { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; }
+        .sa-stat .delta {
+            font-size: 11px; margin-top: 4px;
+            display: inline-flex; align-items: center; gap: 4px;
+        }
+        .sa-stat .delta.up { color: var(--green); }
+        .sa-stat .delta.dn { color: var(--red); }
+        .sa-stat .spark {
+            margin-top: 6px;
+            display: flex; align-items: end; gap: 2px;
+            height: 18px;
+        }
+        .sa-stat .spark i {
+            flex: 1;
+            background: var(--line-soft);
+            border-radius: 1px;
+        }
+        .sa-stat .spark i.act { background: var(--accent); }
+
+        /* filter row */
+        .sa-filter {
+            display: flex; align-items: center; gap: 8px;
+            margin-bottom: 12px; flex-wrap: wrap;
+        }
+        .sa-filter .chip {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 4px 10px; border-radius: 6px;
+            border: 1px dashed var(--line);
+            color: var(--muted); font-size: 12px;
+            cursor: pointer; background: var(--panel);
+        }
+        .sa-filter .chip:hover { border-color: var(--ink); color: var(--ink); }
+        .sa-filter .chip.active {
+            background: var(--accent-bg); color: var(--accent);
+            border: 1px solid var(--accent); border-style: solid;
+            font-weight: 500;
+        }
+        .sa-filter .chip .x { color: currentColor; opacity: 0.5; margin-left: 2px; }
+        .sa-filter .grow { flex: 1; }
+        .sa-filter .view {
+            display: flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden;
+        }
+        .sa-filter .view button {
+            padding: 4px 10px;
+            background: var(--panel); border: 0; cursor: pointer;
+            color: var(--muted); font-family: inherit; font-size: 12px;
+        }
+        .sa-filter .view button.on { background: var(--bg); color: var(--ink); font-weight: 500; }
+
+        /* table */
+        .sa-table-wrap {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .sa-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .sa-table th, .sa-table td {
+            text-align: left;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--line-soft);
+        }
+        .sa-table th {
+            background: var(--bg);
+            font-weight: 500; color: var(--muted);
+            font-size: 11px; text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .sa-table tbody tr:hover { background: var(--bg); }
+        .sa-table tbody tr:last-child td { border-bottom: none; }
+        .sa-table .id { font-family: var(--mono); font-size: 12px; color: var(--accent); }
+        .sa-table .cust { display: flex; align-items: center; gap: 10px; }
+        .sa-table .av {
+            width: 26px; height: 26px; border-radius: 50%;
+            display: grid; place-items: center;
+            color: #fff; font-weight: 600; font-size: 11px;
+        }
+        .sa-table .av.a1 { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+        .sa-table .av.a2 { background: linear-gradient(135deg, #10b981, #06b6d4); }
+        .sa-table .av.a3 { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+        .sa-table .av.a4 { background: linear-gradient(135deg, #ec4899, #f43f5e); }
+        .sa-table .av.a5 { background: linear-gradient(135deg, #8b5cf6, #ec4899); }
+        .sa-table .nm { font-weight: 500; line-height: 1.2; }
+        .sa-table .em { font-size: 11px; color: var(--muted); margin-top: 1px; }
+        .sa-table .amt { font-family: var(--mono); font-weight: 500; text-align: right; }
+        .sa-table .ts { color: var(--muted); font-size: 12px; }
+
+        .pill {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 2px 8px; border-radius: 999px;
+            font-size: 11px; font-weight: 500;
+        }
+        .pill::before {
+            content: ""; width: 6px; height: 6px; border-radius: 50%;
+            background: currentColor;
+        }
+        .pill.success { background: var(--green-bg); color: var(--green); }
+        .pill.warn { background: var(--amber-bg); color: var(--amber); }
+        .pill.danger { background: var(--red-bg); color: var(--red); }
+        .pill.info { background: var(--accent-bg); color: var(--accent); }
+        .pill.neutral { background: var(--line-soft); color: var(--ink-2); }
+
+        .tag {
+            display: inline-block;
+            padding: 1px 8px; border-radius: 4px;
+            font-size: 11px; font-weight: 500;
+            background: var(--bg); border: 1px solid var(--line);
+            color: var(--ink-2);
+        }
+
+        .sa-table .more {
+            display: grid; place-items: center;
+            width: 22px; height: 22px;
+            border-radius: 4px;
+            color: var(--muted); cursor: pointer;
+            margin-left: auto;
+        }
+        .sa-table .more:hover { background: var(--bg); color: var(--ink); }
+
+        /* table footer */
+        .sa-table-foot {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 14px;
+            background: var(--bg);
+            border-top: 1px solid var(--line-soft);
+            font-size: 12px; color: var(--muted);
+        }
+        .sa-table-foot .pages { display: flex; gap: 4px; }
+        .sa-table-foot .pages button {
+            min-width: 26px; height: 26px;
+            background: var(--panel); border: 1px solid var(--line);
+            border-radius: 5px; cursor: pointer;
+            color: var(--ink-2); font-family: inherit; font-size: 12px;
+        }
+        .sa-table-foot .pages button.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+        /* small section grid bottom */
+        .sa-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-top: 18px; }
+        .sa-card {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+        }
+        .sa-card .ch {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--line-soft);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .sa-card .ch h3 { margin: 0; font-size: 13px; font-weight: 600; }
+        .sa-card .ch .more { font-size: 11px; color: var(--muted); cursor: pointer; }
+        .sa-card .cb { padding: 14px 16px; }
+
+        .sa-feed { display: flex; flex-direction: column; gap: 12px; }
+        .sa-feed .ev { display: grid; grid-template-columns: 24px 1fr auto; gap: 10px; align-items: flex-start; }
+        .sa-feed .ev .dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            margin: 7px auto; background: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-bg);
+        }
+        .sa-feed .ev.green .dot { background: var(--green); box-shadow: 0 0 0 3px var(--green-bg); }
+        .sa-feed .ev.amber .dot { background: var(--amber); box-shadow: 0 0 0 3px var(--amber-bg); }
+        .sa-feed .ev .desc { font-size: 12.5px; line-height: 1.4; }
+        .sa-feed .ev .desc b { font-weight: 600; }
+        .sa-feed .ev .desc small { display: block; color: var(--muted); margin-top: 1px; font-size: 11px; }
+        .sa-feed .ev .ts { font-size: 11px; color: var(--muted); white-space: nowrap; }
+
+        /* chart placeholder */
+        .sa-chart svg { width: 100%; height: 200px; display: block; }
+
+        @media (max-width: 1100px) {
+            .saas { grid-template-columns: 1fr; }
+            .sa-side { display: none; }
+            .sa-stats { grid-template-columns: 1fr 1fr; }
+            .sa-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="saas">
+
+    <!-- ============= SIDEBAR ============= -->
+    <aside class="sa-side">
+        <div class="sa-ws">
+            <div class="ws-logo">W</div>
+            <div class="ws-name">WICRM</div>
+            <span class="ws-arrow">▾</span>
+        </div>
+
+        <div class="sa-search">
+            <span>⌕</span>
+            <span>Search or jump…</span>
+            <span class="kbd">⌘K</span>
+        </div>
+
+        <div class="sa-grp">Workspace</div>
+        <nav class="sa-nav">
+            <a href="#"><span class="ic">⌂</span> Overview</a>
+            <a href="#"><span class="ic">∿</span> Insights</a>
+            <a href="#"><span class="ic">⊕</span> Inbox <span class="badge">12</span></a>
+        </nav>
+
+        <div class="sa-grp">Operations</div>
+        <nav class="sa-nav">
+            <a href="#" class="on"><span class="ic">▤</span> Orders <span class="badge">128</span></a>
+            <a href="#"><span class="ic">↩</span> Refunds <span class="badge muted">312</span></a>
+            <a href="#"><span class="ic">⇆</span> Exchanges</a>
+            <a href="#"><span class="ic">▶</span> Shipping</a>
+            <a href="#"><span class="ic">◷</span> Pending</a>
+        </nav>
+
+        <div class="sa-grp">Catalog</div>
+        <nav class="sa-nav">
+            <a href="#"><span class="ic">▢</span> Products</a>
+            <a href="#"><span class="ic">⌾</span> Inventory</a>
+            <a href="#"><span class="ic">★</span> Collections</a>
+        </nav>
+
+        <div class="sa-grp">Customers</div>
+        <nav class="sa-nav">
+            <a href="#"><span class="ic">◔</span> All members</a>
+            <a href="#"><span class="ic">★</span> VIP</a>
+            <a href="#"><span class="ic">⊜</span> Mileage</a>
+        </nav>
+
+        <div class="sa-foot">
+            <div class="av">민</div>
+            <div>
+                <div class="nm">김민우</div>
+                <div class="em">admin@wicrm.kr</div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ============= MAIN ============= -->
+    <main class="sa-main">
+
+        <div class="sa-top">
+            <a href="index.html" class="back">← index</a>
+            <div class="crumb">
+                <a href="#">Operations</a>
+                <span class="sep">/</span>
+                <a href="#">Orders</a>
+                <span class="sep">/</span>
+                <a href="#">All</a>
+            </div>
+            <div class="filler"></div>
+            <span class="pill">Type 15 · SaaS Pro</span>
+            <div class="icon-btn">⌕</div>
+            <div class="icon-btn">⌬</div>
+            <div class="icon-btn">⏻</div>
+        </div>
+
+        <div class="sa-page">
+
+            <header class="sa-head">
+                <div>
+                    <h1>주문 (Orders)</h1>
+                    <p>11개 사이트에서 발생한 주문을 통합 관리합니다.</p>
+                </div>
+                <div class="actions">
+                    <button class="sa-btn">내보내기</button>
+                    <button class="sa-btn">필터 저장</button>
+                    <button class="sa-btn primary">+ 주문 등록 <span class="kbd">N</span></button>
+                </div>
+            </header>
+
+            <div class="sa-tabs">
+                <a href="#" class="on">전체 <span class="cnt">8,412</span></a>
+                <a href="#">결제 대기 <span class="cnt">128</span></a>
+                <a href="#">출고 대기 <span class="cnt">412</span></a>
+                <a href="#">배송중 <span class="cnt">1,284</span></a>
+                <a href="#">완료 <span class="cnt">6,124</span></a>
+                <a href="#">환불/교환 <span class="cnt">312</span></a>
+            </div>
+
+            <section class="sa-stats">
+                <div class="sa-stat">
+                    <div class="lbl"><span class="dot"></span>오늘 주문</div>
+                    <div class="v">412</div>
+                    <div class="delta up">↑ 6.2%</div>
+                    <div class="spark">
+                        <i></i><i></i><i></i><i style="height:60%"></i><i style="height:40%"></i><i style="height:75%"></i><i style="height:55%"></i><i style="height:90%"></i><i style="height:70%"></i><i class="act" style="height:100%"></i>
+                    </div>
+                </div>
+                <div class="sa-stat">
+                    <div class="lbl"><span class="dot" style="background:var(--green)"></span>총 매출 (24h)</div>
+                    <div class="v">₩84.2M</div>
+                    <div class="delta up">↑ 12.4% vs YDA</div>
+                    <div class="spark">
+                        <i style="height:30%"></i><i style="height:50%"></i><i style="height:60%"></i><i style="height:45%"></i><i style="height:70%"></i><i style="height:80%"></i><i style="height:65%"></i><i style="height:85%"></i><i style="height:75%"></i><i class="act" style="height:100%; background:var(--green)"></i>
+                    </div>
+                </div>
+                <div class="sa-stat">
+                    <div class="lbl"><span class="dot" style="background:var(--amber)"></span>SLA 위험</div>
+                    <div class="v">17</div>
+                    <div class="delta dn">↑ 3건</div>
+                    <div class="spark">
+                        <i style="height:20%"></i><i style="height:30%"></i><i style="height:25%"></i><i style="height:40%"></i><i style="height:35%"></i><i style="height:50%"></i><i style="height:45%"></i><i style="height:60%"></i><i style="height:55%"></i><i class="act" style="height:80%; background:var(--amber)"></i>
+                    </div>
+                </div>
+                <div class="sa-stat">
+                    <div class="lbl"><span class="dot" style="background:var(--red)"></span>환불률</div>
+                    <div class="v">14.7%</div>
+                    <div class="delta dn">↑ 1.8pt</div>
+                    <div class="spark">
+                        <i style="height:40%"></i><i style="height:35%"></i><i style="height:50%"></i><i style="height:45%"></i><i style="height:55%"></i><i style="height:50%"></i><i style="height:60%"></i><i style="height:65%"></i><i style="height:75%"></i><i class="act" style="height:90%; background:var(--red)"></i>
+                    </div>
+                </div>
+            </section>
+
+            <div class="sa-filter">
+                <span class="chip active">사이트 · 자사몰 <span class="x">×</span></span>
+                <span class="chip active">기간 · 오늘 <span class="x">×</span></span>
+                <span class="chip">+ 브랜드</span>
+                <span class="chip">+ 결제수단</span>
+                <span class="chip">+ 상태</span>
+                <span class="grow"></span>
+                <div class="view">
+                    <button class="on">▤ Table</button>
+                    <button>▦ Board</button>
+                    <button>▧ Group</button>
+                </div>
+            </div>
+
+            <div class="sa-table-wrap">
+                <table class="sa-table">
+                    <thead>
+                        <tr>
+                            <th style="width:32px;"><input type="checkbox" disabled></th>
+                            <th>주문 ID</th>
+                            <th>고객</th>
+                            <th>상품</th>
+                            <th>사이트</th>
+                            <th>결제</th>
+                            <th>상태</th>
+                            <th style="text-align:right;">금액</th>
+                            <th>접수</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" disabled></td>
+                            <td><span class="id">#WC-3128</span></td>
+                            <td><div class="cust"><span class="av a1">김</span><div><div class="nm">김민지</div><div class="em">minji@example.com</div></div></div></td>
+                            <td>RN-GSZD962 외 2건</td>
+                            <td><span class="tag">자사몰 · 레노마</span></td>
+                            <td><span class="tag">네이버페이</span></td>
+                            <td><span class="pill warn">출고 대기</span></td>
+                            <td class="amt">₩128,400</td>
+                            <td class="ts">12:29</td>
+                            <td><span class="more">⋯</span></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" disabled></td>
+                            <td><span class="id">#WC-3127</span></td>
+                            <td><div class="cust"><span class="av a2">박</span><div><div class="nm">박서연</div><div class="em">seoyeon@example.com</div></div></div></td>
+                            <td>CO-DR1042</td>
+                            <td><span class="tag">29CM · 코랄리크</span></td>
+                            <td><span class="tag">카드</span></td>
+                            <td><span class="pill info">배송중</span></td>
+                            <td class="amt">₩42,000</td>
+                            <td class="ts">12:18</td>
+                            <td><span class="more">⋯</span></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" disabled></td>
+                            <td><span class="id">#WC-3126</span></td>
+                            <td><div class="cust"><span class="av a3">이</span><div><div class="nm">이지훈</div><div class="em">jihoon@example.com</div></div></div></td>
+                            <td>RN-PT2207 외 1건</td>
+                            <td><span class="tag">지그재그 · 레노마</span></td>
+                            <td><span class="tag">카카오페이</span></td>
+                            <td><span class="pill danger">환불 요청</span></td>
+                            <td class="amt">₩86,400</td>
+                            <td class="ts">12:09</td>
+                            <td><span class="more">⋯</span></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" disabled></td>
+                            <td><span class="id">#WC-3125</span></td>
+                            <td><div class="cust"><span class="av a4">최</span><div><div class="nm">최예린</div><div class="em">yelin@example.com</div></div></div></td>
+                            <td>CO-BG2018</td>
+                            <td><span class="tag">SSG · 코랄리크</span></td>
+                            <td><span class="tag">토스</span></td>
+                            <td><span class="pill success">완료</span></td>
+                            <td class="amt">₩214,000</td>
+                            <td class="ts">11:58</td>
+                            <td><span class="more">⋯</span></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" disabled></td>
+                            <td><span class="id">#WC-3124</span></td>
+                            <td><div class="cust"><span class="av a5">정</span><div><div class="nm">정현우</div><div class="em">hyunwoo@example.com</div></div></div></td>
+                            <td>RN-SH3019 외 4건</td>
+                            <td><span class="tag">무신사 · 레노마</span></td>
+                            <td><span class="tag">네이버페이</span></td>
+                            <td><span class="pill info">배송중</span></td>
+                            <td class="amt">₩342,800</td>
+                            <td class="ts">11:42</td>
+                            <td><span class="more">⋯</span></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" disabled></td>
+                            <td><span class="id">#WC-3123</span></td>
+                            <td><div class="cust"><span class="av a1">한</span><div><div class="nm">한지민</div><div class="em">jimin@example.com</div></div></div></td>
+                            <td>CO-DR1042</td>
+                            <td><span class="tag">자사몰 · 코랄리크</span></td>
+                            <td><span class="tag">카드</span></td>
+                            <td><span class="pill warn">결제 검증</span></td>
+                            <td class="amt">₩42,000</td>
+                            <td class="ts">11:30</td>
+                            <td><span class="more">⋯</span></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" disabled></td>
+                            <td><span class="id">#WC-3122</span></td>
+                            <td><div class="cust"><span class="av a2">오</span><div><div class="nm">오지수</div><div class="em">jisoo@example.com</div></div></div></td>
+                            <td>RN-GSZD962</td>
+                            <td><span class="tag">LF · 레노마</span></td>
+                            <td><span class="tag">카드</span></td>
+                            <td><span class="pill success">완료</span></td>
+                            <td class="amt">₩68,000</td>
+                            <td class="ts">11:18</td>
+                            <td><span class="more">⋯</span></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" disabled></td>
+                            <td><span class="id">#WC-3121</span></td>
+                            <td><div class="cust"><span class="av a3">윤</span><div><div class="nm">윤서희</div><div class="em">seohee@example.com</div></div></div></td>
+                            <td>CO-BG2018 외 2건</td>
+                            <td><span class="tag">29CM · 코랄리크</span></td>
+                            <td><span class="tag">토스</span></td>
+                            <td><span class="pill neutral">초안</span></td>
+                            <td class="amt">₩162,000</td>
+                            <td class="ts">11:02</td>
+                            <td><span class="more">⋯</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="sa-table-foot">
+                    <span>총 8,412건 · 1–8 표시</span>
+                    <div class="pages">
+                        <button>‹</button>
+                        <button class="on">1</button>
+                        <button>2</button>
+                        <button>3</button>
+                        <button>…</button>
+                        <button>1052</button>
+                        <button>›</button>
+                    </div>
+                </div>
+            </div>
+
+            <section class="sa-grid">
+
+                <article class="sa-card sa-chart">
+                    <div class="ch">
+                        <h3>주문 추이 · 최근 7일</h3>
+                        <span class="more">전체 보기 →</span>
+                    </div>
+                    <div class="cb">
+                        <svg viewBox="0 0 600 200" preserveAspectRatio="none">
+                            <defs>
+                                <linearGradient id="saF" x1="0" x2="0" y1="0" y2="1">
+                                    <stop offset="0%" stop-color="#6366f1" stop-opacity="0.18"/>
+                                    <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+                                </linearGradient>
+                            </defs>
+                            <g stroke="#f0f0f0" stroke-width="1">
+                                <line x1="0" y1="50" x2="600" y2="50"/>
+                                <line x1="0" y1="100" x2="600" y2="100"/>
+                                <line x1="0" y1="150" x2="600" y2="150"/>
+                            </g>
+                            <path d="M0,140 L86,120 L172,90 L258,110 L344,70 L430,80 L516,40 L600,60"
+                                  fill="none" stroke="#6366f1" stroke-width="2" stroke-linejoin="round"/>
+                            <path d="M0,140 L86,120 L172,90 L258,110 L344,70 L430,80 L516,40 L600,60 L600,200 L0,200 Z"
+                                  fill="url(#saF)"/>
+                            <g fill="#6366f1">
+                                <circle cx="86" cy="120" r="3"/>
+                                <circle cx="172" cy="90" r="3"/>
+                                <circle cx="258" cy="110" r="3"/>
+                                <circle cx="344" cy="70" r="3"/>
+                                <circle cx="430" cy="80" r="3"/>
+                                <circle cx="516" cy="40" r="3"/>
+                                <circle cx="600" cy="60" r="3" fill="#fff" stroke="#6366f1" stroke-width="2"/>
+                            </g>
+                            <g fill="#737373" font-family="JetBrains Mono" font-size="9">
+                                <text x="2" y="195">04.22</text>
+                                <text x="86" y="195">23</text>
+                                <text x="172" y="195">24</text>
+                                <text x="258" y="195">25</text>
+                                <text x="344" y="195">26</text>
+                                <text x="430" y="195">27</text>
+                                <text x="516" y="195">28</text>
+                                <text x="565" y="195" fill="#6366f1" font-weight="600">today</text>
+                            </g>
+                        </svg>
+                    </div>
+                </article>
+
+                <article class="sa-card">
+                    <div class="ch">
+                        <h3>최근 활동</h3>
+                        <span class="more">전체</span>
+                    </div>
+                    <div class="cb">
+                        <div class="sa-feed">
+                            <div class="ev green">
+                                <span class="dot"></span>
+                                <div class="desc"><b>#WC-3128</b> 결제 승인 <small>네이버페이 · 김민지 · ₩128,400</small></div>
+                                <span class="ts">2m</span>
+                            </div>
+                            <div class="ev">
+                                <span class="dot"></span>
+                                <div class="desc"><b>#WC-3127</b> 송장 발행 <small>CJ대한통운 · 632049182</small></div>
+                                <span class="ts">8m</span>
+                            </div>
+                            <div class="ev amber">
+                                <span class="dot"></span>
+                                <div class="desc"><b>#WC-3126</b> 환불 요청 접수 <small>이지훈 · 사이즈 불일치</small></div>
+                                <span class="ts">15m</span>
+                            </div>
+                            <div class="ev green">
+                                <span class="dot"></span>
+                                <div class="desc"><b>#WC-3125</b> 배송 완료 <small>SSG · 최예린</small></div>
+                                <span class="ts">22m</span>
+                            </div>
+                            <div class="ev">
+                                <span class="dot"></span>
+                                <div class="desc"><b>RN-GSZD962</b> 재고 알림 <small>임계치 50개 미만 · 자사몰</small></div>
+                                <span class="ts">31m</span>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+            </section>
+
+        </div>
+
+    </main>
+</div>
+
+</body>
+</html>

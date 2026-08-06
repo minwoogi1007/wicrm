@@ -59,7 +59,7 @@ public class ExchangeController {
     @Value("${file.upload-dir:./uploads}")
     private String uploadBaseDir;
     
-    @Value("${file.server-url:http://localhost:8080}")
+    @Value("${app.file-server.url}")
     private String fileServerUrl;
 
     /**
@@ -69,11 +69,11 @@ public class ExchangeController {
     public String list(
             Model model, 
             @ModelAttribute ReturnItemSearchDTO searchDTO,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String sortBy,
-            @RequestParam(required = false) String sortDir,
-            @RequestParam(required = false) String filters) {
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "sortBy", required = false) String sortBy,
+            @RequestParam(value = "sortDir", required = false) String sortDir,
+            @RequestParam(value = "filters", required = false) String filters) {
         
         log.info("교환/반품 목록 조회 - 검색조건: {}, 필터: {}", searchDTO, filters);
         
@@ -266,6 +266,7 @@ public class ExchangeController {
         model.addAttribute("brandCounts", brandCounts);
         model.addAttribute("todayCount", todayCount);
         model.addAttribute("cardStats", cardStats);
+        model.addAttribute("fileServerUploadUrl", fileServerUrl + "/uploads/");
         model.addAttribute("pageTitle", "교환/반품 관리");
         
         // 🎯 현재 적용된 필터 정보 추가
@@ -302,7 +303,7 @@ public class ExchangeController {
      */
     @GetMapping("/api/detail/{returnId}")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> getExchangeDetail(@PathVariable Long returnId) {
+    public ResponseEntity<Map<String, Object>> getExchangeDetail(@PathVariable("returnId") Long returnId) {
         try {
             Map<String, Object> result = new HashMap<>();
             result.put("success", true);
@@ -321,7 +322,7 @@ public class ExchangeController {
      */
     @GetMapping("/api/sites")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> getSitesByBrand(@RequestParam(required = false) String brand) {
+    public ResponseEntity<Map<String, Object>> getSitesByBrand(@RequestParam(value = "brand", required = false) String brand) {
         
         Map<String, Object> result = new HashMap<>();
         
@@ -503,13 +504,13 @@ public class ExchangeController {
      */
     @GetMapping("/api/card-stats")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> getCardStats(@RequestParam(required = false) String keyword,
-                                                           @RequestParam(required = false) String startDate,
-                                                           @RequestParam(required = false) String endDate,
-                                                           @RequestParam(required = false) String returnTypeCode,
-                                                           @RequestParam(required = false) String returnStatusCode,
-                                                           @RequestParam(required = false) String paymentStatus,
-                                                           @RequestParam(required = false) String siteName) {
+    public ResponseEntity<Map<String, Object>> getCardStats(@RequestParam(value = "keyword", required = false) String keyword,
+                                                           @RequestParam(value = "startDate", required = false) String startDate,
+                                                           @RequestParam(value = "endDate", required = false) String endDate,
+                                                           @RequestParam(value = "returnTypeCode", required = false) String returnTypeCode,
+                                                           @RequestParam(value = "returnStatusCode", required = false) String returnStatusCode,
+                                                           @RequestParam(value = "paymentStatus", required = false) String paymentStatus,
+                                                           @RequestParam(value = "siteName", required = false) String siteName) {
         try {
             log.info("🚀 카드 통계 조회 시작 - 검색 조건: keyword={}, startDate={}, endDate={}", keyword, startDate, endDate);
             long startTime = System.currentTimeMillis();
@@ -678,8 +679,8 @@ public class ExchangeController {
      */
     @GetMapping("/api/typeStats")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> getTypeStats(@RequestParam(required = false) String startDate,
-                                                            @RequestParam(required = false) String endDate) {
+    public ResponseEntity<Map<String, Object>> getTypeStats(@RequestParam(value = "startDate", required = false) String startDate,
+                                                            @RequestParam(value = "endDate", required = false) String endDate) {
         try {
             // 기본값 설정 (최근 30일)
             if (startDate == null || startDate.isEmpty()) {
@@ -706,13 +707,13 @@ public class ExchangeController {
      */
     @GetMapping("/api/realtime-stats")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> getRealtimeStats(@RequestParam(required = false) String keyword,
-                                                               @RequestParam(required = false) String startDate,
-                                                               @RequestParam(required = false) String endDate,
-                                                               @RequestParam(required = false) String returnTypeCode,
-                                                               @RequestParam(required = false) String returnStatusCode,
-                                                               @RequestParam(required = false) String paymentStatus,
-                                                               @RequestParam(required = false) String siteName) {
+    public ResponseEntity<Map<String, Object>> getRealtimeStats(@RequestParam(value = "keyword", required = false) String keyword,
+                                                               @RequestParam(value = "startDate", required = false) String startDate,
+                                                               @RequestParam(value = "endDate", required = false) String endDate,
+                                                               @RequestParam(value = "returnTypeCode", required = false) String returnTypeCode,
+                                                               @RequestParam(value = "returnStatusCode", required = false) String returnStatusCode,
+                                                               @RequestParam(value = "paymentStatus", required = false) String paymentStatus,
+                                                               @RequestParam(value = "siteName", required = false) String siteName) {
         try {
             log.info("🚀 실시간 통계 조회 시작 - 검색 조건: keyword={}, startDate={}, endDate={}", keyword, startDate, endDate);
             long startTime = System.currentTimeMillis();
@@ -911,12 +912,12 @@ public class ExchangeController {
      */
     @GetMapping("/filter/{filterType}")
     public String filterByCard(
-            @PathVariable String filterType,
+            @PathVariable("filterType") String filterType,
             Model model,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String sortBy,
-            @RequestParam(required = false) String sortDir) {
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "sortBy", required = false) String sortBy,
+            @RequestParam(value = "sortDir", required = false) String sortDir) {
         
         log.info("🎯 카드 필터링 요청 - filterType: {}", filterType);
         
@@ -1112,16 +1113,16 @@ public class ExchangeController {
     public String listWithMultipleFilters(
             Model model, 
             @ModelAttribute ReturnItemSearchDTO searchDTO,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String sortBy,
-            @RequestParam(required = false) String sortDir,
-            @RequestParam(required = false) String filters,
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate,
-            @RequestParam(required = false) String logisticsStartDate,
-            @RequestParam(required = false) String logisticsEndDate) {
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "sortBy", required = false) String sortBy,
+            @RequestParam(value = "sortDir", required = false) String sortDir,
+            @RequestParam(value = "filters", required = false) String filters,
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "startDate", required = false) String startDate,
+            @RequestParam(value = "endDate", required = false) String endDate,
+            @RequestParam(value = "logisticsStartDate", required = false) String logisticsStartDate,
+            @RequestParam(value = "logisticsEndDate", required = false) String logisticsEndDate) {
         
         log.info("🎯 다중 필터 조회 - filters: {}, 검색조건: {}", filters, searchDTO);
         
@@ -1365,6 +1366,7 @@ public class ExchangeController {
         model.addAttribute("returnItem", new ReturnItemDTO());
         model.addAttribute("isEdit", false);
         model.addAttribute("pageTitle", "교환/반품 등록");
+        model.addAttribute("fileServerUploadUrl", fileServerUrl + "/uploads/");
         
         // 🔐 로그인 사용자 정보 전달
         if (authentication != null && authentication.getName() != null) {
@@ -1379,8 +1381,8 @@ public class ExchangeController {
      * 📝 교환/반품 수정 폼 (Sample에서 통합)
      */
     @GetMapping("/edit/{id}")
-    public String editForm(@PathVariable Long id, 
-                          @RequestParam(required = false) String returnTo, 
+    public String editForm(@PathVariable("id") Long id, 
+                          @RequestParam(value = "returnTo", required = false) String returnTo, 
                           Model model,
                           Authentication authentication) {
         log.info("📝 교환/반품 수정 폼 접속 - ID: {}", id);
@@ -1391,6 +1393,7 @@ public class ExchangeController {
             model.addAttribute("isEdit", true);
             model.addAttribute("returnTo", returnTo);
             model.addAttribute("pageTitle", "교환/반품 수정");
+            model.addAttribute("fileServerUploadUrl", fileServerUrl + "/uploads/");
             
             // 🔐 로그인 사용자 정보 전달
             if (authentication != null && authentication.getName() != null) {
@@ -1419,8 +1422,8 @@ public class ExchangeController {
      * 📋 교환/반품 상세 보기 (Sample에서 통합)
      */
     @GetMapping("/view/{id}")
-    public String view(@PathVariable Long id, 
-                       @RequestParam(required = false) String returnTo, 
+    public String view(@PathVariable("id") Long id, 
+                       @RequestParam(value = "returnTo", required = false) String returnTo, 
                        Model model) {
         log.info("📋 교환/반품 상세 보기 접속 - ID: {}", id);
         
@@ -1516,7 +1519,7 @@ public class ExchangeController {
      * 🗑️ 교환/반품 삭제 처리 (Sample에서 통합)
      */
     @PostMapping("/delete/{id}")
-    public String delete(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String delete(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
         log.info("🗑️ 교환/반품 삭제 처리 시작 - ID: {}", id);
         
         try {
@@ -1537,8 +1540,8 @@ public class ExchangeController {
     @PostMapping("/api/{id}/status")
     @ResponseBody
     public ResponseEntity<ReturnItemDTO> updateStatus(
-            @PathVariable Long id,
-            @RequestParam String status) {
+            @PathVariable("id") Long id,
+            @RequestParam(value = "status") String status) {
         
         log.info("🔄 교환/반품 상태 업데이트 API 호출 - ID: {}, 상태: {}", id, status);
         
@@ -1558,7 +1561,7 @@ public class ExchangeController {
      */
     @DeleteMapping("/api/{id}")
     @ResponseBody
-    public ResponseEntity<Void> deleteAjax(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteAjax(@PathVariable("id") Long id) {
         log.info("🗑️ 교환/반품 삭제 API 호출 - ID: {}", id);
         
         try {
@@ -1660,6 +1663,16 @@ public class ExchangeController {
             response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
             response.setHeader("Pragma", "no-cache");
             response.setHeader("Expires", "0");
+
+            // 다운로드 완료 감지용 쿠키 설정 (응답 바디 전송 전에 헤더로 설정)
+            String downloadToken = request.getParameter("downloadToken");
+            if (downloadToken != null && !downloadToken.isEmpty()) {
+                jakarta.servlet.http.Cookie downloadCookie = new jakarta.servlet.http.Cookie("fileDownload_" + downloadToken, "complete");
+                downloadCookie.setPath("/");
+                downloadCookie.setMaxAge(60);
+                response.addCookie(downloadCookie);
+                log.info("✅ 다운로드 완료 쿠키 설정: fileDownload_{}", downloadToken);
+            }
             
             // 엑셀 파일 생성 및 출력
             try (XSSFWorkbook workbook = createExcelFile(allData)) {
@@ -1757,6 +1770,16 @@ public class ExchangeController {
             response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
             response.setHeader("Pragma", "no-cache");
             response.setHeader("Expires", "0");
+
+            // 다운로드 완료 감지용 쿠키 설정
+            String downloadToken = request.getParameter("downloadToken");
+            if (downloadToken != null && !downloadToken.isEmpty()) {
+                jakarta.servlet.http.Cookie downloadCookie = new jakarta.servlet.http.Cookie("fileDownload_" + downloadToken, "complete");
+                downloadCookie.setPath("/");
+                downloadCookie.setMaxAge(60);
+                response.addCookie(downloadCookie);
+                log.info("✅ 이미지 포함 다운로드 완료 쿠키 설정: fileDownload_{}", downloadToken);
+            }
             
             // 이미지 포함 엑셀 파일 생성 및 출력
             try (XSSFWorkbook workbook = createExcelFileWithImages(allData)) {
@@ -1829,7 +1852,7 @@ public class ExchangeController {
     @PostMapping("/upload/excel")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> uploadExcel(
-            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "file") MultipartFile file,
             HttpServletRequest request) {
         
         log.info("📤 엑셀 파일 업로드 요청 - 파일명: {}, 크기: {} bytes", file.getOriginalFilename(), file.getSize());
@@ -2103,7 +2126,7 @@ public class ExchangeController {
         try {
             // 상대 경로인 경우 절대 URL로 변환
             String fullUrl;
-            String remoteServerUrl = "http://175.119.224.45:8080";
+            String remoteServerUrl = fileServerUrl;
             
             if (imageUrl.startsWith("http")) {
                 // 이미 절대 URL인 경우
@@ -2703,11 +2726,11 @@ public class ExchangeController {
      */
     @PostMapping("/api/statistics/excel")
     public void downloadStatisticsExcel(
-            @RequestParam(required = false) String dateFilterType,
-            @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate,
-            @RequestParam(required = false) String returnType,
-            @RequestParam(required = false) String brandFilter,
+            @RequestParam(value = "dateFilterType", required = false) String dateFilterType,
+            @RequestParam(value = "startDate", required = false) String startDate,
+            @RequestParam(value = "endDate", required = false) String endDate,
+            @RequestParam(value = "returnType", required = false) String returnType,
+            @RequestParam(value = "brandFilter", required = false) String brandFilter,
             HttpServletResponse response) throws IOException {
         
         try {
@@ -3378,7 +3401,7 @@ public class ExchangeController {
             // HTTP 요청 엔티티 생성
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
             
-            // 원격 서버 업로드 API 호출
+            // 원격 서버 업로드 API 호출 (repair 파일서버: /exchange/api/upload)
             String uploadUrl = fileServerUrl + "/exchange/api/upload";
             log.info("🔧 디버그 - 파일 업로드 URL: {}", uploadUrl);
             log.info("🔧 디버그 - 요청 헤더: {}", headers);
@@ -3488,7 +3511,7 @@ public class ExchangeController {
             // HTTP 요청 엔티티 생성
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
             
-            // 원격 서버 업로드 API 호출
+            // 원격 서버 업로드 API 호출 (repair 파일서버: /exchange/api/upload)
             String uploadUrl = fileServerUrl + "/exchange/api/upload";
             log.info("🔧 디버그 - Base64 업로드 URL: {}", uploadUrl);
             ResponseEntity<String> response = restTemplate.exchange(
@@ -3833,7 +3856,7 @@ public class ExchangeController {
     @ResponseBody
     public ResponseEntity<Map<String, Object>> attachImage(
             @RequestParam(value = "defectPhoto", required = false) MultipartFile defectPhoto,
-            @RequestParam("itemId") Long itemId,
+            @RequestParam(value = "itemId") Long itemId,
             @RequestParam(value = "defectDetail", required = false) String defectDetail) {
         
         log.info("📷 이미지/메모 업데이트 요청: itemId={}, 파일명={}, 불량상세={}", 
@@ -3916,17 +3939,17 @@ public class ExchangeController {
         }
     }
 
-    // 🆕 이미지 삭제 API
-    @DeleteMapping("/api/delete-image/{itemId}")
+    // 🆕 이미지 삭제 API (POST 사용 - CSRF 호환성 확보)
+    @PostMapping("/api/delete-image/{itemId}")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> deleteImage(@PathVariable Long itemId) {
+    public ResponseEntity<Map<String, Object>> deleteImage(@PathVariable("itemId") Long itemId) {
         
         log.info("🗑️ 이미지 삭제 요청: itemId={}", itemId);
         
         Map<String, Object> response = new HashMap<>();
         
         try {
-            // DB에서 이미지 경로 제거
+            // DB에서 이미지 경로 제거 (내부에서 항목 존재 여부 확인)
             returnItemService.updateDefectPhotoUrl(itemId, null);
             
             log.info("✅ 이미지 삭제 완료: itemId={}", itemId);

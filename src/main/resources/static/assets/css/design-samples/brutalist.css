@@ -1,0 +1,215 @@
+/* ============================================================
+   Design Sample 08 — Neo-Brutalism Operations Console
+   - Visible grid, monospaced typography, raw aesthetic
+   - Trust-by-structure for ops/logistics monitoring
+   ============================================================ */
+.brutalist-page {
+    --br-bg: #f1efe8;
+    --br-paper: #fffefa;
+    --br-ink: #0d0d0d;
+    --br-line: #0d0d0d;
+    --br-muted: #6b6b6b;
+    --br-accent: #ff3d2e;
+    --br-amber: #ffd23f;
+    --br-blue: #1d4ed8;
+    --br-green: #047857;
+    --br-mono: "JetBrains Mono", "Fira Code", "D2Coding", "Courier New", monospace;
+
+    background:
+        repeating-linear-gradient(0deg, transparent 0 39px, rgba(13,13,13,0.05) 39px 40px),
+        repeating-linear-gradient(90deg, transparent 0 39px, rgba(13,13,13,0.05) 39px 40px),
+        var(--br-bg);
+    min-height: 100vh;
+    padding: 32px clamp(16px, 3vw, 56px) 80px;
+    color: var(--br-ink);
+    font-family: "Inter", "Pretendard", system-ui, sans-serif;
+}
+
+.brutalist-page * { box-sizing: border-box; }
+.brutalist-shell { max-width: 1380px; margin: 0 auto; }
+
+/* ---------- Header ---------- */
+.br-header {
+    border: 2px solid var(--br-line);
+    background: var(--br-paper);
+    padding: 18px 22px;
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 24px; flex-wrap: wrap;
+    box-shadow: 8px 8px 0 var(--br-line);
+    margin-bottom: 28px;
+}
+.br-header .back-link {
+    color: var(--br-ink); font-family: var(--br-mono); font-size: 12px;
+    text-decoration: underline;
+}
+.br-header h1 {
+    margin: 8px 0 6px;
+    font-size: clamp(26px, 3.6vw, 44px);
+    font-weight: 900; letter-spacing: -0.02em; line-height: 1;
+    text-transform: uppercase;
+}
+.br-header h1 span { background: var(--br-amber); padding: 0 10px; }
+.br-header p { margin: 0; color: var(--br-muted); font-size: 13px; max-width: 520px; }
+.br-tag {
+    display: inline-block;
+    border: 2px solid var(--br-line);
+    background: var(--br-ink); color: var(--br-paper);
+    font-family: var(--br-mono);
+    font-size: 11px; padding: 4px 10px;
+    text-transform: uppercase; letter-spacing: 0.1em;
+}
+.br-header .meta {
+    font-family: var(--br-mono); font-size: 12px; color: var(--br-muted);
+    text-align: right;
+}
+.br-header .meta strong { color: var(--br-ink); display: block; font-size: 22px; }
+
+/* ---------- Status banner ---------- */
+.br-banner {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border: 2px solid var(--br-line);
+    margin-bottom: 24px;
+    background: var(--br-paper);
+    box-shadow: 6px 6px 0 var(--br-line);
+}
+.br-banner > div {
+    padding: 18px 20px;
+    border-right: 2px solid var(--br-line);
+    font-family: var(--br-mono);
+}
+.br-banner > div:last-child { border-right: none; }
+.br-banner .label { font-size: 11px; text-transform: uppercase; color: var(--br-muted); }
+.br-banner .num {
+    font-size: 36px; font-weight: 800; letter-spacing: -0.02em;
+    margin: 4px 0;
+    font-family: "Inter", system-ui, sans-serif;
+}
+.br-banner .delta { font-size: 12px; }
+.br-banner .delta.up { color: var(--br-green); }
+.br-banner .delta.dn { color: var(--br-accent); }
+.br-banner .alert { background: var(--br-accent); color: #fff; }
+.br-banner .alert .label, .br-banner .alert .delta { color: rgba(255,255,255,0.85); }
+
+/* ---------- Grid ---------- */
+.br-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+.br-card {
+    border: 2px solid var(--br-line);
+    background: var(--br-paper);
+    padding: 18px 20px;
+    box-shadow: 6px 6px 0 var(--br-line);
+}
+.br-card h3 {
+    margin: 0 0 12px;
+    font-size: 13px;
+    font-family: var(--br-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    display: flex; justify-content: space-between; align-items: center;
+}
+.br-card h3 .chip {
+    background: var(--br-ink); color: var(--br-paper);
+    font-size: 10px; padding: 2px 8px; letter-spacing: 0.2em;
+}
+
+/* table */
+.br-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.br-table th, .br-table td {
+    text-align: left; padding: 10px 6px;
+    border-bottom: 1px dashed var(--br-line);
+    font-family: var(--br-mono);
+}
+.br-table th {
+    font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--br-muted);
+    border-bottom: 2px solid var(--br-line);
+}
+.br-table td b { font-family: "Inter", sans-serif; font-weight: 700; }
+.br-table .pill {
+    display: inline-block; padding: 2px 8px; border: 1.5px solid var(--br-line);
+    font-size: 11px; text-transform: uppercase;
+}
+.br-table .pill.ok { background: var(--br-green); color: #fff; border-color: var(--br-green); }
+.br-table .pill.wait { background: var(--br-amber); }
+.br-table .pill.err { background: var(--br-accent); color: #fff; border-color: var(--br-accent); }
+.br-table .pill.run { background: var(--br-blue); color: #fff; border-color: var(--br-blue); }
+
+/* ascii bar chart */
+.br-bars { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+.br-bars .row {
+    display: grid;
+    grid-template-columns: 110px 1fr 60px;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--br-mono);
+    font-size: 12px;
+}
+.br-bars .track {
+    height: 18px;
+    border: 1.5px solid var(--br-line);
+    background:
+        repeating-linear-gradient(45deg, transparent 0 6px, rgba(13,13,13,0.06) 6px 8px);
+    position: relative;
+}
+.br-bars .fill {
+    position: absolute; inset: 0;
+    background: var(--br-ink);
+    width: 0;
+}
+.br-bars .row.alert .fill { background: var(--br-accent); }
+.br-bars .row.warn .fill { background: var(--br-amber); }
+.br-bars .row.ok .fill { background: var(--br-green); }
+.br-bars .val { text-align: right; }
+
+/* terminal log */
+.br-terminal {
+    background: var(--br-ink);
+    color: #f3f3f3;
+    font-family: var(--br-mono);
+    font-size: 12px;
+    padding: 16px 18px;
+    border: 2px solid var(--br-line);
+    box-shadow: 6px 6px 0 var(--br-amber);
+    line-height: 1.7;
+    max-height: 240px; overflow: hidden;
+}
+.br-terminal .line .ts { color: #888; }
+.br-terminal .line .ok { color: #4ade80; }
+.br-terminal .line .warn { color: var(--br-amber); }
+.br-terminal .line .err { color: #ff6b6b; }
+.br-terminal .prompt { color: var(--br-amber); }
+
+/* legend / status grid */
+.br-status-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border: 2px solid var(--br-line);
+}
+.br-status-grid div {
+    padding: 12px;
+    border-right: 1.5px solid var(--br-line);
+    border-bottom: 1.5px solid var(--br-line);
+    font-family: var(--br-mono); font-size: 11px;
+}
+.br-status-grid div:nth-child(4n) { border-right: none; }
+.br-status-grid .name { font-size: 13px; color: var(--br-ink); margin-bottom: 4px; font-weight: 700; }
+.br-status-grid .ok { background: rgba(4,120,87,0.12); }
+.br-status-grid .warn { background: rgba(255,210,63,0.25); }
+.br-status-grid .err { background: rgba(255,61,46,0.18); }
+
+/* responsive */
+@media (max-width: 1024px) {
+    .br-grid { grid-template-columns: 1fr; }
+    .br-banner { grid-template-columns: repeat(2, 1fr); }
+    .br-banner > div:nth-child(2n) { border-right: none; }
+    .br-banner > div:nth-child(-n+2) { border-bottom: 2px solid var(--br-line); }
+}
+@media (max-width: 600px) {
+    .br-status-grid { grid-template-columns: repeat(2, 1fr); }
+    .br-status-grid div:nth-child(4n) { border-right: 1.5px solid var(--br-line); }
+    .br-status-grid div:nth-child(2n) { border-right: none; }
+}

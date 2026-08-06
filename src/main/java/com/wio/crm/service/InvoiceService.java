@@ -10,11 +10,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 
 @Service
 public class InvoiceService {
+
+    private static final Logger logger = LoggerFactory.getLogger(InvoiceService.class);
 
     @Autowired
     private InvoiceMapper invoiceMapper;
@@ -52,7 +56,8 @@ public class InvoiceService {
                 invoiceMapper.insertInvoice(invoice);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("송장 파일 처리 중 오류 발생: {}", file.getOriginalFilename(), e);
+            throw new RuntimeException("송장 처리 실패", e);
         }
     }
 

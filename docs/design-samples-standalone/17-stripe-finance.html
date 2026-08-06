@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WICRM Design 17 · Stripe Finance Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; }
+
+        .stp {
+            --bg: #f6f9fc;
+            --surface: #ffffff;
+            --ink: #0a2540;
+            --ink-2: #425466;
+            --muted: #697386;
+            --line: #e6ebf1;
+            --line-soft: #ebf0f5;
+            --indigo: #635bff;
+            --indigo-2: #7c5cff;
+            --indigo-soft: #efeefe;
+            --teal: #00d4ff;
+            --green: #00d924;
+            --green-soft: #d7f7c2;
+            --amber: #ffc043;
+            --red: #ff5996;
+            --mono: "JetBrains Mono", monospace;
+
+            background: var(--bg);
+            color: var(--ink);
+            font-family: "Inter", "Pretendard", system-ui, sans-serif;
+            font-size: 14px;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 240px 1fr;
+        }
+
+        /* ============= SIDEBAR ============= */
+        .stp-side {
+            background: var(--surface);
+            border-right: 1px solid var(--line);
+            padding: 16px 12px;
+            display: flex; flex-direction: column;
+            position: sticky; top: 0; height: 100vh;
+            overflow-y: auto;
+        }
+        .stp-brand {
+            display: flex; align-items: center; gap: 10px;
+            padding: 6px 10px 14px;
+            border-bottom: 1px solid var(--line-soft);
+            margin-bottom: 12px;
+        }
+        .stp-brand .logo {
+            width: 28px; height: 28px; border-radius: 8px;
+            background: linear-gradient(135deg, #635bff, #00d4ff);
+            color: #fff; font-weight: 800; font-size: 13px;
+            display: grid; place-items: center;
+        }
+        .stp-brand .name { font-weight: 700; font-size: 15px; line-height: 1.2; }
+        .stp-brand .name small { display: block; color: var(--muted); font-size: 11px; font-weight: 400; }
+
+        .stp-mode {
+            display: flex; gap: 0;
+            background: var(--bg);
+            border-radius: 8px;
+            padding: 3px;
+            margin-bottom: 14px;
+        }
+        .stp-mode button {
+            flex: 1;
+            background: transparent; border: 0; padding: 4px 8px;
+            border-radius: 6px; cursor: pointer;
+            font-family: inherit; font-size: 12px;
+            color: var(--muted); font-weight: 500;
+        }
+        .stp-mode button.on {
+            background: var(--surface); color: var(--ink);
+            box-shadow: 0 1px 2px rgba(10,37,64,0.08);
+        }
+
+        .stp-grp {
+            font-size: 11px; color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-weight: 600;
+            padding: 12px 10px 4px;
+        }
+        .stp-nav { display: flex; flex-direction: column; gap: 1px; }
+        .stp-nav a {
+            display: flex; align-items: center; gap: 10px;
+            padding: 6px 10px; border-radius: 6px;
+            text-decoration: none; color: var(--ink-2);
+            font-size: 13px; font-weight: 500;
+        }
+        .stp-nav a:hover { background: var(--bg); color: var(--ink); }
+        .stp-nav a.on {
+            background: var(--indigo-soft);
+            color: var(--indigo);
+            font-weight: 600;
+        }
+        .stp-nav a .ic { width: 16px; opacity: 0.8; text-align: center; }
+        .stp-nav a .badge {
+            margin-left: auto;
+            font-family: var(--mono); font-size: 10px;
+            background: var(--bg); border: 1px solid var(--line);
+            padding: 1px 6px; border-radius: 4px;
+            color: var(--muted);
+        }
+
+        /* ============= MAIN ============= */
+        .stp-main { min-width: 0; }
+        .stp-top {
+            background: var(--surface);
+            border-bottom: 1px solid var(--line);
+            padding: 12px 28px;
+            display: flex; align-items: center; gap: 14px;
+            position: sticky; top: 0; z-index: 10;
+        }
+        .stp-top .back {
+            color: var(--muted); text-decoration: none;
+            border: 1px solid var(--line); padding: 4px 10px; border-radius: 6px;
+            font-size: 12px; background: var(--bg);
+        }
+        .stp-top .crumb { font-size: 13px; color: var(--muted); font-weight: 500; }
+        .stp-top .crumb b { color: var(--ink); font-weight: 600; }
+        .stp-top .filler { flex: 1; }
+        .stp-top .pill {
+            background: var(--indigo-soft); color: var(--indigo);
+            padding: 3px 10px; border-radius: 999px;
+            font-size: 11px; font-weight: 600;
+        }
+        .stp-top .icon-btn {
+            width: 30px; height: 30px;
+            display: grid; place-items: center;
+            border-radius: 6px; cursor: pointer;
+            color: var(--muted);
+        }
+        .stp-top .icon-btn:hover { background: var(--bg); color: var(--ink); }
+
+        .stp-page { padding: 24px 28px 60px; max-width: 1480px; }
+
+        /* page header */
+        .stp-head {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            margin-bottom: 20px; gap: 16px; flex-wrap: wrap;
+        }
+        .stp-head h1 {
+            margin: 0; font-size: 22px; font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+        .stp-head p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+        .stp-head .actions { display: flex; gap: 8px; align-items: center; }
+
+        .stp-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 12px; border-radius: 6px;
+            background: var(--surface); border: 1px solid var(--line);
+            color: var(--ink); font-family: inherit; font-size: 13px;
+            font-weight: 500; cursor: pointer;
+            box-shadow: 0 1px 1px rgba(10,37,64,0.04);
+        }
+        .stp-btn:hover { border-color: var(--ink-2); }
+        .stp-btn.primary {
+            background: var(--indigo); color: #fff;
+            border-color: var(--indigo);
+            box-shadow: 0 1px 2px rgba(99,91,255,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+        }
+        .stp-btn.primary:hover { background: var(--indigo-2); border-color: var(--indigo-2); }
+
+        .stp-date {
+            display: flex; align-items: center; gap: 6px;
+            border: 1px solid var(--line); border-radius: 6px;
+            background: var(--surface); padding: 5px 10px;
+            font-size: 12px; color: var(--ink-2);
+            cursor: pointer;
+        }
+        .stp-date .arrow { color: var(--muted); }
+
+        /* hero metric (Stripe-like big number with chart) */
+        .stp-hero {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(10,37,64,0.04);
+            padding: 24px 28px;
+            margin-bottom: 16px;
+        }
+        .stp-hero .row {
+            display: flex; align-items: flex-end; justify-content: space-between;
+            gap: 24px; flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+        .stp-hero h2 {
+            margin: 0;
+            font-size: 13px; color: var(--muted); font-weight: 500;
+        }
+        .stp-hero .v {
+            font-size: 42px; font-weight: 600; letter-spacing: -0.02em;
+            color: var(--ink);
+            margin: 4px 0 0;
+            font-variant-numeric: tabular-nums;
+        }
+        .stp-hero .v small { font-size: 18px; color: var(--muted); font-weight: 500; margin-left: 4px; }
+        .stp-hero .delta {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 13px; color: var(--green); font-weight: 600;
+            margin-top: 6px;
+        }
+        .stp-hero .delta .vs { color: var(--muted); font-weight: 400; margin-left: 6px; }
+        .stp-hero .compare {
+            display: flex; gap: 28px;
+            font-size: 12px;
+        }
+        .stp-hero .compare div .lbl {
+            display: flex; align-items: center; gap: 6px;
+            color: var(--muted); margin-bottom: 2px;
+        }
+        .stp-hero .compare div .lbl .dot { width: 8px; height: 8px; border-radius: 2px; background: var(--indigo); }
+        .stp-hero .compare div .lbl.b .dot { background: var(--line); }
+        .stp-hero .compare div strong { font-size: 14px; color: var(--ink); font-weight: 600; }
+
+        .stp-hero svg { width: 100%; height: 220px; display: block; }
+        .stp-hero .axis {
+            display: flex; justify-content: space-between;
+            color: var(--muted); font-size: 11px; margin-top: 6px;
+            font-family: var(--mono);
+        }
+
+        /* mini-stat row */
+        .stp-mini {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .stp-mini-card {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 18px 20px;
+            box-shadow: 0 1px 2px rgba(10,37,64,0.04);
+            position: relative;
+        }
+        .stp-mini-card .lbl {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 12px; color: var(--muted); font-weight: 500;
+            margin-bottom: 8px;
+        }
+        .stp-mini-card .v {
+            font-size: 24px; font-weight: 600; letter-spacing: -0.02em;
+            font-variant-numeric: tabular-nums;
+        }
+        .stp-mini-card .delta {
+            font-size: 12px; color: var(--green); font-weight: 600;
+            margin-top: 4px;
+        }
+        .stp-mini-card .delta.dn { color: var(--red); }
+        .stp-mini-card .delta .vs { color: var(--muted); font-weight: 400; margin-left: 4px; }
+
+        /* split: payments + tabular */
+        .stp-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 16px; }
+
+        .stp-card {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            box-shadow: 0 1px 2px rgba(10,37,64,0.04);
+            overflow: hidden;
+        }
+        .stp-card .ch {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--line-soft);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .stp-card .ch h3 { margin: 0; font-size: 14px; font-weight: 600; }
+        .stp-card .ch .meta { font-size: 12px; color: var(--muted); }
+        .stp-card .ch .link { color: var(--indigo); text-decoration: none; font-size: 13px; font-weight: 500; }
+
+        /* payments table */
+        .stp-tx { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .stp-tx th, .stp-tx td {
+            text-align: left; padding: 10px 20px;
+            border-bottom: 1px solid var(--line-soft);
+            font-variant-numeric: tabular-nums;
+        }
+        .stp-tx th {
+            font-size: 11px; color: var(--muted); font-weight: 500;
+            text-transform: uppercase; letter-spacing: 0.04em;
+        }
+        .stp-tx tbody tr:hover { background: var(--bg); cursor: pointer; }
+        .stp-tx tbody tr:last-child td { border-bottom: none; }
+        .stp-tx .amt { font-weight: 600; color: var(--ink); }
+        .stp-tx .pm {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-family: var(--mono); font-size: 12px; color: var(--ink-2);
+        }
+        .stp-tx .pm .brand-tag {
+            display: grid; place-items: center;
+            width: 28px; height: 18px;
+            border-radius: 4px;
+            font-size: 9px; font-weight: 700;
+            color: #fff;
+        }
+        .stp-tx .pm .brand-tag.np { background: #03c75a; }
+        .stp-tx .pm .brand-tag.kp { background: #fee500; color: #000; }
+        .stp-tx .pm .brand-tag.tp { background: #0064ff; }
+        .stp-tx .pm .brand-tag.cd { background: #635bff; }
+        .stp-tx .id { color: var(--indigo); font-family: var(--mono); font-size: 12px; }
+        .stp-tx .ts { color: var(--muted); font-size: 12px; }
+
+        .stp-pill {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 2px 8px; border-radius: 4px;
+            font-size: 11px; font-weight: 600;
+        }
+        .stp-pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+        .stp-pill.success { background: rgba(0,217,36,0.1); color: #008a17; }
+        .stp-pill.warn { background: rgba(255,192,67,0.15); color: #98740b; }
+        .stp-pill.danger { background: rgba(255,89,150,0.15); color: #b31464; }
+        .stp-pill.info { background: var(--indigo-soft); color: var(--indigo); }
+
+        /* method donut */
+        .stp-donut { padding: 18px 20px 22px; }
+        .stp-donut .ring { display: flex; align-items: center; gap: 18px; }
+        .stp-donut svg { width: 130px; height: 130px; flex-shrink: 0; }
+        .stp-donut .leg { display: flex; flex-direction: column; gap: 8px; flex: 1; font-size: 13px; }
+        .stp-donut .leg .row {
+            display: grid; grid-template-columns: auto 1fr auto;
+            gap: 8px; align-items: center;
+        }
+        .stp-donut .leg .row .dot { width: 10px; height: 10px; border-radius: 3px; }
+        .stp-donut .leg .row .nm { font-weight: 500; }
+        .stp-donut .leg .row .v { color: var(--muted); font-variant-numeric: tabular-nums; }
+
+        /* funnel / breakdown */
+        .stp-flow { padding: 18px 20px 22px; display: flex; flex-direction: column; gap: 12px; }
+        .stp-flow .step {
+            display: grid; grid-template-columns: 24px 1fr auto auto;
+            gap: 12px; align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--line-soft);
+        }
+        .stp-flow .step:last-child { border-bottom: none; }
+        .stp-flow .step .n {
+            width: 22px; height: 22px; border-radius: 6px;
+            display: grid; place-items: center;
+            background: var(--indigo-soft); color: var(--indigo);
+            font-family: var(--mono); font-size: 11px; font-weight: 700;
+        }
+        .stp-flow .step .name { font-weight: 500; }
+        .stp-flow .step .name small { display: block; color: var(--muted); font-size: 11px; font-weight: 400; }
+        .stp-flow .step .cnt { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--ink); }
+        .stp-flow .step .pct { font-size: 12px; color: var(--muted); min-width: 56px; text-align: right; }
+        .stp-flow .step.dropped .n { background: rgba(255,89,150,0.15); color: var(--red); }
+
+        /* anomaly card */
+        .stp-anom {
+            background: linear-gradient(135deg, #635bff, #7c5cff);
+            color: #fff;
+            border-radius: 10px;
+            padding: 22px 24px;
+            margin-bottom: 16px;
+            display: grid; grid-template-columns: 1fr auto;
+            gap: 18px; align-items: center;
+        }
+        .stp-anom .badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(255,255,255,0.18);
+            padding: 4px 10px; border-radius: 999px;
+            font-size: 11px; font-weight: 600;
+            letter-spacing: 0.06em; text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        .stp-anom h2 { margin: 0; font-size: 18px; font-weight: 600; line-height: 1.4; }
+        .stp-anom h2 b { background: rgba(255,255,255,0.18); padding: 0 6px; border-radius: 4px; }
+        .stp-anom p { margin: 6px 0 0; opacity: 0.85; font-size: 13px; }
+        .stp-anom .cta {
+            display: inline-flex; gap: 8px; align-items: center;
+            background: #fff; color: var(--indigo);
+            padding: 8px 14px; border-radius: 6px;
+            font-weight: 600; text-decoration: none; font-size: 13px;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 1100px) {
+            .stp { grid-template-columns: 1fr; }
+            .stp-side { display: none; }
+            .stp-mini { grid-template-columns: 1fr 1fr; }
+            .stp-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="stp">
+
+    <!-- ============= SIDEBAR ============= -->
+    <aside class="stp-side">
+        <div class="stp-brand">
+            <div class="logo">W</div>
+            <div class="name">WICRM<small>Commerce Suite</small></div>
+        </div>
+
+        <div class="stp-mode">
+            <button class="on">Live</button>
+            <button>Test</button>
+        </div>
+
+        <div class="stp-grp">매출</div>
+        <nav class="stp-nav">
+            <a href="#" class="on"><span class="ic">$</span> Overview</a>
+            <a href="#"><span class="ic">$</span> Revenue <span class="badge">↑</span></a>
+            <a href="#"><span class="ic">↹</span> Payments</a>
+            <a href="#"><span class="ic">↩</span> Refunds <span class="badge">312</span></a>
+            <a href="#"><span class="ic">⚇</span> Disputes <span class="badge">2</span></a>
+        </nav>
+
+        <div class="stp-grp">주문 / 운영</div>
+        <nav class="stp-nav">
+            <a href="#"><span class="ic">▤</span> Orders</a>
+            <a href="#"><span class="ic">▢</span> Products</a>
+            <a href="#"><span class="ic">⌾</span> Inventory</a>
+            <a href="#"><span class="ic">▶</span> Shipping</a>
+        </nav>
+
+        <div class="stp-grp">고객</div>
+        <nav class="stp-nav">
+            <a href="#"><span class="ic">◔</span> Customers</a>
+            <a href="#"><span class="ic">★</span> VIP</a>
+            <a href="#"><span class="ic">⊜</span> Mileage</a>
+        </nav>
+
+        <div class="stp-grp">분석 / 설정</div>
+        <nav class="stp-nav">
+            <a href="#"><span class="ic">∿</span> Analytics</a>
+            <a href="#"><span class="ic">⌬</span> Reports</a>
+            <a href="#"><span class="ic">⚙</span> Settings</a>
+        </nav>
+    </aside>
+
+    <!-- ============= MAIN ============= -->
+    <main class="stp-main">
+
+        <div class="stp-top">
+            <a href="index.html" class="back">← index</a>
+            <span class="crumb"><b>Overview</b> · 매출 대시보드</span>
+            <span class="filler"></span>
+            <span class="pill">Type 17 · Stripe Finance</span>
+            <div class="icon-btn">⌕</div>
+            <div class="icon-btn">?</div>
+            <div class="icon-btn">◐</div>
+        </div>
+
+        <div class="stp-page">
+
+            <header class="stp-head">
+                <div>
+                    <h1>매출 개요</h1>
+                    <p>11개 사이트 · 2개 브랜드의 결제와 환불을 한곳에서 분석합니다.</p>
+                </div>
+                <div class="actions">
+                    <span class="stp-date">📅 04.22 — 04.28 <span class="arrow">▾</span></span>
+                    <span class="stp-date">vs 이전 7일 <span class="arrow">▾</span></span>
+                    <button class="stp-btn">내보내기</button>
+                    <button class="stp-btn primary">+ 결제 만들기</button>
+                </div>
+            </header>
+
+            <article class="stp-hero">
+                <div class="row">
+                    <div>
+                        <h2>총 매출 (Gross Volume)</h2>
+                        <div class="v">₩384,218,400</div>
+                        <span class="delta">▲ 12.4%<span class="vs">vs 이전 7일 ₩342M</span></span>
+                    </div>
+                    <div class="compare">
+                        <div>
+                            <div class="lbl"><span class="dot"></span>이번 기간</div>
+                            <strong>₩384.2M</strong>
+                        </div>
+                        <div>
+                            <div class="lbl b"><span class="dot"></span>이전 기간</div>
+                            <strong>₩342.0M</strong>
+                        </div>
+                        <div>
+                            <div class="lbl"><span class="dot" style="background:var(--green)"></span>순매출</div>
+                            <strong>₩327.6M</strong>
+                        </div>
+                    </div>
+                </div>
+                <svg viewBox="0 0 1000 220" preserveAspectRatio="none">
+                    <defs>
+                        <linearGradient id="stpFill" x1="0" x2="0" y1="0" y2="1">
+                            <stop offset="0%" stop-color="#635bff" stop-opacity="0.18"/>
+                            <stop offset="100%" stop-color="#635bff" stop-opacity="0"/>
+                        </linearGradient>
+                    </defs>
+                    <g stroke="#ebf0f5" stroke-width="1">
+                        <line x1="0" y1="44"  x2="1000" y2="44"/>
+                        <line x1="0" y1="88"  x2="1000" y2="88"/>
+                        <line x1="0" y1="132" x2="1000" y2="132"/>
+                        <line x1="0" y1="176" x2="1000" y2="176"/>
+                    </g>
+                    <text x="6" y="40" fill="#697386" font-size="10" font-family="JetBrains Mono">₩80M</text>
+                    <text x="6" y="84" fill="#697386" font-size="10" font-family="JetBrains Mono">₩60M</text>
+                    <text x="6" y="128" fill="#697386" font-size="10" font-family="JetBrains Mono">₩40M</text>
+                    <text x="6" y="172" fill="#697386" font-size="10" font-family="JetBrains Mono">₩20M</text>
+
+                    <!-- previous period (dashed) -->
+                    <path d="M0,160 L143,150 L286,140 L429,150 L572,130 L715,135 L858,120 L1000,130"
+                          fill="none" stroke="#c1c9d2" stroke-width="1.5" stroke-dasharray="4 4"/>
+
+                    <!-- current period -->
+                    <path d="M0,150 L143,130 L286,100 L429,120 L572,80 L715,90 L858,55 L1000,40"
+                          fill="none" stroke="#635bff" stroke-width="2.4" stroke-linejoin="round"/>
+                    <path d="M0,150 L143,130 L286,100 L429,120 L572,80 L715,90 L858,55 L1000,40 L1000,220 L0,220 Z"
+                          fill="url(#stpFill)"/>
+
+                    <g fill="#635bff">
+                        <circle cx="143" cy="130" r="3.5"/>
+                        <circle cx="286" cy="100" r="3.5"/>
+                        <circle cx="429" cy="120" r="3.5"/>
+                        <circle cx="572" cy="80" r="3.5"/>
+                        <circle cx="715" cy="90" r="3.5"/>
+                        <circle cx="858" cy="55" r="3.5"/>
+                        <circle cx="1000" cy="40" r="5" fill="#fff" stroke="#635bff" stroke-width="2.5"/>
+                    </g>
+                </svg>
+                <div class="axis">
+                    <span>04.22</span><span>04.23</span><span>04.24</span><span>04.25</span><span>04.26</span><span>04.27</span><span>04.28 (today)</span>
+                </div>
+            </article>
+
+            <section class="stp-mini">
+                <div class="stp-mini-card">
+                    <div class="lbl">결제 (성공)</div>
+                    <div class="v">8,412</div>
+                    <div class="delta">▲ 6.2%<span class="vs">7,924</span></div>
+                </div>
+                <div class="stp-mini-card">
+                    <div class="lbl">평균 주문 금액 (AOV)</div>
+                    <div class="v">₩45,680</div>
+                    <div class="delta">▲ 5.8%<span class="vs">₩43,180</span></div>
+                </div>
+                <div class="stp-mini-card">
+                    <div class="lbl">환불</div>
+                    <div class="v">₩56.6M</div>
+                    <div class="delta dn">▲ 18.2%<span class="vs">₩47.9M</span></div>
+                </div>
+                <div class="stp-mini-card">
+                    <div class="lbl">분쟁 / 차지백</div>
+                    <div class="v">2</div>
+                    <div class="delta dn">▲ 1<span class="vs">전주 1건</span></div>
+                </div>
+            </section>
+
+            <section class="stp-anom">
+                <div>
+                    <span class="badge">● Anomaly · 자동 탐지</span>
+                    <h2>자사몰 환불이 지난 7일 대비 <b>+34%</b> 증가했습니다.</h2>
+                    <p>RN-GSZD962 · RN-PT2207 두 품번에 절반 이상 집중. 사이즈 가이드 보정으로 월 ₩14.2M 절감 가능.</p>
+                </div>
+                <a href="#" class="cta">상세 분석 →</a>
+            </section>
+
+            <section class="stp-grid">
+
+                <article class="stp-card">
+                    <div class="ch">
+                        <h3>최근 결제</h3>
+                        <a href="#" class="link">모두 보기 →</a>
+                    </div>
+                    <table class="stp-tx">
+                        <thead>
+                            <tr>
+                                <th>금액</th>
+                                <th>결제수단</th>
+                                <th>상태</th>
+                                <th>고객</th>
+                                <th>주문</th>
+                                <th>일시</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="amt">₩128,400</td>
+                                <td><div class="pm"><span class="brand-tag np">NP</span>네이버페이 ···2841</div></td>
+                                <td><span class="stp-pill success">Succeeded</span></td>
+                                <td>김민지</td>
+                                <td><span class="id">#wc_3128</span></td>
+                                <td class="ts">12:29</td>
+                            </tr>
+                            <tr>
+                                <td class="amt">₩42,000</td>
+                                <td><div class="pm"><span class="brand-tag cd">CD</span>VISA ···4118</div></td>
+                                <td><span class="stp-pill success">Succeeded</span></td>
+                                <td>박서연</td>
+                                <td><span class="id">#wc_3127</span></td>
+                                <td class="ts">12:18</td>
+                            </tr>
+                            <tr>
+                                <td class="amt">−₩86,400</td>
+                                <td><div class="pm"><span class="brand-tag kp">KP</span>카카오페이</div></td>
+                                <td><span class="stp-pill warn">Refund</span></td>
+                                <td>이지훈</td>
+                                <td><span class="id">#wc_3126</span></td>
+                                <td class="ts">12:09</td>
+                            </tr>
+                            <tr>
+                                <td class="amt">₩214,000</td>
+                                <td><div class="pm"><span class="brand-tag tp">TP</span>토스페이 ···0298</div></td>
+                                <td><span class="stp-pill success">Succeeded</span></td>
+                                <td>최예린</td>
+                                <td><span class="id">#wc_3125</span></td>
+                                <td class="ts">11:58</td>
+                            </tr>
+                            <tr>
+                                <td class="amt">₩342,800</td>
+                                <td><div class="pm"><span class="brand-tag np">NP</span>네이버페이 ···7720</div></td>
+                                <td><span class="stp-pill success">Succeeded</span></td>
+                                <td>정현우</td>
+                                <td><span class="id">#wc_3124</span></td>
+                                <td class="ts">11:42</td>
+                            </tr>
+                            <tr>
+                                <td class="amt">₩42,000</td>
+                                <td><div class="pm"><span class="brand-tag cd">CD</span>MASTER ···6671</div></td>
+                                <td><span class="stp-pill info">Processing</span></td>
+                                <td>한지민</td>
+                                <td><span class="id">#wc_3123</span></td>
+                                <td class="ts">11:30</td>
+                            </tr>
+                            <tr>
+                                <td class="amt">₩68,000</td>
+                                <td><div class="pm"><span class="brand-tag cd">CD</span>VISA ···0098</div></td>
+                                <td><span class="stp-pill success">Succeeded</span></td>
+                                <td>오지수</td>
+                                <td><span class="id">#wc_3122</span></td>
+                                <td class="ts">11:18</td>
+                            </tr>
+                            <tr>
+                                <td class="amt">−₩162,000</td>
+                                <td><div class="pm"><span class="brand-tag tp">TP</span>토스페이</div></td>
+                                <td><span class="stp-pill danger">Disputed</span></td>
+                                <td>윤서희</td>
+                                <td><span class="id">#wc_3121</span></td>
+                                <td class="ts">11:02</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </article>
+
+                <div style="display:flex; flex-direction:column; gap:16px;">
+
+                    <article class="stp-card">
+                        <div class="ch">
+                            <h3>결제수단 분포</h3>
+                            <span class="meta">최근 7일</span>
+                        </div>
+                        <div class="stp-donut">
+                            <div class="ring">
+                                <svg viewBox="0 0 36 36">
+                                    <circle cx="18" cy="18" r="15.915" fill="none" stroke="#ebf0f5" stroke-width="3.6"/>
+                                    <circle cx="18" cy="18" r="15.915" fill="none" stroke="#03c75a" stroke-width="3.6" stroke-dasharray="42 58" stroke-dashoffset="25" stroke-linecap="butt"/>
+                                    <circle cx="18" cy="18" r="15.915" fill="none" stroke="#635bff" stroke-width="3.6" stroke-dasharray="28 72" stroke-dashoffset="-17" stroke-linecap="butt"/>
+                                    <circle cx="18" cy="18" r="15.915" fill="none" stroke="#fee500" stroke-width="3.6" stroke-dasharray="18 82" stroke-dashoffset="-45" stroke-linecap="butt"/>
+                                    <circle cx="18" cy="18" r="15.915" fill="none" stroke="#0064ff" stroke-width="3.6" stroke-dasharray="12 88" stroke-dashoffset="-63" stroke-linecap="butt"/>
+                                    <text x="18" y="17" text-anchor="middle" fill="#0a2540" font-size="5.2" font-weight="600">8.4K</text>
+                                    <text x="18" y="22" text-anchor="middle" fill="#697386" font-size="2.4">결제</text>
+                                </svg>
+                                <div class="leg">
+                                    <div class="row"><span class="dot" style="background:#03c75a;"></span><span class="nm">네이버페이</span><span class="v">42% · ₩161M</span></div>
+                                    <div class="row"><span class="dot" style="background:#635bff;"></span><span class="nm">카드</span><span class="v">28% · ₩107M</span></div>
+                                    <div class="row"><span class="dot" style="background:#fee500;"></span><span class="nm">카카오페이</span><span class="v">18% · ₩69M</span></div>
+                                    <div class="row"><span class="dot" style="background:#0064ff;"></span><span class="nm">토스</span><span class="v">12% · ₩46M</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="stp-card">
+                        <div class="ch">
+                            <h3>결제 퍼널</h3>
+                            <span class="meta">2026.04.28</span>
+                        </div>
+                        <div class="stp-flow">
+                            <div class="step">
+                                <span class="n">1</span>
+                                <div class="name">장바구니 진입<small>장바구니 페이지 도달</small></div>
+                                <span class="cnt">12,840</span>
+                                <span class="pct">100%</span>
+                            </div>
+                            <div class="step">
+                                <span class="n">2</span>
+                                <div class="name">결제 진입<small>checkout 페이지 도달</small></div>
+                                <span class="cnt">9,128</span>
+                                <span class="pct">71%</span>
+                            </div>
+                            <div class="step">
+                                <span class="n">3</span>
+                                <div class="name">결제수단 선택<small>PG 호출 직전</small></div>
+                                <span class="cnt">8,602</span>
+                                <span class="pct">67%</span>
+                            </div>
+                            <div class="step dropped">
+                                <span class="n">!</span>
+                                <div class="name">결제 실패 / 이탈<small>인증 실패 · 잔액 부족 외</small></div>
+                                <span class="cnt">190</span>
+                                <span class="pct">−1.5%</span>
+                            </div>
+                            <div class="step">
+                                <span class="n">4</span>
+                                <div class="name">결제 완료<small>승인 완료</small></div>
+                                <span class="cnt">8,412</span>
+                                <span class="pct">65%</span>
+                            </div>
+                        </div>
+                    </article>
+
+                </div>
+            </section>
+
+        </div>
+
+    </main>
+</div>
+
+</body>
+</html>

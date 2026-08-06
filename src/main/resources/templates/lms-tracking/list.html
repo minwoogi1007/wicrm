@@ -7,7 +7,7 @@
     <meta name="_csrf" th:if="${_csrf}" th:content="${_csrf.token}"/>
     <meta name="_csrf" th:unless="${_csrf}" content=""/>
     <meta name="_csrf_header" th:if="${_csrf}" th:content="${_csrf.headerName}"/>
-    <meta name="_csrf_header" th:unless="${_csrf}" content="X-CSRF-TOKEN"/>
+    <meta name="_csrf_header" th:unless="${_csrf}" content="X-XSRF-TOKEN"/>
     
     <style>
         /* 🎨 CSS 변수 정의 */
@@ -834,7 +834,7 @@ function loadStatistics() {
         url: '/lms-tracking/api/statistics',
         method: 'GET',
         headers: {
-            'X-CSRF-TOKEN': window.csrfToken
+            [window.csrfHeader]: window.csrfToken
         },
         data: {
             startDate: startDate,
@@ -906,7 +906,7 @@ function loadLmsList(page = 1) {
         url: '/lms-tracking/api/lms-list',
         method: 'GET',
         headers: {
-            'X-CSRF-TOKEN': window.csrfToken
+            [window.csrfHeader]: window.csrfToken
         },
         data: {
             startDate: startDate,

@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WICRM Design Concepts 2026</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&family=Instrument+Serif&family=Fraunces:wght@500;700;900&family=Archivo+Black&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        :root {
+            --ink: #0e1014;
+            --paper: #fafaf7;
+            --paper-2: #ffffff;
+            --muted: #6b7280;
+            --line: rgba(14,16,20,0.08);
+            --accent: #ff5b3a;
+            --accent-2: #2649ff;
+            --mono: "JetBrains Mono", "D2Coding", monospace;
+        }
+        body {
+            margin: 0;
+            background: var(--paper);
+            color: var(--ink);
+            font-family: "Inter", "Pretendard", system-ui, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ---------- Top doc bar ---------- */
+        .doc-bar {
+            border-bottom: 1px solid var(--line);
+            background: var(--paper-2);
+            padding: 14px clamp(20px, 4vw, 56px);
+            display: flex; justify-content: space-between; align-items: center;
+            font-family: var(--mono); font-size: 12px; color: var(--muted);
+            flex-wrap: wrap; gap: 12px;
+        }
+        .doc-bar .brand { color: var(--ink); font-weight: 700; letter-spacing: 0.04em; }
+        .doc-bar .meta { display: flex; gap: 18px; flex-wrap: wrap; }
+        .doc-bar .meta span b { color: var(--ink); font-weight: 600; }
+
+        /* ---------- Hero ---------- */
+        .hero {
+            padding: 80px clamp(20px, 4vw, 56px) 56px;
+            max-width: 1320px; margin: 0 auto;
+        }
+        .hero .eyebrow {
+            display: inline-flex; align-items: center; gap: 10px;
+            font-family: var(--mono); font-size: 12px;
+            color: var(--muted); margin-bottom: 24px;
+            text-transform: uppercase; letter-spacing: 0.14em;
+        }
+        .hero .eyebrow::before {
+            content: ""; width: 28px; height: 1px; background: var(--ink);
+        }
+        .hero h1 {
+            margin: 0 0 20px;
+            font-size: clamp(44px, 7vw, 96px);
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            line-height: 0.95;
+        }
+        .hero h1 em {
+            font-style: normal;
+            background: linear-gradient(120deg, var(--accent), var(--accent-2));
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+        .hero .lead {
+            font-size: clamp(16px, 1.4vw, 19px);
+            color: var(--muted);
+            max-width: 720px;
+            line-height: 1.55;
+            margin: 0 0 28px;
+            text-wrap: pretty;
+        }
+        .hero .stats {
+            display: grid; grid-template-columns: repeat(4, auto);
+            gap: 56px; margin-top: 36px;
+            border-top: 1px solid var(--line);
+            padding-top: 32px;
+        }
+        .hero .stats div { display: flex; flex-direction: column; }
+        .hero .stats .n {
+            font-size: 34px; font-weight: 800; letter-spacing: -0.02em; line-height: 1;
+        }
+        .hero .stats .l {
+            font-family: var(--mono); font-size: 11px;
+            color: var(--muted); margin-top: 8px;
+            text-transform: uppercase; letter-spacing: 0.14em;
+        }
+
+        /* ---------- Section heads ---------- */
+        .section-head {
+            max-width: 1320px; margin: 64px auto 28px;
+            padding: 0 clamp(20px, 4vw, 56px);
+            display: flex; justify-content: space-between; align-items: flex-end;
+            border-top: 1px solid var(--line);
+            padding-top: 36px;
+            flex-wrap: wrap; gap: 12px;
+        }
+        .section-head h2 {
+            margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.02em;
+        }
+        .section-head .num {
+            font-family: var(--mono); font-size: 12px; color: var(--muted);
+        }
+        .section-head .cat-bar {
+            display: flex; gap: 6px; flex-wrap: wrap;
+            font-family: var(--mono); font-size: 11px;
+        }
+        .section-head .cat-bar span {
+            border: 1px solid var(--line); padding: 5px 10px; border-radius: 999px;
+            color: var(--muted);
+        }
+        .section-head .cat-bar span.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+        /* ---------- Concept cards ---------- */
+        .concepts {
+            max-width: 1320px; margin: 0 auto;
+            padding: 0 clamp(20px, 4vw, 56px) 24px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+        .concept {
+            background: var(--paper-2);
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            overflow: hidden;
+            display: flex; flex-direction: column;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            text-decoration: none; color: inherit;
+        }
+        .concept:hover { transform: translateY(-4px); box-shadow: 0 30px 60px -30px rgba(0,0,0,0.18); }
+
+        .preview {
+            aspect-ratio: 16/10;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid var(--line);
+        }
+
+        /* preview 07 — bento */
+        .preview.bento {
+            background:
+                radial-gradient(circle at 12% -10%, rgba(38, 73, 255, 0.18), transparent 38%),
+                radial-gradient(circle at 110% 0%, rgba(255, 91, 58, 0.16), transparent 40%),
+                #f4f1ec;
+            padding: 18px;
+        }
+        .preview.bento .pv-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            grid-auto-rows: 32px;
+            gap: 6px; height: 100%;
+        }
+        .preview.bento .t { background: #fff; border-radius: 8px; box-shadow: 0 8px 16px -8px rgba(0,0,0,0.12); }
+        .preview.bento .t.ink { background: #16181d; }
+        .preview.bento .t.acc { background: #ffe7e0; }
+        .preview.bento .t.ai  { background: linear-gradient(135deg,#2649ff,#5b3df6); }
+        .preview.bento .a { grid-column: span 4; grid-row: span 3; }
+        .preview.bento .b { grid-column: span 2; grid-row: span 2; }
+        .preview.bento .c { grid-column: span 2; grid-row: span 1; }
+        .preview.bento .d { grid-column: span 3; grid-row: span 2; }
+        .preview.bento .e { grid-column: span 3; grid-row: span 2; }
+
+        /* preview 08 — brutalist */
+        .preview.brutalist {
+            background:
+                repeating-linear-gradient(0deg, transparent 0 19px, rgba(13,13,13,0.08) 19px 20px),
+                repeating-linear-gradient(90deg, transparent 0 19px, rgba(13,13,13,0.08) 19px 20px),
+                #f1efe8;
+            padding: 18px;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .preview.brutalist .pv-bar { background: #fff; border: 2px solid #0d0d0d; padding: 8px 10px; box-shadow: 4px 4px 0 #0d0d0d; font-family: var(--mono); font-size: 10px; display: flex; justify-content: space-between; }
+        .preview.brutalist .pv-bar strong { font-size: 14px; }
+        .preview.brutalist .pv-row { display: grid; grid-template-columns: 4fr 3fr 3fr 4fr; gap: 6px; flex: 1; }
+        .preview.brutalist .pv-row > div { background: #fff; border: 2px solid #0d0d0d; box-shadow: 3px 3px 0 #0d0d0d; padding: 6px; font-family: var(--mono); font-size: 9px; }
+        .preview.brutalist .pv-row .alert { background: #ff3d2e; color: #fff; }
+        .preview.brutalist .pv-row .term { background: #0d0d0d; color: #4ade80; }
+
+        /* preview 09 — glass */
+        .preview.glass {
+            background:
+                radial-gradient(circle at 12% 10%, rgba(56,230,255,0.5), transparent 32%),
+                radial-gradient(circle at 92% 8%,  rgba(255,69,200,0.4),  transparent 32%),
+                radial-gradient(circle at 80% 110%, rgba(108,123,255,0.5), transparent 36%),
+                #0b0d18;
+            padding: 18px;
+            position: relative;
+        }
+        .preview.glass::before {
+            content: ""; position: absolute; inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+        }
+        .preview.glass .pv-stack { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 8px; height: 100%; }
+        .preview.glass .pv-card {
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 12px;
+            padding: 10px 12px;
+            color: #f4f7ff;
+            font-size: 11px;
+        }
+        .preview.glass .pv-card.hero {
+            background: linear-gradient(135deg, rgba(56,230,255,0.18), rgba(108,123,255,0.14));
+            font-size: 13px; font-weight: 600; flex: 1;
+        }
+        .preview.glass .pv-card.hero .glow {
+            background: linear-gradient(120deg, transparent 0% 60%, rgba(255,69,200,0.45) 60% 100%);
+            padding: 0 4px;
+        }
+        .preview.glass .pv-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+        /* preview 10 — editorial */
+        .preview.editorial {
+            background: #f7f3ea;
+            padding: 22px 24px;
+            display: flex; flex-direction: column;
+            font-family: "Fraunces", serif;
+        }
+        .preview.editorial .ed-top {
+            display: flex; justify-content: space-between;
+            font-family: var(--mono); font-size: 9px;
+            color: #6f6863; letter-spacing: 0.18em;
+            text-transform: uppercase;
+            border-top: 3px double #1a1715;
+            border-bottom: 1px solid #1a1715;
+            padding: 6px 0;
+            margin-bottom: 14px;
+        }
+        .preview.editorial .ed-h {
+            font-size: 36px; font-weight: 900; line-height: 0.92;
+            letter-spacing: -0.03em; font-style: italic;
+            margin: 4px 0 8px; color: #1a1715;
+        }
+        .preview.editorial .ed-h b { font-style: normal; color: #c8341e; }
+        .preview.editorial .ed-d {
+            font-size: 11px; line-height: 1.45; color: #1a1715;
+            margin: 0; padding-bottom: 10px;
+            border-bottom: 1px solid #1a1715;
+        }
+        .preview.editorial .ed-strip {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            margin-top: auto; gap: 0;
+            border-top: 1px solid #1a1715;
+            padding-top: 8px;
+        }
+        .preview.editorial .ed-strip div { font-family: "Fraunces", serif; font-size: 18px; font-weight: 900; color: #1a1715; }
+        .preview.editorial .ed-strip div:nth-child(2) { color: #c8341e; }
+        .preview.editorial .ed-strip span { display:block; font-family: var(--mono); font-size: 8px; color: #6f6863; letter-spacing: 0.14em; text-transform: uppercase; font-weight: normal; }
+
+        /* preview 11 — clay */
+        .preview.clay {
+            background:
+                radial-gradient(circle at 80% -10%, #e0d8ff 0%, transparent 50%),
+                radial-gradient(circle at 0% 90%, #c8e8ff 0%, transparent 45%),
+                #ece9ff;
+            padding: 18px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 12px;
+        }
+        .preview.clay .cl {
+            background: #f4f1ff;
+            border-radius: 18px;
+            box-shadow: -6px -6px 14px rgba(255,255,255,0.85), 8px 8px 18px rgba(75,65,145,0.18), inset 1px 1px 1px rgba(255,255,255,0.6);
+            padding: 10px 12px;
+            font-size: 10px;
+            color: #2a2655;
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .preview.clay .cl .n { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; }
+        .preview.clay .cl.gradient .n { background: linear-gradient(135deg, #6b5cff, #ff6cb6); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .preview.clay .cl.peach { background: #ffc8b8; }
+        .preview.clay .cl.mint { background: #a6f0d4; }
+        .preview.clay .cl.butter { background: #ffe89a; }
+
+        /* preview 12 — terminal */
+        .preview.terminal {
+            background: #050b06;
+            padding: 14px;
+            position: relative;
+            font-family: var(--mono);
+            color: #4afa6e;
+            overflow: hidden;
+        }
+        .preview.terminal::before {
+            content: ""; position: absolute; inset: 0;
+            background: repeating-linear-gradient(0deg, rgba(74,250,110,0.04) 0 1px, transparent 1px 3px);
+            pointer-events: none;
+        }
+        .preview.terminal .t-row { font-size: 9px; line-height: 1.5; text-shadow: 0 0 4px rgba(74,250,110,0.5); }
+        .preview.terminal .t-h { font-size: 11px; font-weight: 700; letter-spacing: 0.16em; margin-bottom: 6px; }
+        .preview.terminal .err { color: #ff4a4a; text-shadow: 0 0 4px rgba(255,74,74,0.5); }
+        .preview.terminal .wrn { color: #ffc04a; }
+        .preview.terminal .dim { color: #2c8a3e; }
+        .preview.terminal .ascii-bar { letter-spacing: -1px; }
+        .preview.terminal .box {
+            border: 1px solid #2c8a3e;
+            padding: 8px 10px; margin-top: 6px;
+            position: relative;
+        }
+
+        /* preview 13 — y2k */
+        .preview.y2k {
+            background:
+                radial-gradient(circle at 90% -10%, rgba(255,62,181,0.25), transparent 40%),
+                radial-gradient(circle at -10% 100%, rgba(46,123,255,0.25), transparent 40%),
+                #fff5e1;
+            padding: 18px;
+            display: flex; flex-direction: column; gap: 10px;
+            position: relative;
+            font-family: "Archivo Black", sans-serif;
+        }
+        .preview.y2k::before {
+            content: ""; position: absolute; inset: 0;
+            background-image: radial-gradient(rgba(13,13,18,0.18) 1.4px, transparent 1.4px);
+            background-size: 12px 12px; opacity: 0.4; pointer-events: none;
+        }
+        .preview.y2k .y-h {
+            position: relative; z-index: 1;
+            font-size: 30px; line-height: 0.92;
+            text-transform: uppercase; letter-spacing: -0.02em;
+        }
+        .preview.y2k .y-h .a { color: #ff3eb5; }
+        .preview.y2k .y-h .b { color: #2e7bff; }
+        .preview.y2k .y-h .c { background: #b5ff3a; padding: 0 6px; box-shadow: 4px 4px 0 #0d0d12; display: inline-block; transform: rotate(-2deg); }
+        .preview.y2k .y-row { position: relative; z-index: 1; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; flex: 1; }
+        .preview.y2k .y-tile { border: 2px solid #0d0d12; box-shadow: 3px 3px 0 #0d0d12; padding: 8px; border-radius: 12px; font-family: "Inter", sans-serif; font-size: 9px; font-weight: 700; }
+        .preview.y2k .y-tile strong { font-family: "Archivo Black"; font-size: 16px; display: block; line-height: 1; }
+        .preview.y2k .y-tile.pink { background: #ff3eb5; color: #fff; }
+        .preview.y2k .y-tile.cyan { background: #2af0ff; }
+        .preview.y2k .y-tile.lime { background: #b5ff3a; }
+        .preview.y2k .shape { position: absolute; right: 12px; top: 8px; width: 26px; height: 26px; background: #ffe14a; border: 2px solid #0d0d12; border-radius: 50%; z-index: 1; }
+
+        /* preview 14 — aurora */
+        .preview.aurora {
+            background: #fefbff;
+            padding: 18px;
+            position: relative;
+            overflow: hidden;
+            font-family: "Outfit", sans-serif;
+        }
+        .preview.aurora::before {
+            content: ""; position: absolute; inset: -10%;
+            background:
+                radial-gradient(circle at 25% 25%, #ffb6e6 0%, transparent 40%),
+                radial-gradient(circle at 75% 25%, #b6c4ff 0%, transparent 40%),
+                radial-gradient(circle at 70% 80%, #c5fff0 0%, transparent 42%),
+                radial-gradient(circle at 30% 90%, #fff0b8 0%, transparent 40%);
+            filter: blur(40px) saturate(120%);
+            opacity: 0.85;
+        }
+        .preview.aurora .au-stack { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 8px; height: 100%; }
+        .preview.aurora .au-card {
+            background: rgba(255,255,255,0.55);
+            backdrop-filter: blur(14px) saturate(180%);
+            -webkit-backdrop-filter: blur(14px) saturate(180%);
+            border: 1px solid rgba(255,255,255,0.7);
+            border-radius: 12px;
+            padding: 10px 12px;
+            font-size: 10px; color: #1c1428;
+        }
+        .preview.aurora .au-card.hero {
+            font-family: "Instrument Serif", serif;
+            font-size: 13px; font-weight: 400; line-height: 1.3; flex: 1;
+        }
+        .preview.aurora .au-card.hero em {
+            font-style: italic;
+            background: linear-gradient(120deg, #d56cff, #6c8aff);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+        .preview.aurora .au-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .preview.aurora .au-card .num { font-family: "Instrument Serif", serif; font-size: 22px; line-height: 1; background: linear-gradient(135deg, #6c8aff, #d56cff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+        /* card body */
+        .body {
+            padding: 22px;
+            display: flex; flex-direction: column; gap: 10px;
+            flex: 1;
+        }
+        .body .tag {
+            font-family: var(--mono); font-size: 11px; color: var(--muted);
+            letter-spacing: 0.12em; text-transform: uppercase;
+        }
+        .body h3 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.01em; }
+        .body p { margin: 0; color: var(--muted); font-size: 13.5px; line-height: 1.55; flex: 1; }
+        .body .specs {
+            display: flex; flex-wrap: wrap; gap: 6px;
+            margin-top: 6px;
+        }
+        .body .specs span {
+            font-size: 11px; color: var(--ink);
+            background: var(--paper);
+            border: 1px solid var(--line);
+            padding: 4px 10px; border-radius: 999px;
+            font-family: var(--mono);
+        }
+        .body .open {
+            display: inline-flex; align-items: center; gap: 8px;
+            margin-top: 6px;
+            font-size: 13px; font-weight: 700;
+            color: var(--ink);
+        }
+        .body .open::after {
+            content: "→"; transition: transform 0.2s ease;
+        }
+        .concept:hover .body .open::after { transform: translateX(4px); }
+
+        /* ============ ADMIN PREVIEWS ============ */
+        /* preview 15 — saas pro */
+        .preview.saas-pv {
+            background: #fafafa;
+            display: grid;
+            grid-template-columns: 70px 1fr;
+            gap: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: "Inter", sans-serif;
+        }
+        .preview.saas-pv .sp-side {
+            background: #fff;
+            border-right: 1px solid #e5e5e5;
+            padding: 8px 6px;
+            font-size: 9px;
+        }
+        .preview.saas-pv .sp-ws {
+            display: flex; align-items: center; gap: 4px;
+            padding: 4px; border: 1px solid #e5e5e5; border-radius: 5px;
+            margin-bottom: 6px;
+        }
+        .preview.saas-pv .sp-ws .sp-logo {
+            width: 14px; height: 14px; border-radius: 3px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: #fff; font-weight: 700; font-size: 8px;
+            display: grid; place-items: center;
+        }
+        .preview.saas-pv .sp-ws .sp-nm { font-weight: 600; font-size: 9px; }
+        .preview.saas-pv .sp-row {
+            display: flex; align-items: center; gap: 4px;
+            padding: 3px 5px; border-radius: 4px;
+            color: #404040; font-weight: 500; font-size: 9px;
+            margin-bottom: 1px;
+        }
+        .preview.saas-pv .sp-row.on { background: #fafafa; color: #0a0a0a; font-weight: 600; }
+        .preview.saas-pv .sp-row .sp-ic { color: #737373; }
+        .preview.saas-pv .sp-row.on .sp-ic { color: #6366f1; }
+        .preview.saas-pv .sp-row .sp-bg {
+            margin-left: auto;
+            background: #eef2ff; color: #6366f1;
+            padding: 0 4px; border-radius: 999px;
+            font-size: 8px; font-weight: 600;
+        }
+        .preview.saas-pv .sp-main { padding: 10px 12px; }
+        .preview.saas-pv .sp-tabs {
+            display: flex; gap: 8px;
+            border-bottom: 1px solid #e5e5e5;
+            margin-bottom: 8px;
+            padding-bottom: 4px;
+            font-size: 9px;
+        }
+        .preview.saas-pv .sp-tabs span { color: #737373; padding-bottom: 3px; }
+        .preview.saas-pv .sp-tabs span.on { color: #0a0a0a; font-weight: 600; border-bottom: 2px solid #0a0a0a; margin-bottom: -5px; }
+        .preview.saas-pv .sp-stats {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 6px; margin-bottom: 8px;
+        }
+        .preview.saas-pv .sp-stat {
+            background: #fff; border: 1px solid #e5e5e5;
+            border-radius: 5px; padding: 5px 7px;
+            font-size: 9px;
+        }
+        .preview.saas-pv .sp-stat small { display: block; color: #737373; }
+        .preview.saas-pv .sp-stat strong { font-size: 13px; font-weight: 600; }
+        .preview.saas-pv .sp-table {
+            background: #fff; border: 1px solid #e5e5e5;
+            border-radius: 5px; overflow: hidden;
+        }
+        .preview.saas-pv .sp-tr {
+            display: grid; grid-template-columns: auto 1fr auto;
+            gap: 6px; align-items: center;
+            padding: 5px 8px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 9px;
+        }
+        .preview.saas-pv .sp-tr:last-child { border-bottom: none; }
+        .preview.saas-pv .sp-id { font-family: "JetBrains Mono"; color: #6366f1; }
+        .preview.saas-pv .sp-pl {
+            padding: 1px 6px; border-radius: 999px;
+            font-size: 8px; font-weight: 600;
+        }
+        .preview.saas-pv .sp-pl.warn { background: #fffbeb; color: #f59e0b; }
+        .preview.saas-pv .sp-pl.info { background: #eef2ff; color: #6366f1; }
+        .preview.saas-pv .sp-pl.danger { background: #fef2f2; color: #ef4444; }
+        .preview.saas-pv .sp-pl.ok { background: #ecfdf5; color: #10b981; }
+
+        /* preview 16 — polaris */
+        .preview.polaris-pv {
+            background: #f1f1f1;
+            display: grid;
+            grid-template-columns: 70px 1fr;
+            padding: 0;
+            font-family: "Inter", sans-serif;
+        }
+        .preview.polaris-pv .pl-side {
+            background: #fff;
+            border-right: 1px solid #e3e3e3;
+            padding: 8px 6px;
+        }
+        .preview.polaris-pv .pl-shop {
+            display: flex; align-items: center; gap: 4px;
+            padding: 4px; margin-bottom: 6px;
+            font-weight: 600; font-size: 9px;
+        }
+        .preview.polaris-pv .pl-logo {
+            width: 16px; height: 16px; border-radius: 4px;
+            background: #008060; color: #fff;
+            display: grid; place-items: center;
+            font-weight: 700; font-size: 9px;
+        }
+        .preview.polaris-pv .pl-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 4px 6px; border-radius: 4px;
+            font-size: 9px; color: #303030; font-weight: 500;
+            margin-bottom: 1px;
+        }
+        .preview.polaris-pv .pl-row.on { background: #e3f5ed; color: #004c3f; font-weight: 600; }
+        .preview.polaris-pv .pl-row span {
+            background: #008060; color: #fff;
+            font-size: 7px; padding: 0 4px; border-radius: 999px;
+        }
+        .preview.polaris-pv .pl-main { padding: 10px 12px; }
+        .preview.polaris-pv .pl-hello {
+            font-size: 11px; font-weight: 700; color: #1a1a1a;
+            margin-bottom: 6px;
+        }
+        .preview.polaris-pv .pl-banner {
+            background: #ebf5ff; border-left: 3px solid #2c6ecb;
+            border-radius: 6px; padding: 5px 8px;
+            font-size: 9px; color: #2c6ecb; font-weight: 500;
+            margin-bottom: 8px;
+        }
+        .preview.polaris-pv .pl-kpis {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 6px; margin-bottom: 6px;
+        }
+        .preview.polaris-pv .pl-kpi {
+            background: #fff; border: 1px solid #e3e3e3;
+            border-radius: 6px; padding: 5px 7px;
+            font-size: 9px;
+        }
+        .preview.polaris-pv .pl-kpi small { display: block; color: #616161; }
+        .preview.polaris-pv .pl-kpi strong { font-size: 13px; font-weight: 600; display: block; }
+        .preview.polaris-pv .pl-kpi .up { color: #008060; font-size: 8px; }
+        .preview.polaris-pv .pl-kpi .dn { color: #d72c0d; font-size: 8px; }
+        .preview.polaris-pv .pl-list {
+            background: #fff; border: 1px solid #e3e3e3;
+            border-radius: 6px; padding: 6px 8px;
+            font-size: 9px; color: #616161;
+        }
+        .preview.polaris-pv .pl-list b { color: #1a1a1a; margin-right: 4px; }
+
+        /* preview 17 — stripe */
+        .preview.stripe-pv {
+            background: #f6f9fc;
+            display: grid;
+            grid-template-columns: 80px 1fr;
+            padding: 0;
+            font-family: "Inter", sans-serif;
+        }
+        .preview.stripe-pv .st-side {
+            background: #fff;
+            border-right: 1px solid #e6ebf1;
+            padding: 8px 6px;
+        }
+        .preview.stripe-pv .st-brand {
+            display: flex; align-items: center; gap: 4px;
+            padding: 4px; margin-bottom: 4px;
+            font-weight: 700; font-size: 9px;
+        }
+        .preview.stripe-pv .st-logo {
+            width: 16px; height: 16px; border-radius: 4px;
+            background: linear-gradient(135deg, #635bff, #00d4ff);
+            color: #fff; font-weight: 800; font-size: 9px;
+            display: grid; place-items: center;
+        }
+        .preview.stripe-pv .st-mode {
+            display: flex; background: #f6f9fc; border-radius: 5px;
+            padding: 2px; margin-bottom: 6px;
+            font-size: 8px;
+        }
+        .preview.stripe-pv .st-mode span {
+            flex: 1; text-align: center; padding: 2px;
+            color: #697386; font-weight: 500;
+        }
+        .preview.stripe-pv .st-mode span.on {
+            background: #fff; color: #0a2540;
+            border-radius: 4px; box-shadow: 0 1px 2px rgba(10,37,64,0.08);
+        }
+        .preview.stripe-pv .st-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 3px 6px; border-radius: 4px;
+            font-size: 9px; color: #425466; font-weight: 500;
+        }
+        .preview.stripe-pv .st-row.on { background: #efeefe; color: #635bff; font-weight: 600; }
+        .preview.stripe-pv .st-row span {
+            background: #f6f9fc; border: 1px solid #e6ebf1;
+            font-family: "JetBrains Mono"; font-size: 8px;
+            padding: 0 4px; border-radius: 3px;
+            color: #697386;
+        }
+        .preview.stripe-pv .st-main { padding: 10px 12px; }
+        .preview.stripe-pv .st-h {
+            display: flex; align-items: baseline; gap: 6px;
+            margin-bottom: 4px;
+            background: #fff; border: 1px solid #e6ebf1;
+            padding: 6px 8px; border-radius: 6px;
+        }
+        .preview.stripe-pv .st-h span { font-size: 9px; color: #697386; }
+        .preview.stripe-pv .st-h strong { font-size: 14px; font-weight: 600; color: #0a2540; flex: 1; }
+        .preview.stripe-pv .st-h i { font-size: 9px; color: #008a17; font-style: normal; font-weight: 600; }
+        .preview.stripe-pv .st-chart {
+            width: 100%; height: 56px; display: block;
+            background: #fff; border: 1px solid #e6ebf1;
+            border-radius: 6px; padding: 4px;
+            margin-bottom: 6px;
+        }
+        .preview.stripe-pv .st-mini {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+        }
+        .preview.stripe-pv .st-mini div {
+            background: #fff; border: 1px solid #e6ebf1;
+            border-radius: 6px; padding: 5px 7px;
+            font-size: 9px;
+        }
+        .preview.stripe-pv .st-mini small { display: block; color: #697386; }
+        .preview.stripe-pv .st-mini b { font-size: 12px; font-weight: 600; color: #0a2540; }
+
+        /* preview 18 — attio */
+        .preview.attio-pv {
+            background: #fcfcfd;
+            padding: 12px 10px;
+            font-family: "Inter", sans-serif;
+        }
+        .preview.attio-pv .at-pv-cols {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            height: 100%;
+        }
+        .preview.attio-pv .at-col-pv {
+            background: #f7f7f8;
+            border: 1px solid #ececec;
+            border-radius: 6px;
+            padding: 6px;
+            display: flex; flex-direction: column; gap: 4px;
+        }
+        .preview.attio-pv .at-col-h-pv {
+            display: flex; align-items: center; gap: 4px;
+            font-size: 9px; font-weight: 600; color: #1a1a1a;
+            margin-bottom: 2px;
+        }
+        .preview.attio-pv .at-col-h-pv .dot {
+            width: 6px; height: 6px; border-radius: 50%;
+        }
+        .preview.attio-pv .at-col-h-pv .cnt {
+            margin-left: auto;
+            background: #fff; border: 1px solid #ececec;
+            font-family: "JetBrains Mono"; font-size: 8px;
+            padding: 0 4px; border-radius: 999px;
+            color: #8b8b8b; font-weight: 500;
+        }
+        .preview.attio-pv .at-card-pv {
+            background: #fff;
+            border: 1px solid #ececec;
+            border-radius: 5px;
+            padding: 4px 6px;
+        }
+        .preview.attio-pv .at-card-pv .id {
+            font-family: "JetBrains Mono"; font-size: 8px;
+            color: #8b8b8b;
+        }
+        .preview.attio-pv .at-card-pv .ti {
+            font-size: 9px; font-weight: 500;
+            margin: 1px 0 3px; color: #1a1a1a;
+            line-height: 1.2;
+        }
+        .preview.attio-pv .at-card-pv .tg {
+            display: flex; gap: 3px; flex-wrap: wrap;
+        }
+        .preview.attio-pv .at-card-pv .tg .t {
+            font-size: 7.5px; padding: 1px 4px; border-radius: 3px;
+            font-weight: 500;
+        }
+        .preview.attio-pv .at-card-pv .tg .t.pink { background: #ffe9f1; color: #d63b7c; }
+        .preview.attio-pv .at-card-pv .tg .t.blue { background: #e8f1ff; color: #2c6ecb; }
+        .preview.attio-pv .at-card-pv .tg .t.purple { background: #f3effe; color: #6e3aff; }
+        .preview.attio-pv .at-card-pv .tg .t.teal { background: #e2f6f3; color: #1a8e7a; }
+        .preview.attio-pv .at-card-pv .tg .t.red { background: #ffeaea; color: #d83a3a; }
+
+        /* admin row spacing tweak */
+        .concepts.admin-row .concept { box-shadow: 0 4px 16px -8px rgba(0,0,0,0.06); }
+
+        /* ---------- comparison matrix ---------- */
+        .matrix {
+            max-width: 1320px; margin: 56px auto 0;
+            padding: 0 clamp(20px, 4vw, 56px);
+        }
+        .matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--paper-2);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .matrix-table th, .matrix-table td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--line);
+            font-size: 13px;
+        }
+        .matrix-table th {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            font-weight: 500;
+            background: var(--paper);
+        }
+        .matrix-table td:first-child { font-weight: 700; }
+        .matrix-table td .dot {
+            display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+            margin-right: 6px; vertical-align: middle;
+        }
+        .matrix-table td .pill {
+            display: inline-block;
+            padding: 2px 8px; border-radius: 999px;
+            font-family: var(--mono); font-size: 10px;
+            background: var(--paper);
+            border: 1px solid var(--line);
+        }
+        .matrix-table tr:last-child td { border-bottom: none; }
+
+        /* ---------- System notes ---------- */
+        .notes {
+            max-width: 1320px; margin: 56px auto 0;
+            padding: 56px clamp(20px, 4vw, 56px);
+            border-top: 1px solid var(--line);
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 48px;
+        }
+        .notes h2 {
+            margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.02em;
+        }
+        .notes h2 em { font-style: normal; color: var(--accent); }
+        .notes .sub { color: var(--muted); margin-top: 8px; font-size: 13px; }
+        .notes .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+        }
+        .notes .grid div {
+            border-top: 1px solid var(--ink);
+            padding-top: 14px;
+        }
+        .notes .grid h4 {
+            margin: 0 0 6px; font-size: 12px;
+            text-transform: uppercase; letter-spacing: 0.14em;
+            font-family: var(--mono);
+        }
+        .notes .grid p { margin: 0; font-size: 13.5px; color: var(--muted); line-height: 1.55; }
+        .notes .grid p code { font-family: var(--mono); background: var(--paper); padding: 1px 6px; border-radius: 4px; color: var(--ink); }
+
+        footer {
+            max-width: 1320px; margin: 56px auto 0;
+            padding: 28px clamp(20px, 4vw, 56px) 48px;
+            border-top: 1px solid var(--line);
+            display: flex; justify-content: space-between;
+            font-family: var(--mono); font-size: 11px; color: var(--muted);
+            flex-wrap: wrap; gap: 12px;
+        }
+
+        @media (max-width: 1100px) {
+            .concepts { grid-template-columns: 1fr 1fr; }
+            .notes { grid-template-columns: 1fr; gap: 32px; }
+            .hero .stats { gap: 32px; }
+        }
+        @media (max-width: 720px) {
+            .concepts { grid-template-columns: 1fr; }
+            .notes .grid { grid-template-columns: 1fr; }
+            .hero .stats { grid-template-columns: 1fr 1fr; gap: 24px; }
+            .matrix-table { font-size: 11px; }
+            .matrix-table th, .matrix-table td { padding: 10px 8px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="doc-bar">
+    <span class="brand">WICRM / DESIGN-DOC-2026-04 · v3</span>
+    <div class="meta">
+        <span><b>Author</b> · WICRM Design</span>
+        <span><b>Status</b> · Exploration</span>
+        <span><b>Issued</b> · 2026.04.28</span>
+    </div>
+</div>
+
+<header class="hero">
+    <div class="eyebrow">Visual Direction Study · 12 Concepts</div>
+    <h1>2026 WICRM<br>Design <em>Concepts</em>.</h1>
+    <p class="lead">
+        쇼핑몰 CRM 어드민을 위한 12가지 시각 방향성 탐색.
+        실전 어드민 패턴 4종(SaaS Pro · Shopify Polaris · Stripe · Attio Kanban)과
+        분위기 탐색 8종을 함께 비교해, 영역별로 어떤 톤과 정보 밀도가 적합한지 빠르게 판단합니다.
+    </p>
+    <div class="stats">
+        <div><span class="n">12</span><span class="l">Concepts</span></div>
+        <div><span class="n">4</span><span class="l">Admin Patterns</span></div>
+        <div><span class="n">8</span><span class="l">Mood Studies</span></div>
+        <div><span class="n">100%</span><span class="l">Standalone HTML</span></div>
+    </div>
+</header>
+
+<!-- ============ ADMIN PATTERNS — RECOMMENDED ============ -->
+<div class="section-head">
+    <h2>쇼핑몰 어드민 패턴 <span style="font-weight:500; color:var(--muted); font-size:14px; margin-left:8px;">— 실전 적용 추천</span></h2>
+    <div class="cat-bar">
+        <span class="on">recommended</span>
+        <span>4 patterns</span>
+    </div>
+</div>
+
+<section class="concepts admin-row">
+
+    <!-- 15 SAAS PRO -->
+    <a href="15-saas-pro-console.html" class="concept">
+        <div class="preview saas-pv">
+            <div class="sp-side">
+                <div class="sp-ws"><span class="sp-logo">W</span><span class="sp-nm">WICRM</span></div>
+                <div class="sp-row on"><span class="sp-ic">▤</span>Orders<span class="sp-bg">128</span></div>
+                <div class="sp-row"><span class="sp-ic">↩</span>Refunds</div>
+                <div class="sp-row"><span class="sp-ic">▢</span>Products</div>
+                <div class="sp-row"><span class="sp-ic">◔</span>Customers</div>
+            </div>
+            <div class="sp-main">
+                <div class="sp-tabs"><span class="on">전체 8.4K</span><span>출고 412</span><span>배송중 1.2K</span></div>
+                <div class="sp-stats">
+                    <div class="sp-stat"><small>주문</small><strong>412</strong></div>
+                    <div class="sp-stat"><small>매출</small><strong>₩84M</strong></div>
+                    <div class="sp-stat"><small>SLA</small><strong>17 ⚠</strong></div>
+                </div>
+                <div class="sp-table">
+                    <div class="sp-tr"><span class="sp-id">#3128</span><span>김민지</span><span class="sp-pl warn">출고</span></div>
+                    <div class="sp-tr"><span class="sp-id">#3127</span><span>박서연</span><span class="sp-pl info">배송</span></div>
+                    <div class="sp-tr"><span class="sp-id">#3126</span><span>이지훈</span><span class="sp-pl danger">환불</span></div>
+                    <div class="sp-tr"><span class="sp-id">#3125</span><span>최예린</span><span class="sp-pl ok">완료</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="body">
+            <span class="tag">Type 15 · SaaS Pro Console</span>
+            <h3>Linear / Vercel 스타일</h3>
+            <p>좌측 사이드바 + 탭 + 고밀도 테이블, 커맨드 팔레트(⌘K). 일평균 수백~수천 주문을 빠르게 스캔·필터·처리하는 메인 어드민에 가장 적합.</p>
+            <div class="specs"><span>sidebar+topbar</span><span>cmd-K</span><span>dense table</span><span>⌘ shortcut</span></div>
+            <span class="open">디자인 보기</span>
+        </div>
+    </a>
+
+    <!-- 16 POLARIS -->
+    <a href="16-shopify-polaris.html" class="concept">
+        <div class="preview polaris-pv">
+            <div class="pl-side">
+                <div class="pl-shop"><span class="pl-logo">W</span><span>WICRM</span></div>
+                <div class="pl-row on">▤ 주문<span>128</span></div>
+                <div class="pl-row">▢ 상품</div>
+                <div class="pl-row">◔ 고객</div>
+                <div class="pl-row">★ VIP</div>
+            </div>
+            <div class="pl-main">
+                <div class="pl-hello">안녕하세요, 김민우님 👋</div>
+                <div class="pl-banner">i &nbsp; 4월 환불 +34% 증가 · 사이즈 가이드 점검</div>
+                <div class="pl-kpis">
+                    <div class="pl-kpi"><small>매출</small><strong>₩84M</strong><i class="up">▲12%</i></div>
+                    <div class="pl-kpi"><small>주문</small><strong>412</strong><i class="up">▲6%</i></div>
+                    <div class="pl-kpi"><small>전환</small><strong>5.0%</strong><i class="dn">▼0.3</i></div>
+                </div>
+                <div class="pl-list"><b>최근 주문</b> · 김민지 / 박서연 / 이지훈 →</div>
+            </div>
+        </div>
+        <div class="body">
+            <span class="tag">Type 16 · Shopify Polaris</span>
+            <h3>친근한 이커머스 어드민</h3>
+            <p>화이트 배경 + 세이지 그린 액센트, 인사말 헤더, 컬러 배너 알림, KPI 카드. 운영자가 매일 가장 먼저 여는 홈/오늘 화면에 적합.</p>
+            <div class="specs"><span>sage green</span><span>greeting</span><span>banner alert</span><span>tasks</span></div>
+            <span class="open">디자인 보기</span>
+        </div>
+    </a>
+
+    <!-- 17 STRIPE -->
+    <a href="17-stripe-finance.html" class="concept">
+        <div class="preview stripe-pv">
+            <div class="st-side">
+                <div class="st-brand"><span class="st-logo">W</span><span>WICRM</span></div>
+                <div class="st-mode"><span class="on">Live</span><span>Test</span></div>
+                <div class="st-row on">$ Overview</div>
+                <div class="st-row">↹ Payments</div>
+                <div class="st-row">↩ Refunds<span>312</span></div>
+            </div>
+            <div class="st-main">
+                <div class="st-h"><span>총 매출</span><strong>₩384.2M</strong><i class="up">▲ 12.4%</i></div>
+                <svg viewBox="0 0 200 56" preserveAspectRatio="none" class="st-chart">
+                    <defs><linearGradient id="ipv" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#635bff" stop-opacity="0.25"/><stop offset="100%" stop-color="#635bff" stop-opacity="0"/></linearGradient></defs>
+                    <path d="M0,40 L30,36 L60,28 L90,32 L120,20 L150,22 L180,12 L200,8" fill="none" stroke="#635bff" stroke-width="1.5"/>
+                    <path d="M0,40 L30,36 L60,28 L90,32 L120,20 L150,22 L180,12 L200,8 L200,56 L0,56 Z" fill="url(#ipv)"/>
+                    <path d="M0,42 L30,40 L60,38 L90,40 L120,36 L150,38 L180,34 L200,36" fill="none" stroke="#c1c9d2" stroke-width="1" stroke-dasharray="2 2"/>
+                </svg>
+                <div class="st-mini">
+                    <div><small>결제</small><b>8.4K</b></div>
+                    <div><small>AOV</small><b>₩45,680</b></div>
+                    <div><small>환불</small><b>₩56.6M</b></div>
+                </div>
+            </div>
+        </div>
+        <div class="body">
+            <span class="tag">Type 17 · Stripe Finance</span>
+            <h3>파이낸스 등급 대시보드</h3>
+            <p>큰 매출 차트 + 비교 라인 + 결제 트랜잭션 테이블. 정산·결제·환불 등 금융 데이터를 다루는 임원/회계 어드민에 적합.</p>
+            <div class="specs"><span>indigo</span><span>compare line</span><span>tabular</span><span>funnel</span></div>
+            <span class="open">디자인 보기</span>
+        </div>
+    </a>
+
+    <!-- 18 ATTIO -->
+    <a href="18-attio-kanban.html" class="concept">
+        <div class="preview attio-pv">
+            <div class="at-pv-cols">
+                <div class="at-col-pv">
+                    <div class="at-col-h-pv"><span class="dot" style="background:#5b5b5b;"></span>신규<span class="cnt">5</span></div>
+                    <div class="at-card-pv">
+                        <span class="id">#3128</span>
+                        <div class="ti">RN-GSZD962</div>
+                        <div class="tg"><span class="t pink">자사몰</span><span class="t blue">네이버페이</span></div>
+                    </div>
+                    <div class="at-card-pv">
+                        <span class="id">#3123</span>
+                        <div class="ti">CO-DR1042</div>
+                        <div class="tg"><span class="t teal">코랄리크</span></div>
+                    </div>
+                </div>
+                <div class="at-col-pv">
+                    <div class="at-col-h-pv"><span class="dot" style="background:#2c6ecb;"></span>결제<span class="cnt">6</span></div>
+                    <div class="at-card-pv">
+                        <span class="id">#3127</span>
+                        <div class="ti">CO-DR1042</div>
+                        <div class="tg"><span class="t blue">29CM</span></div>
+                    </div>
+                </div>
+                <div class="at-col-pv">
+                    <div class="at-col-h-pv"><span class="dot" style="background:#d97917;"></span>출고<span class="cnt">7</span></div>
+                    <div class="at-card-pv">
+                        <span class="id">#3112</span>
+                        <div class="ti">RN ★ VIP</div>
+                        <div class="tg"><span class="t red">SLA</span><span class="t purple">레노마</span></div>
+                    </div>
+                </div>
+                <div class="at-col-pv">
+                    <div class="at-col-h-pv"><span class="dot" style="background:#1a9a4d;"></span>완료<span class="cnt">128</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="body">
+            <span class="tag">Type 18 · Attio CRM Kanban</span>
+            <h3>주문 파이프라인 보드</h3>
+            <p>5단계 칸반(신규→결제→출고→배송→완료)으로 주문 흐름을 시각적으로 관제. 컬러 태그 시스템과 드래그&드롭. 운영팀의 일일 워크보드로 적합.</p>
+            <div class="specs"><span>5-stage</span><span>color tags</span><span>drag&drop</span><span>WIP-aware</span></div>
+            <span class="open">디자인 보기</span>
+        </div>
+    </a>
+
+</section>
+
+<div class="section-head">
+    <h2>분위기 탐색 컨셉 <span style="font-weight:500; color:var(--muted); font-size:14px; margin-left:8px;">— 톤 & 매너 스터디</span></h2>
+    <span class="num">8 mood studies</span>
+</div>
+
+<section class="concepts">
+
+    <!-- 07 BENTO -->
+    <a href="07-bento-grid.html" class="concept">
+        <div class="preview bento">
+            <div class="pv-grid">
+                <div class="t ink a"></div>
+                <div class="t b"></div>
+                <div class="t acc c"></div>
+                <div class="t c"></div>
+                <div class="t d"></div>
+                <div class="t ai e"></div>
+                <div class="t c"></div>
+                <div class="t acc c"></div>
+            </div>
+        </div>
+        <div class="body">
+            <span class="tag">Type 07 · Soft Editorial</span>
+            <h3>Bento Grid 2026</h3>
+            <p>가변 크기 카드를 12-컬럼 그리드에 배치한 모듈형 대시보드. 한 화면에서 운영 전체를 스캔하는 메인 대시보드에 적합.</p>
+            <div class="specs"><span>warm sand</span><span>12-col bento</span><span>maximalist KPI</span></div>
+            <span class="open">디자인 보기</span>
+        </div>
+    </a>
+
+    <!-- 08 BRUTALIST -->
+    <a href="08-brutalist-ops.html" class="concept">
+        <div class="preview brutalist">
+            <div class="pv-bar">
+                <span>OPS CONSOLE</span>
+                <strong>2026-04-28</strong>
+                <span>BUILD #4f9c2a</span>
+            </div>
+            <div class="pv-row">
+                <div>QUEUED<br><strong style="font-size:14px;">1,284</strong></div>
+                <div>SHIP/D<br><strong style="font-size:14px;">873</strong></div>
+                <div>SLA<br><strong style="font-size:14px;">97.6%</strong></div>
+                <div class="alert">INC<br><strong style="font-size:14px;">02</strong></div>
+            </div>
+            <div class="pv-row" style="grid-template-columns: 6fr 4fr;">
+                <div>
+                    INC-031 · cj · P1<br>
+                    INC-029 · naver · P2<br>
+                    INC-024 · consult · OK<br>
+                    INC-018 · upload · OK<br>
+                </div>
+                <div class="term">
+                    [12:29] OK ship<br>
+                    [12:28] ERR cj<br>
+                    [12:27] WRN q=17<br>
+                    $ tail -f
+                </div>
+            </div>
+        </div>
+        <div class="body">
+            <span class="tag">Type 08 · Raw / High-Trust</span>
+            <h3>Neo-Brutalist Ops</h3>
+            <p>보이는 그리드, 모노스페이스 폰트, 두꺼운 검정 라인과 하드 섀도. 물류·결제·외부 연동 모니터링 콘솔에 적합.</p>
+            <div class="specs"><span>visible grid</span><span>mono type</span><span>hard shadow</span></div>
+            <span class="open">디자인 보기</span>
+        </div>
+    </a>
+
+    <!-- 09 GLASS -->
+    <a href="09-glassmorphism-ai.html" class="concept">
+        <div class="preview glass">
+            <div class="pv-stack">
+                <div class="pv-card hero">
+                    GPT · 자사몰 환불
+                    <span class="glow">+34%</span>
+                    급증을 발견했습니다.
+                </div>
+                <div class="pv-row">
+                    <div class="pv-card">사이즈 가이드<br><span style="color:#38e6ff;">High</span></div>
+                    <div class="pv-card">CJ 회수<br><span style="color:#ff45c8;">Mid</span></div>
+                </div>
+                <div class="pv-card" style="font-family:var(--mono);">
+                    [12:29] Insight · DONE<br>
+                    [11:58] Anomaly · ALERT
+                </div>
+            </div>
+        </div>
+        <div class="body">
+            <span class="tag">Type 09 · Cyber / AI-Forward</span>
+            <h3>Glassmorphism + Cyber</h3>
+            <p>딥 다크 + 프로스티드 글래스 + 시안/마젠타/라임 네온. AI 인사이트와 어드밴스드 분석 영역에 적합.</p>
+            <div class="specs"><span>dark base</span><span>frosted glass</span><span>cyber neon</span></div>
+            <span class="open">디자인 보기</span>
+        </div>
+    </a>
+
+    <!-- 10 EDITORIAL -->
+    <a href="10-editorial-swiss.html" class="concept">
+        <div class="preview editorial">
+            <div class="ed-top">
+                <span>WICRM REVIEW</span>
+                <span>VOL III · NO 04</span>
+            </div>
+            <div class="ed-h">The Quiet<br><b>Quarter</b>.</div>
+            <p class="ed-d">
+                1분기 환불률은 안정세였지만, 4월 첫 주에 들어 자사몰 환불이 +34% 급증했다.
+            </p>
+            <div class="ed-strip">
+                <div>8,412<span>orders</span></div>
+                <div>14.7%<span>refund</span></div>
+                <div>97.6%<span>sla</span></div>
+            </div>
+        </div>
+        <div class="body">
+            <span class="tag">Type 10 · Editorial / Print</span>
+            <h3>Editorial Swiss</h3>
+            <p>세리프 헤드라인, 다단 레이아웃, 클래식 매거진 톤. 월간 임원 리포트 · 인사이트 매거진 · 분기 보고서에 적합.</p>
+            <div class="specs"><span>serif</span><span>multi-column</span><span>drop-cap</span></div>
+            <span class="open">디자인 보기</span>
+        </div>
+    </a>
+
+    <!-- 11 CLAY -->
+    <a href="11-claymorphism.html" class="concept">
+        <div class="preview clay">
+            <div class="cl gradient">
+                <span style="font-size:9px; opacity:0.7;">마일리지 합계</span>
+                <span class="n">+5.24M</span>
+            </div>
+            <div class="cl peach">
+                <span style="font-size:9px;">활성</span>
+                <span class="n">42K</span>
+            </div>
+            <div class="cl mint">
+                <span style="font-size:9px;">VIP</span>
+                <span class="n">1,082</span>
+            </div>
+            <div class="cl butter">
+                <span style="font-size:9px;">신규</span>
+                <span class="n">128</span>
+            </div>
+        </div>
+        <div class="body">
+            <span class="tag">Type 11 · Soft 3D / Friendly</span>
+            <h3>Claymorphism</h3>
+            <p>부드러운 입체감과 파스텔 팔레트, 라벤더-민트-피치 톤. 회원 · 마일리지 · 로열티 등 친근한 영역에 적합.</p>
+            <div class="specs"><span>pastel</span><span>soft shadow</span><span>pillow</span></div>
+            <span class="open">디자인 보기</span>
+        </div>
+    </a>
+
+    <!-- 12 TERMINAL -->
+    <a href="12-terminal-matrix.html" class="concept">
+        <div class="preview terminal">
+            <div class="t-row t-h">[ WICRM // OPS ]</div>
+            <div class="t-row dim">─── KPI ───</div>
+            <div class="t-row">queue=17 ship=873/day sla=<span class="wrn">97.6%</span></div>
+            <div class="t-row dim">─── LOG ───</div>
+            <div class="t-row">[12:29] OK ship.batch (873/873)</div>
+            <div class="t-row"><span class="err">[12:28] ERR cj timeout 5000ms</span></div>
+            <div class="t-row"><span class="wrn">[12:27] WRN queue above threshold</span></div>
+            <div class="t-row dim">─── BARS ───</div>
+            <div class="t-row ascii-bar">RENOMA  ████████████████████░░ 88%</div>
+            <div class="t-row ascii-bar"><span class="wrn">CORALI  ████████░░░░░░░░░░░░░░ 34%</span></div>
+            <div class="t-row" style="margin-top:6px;">$ <span style="background:#4afa6e; color:#050b06; padding:0 2px;">_</span></div>
+        </div>
+        <div class="body">
+            <span class="tag">Type 12 · Terminal / Sysadmin</span>
+            <h3>Terminal Matrix</h3>
+            <p>다크 베이스 + 인광 그린, CRT 스캔라인, ASCII 차트. 시스템 관리 · 로그 분석 · 인시던트 워룸에 적합.</p>
+            <div class="specs"><span>phosphor green</span><span>scanlines</span><span>ascii</span></div>
+            <span class="open">디자인 보기</span>
+        </div>
+    </a>
+
+    <!-- 13 Y2K -->
+    <a href="13-y2k-memphis.html" class="concept">
+        <div class="preview y2k">
+            <span class="shape"></span>
+            <div class="y-h">
+                <span class="a">SUPER</span><br>
+                <span class="b">CRM!</span> <span class="c">26</span>
+            </div>
+            <div class="y-row">
+                <div class="y-tile pink">신규<strong>128</strong></div>
+                <div class="y-tile cyan">VIP<strong>1K</strong></div>
+                <div class="y-tile lime">매출<strong>₩384M</strong></div>
+            </div>
+        </div>
+        <div class="body">
+            <span class="tag">Type 13 · Pop / Playful</span>
+            <h3>Y2K Memphis Pop</h3>
+            <p>비비드 컬러 · 도형 · 두꺼운 라인 · 하드 섀도. 마케팅 캠페인 · 신규 가입 이벤트 · 고객 향 화면에 적합.</p>
+            <div class="specs"><span>vivid</span><span>thick stroke</span><span>sticker</span></div>
+            <span class="open">디자인 보기</span>
+        </div>
+    </a>
+
+    <!-- 14 AURORA -->
+    <a href="14-aurora-liquid.html" class="concept">
+        <div class="preview aurora">
+            <div class="au-stack">
+                <div class="au-card hero">
+                    고객은 사이즈에 대해 <em>더 많은 확신</em>을 원하고 있습니다.
+                </div>
+                <div class="au-row">
+                    <div class="au-card"><span style="font-size:9px; color:#7d6d8f;">환불률</span><div class="num">14.7%</div></div>
+                    <div class="au-card"><span style="font-size:9px; color:#7d6d8f;">CSAT</span><div class="num">4.78</div></div>
+                </div>
+                <div class="au-card" style="font-size:9.5px;">
+                    Insight Agent · 다음 7일 환불 예측 중 · 87%
+                </div>
+            </div>
+        </div>
+        <div class="body">
+            <span class="tag">Type 14 · Liquid / Dreamy</span>
+            <h3>Aurora Liquid Gradient</h3>
+            <p>흐르는 메시 그라디언트 위 프로스티드 글래스 + 세리프 헤드라인. 고객 향 리포트 · 임원 요약 · CX 스토리텔링에 적합.</p>
+            <div class="specs"><span>animated mesh</span><span>serif italic</span><span>pastel glass</span></div>
+            <span class="open">디자인 보기</span>
+        </div>
+    </a>
+
+</section>
+
+<!-- ============ COMPARISON MATRIX ============ -->
+<div class="section-head">
+    <h2>Comparison Matrix</h2>
+    <div class="cat-bar">
+        <span class="on">12 concepts</span>
+        <span>4 admin · 8 mood</span>
+    </div>
+</div>
+
+<div class="matrix">
+    <table class="matrix-table">
+        <thead>
+            <tr>
+                <th>Concept</th>
+                <th>Category</th>
+                <th>Tone</th>
+                <th>Density</th>
+                <th>Best Fit</th>
+                <th>Vibe Tag</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>15 · SaaS Pro Console</td>
+                <td><span class="pill" style="background:#eef2ff; color:#6366f1; border-color:#eef2ff;">admin</span></td>
+                <td>Productive · Neutral</td>
+                <td>High</td>
+                <td>주문/리스트 메인</td>
+                <td><span class="pill">linear</span></td>
+            </tr>
+            <tr>
+                <td>16 · Shopify Polaris</td>
+                <td><span class="pill" style="background:#eef2ff; color:#6366f1; border-color:#eef2ff;">admin</span></td>
+                <td>Friendly · Branded</td>
+                <td>Medium</td>
+                <td>홈 / 오늘 화면</td>
+                <td><span class="pill">welcoming</span></td>
+            </tr>
+            <tr>
+                <td>17 · Stripe Finance</td>
+                <td><span class="pill" style="background:#eef2ff; color:#6366f1; border-color:#eef2ff;">admin</span></td>
+                <td>Authoritative · Numeric</td>
+                <td>Medium-High</td>
+                <td>매출 / 결제 / 환불</td>
+                <td><span class="pill">finance-grade</span></td>
+            </tr>
+            <tr>
+                <td>18 · Attio Kanban</td>
+                <td><span class="pill" style="background:#eef2ff; color:#6366f1; border-color:#eef2ff;">admin</span></td>
+                <td>Modern · Visual</td>
+                <td>Medium</td>
+                <td>주문 파이프라인</td>
+                <td><span class="pill">workflow</span></td>
+            </tr>
+            <tr>
+                <td>07 · Bento Grid</td>
+                <td><span class="pill">mood</span></td>
+                <td>Modern · Confident</td>
+                <td>Medium</td>
+                <td>Main Dashboard</td>
+                <td><span class="pill">scannable</span></td>
+            </tr>
+            <tr>
+                <td>08 · Neo-Brutalist</td>
+                <td><span class="pill">mood</span></td>
+                <td>Raw · Trustworthy</td>
+                <td>Very High</td>
+                <td>Ops / Monitoring</td>
+                <td><span class="pill">no-nonsense</span></td>
+            </tr>
+            <tr>
+                <td>09 · Glassmorphism</td>
+                <td><span class="pill">mood</span></td>
+                <td>Futuristic · Premium</td>
+                <td>Low–Medium</td>
+                <td>AI Insight</td>
+                <td><span class="pill">cinematic</span></td>
+            </tr>
+            <tr>
+                <td>10 · Editorial Swiss</td>
+                <td><span class="pill">mood</span></td>
+                <td>Authoritative · Calm</td>
+                <td>Reading</td>
+                <td>Executive Report</td>
+                <td><span class="pill">storytelling</span></td>
+            </tr>
+            <tr>
+                <td>11 · Claymorphism</td>
+                <td><span class="pill">mood</span></td>
+                <td>Friendly · Soft</td>
+                <td>Medium</td>
+                <td>Member / Mileage</td>
+                <td><span class="pill">approachable</span></td>
+            </tr>
+            <tr>
+                <td>12 · Terminal Matrix</td>
+                <td><span class="pill">mood</span></td>
+                <td>Technical · Niche</td>
+                <td>High · Mono</td>
+                <td>Sysadmin / Logs</td>
+                <td><span class="pill">expert mode</span></td>
+            </tr>
+            <tr>
+                <td>13 · Y2K Memphis Pop</td>
+                <td><span class="pill">mood</span></td>
+                <td>Playful · Loud</td>
+                <td>Medium</td>
+                <td>Campaign / Event</td>
+                <td><span class="pill">energetic</span></td>
+            </tr>
+            <tr>
+                <td>14 · Aurora Liquid</td>
+                <td><span class="pill">mood</span></td>
+                <td>Dreamy · Premium</td>
+                <td>Low</td>
+                <td>CX Report / Public</td>
+                <td><span class="pill">elegant</span></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- ============ SYSTEM NOTES ============ -->
+<section id="system" class="notes">
+    <div>
+        <h2>System <em>Notes</em></h2>
+        <p class="sub">12개 컨셉의 운영 적용 가이드입니다. <b>실전 어드민 4종</b>은 하나를 메인으로 채택하고, <b>분위기 8종</b>은 영역별 보조 톤으로 차용하는 혼합 전략을 권장합니다.</p>
+    </div>
+    <div class="grid">
+        <div>
+            <h4>01 · 추천 조합 (실전)</h4>
+            <p>
+                메인 어드민에 <code>15 SaaS Pro</code>, 임원 매출 화면에 <code>17 Stripe</code>,
+                상담사용 일일 워크보드에 <code>18 Attio Kanban</code>, 신규/홈 화면에 <code>16 Polaris</code>를 배치하는 4종 조합이 가장 실전적입니다.
+            </p>
+        </div>
+        <div>
+            <h4>01b · 분위기 매핑</h4>
+            <p>
+                <code>Bento</code> 종합 대시보드, <code>Brutalist</code> 운영 모니터링,
+                <code>Glass</code> AI 분석, <code>Editorial</code> 임원 리포트,
+                <code>Clay</code> 마일리지, <code>Terminal</code> 시스템 관리,
+                <code>Y2K</code> 캠페인, <code>Aurora</code> 외부 공유 리포트.
+            </p>
+        </div>
+        <div>
+            <h4>02 · 컬러 토큰</h4>
+            <p>
+                각 컨셉이 자체 토큰을 정의합니다. 두 브랜드(<code>RENOMA</code>, <code>CORALIQUE</code>) 액센트는 보존하며 데이터 색은 컨셉별 팔레트를 따릅니다.
+            </p>
+        </div>
+        <div>
+            <h4>03 · 타이포그래피</h4>
+            <p>
+                본문 <code>Inter / Pretendard</code>. 컨셉별로 <code>Fraunces</code>(Editorial), <code>Instrument Serif</code>(Aurora), <code>Archivo Black</code>(Y2K), <code>JetBrains Mono</code>(Brutalist · Terminal)를 추가 사용.
+            </p>
+        </div>
+        <div>
+            <h4>04 · 모션</h4>
+            <p>
+                과한 모션은 지양. <code>Glass</code>의 라이브 인디케이터 맥동, <code>Aurora</code>의 메시 그라디언트 드리프트, <code>Y2K</code>의 호버 리프트만 활용. 상태 전환은 180–250ms ease.
+            </p>
+        </div>
+        <div>
+            <h4>05 · 정보 밀도 단계</h4>
+            <p>
+                낮음(<code>Aurora · Glass</code>) → 중간(<code>Bento · Clay · Y2K</code>) → 높음(<code>Brutalist · Terminal</code>) → 읽기(<code>Editorial</code>). 한 사용자 세션에서 단계가 점진적으로 변하도록 라우팅 구성.
+            </p>
+        </div>
+        <div>
+            <h4>06 · 다음 단계</h4>
+            <p>
+                선호 컨셉 2–3개 선정 → 실제 데이터/컴포넌트 교체 → 다크/라이트 페어링 정의 → 기존 운영 화면(상담·교환반품·통계·마일리지)에 단계 적용.
+            </p>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <span>WICRM · 12 Design Concepts (4 admin + 8 mood) · 2026.04.28 · v3</span>
+    <span>HTML standalone · open with browser · zip-shareable</span>
+</footer>
+
+</body>
+</html>

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -26,6 +27,9 @@ public class ConsultingController {
     @Autowired
     private ConsultingService consultingService;
 
+    @Value("${app.file-server.url}${app.file-server.upload-path}")
+    private String fileServerUploadUrl;
+
     /**
      * 상담 문의 리스트 페이지
      */
@@ -34,18 +38,21 @@ public class ConsultingController {
      */
     @GetMapping("/list")
     public String listConsulting(Model model,
+                               @RequestParam(name = "keyword", required = false) String keyword,
                                @RequestParam(name = "customerName", required = false) String customerName,
                                @RequestParam(name = "phoneNumber", required = false) String phoneNumber,
                                @RequestParam(name = "orderNumber", required = false) String orderNumber,
                                @RequestParam(name = "inquiryType", required = false) String inquiryType,
                                @RequestParam(name = "status", required = false) String status,
+                               @RequestParam(name = "startDate", required = false) String startDate,
+                               @RequestParam(name = "endDate", required = false) String endDate,
                                @RequestParam(name = "sortField", required = false, defaultValue = "created_date") String sortField,
                                @RequestParam(name = "sortDirection", required = false, defaultValue = "desc") String sortDirection,
                                @RequestParam(name = "page", required = false, defaultValue = "1") int page,
                                @RequestParam(name = "size", required = false, defaultValue = "10") int size) {
         
-        logger.info("상담 문의 리스트 조회: customerName={}, phoneNumber={}, status={}, page={}, size={}", 
-                customerName, phoneNumber, status, page, size);
+        logger.info("상담 문의 리스트 조회: keyword={}, customerName={}, phoneNumber={}, status={}, startDate={}, endDate={}, page={}, size={}", 
+                keyword, customerName, phoneNumber, status, startDate, endDate, page, size);
         
         // 테스트 데이터 자동 생성
         if (consultingService.createDummyDataIfNeeded()) {
@@ -55,38 +62,35 @@ public class ConsultingController {
         // 페이징 처리: 페이지는 1부터 시작하지만, offset은 0부터 시작
         int offset = (page - 1) * size;
         
-        // 페이징 로그 추가
-        logger.info("페이징 계산: page={}, size={}, offset={}", page, size, offset);
-        
         Map<String, Object> pageInfo = consultingService.getConsultingInquiriesWithPaging(
-                customerName, phoneNumber, orderNumber, inquiryType, status, 
-                sortField, sortDirection, offset, size);
+                keyword, customerName, phoneNumber, orderNumber, inquiryType, status, 
+                startDate, endDate, sortField, sortDirection, offset, size);
         
         // 조회 결과 확인
         List<?> inquiries = (List<?>) pageInfo.get("inquiries");
         long totalCount = (Long) pageInfo.get("totalCount");
         logger.info("조회 결과: 총 건수={}, 가져온 건수={}", totalCount, inquiries != null ? inquiries.size() : 0);
         
-        // 상태별 건수 조회
-        Map<String, Long> statusCounts = consultingService.getStatusCounts(customerName, phoneNumber, orderNumber, inquiryType);
+        // 상태별 건수 조회 (날짜 조건 포함)
+        Map<String, Long> statusCounts = consultingService.getStatusCounts(
+                keyword, customerName, phoneNumber, orderNumber, inquiryType, startDate, endDate);
         model.addAttribute("pendingCount", statusCounts.get("PENDING"));
         model.addAttribute("processingCount", statusCounts.get("PROCESSING"));
         model.addAttribute("completedCount", statusCounts.get("COMPLETED"));
-        
-        if (inquiries != null && !inquiries.isEmpty()) {
-            logger.info("첫 번째 문의 데이터: {}", inquiries.get(0));
-        }
         
         // 상담 유형 목록 조회
         List<Map<String, Object>> inquiryTypes = consultingService.getAllInquiryTypes();
         
         model.addAttribute("inquiries", inquiries);
         model.addAttribute("inquiryTypes", inquiryTypes);
+        model.addAttribute("keyword", keyword);
         model.addAttribute("customerName", customerName);
         model.addAttribute("phoneNumber", phoneNumber);
         model.addAttribute("orderNumber", orderNumber);
         model.addAttribute("inquiryType", inquiryType);
         model.addAttribute("status", status);
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDirection", sortDirection);
         
@@ -98,8 +102,6 @@ public class ConsultingController {
         // 총 페이지 수 계산 - 제로 나누기 방지
         int totalPages = totalCount > 0 ? (int) Math.ceil((double) totalCount / size) : 0;
         model.addAttribute("totalPages", totalPages);
-        
-        logger.info("페이징 정보: 총 페이지 수={}, 현재 페이지={}", totalPages, page);
         
         return "consulting/list";
     }
@@ -135,11 +137,10 @@ public class ConsultingController {
                 // 전체 URL 구성
                 if (attachment.containsKey("file_path")) {
                     String filePath = (String) attachment.get("file_path");
-                    String serverUrl = "http://175.119.224.45:8080/uploads/";
-                    String fullUrl = serverUrl + filePath;
+                    String fullUrl = fileServerUploadUrl + filePath;
                     
                     logger.info("  [이미지 경로 정보]");
-                    logger.info("  - 기본 URL: {}", serverUrl);
+                    logger.info("  - 기본 URL: {}", fileServerUploadUrl);
                     logger.info("  - 파일 경로: {}", filePath);
                     logger.info("  - 전체 URL: {}", fullUrl);
                     
@@ -322,8 +323,7 @@ public class ConsultingController {
                 for (Map<String, Object> attachment : attachments) {
                     if (attachment.containsKey("file_path")) {
                         String filePath = (String) attachment.get("file_path");
-                        String serverUrl = "http://175.119.224.45:8080/uploads/";
-                        attachment.put("full_url", serverUrl + filePath);
+                        attachment.put("full_url", fileServerUploadUrl + filePath);
                     }
                 }
             }
@@ -331,7 +331,7 @@ public class ConsultingController {
         
         model.addAttribute("inquiry", inquiry);
         model.addAttribute("attachments", attachments);
-        model.addAttribute("serverUrl", "http://175.119.224.45:8080/uploads/");
+        model.addAttribute("serverUrl", fileServerUploadUrl);
         
         return "consulting/image_fix";
     }

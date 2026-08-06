@@ -197,7 +197,24 @@
                        ORDER BY 
                            <choose>
                                <when test="searchParams.sortBy != null and searchParams.sortOrder != null">
-                                   ${searchParams.sortBy} ${searchParams.sortOrder}
+                                   <choose>
+                                       <when test="searchParams.sortBy == 'RETURN_ID'">RETURN_ID</when>
+                                       <when test="searchParams.sortBy == 'RETURN_DATE'">RETURN_DATE</when>
+                                       <when test="searchParams.sortBy == 'CUSTOMER_NAME'">CUSTOMER_NAME</when>
+                                       <when test="searchParams.sortBy == 'PRODUCT_NAME'">PRODUCT_NAME</when>
+                                       <when test="searchParams.sortBy == 'SITE_NAME'">SITE_NAME</when>
+                                       <when test="searchParams.sortBy == 'RETURN_TYPE_CODE'">RETURN_TYPE_CODE</when>
+                                       <when test="searchParams.sortBy == 'ORDER_NUMBER'">ORDER_NUMBER</when>
+                                       <when test="searchParams.sortBy == 'ORDER_DATE'">ORDER_DATE</when>
+                                       <when test="searchParams.sortBy == 'CS_RECEIVED_DATE'">CS_RECEIVED_DATE</when>
+                                       <when test="searchParams.sortBy == 'REFUND_AMOUNT'">REFUND_AMOUNT</when>
+                                       <when test="searchParams.sortBy == 'IS_COMPLETED'">IS_COMPLETED</when>
+                                       <otherwise>RETURN_ID</otherwise>
+                                   </choose>
+                                   <choose>
+                                       <when test="searchParams.sortOrder == 'ASC'">ASC</when>
+                                       <otherwise>DESC</otherwise>
+                                   </choose>
                                </when>
                                <otherwise>
                                    CASE WHEN (IS_COMPLETED IS NULL OR IS_COMPLETED = 0) THEN 0 ELSE 1 END ASC,

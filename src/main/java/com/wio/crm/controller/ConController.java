@@ -59,24 +59,20 @@ public class ConController {
 
     @GetMapping("/api/consultations")
     public ResponseEntity<Map<String, Object>> getConsultations(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "25") int pageSize,
-            @RequestParam String startDate,
-            @RequestParam String endDate,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) String type,
-            @RequestParam(required = false) String mall,
-            @RequestParam(required = false) String custStat,
-            @RequestParam(required = false) String filter,
-            @RequestParam(required = false) String keyword) {
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "pageSize", defaultValue = "25") int pageSize,
+            @RequestParam(value = "startDate") String startDate,
+            @RequestParam(value = "endDate") String endDate,
+            @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "type", required = false) String type,
+            @RequestParam(value = "mall", required = false) String mall,
+            @RequestParam(value = "custStat", required = false) String custStat,
+            @RequestParam(value = "filter", required = false) String filter,
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "cardFilter", required = false) String cardFilter) {
 
-        //System.out.println("custStat: " + custStat);
-
-        List<Consultation> consultations = conService.getConsultations(page, pageSize, startDate, endDate, status, type, mall,custStat, keyword,filter);
-        //System.out.println("consultations: " + consultations);
-
-        int total = conService.countTotal(startDate, endDate, status, type, mall,custStat, keyword,filter);
-        //System.out.println("total: " + total);
+        List<Consultation> consultations = conService.getConsultations(page, pageSize, startDate, endDate, status, type, mall, custStat, keyword, filter, cardFilter);
+        int total = conService.countTotal(startDate, endDate, status, type, mall, custStat, keyword, filter, cardFilter);
 
         Map<String, Object> response = new HashMap<>();
         response.put("data", consultations);
@@ -84,10 +80,24 @@ public class ConController {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/api/consultations/stats")
+    public ResponseEntity<Map<String, Object>> getConsultationStats(
+            @RequestParam(value = "startDate") String startDate,
+            @RequestParam(value = "endDate") String endDate,
+            @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "type", required = false) String type,
+            @RequestParam(value = "mall", required = false) String mall,
+            @RequestParam(value = "keyword", required = false) String keyword) {
+
+        Map<String, Object> stats = conService.getConsultationStats(startDate, endDate, status, type, mall, keyword);
+        return ResponseEntity.ok(stats);
+    }
+
     @GetMapping("/api/consultations/details")
-    public ResponseEntity<Map<String, Object>> getConsultationDetails(@RequestParam String projectCode,
-                                                                              @RequestParam String personCode,
-                                                                              @RequestParam String callCode) {
+    public ResponseEntity<Map<String, Object>> getConsultationDetails(@RequestParam(value = "projectCode") String projectCode,
+                                                                              @RequestParam(value = "personCode") String personCode,
+                                                                              @RequestParam(value = "callCode") String callCode) {
         Consultation consultation = conService.getConsultationDetails( projectCode, personCode, callCode);
         List<Comment> comments = conService.getComments( projectCode, personCode, callCode);
         List<History> history = conService.getHistory( projectCode, personCode, callCode); // 추가된 부분
@@ -109,21 +119,26 @@ public class ConController {
     @PostMapping("/api/consultations/updateCompletionCode")
     public ResponseEntity<String> updateCompletionCode(@RequestBody CompletionCode request) {
         try {
-            conService.updateCompletionCode(request);
-            return ResponseEntity.ok("Completion code updated successfully");
+            int updatedRows = conService.updateCompletionCode(request);
+            if (updatedRows > 0) {
+                return ResponseEntity.ok("Completion code updated successfully");
+            } else {
+                // TBND01_CUST 레코드가 없는 경우 (CTI 시스템에서 아직 생성되지 않음)
+                return ResponseEntity.ok("NO_RECORD");
+            }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating completion code: " + e.getMessage());
         }
     }
     @GetMapping("/api/consultations/excel")
-    public void downloadExcel(@RequestParam String startDate,
-                              @RequestParam String endDate,
-                              @RequestParam(required = false) String status,
-                              @RequestParam(required = false) String type,
-                              @RequestParam(required = false) String mall,
-                              @RequestParam(required = false) String custStat,
-                              @RequestParam(required = false) String filter,
-                              @RequestParam(required = false) String keyword,
+    public void downloadExcel(@RequestParam(value = "startDate") String startDate,
+                              @RequestParam(value = "endDate") String endDate,
+                              @RequestParam(value = "status", required = false) String status,
+                              @RequestParam(value = "type", required = false) String type,
+                              @RequestParam(value = "mall", required = false) String mall,
+                              @RequestParam(value = "custStat", required = false) String custStat,
+                              @RequestParam(value = "filter", required = false) String filter,
+                              @RequestParam(value = "keyword", required = false) String keyword,
                               HttpServletResponse response) throws IOException {
 
 

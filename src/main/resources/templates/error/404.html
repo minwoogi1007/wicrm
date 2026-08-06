@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{main}">
+<!--begin::Main-->
+<meta name="_csrf" th:content="${_csrf.token}"/>
+<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+<div layout:fragment="content">
+    <div class="d-flex flex-column flex-column-fluid">
+        <!--begin::Content-->
+        <div id="kt_app_content" class="app-content flex-column-fluid">
+            <!--begin::Content container-->
+            <div id="kt_app_content_container" class="app-container container-xxl">
+                <div class="card card-flush mb-6">
+                    <div class="card-body text-center py-20">
+                        <!-- 아이콘 -->
+                        <div class="mb-10">
+                            <i class="ki-duotone ki-search-list fs-5tx text-warning">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                                <span class="path3"></span>
+                            </i>
+                        </div>
+                        
+                        <!-- 404 숫자 -->
+                        <h1 class="fw-bolder text-gray-900 mb-5" style="font-size: 6rem;">404</h1>
+                        
+                        <!-- 제목 -->
+                        <h2 class="fw-bold text-gray-800 mb-4">페이지를 찾을 수 없습니다</h2>
+                        
+                        <!-- 설명 -->
+                        <p class="text-gray-600 fs-5 mb-8" th:text="${errorMessage != null ? errorMessage : '요청하신 페이지가 존재하지 않거나 이동되었습니다.'}"></p>
+                        
+                        <!-- 요청 URI (디버깅용) -->
+                        <p class="text-muted fs-7 mb-10" th:if="${requestUri}">
+                            요청 경로: <code th:text="${requestUri}"></code>
+                        </p>
+                        
+                        <!-- 버튼 -->
+                        <div class="d-flex flex-center gap-3">
+                            <a href="javascript:history.back()" class="btn btn-light-primary">
+                                <i class="ki-duotone ki-arrow-left fs-4 me-1">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                                이전 페이지
+                            </a>
+                            <a href="/main" class="btn btn-primary">
+                                <i class="ki-duotone ki-home fs-4 me-1">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
+                                메인으로 이동
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--end::Content container-->
+        </div>
+        <!--end::Content-->
+    </div>
+</div>
+</html>
+

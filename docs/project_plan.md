@@ -1,5 +1,25 @@
 # 📋 WICRM 프로젝트 개발자 상세 가이드
 
+## 🎯 **프로젝트 페르소나 참조**
+
+> **⚠️ 중요**: 모든 프로젝트 의사결정과 개발 과정에서 다음 페르소나들의 관점을 반드시 고려하세요.
+
+### 👥 **핵심 팀 구성원**
+- **👨‍💼 김성철 (PM)**: 32년 경력의 프로젝트 매니저 - 리스크 관리 및 일정 조율
+- **👨‍💻 박준호 (개발자)**: 35년 경력의 수석 개발자 - Java/Spring/Oracle 전문가
+- **👩‍🎨 이미영 (디자이너)**: 31년 경력의 UX 디자이너 - 사용자 경험 및 인터페이스 설계
+- **🏗️ 정태수 (설계자)**: 33년 경력의 시스템 아키텍트 - 아키텍처 및 보안 설계
+
+### 🔄 **의사결정 시 고려사항**
+1. **기술적 결정**: 박준호(개발자) + 정태수(설계자) 관점 종합
+2. **사용자 경험**: 이미영(디자이너) 전문성 우선 적용  
+3. **프로젝트 관리**: 김성철(PM) 리스크 관리 관점 반영
+4. **최종 결정**: 모든 페르소나 관점을 종합하여 결정
+
+📚 **상세 페르소나 정보**: [프로젝트 페르소나 문서](./project_personas.md)
+
+---
+
 ## 🏛️ 1. 프로젝트 개요
 
 ### 📌 **1.1 프로젝트 정보**
@@ -1510,8 +1530,8 @@ Started CrmApplication in 8.139 seconds
 
 ---
 
-**📅 마지막 업데이트**: 2025년 7월 24일  
-**📝 문서 버전**: v2.4  
+**📅 마지막 업데이트**: 2025년 12월 17일  
+**📝 문서 버전**: v2.5  
 **✍️ 작성자**: WICRM 개발팀
 
 ---
@@ -1675,6 +1695,106 @@ Started CrmApplication in 8.139 seconds
 - 데이터 불일치 문제 해결 후 디버깅 코드 제거
 - 다른 통계 페이지에도 동일한 개선 패턴 적용
 - 실시간 데이터 검증 시스템 구축 검토
+
+---
+
+### 🚀 **2025년 12월 17일 - 코드 품질 개선 및 프로젝트 정리**
+
+#### **🧹 코드 클린업 작업**
+
+**✅ 완성된 개선사항:**
+
+**1. 📂 프로젝트 문서 정리**
+- **삭제된 중복 문서**:
+  - `docs/consulting_image_fix.md` (중복)
+  - `docs/consulting_image_fix_2025-04-22.md` (중복)
+  - `docs/consulting_image_fix_null.md` (중복)
+  - `docs/image_url_solution.md` (중복)
+  - `docs/project_plan.md.new` (구버전)
+- **신규 통합 문서**: `docs/troubleshooting_image_attachment.md`
+  - 이미지 첨부 관련 4개 문서를 1개로 통합
+  - 문제 원인, 해결 방법, 디버깅 가이드 포함
+
+**2. 🗑️ 불필요한 파일 정리 (이전 완료)**
+- **백업 파일 삭제**:
+  - `accountUpdate.html.bak`
+  - `readBoard.html.bak`
+  - `consulting.html.bak`
+  - `sidebar.html.bak`
+  - `statCons.html.BAK`
+- **misplaced Java 파일 삭제**:
+  - `src/main/resources/templates/sample/` 폴더 내 24개 Java 파일
+
+**3. 🔧 System.out.println 제거 (이전 완료)**
+- 총 116개 `System.out.println` 구문 제거
+- 대상 파일:
+  - `DashboardController.java` (45개)
+  - `BoardController.java` (32개)
+  - `DashboardService.java` (20개)
+  - `CustomSuccessHandler.java` (8개)
+  - 기타 서비스/컨트롤러 (11개)
+
+**4. 📋 현재 프로젝트 문서 구조**
+```
+📁 docs/
+├── project_plan.md                    # 메인 프로젝트 계획서 (본 문서)
+├── project_personas.md                # 페르소나 상세 정보
+├── troubleshooting_image_attachment.md # 이미지 첨부 문제 해결 가이드
+└── banner_table_script.sql            # 배너 테이블 SQL
+
+📁 루트/
+├── README.md                          # 프로젝트 소개
+└── PERSONAS.md                        # 페르소나 빠른 참조
+```
+
+#### **🎯 향후 개선 과제**
+
+**높은 우선순위:**
+| 항목 | 설명 | 상태 |
+|------|------|------|
+| e.printStackTrace() 제거 | 5개 위치 → Logger 로깅으로 대체 | ✅ 완료 |
+| DTO 검증 추가 | @Valid 어노테이션 - 운영 영향 고려하여 보류 | 📋 문서화 |
+| 전역 예외 핸들러 | @ControllerAdvice 구현 | ✅ 완료 |
+
+**신규 생성 파일:**
+| 파일 | 설명 |
+|------|------|
+| `GlobalExceptionHandler.java` | 전역 예외 핸들러 (@ControllerAdvice) |
+| `error/404.html` | 404 에러 페이지 |
+| `error/500.html` | 500 에러 페이지 |
+
+**수정된 파일 (로깅 개선):**
+| 파일 | 변경 내용 |
+|------|----------|
+| `OrderService.java` | Logger 추가, e.printStackTrace() → logger.error() |
+| `InvoiceService.java` | Logger 추가, e.printStackTrace() → logger.error() |
+| `FileDownloadController.java` | Logger 추가, e.printStackTrace() → logger.error() |
+| `ImageProxyController.java` | Logger 추가, e.printStackTrace() → logger.error() (2개) |
+
+**5. 🧹 템플릿 파일 정리**
+
+**삭제된 테스트/디버깅 파일 (consulting/):**
+| 파일 | 설명 |
+|------|------|
+| `debug.js` | 디버깅용 콘솔 로그 스크립트 |
+| `detail-fixed.js` | 임시 수정 스크립트 |
+| `emergency-fix.html` | 긴급 수정용 테스트 페이지 |
+| `fixedScript.js` | 임시 수정 스크립트 |
+| `image_fix.html` | 이미지 수정 테스트 페이지 |
+| `image_test.html` | 이미지 테스트 페이지 |
+
+**삭제된 중복 템플릿:**
+| 파일 | 사유 |
+|------|------|
+| `Error.html` | error/ 폴더로 통합 |
+| `cons/consulting.html` | consulting/list.html과 중복 |
+
+**중간 우선순위:**
+| 항목 | 설명 | 상태 |
+|------|------|------|
+| 환경별 설정 분리 | application-dev.properties / application-prod.properties | 계획 |
+| 생성자 주입 전환 | @Autowired 필드 주입 → 생성자 주입 | 계획 |
+| API 문서화 | Swagger/OpenAPI 도입 | 계획 |
 
 ---
 

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{design-samples/public-layout}">
+<body>
+<div layout:fragment="content">
+    <link href="/assets/css/design-samples/bento.css" rel="stylesheet" type="text/css" />
+
+    <main class="bento-page">
+        <div class="bento-shell">
+
+            <header class="bento-header">
+                <div>
+                    <a href="/design-samples/admin" class="back-link">← 샘플 목록</a>
+                    <div style="margin-top:14px;"><span class="bento-kicker">Type 07 · Bento Grid 2026</span></div>
+                    <h1>모듈형 <em>Bento</em> 통합 운영 대시보드</h1>
+                    <p>가변 크기 카드를 격자에 배치해 KPI · 추세 · 리스트 · AI 인사이트를 한 화면에서 빠르게 스캔합니다.</p>
+                </div>
+                <div class="actions">
+                    <button type="button">필터 · 오늘</button>
+                    <button type="button">위젯 편집</button>
+                    <button type="button" class="solid">+ 카드 추가</button>
+                </div>
+            </header>
+
+            <section class="bento-grid">
+
+                <!-- HERO KPI -->
+                <article class="bento-tile tile-hero tile-4x2">
+                    <h3>오늘 종합 운영 지수</h3>
+                    <div class="big-number">94.2<small>+8.1</small></div>
+                    <p style="opacity:0.7; max-width:420px;">전일 대비 상담·물류·결제 처리율이 안정적으로 상승했습니다. 환불 SLA가 다소 지연 구간입니다.</p>
+                    <div class="hero-meta">
+                        <div><span>상담 처리</span><strong>1,284건</strong></div>
+                        <div><span>출고 완료</span><strong>873건</strong></div>
+                        <div><span>환불 SLA</span><strong>97.6%</strong></div>
+                    </div>
+                </article>
+
+                <!-- ACCENT KPI -->
+                <article class="bento-tile tile-accent tile-2x1">
+                    <h3>실시간 대기 상담</h3>
+                    <div class="big">17</div>
+                    <div class="delta">전일 동시간대 대비 -6건</div>
+                </article>
+
+                <!-- MINI STATS -->
+                <article class="bento-tile tile-stat tile-2x1">
+                    <h3>금일 매출</h3>
+                    <div class="num">₩ 38.4M</div>
+                    <span class="sub">목표 대비 102.4%</span>
+                    <span class="pill">▲ 4.2% WoW</span>
+                </article>
+
+                <!-- BAR CHART -->
+                <article class="bento-tile tile-chart tile-3x2">
+                    <h3>시간대별 상담 인입</h3>
+                    <div class="chart-wrap">
+                        <div class="bar" data-label="09" style="height:35%;"></div>
+                        <div class="bar" data-label="10" style="height:55%;"></div>
+                        <div class="bar peak" data-label="11" style="height:82%;"></div>
+                        <div class="bar peak" data-label="12" style="height:74%;"></div>
+                        <div class="bar" data-label="13" style="height:48%;"></div>
+                        <div class="bar" data-label="14" style="height:62%;"></div>
+                        <div class="bar peak" data-label="15" style="height:88%;"></div>
+                        <div class="bar" data-label="16" style="height:65%;"></div>
+                        <div class="bar" data-label="17" style="height:42%;"></div>
+                    </div>
+                    <span class="sub" style="margin-top:32px; color:var(--bn-muted); font-size:12px;">
+                        15시 피크 인입 — 추가 상담사 배치 권장
+                    </span>
+                </article>
+
+                <!-- AI INSIGHT -->
+                <article class="bento-tile tile-ai tile-3x2">
+                    <h3>AI Insight · GPT 분석</h3>
+                    <div class="insight">
+                        ‘<em>레노마 자사몰</em>’의 환불 사유 1순위가 <em>사이즈 불만</em>으로 변동.
+                        지난주 대비 <em>+34%</em> 증가했습니다.
+                    </div>
+                    <div class="insight" style="font-size:14px; opacity:0.85;">
+                        → 주요 품번 RN-GSZD962 / RN-PT2207 의 사이즈 가이드 보완을 추천드립니다.
+                    </div>
+                    <span class="src">분석 기준: 최근 7일 · 1,238건</span>
+                </article>
+
+                <!-- LIST -->
+                <article class="bento-tile tile-list tile-3x1">
+                    <h3>사이트별 환불 TOP</h3>
+                    <ul>
+                        <li><span class="name">자사몰 - 레노마</span><span class="badge dn">+12</span></li>
+                        <li><span class="name">29CM - 코랄리크</span><span class="badge dn">+8</span></li>
+                        <li><span class="name">지그재그 - 레노마</span><span class="badge up">-3</span></li>
+                        <li><span class="name">SSG - 레노마</span><span class="badge up">-5</span></li>
+                    </ul>
+                </article>
+
+                <!-- HEATMAP -->
+                <article class="bento-tile tile-heatmap tile-3x1">
+                    <h3>최근 14일 인입 히트맵</h3>
+                    <div class="heat">
+                        <span></span><span class="l1"></span><span class="l2"></span><span class="l1"></span>
+                        <span class="l3"></span><span class="l4"></span><span class="l2"></span>
+                        <span class="l1"></span><span class="l2"></span><span class="l3"></span>
+                        <span class="l4"></span><span class="l3"></span><span class="l2"></span><span class="l1"></span>
+                    </div>
+                </article>
+
+                <!-- ACCENT BIG -->
+                <article class="bento-tile tile-accent tile-2x1">
+                    <h3>오늘의 신규 가입</h3>
+                    <div class="big">128</div>
+                    <div class="delta">전주 평균 대비 +21건</div>
+                </article>
+
+                <!-- STAT -->
+                <article class="bento-tile tile-stat tile-2x1">
+                    <h3>처리중 교환/반품</h3>
+                    <div class="num">312</div>
+                    <span class="sub">평균 처리 1.8일</span>
+                    <span class="pill">SLA 96.2%</span>
+                </article>
+
+                <!-- LINE CHART -->
+                <article class="bento-tile tile-line tile-4x1">
+                    <h3>주간 매출 추이</h3>
+                    <svg viewBox="0 0 400 110" preserveAspectRatio="none" style="margin-top:8px;">
+                        <defs>
+                            <linearGradient id="bnLine" x1="0" x2="0" y1="0" y2="1">
+                                <stop offset="0%" stop-color="#2649ff" stop-opacity="0.35"/>
+                                <stop offset="100%" stop-color="#2649ff" stop-opacity="0"/>
+                            </linearGradient>
+                        </defs>
+                        <path d="M0,80 L50,70 L100,55 L150,62 L200,40 L250,48 L300,28 L350,32 L400,18"
+                              fill="none" stroke="#2649ff" stroke-width="2.5" stroke-linecap="round"/>
+                        <path d="M0,80 L50,70 L100,55 L150,62 L200,40 L250,48 L300,28 L350,32 L400,18 L400,110 L0,110 Z"
+                              fill="url(#bnLine)"/>
+                    </svg>
+                </article>
+
+            </section>
+        </div>
+    </main>
+</div>
+</body>
+</html>

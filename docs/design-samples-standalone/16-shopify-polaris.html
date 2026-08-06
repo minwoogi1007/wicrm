@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WICRM Design 16 · Shopify Polaris</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; }
+
+        .pol {
+            --bg: #f1f1f1;
+            --surface: #ffffff;
+            --surface-2: #fafafa;
+            --ink: #303030;
+            --ink-strong: #1a1a1a;
+            --muted: #616161;
+            --line: #e3e3e3;
+            --line-soft: #ebebeb;
+            --green: #008060;
+            --green-soft: #e3f5ed;
+            --green-strong: #004c3f;
+            --blue: #2c6ecb;
+            --blue-soft: #ebf5ff;
+            --amber: #ffc453;
+            --amber-soft: #fff5d9;
+            --red: #d72c0d;
+            --red-soft: #fee9e8;
+
+            background: var(--bg);
+            color: var(--ink);
+            font-family: "Inter", "Pretendard", system-ui, sans-serif;
+            font-size: 14px;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 240px 1fr;
+        }
+
+        /* ============= SIDEBAR ============= */
+        .pol-side {
+            background: var(--surface);
+            border-right: 1px solid var(--line);
+            padding: 12px 12px 12px;
+            display: flex; flex-direction: column;
+            position: sticky; top: 0; height: 100vh;
+            overflow-y: auto;
+        }
+        .pol-shop {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .pol-shop:hover { background: var(--surface-2); }
+        .pol-shop .icon {
+            width: 28px; height: 28px; border-radius: 6px;
+            background: var(--green); color: #fff;
+            display: grid; place-items: center;
+            font-weight: 700; font-size: 14px;
+        }
+        .pol-shop .name { font-weight: 600; font-size: 14px; line-height: 1.2; flex: 1; }
+        .pol-shop .name small { display: block; font-weight: 400; color: var(--muted); font-size: 11px; }
+        .pol-shop .arrow { color: var(--muted); font-size: 11px; }
+
+        .pol-search {
+            display: flex; align-items: center; gap: 8px;
+            background: var(--surface-2);
+            border: 1px solid var(--line-soft);
+            padding: 6px 10px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+        .pol-search .kbd {
+            margin-left: auto;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+
+        .pol-nav { display: flex; flex-direction: column; gap: 1px; }
+        .pol-nav a {
+            display: flex; align-items: center; gap: 10px;
+            padding: 7px 10px;
+            border-radius: 6px;
+            text-decoration: none; color: var(--ink);
+            font-size: 13px; font-weight: 500;
+        }
+        .pol-nav a:hover { background: var(--surface-2); }
+        .pol-nav a.on {
+            background: var(--green-soft);
+            color: var(--green-strong);
+            font-weight: 600;
+        }
+        .pol-nav a .ic { width: 18px; text-align: center; opacity: 0.7; }
+        .pol-nav a.on .ic { opacity: 1; }
+        .pol-nav a .badge {
+            margin-left: auto;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            padding: 1px 6px;
+            border-radius: 999px;
+            font-size: 11px; font-weight: 500;
+            color: var(--muted);
+        }
+        .pol-nav a.on .badge {
+            background: var(--green); border-color: var(--green); color: #fff;
+        }
+
+        .pol-grp {
+            font-size: 11px; color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-weight: 600;
+            padding: 14px 10px 6px;
+        }
+
+        .pol-foot {
+            margin-top: auto;
+            padding-top: 12px;
+            border-top: 1px solid var(--line-soft);
+        }
+        .pol-foot .upgrade {
+            background: linear-gradient(135deg, #1a1a1a, #303030);
+            color: #fff;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 12px;
+        }
+        .pol-foot .upgrade strong { display: block; font-size: 13px; margin-bottom: 2px; }
+        .pol-foot .upgrade button {
+            margin-top: 8px;
+            background: #fff; color: #1a1a1a;
+            border: none; padding: 5px 12px;
+            border-radius: 6px; font-weight: 600; cursor: pointer;
+            font-family: inherit; font-size: 12px;
+        }
+
+        /* ============= MAIN ============= */
+        .pol-main { min-width: 0; }
+        .pol-top {
+            display: flex; align-items: center; gap: 12px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--line);
+            padding: 10px 24px;
+            position: sticky; top: 0; z-index: 10;
+        }
+        .pol-top .back {
+            color: var(--muted); text-decoration: none;
+            border: 1px solid var(--line); padding: 4px 10px; border-radius: 6px;
+            font-size: 12px;
+        }
+        .pol-top .crumb { font-size: 13px; color: var(--muted); }
+        .pol-top .crumb b { color: var(--ink); font-weight: 600; }
+        .pol-top .filler { flex: 1; }
+        .pol-top .pill {
+            background: var(--green-soft); color: var(--green-strong);
+            padding: 3px 10px; border-radius: 999px;
+            font-size: 11px; font-weight: 600;
+        }
+        .pol-top .av {
+            width: 28px; height: 28px; border-radius: 50%;
+            background: linear-gradient(135deg, #008060, #2c6ecb);
+            color: #fff; font-weight: 700; font-size: 11px;
+            display: grid; place-items: center;
+        }
+
+        .pol-page { max-width: 1280px; padding: 24px; margin: 0 auto; }
+
+        /* greeting */
+        .pol-hello {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            margin-bottom: 16px; gap: 16px; flex-wrap: wrap;
+        }
+        .pol-hello h1 {
+            margin: 0; font-size: 22px; font-weight: 700;
+            color: var(--ink-strong); letter-spacing: -0.01em;
+        }
+        .pol-hello h1 .wave { display: inline-block; transform-origin: 70% 70%; animation: wave 2s ease infinite; }
+        @keyframes wave { 0%,100% { transform: rotate(0); } 25% { transform: rotate(15deg); } 75% { transform: rotate(-15deg); } }
+        .pol-hello p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+        .pol-hello .actions { display: flex; gap: 8px; }
+        .pol-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 14px; border-radius: 8px;
+            background: var(--surface); border: 1px solid var(--line);
+            color: var(--ink); font-family: inherit; font-size: 13px;
+            font-weight: 500; cursor: pointer;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.05);
+        }
+        .pol-btn:hover { background: var(--surface-2); }
+        .pol-btn.primary {
+            background: var(--green); color: #fff; border-color: var(--green-strong);
+            box-shadow: 0 1px 0 var(--green-strong), inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+        .pol-btn.primary:hover { background: var(--green-strong); }
+
+        /* banner */
+        .pol-banner {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 14px 18px;
+            display: flex; align-items: center; gap: 14px;
+            margin-bottom: 16px;
+            border-left: 4px solid var(--blue);
+        }
+        .pol-banner .ic {
+            width: 32px; height: 32px; border-radius: 8px;
+            background: var(--blue-soft); color: var(--blue);
+            display: grid; place-items: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .pol-banner h4 { margin: 0; font-size: 13px; font-weight: 600; color: var(--ink-strong); }
+        .pol-banner p { margin: 2px 0 0; font-size: 13px; color: var(--muted); }
+        .pol-banner .more { color: var(--blue); text-decoration: underline; cursor: pointer; font-size: 13px; font-weight: 500; }
+        .pol-banner .x { color: var(--muted); cursor: pointer; padding: 4px; }
+
+        /* KPIs */
+        .pol-kpis {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 12px; margin-bottom: 16px;
+        }
+        .pol-kpi {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 14px 16px;
+        }
+        .pol-kpi .lbl {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 13px; color: var(--muted); font-weight: 500;
+            margin-bottom: 8px;
+        }
+        .pol-kpi .lbl .info { width: 14px; height: 14px; border-radius: 50%; background: var(--surface-2); display: grid; place-items: center; font-size: 9px; color: var(--muted); }
+        .pol-kpi .v {
+            font-size: 26px; font-weight: 600; color: var(--ink-strong);
+            letter-spacing: -0.02em;
+        }
+        .pol-kpi .compare {
+            font-size: 12px; color: var(--muted); margin-top: 4px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .pol-kpi .compare .arr { font-weight: 600; }
+        .pol-kpi .compare .arr.up { color: var(--green); }
+        .pol-kpi .compare .arr.dn { color: var(--red); }
+
+        /* card primitive */
+        .pol-card {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        .pol-card .ch {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--line-soft);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .pol-card .ch h3 { margin: 0; font-size: 15px; font-weight: 600; color: var(--ink-strong); }
+        .pol-card .ch .meta { color: var(--muted); font-size: 12px; }
+        .pol-card .ch .link { color: var(--blue); text-decoration: none; font-size: 13px; font-weight: 500; }
+
+        /* orders table */
+        .pol-orders { width: 100%; border-collapse: collapse; }
+        .pol-orders th, .pol-orders td {
+            text-align: left; padding: 12px 18px;
+            border-bottom: 1px solid var(--line-soft);
+            font-size: 13px;
+        }
+        .pol-orders th {
+            font-size: 12px; color: var(--muted); font-weight: 600;
+            background: var(--surface-2);
+        }
+        .pol-orders tbody tr:hover { background: var(--surface-2); }
+        .pol-orders tbody tr:last-child td { border-bottom: none; }
+        .pol-orders .id { color: var(--blue); text-decoration: none; font-weight: 600; }
+        .pol-orders .cust .nm { font-weight: 500; }
+        .pol-orders .cust .em { color: var(--muted); font-size: 12px; }
+        .pol-orders .amt { font-weight: 600; text-align: right; }
+
+        .pol-pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 3px 10px; border-radius: 999px;
+            font-size: 12px; font-weight: 500;
+            border: 1px solid currentColor;
+        }
+        .pol-pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+        .pol-pill.success { color: var(--green-strong); background: var(--green-soft); border-color: var(--green-soft); }
+        .pol-pill.warn { color: #8a6116; background: var(--amber-soft); border-color: var(--amber-soft); }
+        .pol-pill.danger { color: #b32613; background: var(--red-soft); border-color: var(--red-soft); }
+        .pol-pill.info { color: var(--blue); background: var(--blue-soft); border-color: var(--blue-soft); }
+
+        /* main grid */
+        .pol-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+        .pol-grid > * { margin-bottom: 0 !important; }
+
+        /* customer insights */
+        .pol-insight { display: flex; flex-direction: column; gap: 14px; padding: 16px 18px; }
+        .pol-insight .row { display: flex; align-items: center; gap: 12px; }
+        .pol-insight .row .av {
+            width: 36px; height: 36px; border-radius: 50%;
+            display: grid; place-items: center;
+            color: #fff; font-weight: 700; font-size: 13px;
+        }
+        .pol-insight .row .av.a1 { background: linear-gradient(135deg, #008060, #2c6ecb); }
+        .pol-insight .row .av.a2 { background: linear-gradient(135deg, #ffc453, #d72c0d); }
+        .pol-insight .row .av.a3 { background: linear-gradient(135deg, #2c6ecb, #5e3df6); }
+        .pol-insight .row .av.a4 { background: linear-gradient(135deg, #d72c0d, #ec4899); }
+        .pol-insight .row .nm { font-weight: 500; font-size: 13px; }
+        .pol-insight .row .em { color: var(--muted); font-size: 12px; }
+        .pol-insight .row .v {
+            margin-left: auto;
+            font-weight: 600; font-size: 13px;
+            color: var(--ink-strong);
+            text-align: right;
+        }
+        .pol-insight .row .v small { display: block; font-weight: 400; color: var(--muted); font-size: 11px; }
+
+        /* payments / channels */
+        .pol-bars { padding: 14px 18px 18px; }
+        .pol-bars .row {
+            display: grid; grid-template-columns: 110px 1fr 60px;
+            gap: 12px; align-items: center;
+            font-size: 13px; padding: 6px 0;
+        }
+        .pol-bars .row .name { font-weight: 500; }
+        .pol-bars .row .track {
+            height: 8px; border-radius: 999px;
+            background: var(--surface-2); overflow: hidden;
+        }
+        .pol-bars .row .track i {
+            display: block; height: 100%; border-radius: 999px;
+            background: var(--green);
+        }
+        .pol-bars .row .track i.b { background: var(--blue); }
+        .pol-bars .row .track i.a { background: var(--amber); }
+        .pol-bars .row .track i.r { background: var(--red); }
+        .pol-bars .row .v { text-align: right; font-weight: 600; color: var(--ink-strong); }
+
+        /* tasks list */
+        .pol-tasks { padding: 8px 0; }
+        .pol-tasks .task {
+            display: grid; grid-template-columns: 22px 1fr auto;
+            gap: 12px; padding: 10px 18px; align-items: flex-start;
+            border-bottom: 1px solid var(--line-soft);
+        }
+        .pol-tasks .task:last-child { border-bottom: none; }
+        .pol-tasks .task .check {
+            width: 16px; height: 16px; border-radius: 4px;
+            border: 1.5px solid var(--line); margin-top: 2px;
+            background: var(--surface-2);
+            display: grid; place-items: center;
+            font-size: 11px; color: transparent;
+            cursor: pointer;
+        }
+        .pol-tasks .task.done .check {
+            background: var(--green); color: #fff; border-color: var(--green);
+        }
+        .pol-tasks .task .desc { font-size: 13px; color: var(--ink); }
+        .pol-tasks .task.done .desc { color: var(--muted); text-decoration: line-through; }
+        .pol-tasks .task .desc small { display: block; color: var(--muted); font-size: 11px; margin-top: 2px; }
+        .pol-tasks .task .meta { font-size: 11px; color: var(--muted); white-space: nowrap; }
+
+        @media (max-width: 1100px) {
+            .pol { grid-template-columns: 1fr; }
+            .pol-side { display: none; }
+            .pol-kpis { grid-template-columns: 1fr 1fr; }
+            .pol-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="pol">
+
+    <!-- ============= SIDEBAR ============= -->
+    <aside class="pol-side">
+        <div class="pol-shop">
+            <div class="icon">W</div>
+            <div class="name">WICRM<small>renoma · coralique</small></div>
+            <span class="arrow">▾</span>
+        </div>
+
+        <div class="pol-search">
+            <span>⌕</span> 검색
+            <span class="kbd">⌘K</span>
+        </div>
+
+        <nav class="pol-nav">
+            <a href="#"><span class="ic">⌂</span> 홈</a>
+            <a href="#" class="on"><span class="ic">▤</span> 주문 <span class="badge">128</span></a>
+            <a href="#"><span class="ic">▢</span> 상품</a>
+            <a href="#"><span class="ic">⌾</span> 재고</a>
+            <a href="#"><span class="ic">◔</span> 고객</a>
+            <a href="#"><span class="ic">★</span> VIP</a>
+            <a href="#"><span class="ic">⊜</span> 마일리지</a>
+        </nav>
+
+        <div class="pol-grp">매출 / 마케팅</div>
+        <nav class="pol-nav">
+            <a href="#"><span class="ic">∿</span> 분석</a>
+            <a href="#"><span class="ic">▶</span> 캠페인</a>
+            <a href="#"><span class="ic">%</span> 할인 / 쿠폰</a>
+        </nav>
+
+        <div class="pol-grp">처리</div>
+        <nav class="pol-nav">
+            <a href="#"><span class="ic">↩</span> 환불 <span class="badge">312</span></a>
+            <a href="#"><span class="ic">⇆</span> 교환</a>
+            <a href="#"><span class="ic">▶</span> 배송</a>
+        </nav>
+
+        <div class="pol-grp">설정</div>
+        <nav class="pol-nav">
+            <a href="#"><span class="ic">⚙</span> 스토어 설정</a>
+            <a href="#"><span class="ic">◍</span> 사이트 연동</a>
+        </nav>
+
+        <div class="pol-foot">
+            <div class="upgrade">
+                <strong>✦ AI Insight</strong>
+                자동 환불 사유 분석을 활성화하고 월 ₩14M 절감 잠재력을 확인하세요.
+                <button>활성화</button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ============= MAIN ============= -->
+    <main class="pol-main">
+
+        <div class="pol-top">
+            <a href="index.html" class="back">← index</a>
+            <span class="crumb"><b>주문</b> · 전체</span>
+            <span class="filler"></span>
+            <span class="pill">Type 16 · Polaris</span>
+            <span class="av">민</span>
+        </div>
+
+        <div class="pol-page">
+
+            <header class="pol-hello">
+                <div>
+                    <h1>안녕하세요, 김민우님 <span class="wave">👋</span></h1>
+                    <p>오늘 운영 현황을 한눈에 살펴보세요. 처리할 항목이 <b>23건</b> 있어요.</p>
+                </div>
+                <div class="actions">
+                    <button class="pol-btn">내보내기</button>
+                    <button class="pol-btn">필터</button>
+                    <button class="pol-btn primary">+ 주문 등록</button>
+                </div>
+            </header>
+
+            <div class="pol-banner">
+                <div class="ic">i</div>
+                <div style="flex:1;">
+                    <h4>4월 셋째 주 환불이 평소 대비 +34% 증가했어요</h4>
+                    <p>자사몰 RN-GSZD962 · RN-PT2207 두 품번에 집중되어 있습니다. <span class="more">사이즈 가이드 점검하기</span></p>
+                </div>
+                <span class="x">×</span>
+            </div>
+
+            <section class="pol-kpis">
+                <div class="pol-kpi">
+                    <div class="lbl">매출 (오늘) <span class="info">i</span></div>
+                    <div class="v">₩84.2M</div>
+                    <div class="compare"><span class="arr up">▲ 12.4%</span> 전일 대비</div>
+                </div>
+                <div class="pol-kpi">
+                    <div class="lbl">주문 (오늘)</div>
+                    <div class="v">412</div>
+                    <div class="compare"><span class="arr up">▲ 6.2%</span> 전일 대비</div>
+                </div>
+                <div class="pol-kpi">
+                    <div class="lbl">방문자</div>
+                    <div class="v">8,204</div>
+                    <div class="compare"><span class="arr up">▲ 4.1%</span> 전주 대비</div>
+                </div>
+                <div class="pol-kpi">
+                    <div class="lbl">전환율</div>
+                    <div class="v">5.0%</div>
+                    <div class="compare"><span class="arr dn">▼ 0.3pt</span> 전주 대비</div>
+                </div>
+            </section>
+
+            <section class="pol-grid">
+
+                <div>
+
+                    <article class="pol-card">
+                        <div class="ch">
+                            <h3>최근 주문</h3>
+                            <a href="#" class="link">모두 보기 →</a>
+                        </div>
+                        <table class="pol-orders">
+                            <thead>
+                                <tr>
+                                    <th>주문</th>
+                                    <th>고객</th>
+                                    <th>상태</th>
+                                    <th>채널</th>
+                                    <th style="text-align:right;">금액</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><a class="id" href="#">#1003128</a><br><small style="color:var(--muted);">12분 전</small></td>
+                                    <td class="cust"><div class="nm">김민지</div><div class="em">RN-GSZD962 외 2건</div></td>
+                                    <td><span class="pol-pill warn">출고 대기</span></td>
+                                    <td>자사몰 · 레노마</td>
+                                    <td class="amt">₩128,400</td>
+                                </tr>
+                                <tr>
+                                    <td><a class="id" href="#">#1003127</a><br><small style="color:var(--muted);">23분 전</small></td>
+                                    <td class="cust"><div class="nm">박서연</div><div class="em">CO-DR1042</div></td>
+                                    <td><span class="pol-pill info">배송중</span></td>
+                                    <td>29CM · 코랄리크</td>
+                                    <td class="amt">₩42,000</td>
+                                </tr>
+                                <tr>
+                                    <td><a class="id" href="#">#1003126</a><br><small style="color:var(--muted);">38분 전</small></td>
+                                    <td class="cust"><div class="nm">이지훈</div><div class="em">RN-PT2207 외 1건</div></td>
+                                    <td><span class="pol-pill danger">환불 요청</span></td>
+                                    <td>지그재그 · 레노마</td>
+                                    <td class="amt">₩86,400</td>
+                                </tr>
+                                <tr>
+                                    <td><a class="id" href="#">#1003125</a><br><small style="color:var(--muted);">52분 전</small></td>
+                                    <td class="cust"><div class="nm">최예린</div><div class="em">CO-BG2018</div></td>
+                                    <td><span class="pol-pill success">완료</span></td>
+                                    <td>SSG · 코랄리크</td>
+                                    <td class="amt">₩214,000</td>
+                                </tr>
+                                <tr>
+                                    <td><a class="id" href="#">#1003124</a><br><small style="color:var(--muted);">1시간 전</small></td>
+                                    <td class="cust"><div class="nm">정현우</div><div class="em">RN-SH3019 외 4건</div></td>
+                                    <td><span class="pol-pill info">배송중</span></td>
+                                    <td>무신사 · 레노마</td>
+                                    <td class="amt">₩342,800</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </article>
+
+                    <article class="pol-card">
+                        <div class="ch">
+                            <h3>채널별 매출 비중</h3>
+                            <span class="meta">최근 30일</span>
+                        </div>
+                        <div class="pol-bars">
+                            <div class="row">
+                                <span class="name">자사몰</span>
+                                <div class="track"><i style="width:78%"></i></div>
+                                <span class="v">₩142M</span>
+                            </div>
+                            <div class="row">
+                                <span class="name">29CM</span>
+                                <div class="track"><i class="b" style="width:64%"></i></div>
+                                <span class="v">₩94M</span>
+                            </div>
+                            <div class="row">
+                                <span class="name">지그재그</span>
+                                <div class="track"><i class="b" style="width:42%"></i></div>
+                                <span class="v">₩52M</span>
+                            </div>
+                            <div class="row">
+                                <span class="name">SSG</span>
+                                <div class="track"><i class="a" style="width:32%"></i></div>
+                                <span class="v">₩38M</span>
+                            </div>
+                            <div class="row">
+                                <span class="name">무신사</span>
+                                <div class="track"><i class="a" style="width:28%"></i></div>
+                                <span class="v">₩28M</span>
+                            </div>
+                            <div class="row">
+                                <span class="name">LF</span>
+                                <div class="track"><i class="r" style="width:18%"></i></div>
+                                <span class="v">₩18M</span>
+                            </div>
+                        </div>
+                    </article>
+
+                </div>
+
+                <div>
+
+                    <article class="pol-card">
+                        <div class="ch">
+                            <h3>오늘의 할 일</h3>
+                            <span class="meta">3 / 7 완료</span>
+                        </div>
+                        <div class="pol-tasks">
+                            <div class="task done">
+                                <div class="check">✓</div>
+                                <div class="desc">일일 운영 리포트 검토 <small>09:30 예약</small></div>
+                                <div class="meta">완료</div>
+                            </div>
+                            <div class="task done">
+                                <div class="check">✓</div>
+                                <div class="desc">VIP 고객 17명 응대 확인 <small>한지민 매니저</small></div>
+                                <div class="meta">완료</div>
+                            </div>
+                            <div class="task done">
+                                <div class="check">✓</div>
+                                <div class="desc">CJ 회수 지연 5건 클로즈 <small>이현우 매니저</small></div>
+                                <div class="meta">완료</div>
+                            </div>
+                            <div class="task">
+                                <div class="check"></div>
+                                <div class="desc">사이즈 가이드 RN-GSZD962 보완 <small>디자인팀 협업</small></div>
+                                <div class="meta">오늘</div>
+                            </div>
+                            <div class="task">
+                                <div class="check"></div>
+                                <div class="desc">15시 상담 인력 +2 배치 검토 <small>HR 채널</small></div>
+                                <div class="meta">오늘</div>
+                            </div>
+                            <div class="task">
+                                <div class="check"></div>
+                                <div class="desc">봄 컬렉션 재입고 검토 <small>4,218건 알림 신청</small></div>
+                                <div class="meta">내일</div>
+                            </div>
+                            <div class="task">
+                                <div class="check"></div>
+                                <div class="desc">월간 임원 리포트 초안 작성</div>
+                                <div class="meta">금</div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="pol-card">
+                        <div class="ch">
+                            <h3>이번 달 VIP</h3>
+                            <a href="#" class="link">전체 →</a>
+                        </div>
+                        <div class="pol-insight">
+                            <div class="row">
+                                <span class="av a1">김</span>
+                                <div>
+                                    <div class="nm">김지영</div>
+                                    <div class="em">VIP · 가입 3년차</div>
+                                </div>
+                                <div class="v">₩4.2M<small>12회 구매</small></div>
+                            </div>
+                            <div class="row">
+                                <span class="av a2">이</span>
+                                <div>
+                                    <div class="nm">이민서</div>
+                                    <div class="em">VIP · 신규</div>
+                                </div>
+                                <div class="v">₩3.8M<small>8회 구매</small></div>
+                            </div>
+                            <div class="row">
+                                <span class="av a3">박</span>
+                                <div>
+                                    <div class="nm">박서영</div>
+                                    <div class="em">Gold · 승급 임박</div>
+                                </div>
+                                <div class="v">₩2.9M<small>11회 구매</small></div>
+                            </div>
+                            <div class="row">
+                                <span class="av a4">최</span>
+                                <div>
+                                    <div class="nm">최가은</div>
+                                    <div class="em">VIP · 가입 5년차</div>
+                                </div>
+                                <div class="v">₩2.4M<small>14회 구매</small></div>
+                            </div>
+                        </div>
+                    </article>
+
+                </div>
+            </section>
+
+        </div>
+
+    </main>
+</div>
+
+</body>
+</html>

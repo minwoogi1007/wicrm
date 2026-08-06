@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{design-samples/public-layout}">
+<body>
+<div layout:fragment="content">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="/assets/css/design-samples/glass.css" rel="stylesheet" type="text/css" />
+
+    <main class="glass-page">
+        <div class="glass-shell">
+
+            <!-- HEADER -->
+            <header class="gl-header">
+                <div>
+                    <a href="/design-samples/admin" class="back-link">← 샘플 목록</a>
+                    <div style="margin-top:14px;"><span class="gl-kicker">Type 09 · Glassmorphism 2.0</span></div>
+                    <h1>AI <em>Insight</em> 워크스페이스</h1>
+                    <p>다크 베이스 + 프로스티드 글래스 카드 + 네온 그라디언트로, AI가 발견한 패턴을 한눈에 강조하는 인사이트 화면입니다.</p>
+                </div>
+                <div class="gl-actions">
+                    <button type="button">기간 · 최근 7일</button>
+                    <button type="button">사이트 · 전체</button>
+                    <button type="button" class="primary">+ 인사이트 생성</button>
+                </div>
+            </header>
+
+            <div class="gl-grid">
+
+                <!-- LEFT MAIN COLUMN -->
+                <div class="gl-col">
+
+                    <!-- HERO AI INSIGHT -->
+                    <article class="glass-card gl-hero">
+                        <span class="ai-bubble">GPT-Vision · WICRM Brain</span>
+                        <h2>
+                            지난 7일 동안 <mark>레노마 자사몰</mark>의 <mark>사이즈 불만족</mark> 사유 환불이
+                            <mark>+34%</mark> 급증했습니다.
+                            동일 품번 RN-GSZD962에 집중되어 있으며, 사이즈 가이드 보완 시 월 환불 1,420만 원 절감 가능성이 있습니다.
+                        </h2>
+                        <div class="hero-meta">
+                            <div><span>분석 데이터</span><strong>1,238건</strong></div>
+                            <div><span>예상 절감</span><strong>₩14.2M</strong></div>
+                            <div><span>신뢰도</span><strong>92.4%</strong></div>
+                        </div>
+                    </article>
+
+                    <!-- DONUT + LEGEND -->
+                    <article class="glass-card">
+                        <h3>환불 사유 분포 / 7일</h3>
+                        <div class="gl-donut">
+                            <svg viewBox="0 0 36 36">
+                                <defs>
+                                    <linearGradient id="gradC" x1="0" x2="1" y1="0" y2="1">
+                                        <stop offset="0%" stop-color="#38e6ff"/>
+                                        <stop offset="100%" stop-color="#6c7bff"/>
+                                    </linearGradient>
+                                </defs>
+                                <circle cx="18" cy="18" r="15.915" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="3.5"/>
+                                <!-- 사이즈 불만 42% -->
+                                <circle cx="18" cy="18" r="15.915" fill="none" stroke="url(#gradC)" stroke-width="3.5"
+                                        stroke-dasharray="42 58" stroke-dashoffset="25" stroke-linecap="round"/>
+                                <!-- 단순변심 26% -->
+                                <circle cx="18" cy="18" r="15.915" fill="none" stroke="#ff45c8" stroke-width="3.5"
+                                        stroke-dasharray="26 74" stroke-dashoffset="-17" stroke-linecap="round"/>
+                                <!-- 불량 18% -->
+                                <circle cx="18" cy="18" r="15.915" fill="none" stroke="#c8ff45" stroke-width="3.5"
+                                        stroke-dasharray="18 82" stroke-dashoffset="-43" stroke-linecap="round"/>
+                                <!-- 오배송 14% -->
+                                <circle cx="18" cy="18" r="15.915" fill="none" stroke="#ffb627" stroke-width="3.5"
+                                        stroke-dasharray="14 86" stroke-dashoffset="-61" stroke-linecap="round"/>
+                                <text x="18" y="17" text-anchor="middle" fill="#f4f7ff" font-size="6" font-weight="800">1,238</text>
+                                <text x="18" y="22" text-anchor="middle" fill="#8e94b3" font-size="2.4">총 환불건</text>
+                            </svg>
+                            <div class="legend">
+                                <div class="row">
+                                    <span class="dot" style="background:linear-gradient(135deg,#38e6ff,#6c7bff);"></span>
+                                    <div><strong>사이즈 불만족</strong><br><span>전주 대비 +34%</span></div>
+                                    <span style="color:#38e6ff; font-weight:700;">42%</span>
+                                </div>
+                                <div class="row">
+                                    <span class="dot" style="background:#ff45c8;"></span>
+                                    <div><strong>단순 변심</strong><br><span>전주 대비 -2%</span></div>
+                                    <span style="color:#ff45c8; font-weight:700;">26%</span>
+                                </div>
+                                <div class="row">
+                                    <span class="dot" style="background:#c8ff45;"></span>
+                                    <div><strong>제품 불량</strong><br><span>전주 대비 +5%</span></div>
+                                    <span style="color:#c8ff45; font-weight:700;">18%</span>
+                                </div>
+                                <div class="row">
+                                    <span class="dot" style="background:#ffb627;"></span>
+                                    <div><strong>오배송</strong><br><span>전주 대비 -8%</span></div>
+                                    <span style="color:#ffb627; font-weight:700;">14%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- FORECAST CHART -->
+                    <article class="glass-card gl-forecast">
+                        <h3>다음 7일 환불 예측 / Confidence 87%</h3>
+                        <svg viewBox="0 0 600 180" preserveAspectRatio="none">
+                            <defs>
+                                <linearGradient id="forecastFill" x1="0" x2="0" y1="0" y2="1">
+                                    <stop offset="0%" stop-color="#38e6ff" stop-opacity="0.4"/>
+                                    <stop offset="100%" stop-color="#38e6ff" stop-opacity="0"/>
+                                </linearGradient>
+                            </defs>
+                            <!-- grid -->
+                            <g stroke="rgba(255,255,255,0.05)" stroke-width="1">
+                                <line x1="0" y1="40" x2="600" y2="40"/>
+                                <line x1="0" y1="90" x2="600" y2="90"/>
+                                <line x1="0" y1="140" x2="600" y2="140"/>
+                            </g>
+                            <!-- past actual -->
+                            <path d="M0,120 L70,100 L140,110 L210,80 L280,95 L350,70"
+                                  fill="none" stroke="#6c7bff" stroke-width="2.5"/>
+                            <!-- forecast (dashed) -->
+                            <path d="M350,70 L420,55 L490,48 L560,38 L600,32"
+                                  fill="none" stroke="#38e6ff" stroke-width="2.5" stroke-dasharray="6,4"/>
+                            <!-- forecast band -->
+                            <path d="M350,70 L420,55 L490,48 L560,38 L600,32 L600,180 L0,180 L0,120 L70,100 L140,110 L210,80 L280,95 L350,70 Z"
+                                  fill="url(#forecastFill)" opacity="0.7"/>
+                            <!-- divider line -->
+                            <line x1="350" y1="0" x2="350" y2="180" stroke="#ff45c8" stroke-width="1" stroke-dasharray="3,4" opacity="0.6"/>
+                            <text x="356" y="14" fill="#ff45c8" font-size="11">today</text>
+                        </svg>
+                        <div class="axis">
+                            <span>04/22</span><span>04/24</span><span>04/26</span><span>04/28</span>
+                            <span>04/30</span><span>05/02</span><span>05/04</span>
+                        </div>
+                    </article>
+
+                </div>
+
+                <!-- RIGHT SIDE COLUMN -->
+                <div class="gl-col">
+
+                    <!-- RECOMMENDATIONS -->
+                    <article class="glass-card gl-reco">
+                        <h3>AI 추천 액션 · 우선순위</h3>
+                        <ul>
+                            <li class="high">
+                                <div class="icon">!</div>
+                                <div>
+                                    <div class="title">사이즈 가이드 이미지 보완</div>
+                                    <div class="sub">RN-GSZD962, RN-PT2207 (자사몰)</div>
+                                </div>
+                                <span class="impact">High · -18% 예상</span>
+                            </li>
+                            <li class="mid">
+                                <div class="icon">B</div>
+                                <div>
+                                    <div class="title">CJ대한통운 회수 워크플로 점검</div>
+                                    <div class="sub">평균 회수일 3.2일 → 2.4일 단축 가능</div>
+                                </div>
+                                <span class="impact">Mid · SLA +1.5%</span>
+                            </li>
+                            <li class="mid">
+                                <div class="icon">M</div>
+                                <div>
+                                    <div class="title">15시 피크 상담사 +2명 배치</div>
+                                    <div class="sub">최근 14일 평균 대기 17건</div>
+                                </div>
+                                <span class="impact">Mid · CS 만족도 +6%</span>
+                            </li>
+                            <li class="low">
+                                <div class="icon">L</div>
+                                <div>
+                                    <div class="title">우체국 택배 가용성 모니터 추가</div>
+                                    <div class="sub">최근 7일 5xx 비율 0.8%</div>
+                                </div>
+                                <span class="impact">Low · 운영 안정</span>
+                            </li>
+                        </ul>
+                    </article>
+
+                    <!-- AGENT ACTIVITY -->
+                    <article class="glass-card">
+                        <h3>AI 에이전트 활동 로그</h3>
+                        <div class="gl-activity">
+                            <div class="item">
+                                <div class="ts">12:29</div>
+                                <div class="desc"><b>Insight Agent</b>가 환불 사유 클러스터링 완료</div>
+                                <span class="tag">DONE</span>
+                            </div>
+                            <div class="item">
+                                <div class="ts">12:14</div>
+                                <div class="desc"><b>Forecast Agent</b>가 다음 7일 환불 예측 갱신</div>
+                                <span class="tag">DONE</span>
+                            </div>
+                            <div class="item">
+                                <div class="ts">11:58</div>
+                                <div class="desc"><b>Anomaly Agent</b>가 자사몰 환불 +34% 이상 탐지</div>
+                                <span class="tag warn">ALERT</span>
+                            </div>
+                            <div class="item">
+                                <div class="ts">11:30</div>
+                                <div class="desc"><b>Summary Agent</b>가 일일 리포트 초안 생성</div>
+                                <span class="tag">DONE</span>
+                            </div>
+                            <div class="item">
+                                <div class="ts">11:00</div>
+                                <div class="desc"><b>Quality Agent</b>가 상담 100건 자동 채점 완료</div>
+                                <span class="tag">DONE</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- MINI METRIC -->
+                    <article class="glass-card" style="display:flex; flex-direction:column; gap:8px;">
+                        <h3>이번 달 AI가 절감한 비용</h3>
+                        <div style="font-size:44px; font-weight:800; letter-spacing:-0.02em;
+                                    background:linear-gradient(135deg,#c8ff45,#38e6ff);
+                                    -webkit-background-clip:text; background-clip:text; color:transparent;">
+                            ₩ 47.8M
+                        </div>
+                        <div style="color:var(--gl-muted); font-size:12px;">
+                            전월 대비 ▲ 18.2% · 누적 절감 ₩ 312M
+                        </div>
+                    </article>
+                </div>
+
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

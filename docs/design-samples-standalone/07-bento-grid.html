@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WICRM Design 07 · Bento Grid 2026</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; }
+
+        .bento-page {
+            --bn-bg: #f4f1ec;
+            --bn-surface: #ffffff;
+            --bn-ink: #16181d;
+            --bn-muted: #6b7280;
+            --bn-line: rgba(22, 24, 29, 0.08);
+            --bn-accent: #ff5b3a;
+            --bn-accent-soft: #ffe7e0;
+            --bn-blue: #2649ff;
+            --bn-mint: #00c08a;
+            --bn-amber: #ffb627;
+            --bn-shadow: 0 30px 60px -30px rgba(22, 24, 29, 0.18);
+
+            background:
+                radial-gradient(circle at 12% -10%, rgba(38, 73, 255, 0.12), transparent 38%),
+                radial-gradient(circle at 110% 0%, rgba(255, 91, 58, 0.10), transparent 40%),
+                var(--bn-bg);
+            min-height: 100vh;
+            padding: 36px clamp(20px, 4vw, 64px) 80px;
+            color: var(--bn-ink);
+            font-family: "Inter", "Pretendard", system-ui, sans-serif;
+        }
+        .bento-page * { box-sizing: border-box; }
+        .bento-shell { max-width: 1380px; margin: 0 auto; }
+
+        .bento-header { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 24px; margin-bottom: 28px; }
+        .bento-header .back-link { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: var(--bn-muted); font-size: 13px; font-weight: 500; }
+        .bento-header .back-link:hover { color: var(--bn-ink); }
+        .bento-header h1 { margin: 14px 0 6px; font-size: clamp(28px, 4vw, 48px); font-weight: 800; letter-spacing: -0.02em; line-height: 1.05; }
+        .bento-header h1 em { font-style: normal; color: var(--bn-accent); }
+        .bento-header p { margin: 0; color: var(--bn-muted); font-size: 15px; max-width: 520px; }
+        .bento-kicker { display: inline-flex; align-items: center; gap: 8px; background: var(--bn-ink); color: #fff; padding: 6px 12px; border-radius: 999px; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; }
+        .bento-kicker::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--bn-accent); box-shadow: 0 0 0 4px rgba(255, 91, 58, 0.25); }
+        .bento-header .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .bento-header .actions button { border: 1px solid var(--bn-line); background: var(--bn-surface); border-radius: 14px; padding: 10px 16px; font-size: 13px; font-weight: 600; cursor: pointer; }
+        .bento-header .actions button.solid { background: var(--bn-ink); color: #fff; border-color: var(--bn-ink); }
+
+        .bento-grid { display: grid; gap: 18px; grid-template-columns: repeat(12, 1fr); grid-auto-rows: minmax(120px, auto); }
+        .bento-tile { background: var(--bn-surface); border: 1px solid var(--bn-line); border-radius: 24px; padding: 22px; box-shadow: var(--bn-shadow); position: relative; overflow: hidden; display: flex; flex-direction: column; }
+        .bento-tile h3 { margin: 0 0 4px; font-size: 13px; font-weight: 600; color: var(--bn-muted); letter-spacing: 0.04em; text-transform: uppercase; }
+
+        .tile-2x1 { grid-column: span 4; }
+        .tile-3x1 { grid-column: span 6; }
+        .tile-4x1 { grid-column: span 8; }
+        .tile-6x1 { grid-column: span 12; }
+        .tile-2x2 { grid-column: span 4; grid-row: span 2; }
+        .tile-3x2 { grid-column: span 6; grid-row: span 2; }
+        .tile-4x2 { grid-column: span 8; grid-row: span 2; }
+
+        .tile-hero { background: var(--bn-ink); color: #fff; border-color: transparent; }
+        .tile-hero h3 { color: rgba(255,255,255,0.6); }
+        .tile-hero .big-number { font-size: clamp(54px, 7vw, 96px); font-weight: 800; line-height: 1; letter-spacing: -0.04em; margin: 8px 0 16px; }
+        .tile-hero .big-number small { font-size: 22px; color: var(--bn-accent); margin-left: 8px; font-weight: 700; }
+        .tile-hero .hero-meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: auto; }
+        .tile-hero .hero-meta div { background: rgba(255,255,255,0.06); border-radius: 14px; padding: 12px 14px; }
+        .tile-hero .hero-meta strong { display: block; font-size: 18px; font-weight: 700; margin-top: 4px; }
+        .tile-hero .hero-meta span { font-size: 11px; color: rgba(255,255,255,0.55); }
+
+        .tile-accent { background: var(--bn-accent-soft); border-color: transparent; }
+        .tile-accent .big { font-size: 48px; font-weight: 800; letter-spacing: -0.03em; color: var(--bn-accent); margin: 6px 0; }
+        .tile-accent .delta { font-size: 13px; color: var(--bn-ink); font-weight: 600; }
+        .tile-accent .delta::before { content: "▲ "; color: var(--bn-mint); }
+
+        .tile-stat .num { font-size: 38px; font-weight: 800; letter-spacing: -0.02em; margin: 4px 0; }
+        .tile-stat .sub { color: var(--bn-muted); font-size: 12px; }
+        .tile-stat .pill { margin-top: auto; display: inline-flex; align-items: center; gap: 6px; background: var(--bn-bg); padding: 6px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; align-self: flex-start; }
+
+        .tile-chart .chart-wrap { flex: 1; margin-top: 10px; display: flex; align-items: flex-end; gap: 8px; min-height: 140px; }
+        .tile-chart .bar { flex: 1; background: linear-gradient(180deg, var(--bn-blue), #5e75ff); border-radius: 8px 8px 4px 4px; position: relative; }
+        .tile-chart .bar::after { content: attr(data-label); position: absolute; bottom: -22px; left: 0; right: 0; text-align: center; font-size: 10px; color: var(--bn-muted); }
+        .tile-chart .bar.peak { background: linear-gradient(180deg, var(--bn-accent), #ff8e74); }
+
+        .tile-line svg { width: 100%; height: 100%; }
+
+        .tile-list ul { list-style: none; padding: 0; margin: 12px 0 0; flex: 1; }
+        .tile-list li { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed var(--bn-line); font-size: 13px; }
+        .tile-list li:last-child { border-bottom: none; }
+        .tile-list li .name { font-weight: 600; }
+        .tile-list li .badge { background: var(--bn-bg); padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+        .tile-list li .badge.up { background: #e6fff4; color: var(--bn-mint); }
+        .tile-list li .badge.dn { background: var(--bn-accent-soft); color: var(--bn-accent); }
+
+        .tile-heatmap .heat { margin-top: 12px; display: grid; grid-template-columns: repeat(14, 1fr); gap: 4px; flex: 1; }
+        .tile-heatmap .heat span { aspect-ratio: 1/1; border-radius: 4px; background: #ecebe6; }
+        .tile-heatmap .heat span.l1 { background: #ffd9cf; }
+        .tile-heatmap .heat span.l2 { background: #ffb29c; }
+        .tile-heatmap .heat span.l3 { background: #ff8767; }
+        .tile-heatmap .heat span.l4 { background: var(--bn-accent); }
+
+        .tile-ai { background: linear-gradient(135deg, #2649ff, #5b3df6); color: #fff; border-color: transparent; }
+        .tile-ai h3 { color: rgba(255,255,255,0.7); }
+        .tile-ai .insight { font-size: 18px; font-weight: 600; line-height: 1.45; margin: 12px 0; }
+        .tile-ai .insight em { background: rgba(255,255,255,0.15); padding: 2px 8px; border-radius: 6px; font-style: normal; color: #ffe14a; }
+        .tile-ai .src { margin-top: auto; font-size: 11px; color: rgba(255,255,255,0.55); display: flex; align-items: center; gap: 6px; }
+        .tile-ai .src::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #00ffa3; box-shadow: 0 0 8px #00ffa3; }
+
+        @media (max-width: 1100px) {
+            .tile-2x1, .tile-2x2 { grid-column: span 6; }
+            .tile-3x1, .tile-3x2 { grid-column: span 6; }
+            .tile-4x1, .tile-4x2 { grid-column: span 12; }
+        }
+        @media (max-width: 720px) {
+            .bento-grid { gap: 14px; }
+            .tile-2x1, .tile-2x2, .tile-3x1, .tile-3x2, .tile-4x1, .tile-4x2 { grid-column: span 12; }
+            .tile-hero .hero-meta { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<main class="bento-page">
+    <div class="bento-shell">
+
+        <header class="bento-header">
+            <div>
+                <a href="index.html" class="back-link">← 디자인 샘플 인덱스</a>
+                <div style="margin-top:14px;"><span class="bento-kicker">Type 07 · Bento Grid 2026</span></div>
+                <h1>모듈형 <em>Bento</em> 통합 운영 대시보드</h1>
+                <p>가변 크기 카드를 격자에 배치해 KPI · 추세 · 리스트 · AI 인사이트를 한 화면에서 빠르게 스캔합니다.</p>
+            </div>
+            <div class="actions">
+                <button type="button">필터 · 오늘</button>
+                <button type="button">위젯 편집</button>
+                <button type="button" class="solid">+ 카드 추가</button>
+            </div>
+        </header>
+
+        <section class="bento-grid">
+
+            <article class="bento-tile tile-hero tile-4x2">
+                <h3>오늘 종합 운영 지수</h3>
+                <div class="big-number">94.2<small>+8.1</small></div>
+                <p style="opacity:0.7; max-width:420px;">전일 대비 상담·물류·결제 처리율이 안정적으로 상승했습니다. 환불 SLA가 다소 지연 구간입니다.</p>
+                <div class="hero-meta">
+                    <div><span>상담 처리</span><strong>1,284건</strong></div>
+                    <div><span>출고 완료</span><strong>873건</strong></div>
+                    <div><span>환불 SLA</span><strong>97.6%</strong></div>
+                </div>
+            </article>
+
+            <article class="bento-tile tile-accent tile-2x1">
+                <h3>실시간 대기 상담</h3>
+                <div class="big">17</div>
+                <div class="delta">전일 동시간대 대비 -6건</div>
+            </article>
+
+            <article class="bento-tile tile-stat tile-2x1">
+                <h3>금일 매출</h3>
+                <div class="num">₩ 38.4M</div>
+                <span class="sub">목표 대비 102.4%</span>
+                <span class="pill">▲ 4.2% WoW</span>
+            </article>
+
+            <article class="bento-tile tile-chart tile-3x2">
+                <h3>시간대별 상담 인입</h3>
+                <div class="chart-wrap">
+                    <div class="bar" data-label="09" style="height:35%;"></div>
+                    <div class="bar" data-label="10" style="height:55%;"></div>
+                    <div class="bar peak" data-label="11" style="height:82%;"></div>
+                    <div class="bar peak" data-label="12" style="height:74%;"></div>
+                    <div class="bar" data-label="13" style="height:48%;"></div>
+                    <div class="bar" data-label="14" style="height:62%;"></div>
+                    <div class="bar peak" data-label="15" style="height:88%;"></div>
+                    <div class="bar" data-label="16" style="height:65%;"></div>
+                    <div class="bar" data-label="17" style="height:42%;"></div>
+                </div>
+                <span class="sub" style="margin-top:32px; color:var(--bn-muted); font-size:12px;">
+                    15시 피크 인입 — 추가 상담사 배치 권장
+                </span>
+            </article>
+
+            <article class="bento-tile tile-ai tile-3x2">
+                <h3>AI Insight · GPT 분석</h3>
+                <div class="insight">
+                    '<em>레노마 자사몰</em>'의 환불 사유 1순위가 <em>사이즈 불만</em>으로 변동.
+                    지난주 대비 <em>+34%</em> 증가했습니다.
+                </div>
+                <div class="insight" style="font-size:14px; opacity:0.85;">
+                    → 주요 품번 RN-GSZD962 / RN-PT2207 의 사이즈 가이드 보완을 추천드립니다.
+                </div>
+                <span class="src">분석 기준: 최근 7일 · 1,238건</span>
+            </article>
+
+            <article class="bento-tile tile-list tile-3x1">
+                <h3>사이트별 환불 TOP</h3>
+                <ul>
+                    <li><span class="name">자사몰 - 레노마</span><span class="badge dn">+12</span></li>
+                    <li><span class="name">29CM - 코랄리크</span><span class="badge dn">+8</span></li>
+                    <li><span class="name">지그재그 - 레노마</span><span class="badge up">-3</span></li>
+                    <li><span class="name">SSG - 레노마</span><span class="badge up">-5</span></li>
+                </ul>
+            </article>
+
+            <article class="bento-tile tile-heatmap tile-3x1">
+                <h3>최근 14일 인입 히트맵</h3>
+                <div class="heat">
+                    <span></span><span class="l1"></span><span class="l2"></span><span class="l1"></span>
+                    <span class="l3"></span><span class="l4"></span><span class="l2"></span>
+                    <span class="l1"></span><span class="l2"></span><span class="l3"></span>
+                    <span class="l4"></span><span class="l3"></span><span class="l2"></span><span class="l1"></span>
+                </div>
+            </article>
+
+            <article class="bento-tile tile-accent tile-2x1">
+                <h3>오늘의 신규 가입</h3>
+                <div class="big">128</div>
+                <div class="delta">전주 평균 대비 +21건</div>
+            </article>
+
+            <article class="bento-tile tile-stat tile-2x1">
+                <h3>처리중 교환/반품</h3>
+                <div class="num">312</div>
+                <span class="sub">평균 처리 1.8일</span>
+                <span class="pill">SLA 96.2%</span>
+            </article>
+
+            <article class="bento-tile tile-line tile-4x1">
+                <h3>주간 매출 추이</h3>
+                <svg viewBox="0 0 400 110" preserveAspectRatio="none" style="margin-top:8px;">
+                    <defs>
+                        <linearGradient id="bnLine" x1="0" x2="0" y1="0" y2="1">
+                            <stop offset="0%" stop-color="#2649ff" stop-opacity="0.35"/>
+                            <stop offset="100%" stop-color="#2649ff" stop-opacity="0"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M0,80 L50,70 L100,55 L150,62 L200,40 L250,48 L300,28 L350,32 L400,18"
+                          fill="none" stroke="#2649ff" stroke-width="2.5" stroke-linecap="round"/>
+                    <path d="M0,80 L50,70 L100,55 L150,62 L200,40 L250,48 L300,28 L350,32 L400,18 L400,110 L0,110 Z"
+                          fill="url(#bnLine)"/>
+                </svg>
+            </article>
+
+        </section>
+    </div>
+</main>
+
+</body>
+</html>

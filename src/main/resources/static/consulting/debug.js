@@ -28,7 +28,9 @@ function testImageLoad(src, label) {
 // 이미지 원본 다운로드 함수
 window.downloadOriginalImage = function(filePath, fileName) {
     // 원래 이미지 URL
-    var originalUrl = 'http://175.119.224.45:8080/uploads/' + filePath;
+    // 파일 서버 URL은 페이지에서 전달 (Thymeleaf inline JS로 설정)
+    var serverUploadUrl = (window.FILE_SERVER_UPLOAD_URL || '/uploads/');
+    var originalUrl = serverUploadUrl + filePath;
     
     window.console.log('원본 이미지 다운로드 시도:', originalUrl);
     
@@ -78,7 +80,7 @@ window.fixImageUrls = function() {
         
         // 이미지 경로 분석
         if (img.src) {
-            var isExternal = img.src.includes('http://175.119.224.45:8080');
+            var isExternal = img.src.includes(window.FILE_SERVER_UPLOAD_URL || '___none___');
             var isRelative = img.src.startsWith('/');
             var isBlankImage = img.src.includes('blank-image.svg');
             
@@ -105,7 +107,7 @@ window.fixImageUrls = function() {
                 var filePath = img.getAttribute('data-file-path');
                 console.log("- 시도할 경로:", [
                     `/uploads/${filePath}`,
-                    `http://175.119.224.45:8080/uploads/${filePath}`,
+                    (window.FILE_SERVER_UPLOAD_URL || '/uploads/') + filePath,
                     `/api/image-proxy?path=${encodeURIComponent(filePath)}`,
                     `/api/image-base64?path=${encodeURIComponent(filePath)}`
                 ]);
@@ -118,7 +120,7 @@ window.fixImageUrls = function() {
     if (window.performance && window.performance.getEntries) {
         var resources = window.performance.getEntries();
         var failedResources = resources.filter(function(resource) {
-            return resource.name.includes('uploads') && resource.name.includes('175.119.224.45:8080');
+            return resource.name.includes('uploads') && resource.name.includes(window.FILE_SERVER_UPLOAD_URL || '___none___');
         });
         
         console.log(`외부 리소스 요청 (${failedResources.length}개):`);

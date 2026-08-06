@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': getCSRFToken() // Spring Security CSRF 토큰
+                [getCSRFHeader()]: getCSRFToken()
             },
             body: JSON.stringify(logData),
             // 백그라운드로 처리 (사용자 경험에 영향 없음)
@@ -117,9 +117,12 @@ document.addEventListener('DOMContentLoaded', function() {
         return false;
     }
 
-    // CSRF 토큰 가져오기 (Spring Security용)
     function getCSRFToken() {
         return document.querySelector('meta[name="_csrf"]')?.getAttribute('content') || '';
+    }
+
+    function getCSRFHeader() {
+        return document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content') || 'X-XSRF-TOKEN';
     }
 
     // 세션 ID 관리

@@ -7,6 +7,10 @@
 <head>
 	<title>WIO SERVICE</title>
 	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 		<link rel="shortcut icon" href="/assets/media/logos/logo.png" />
 	<!--begin::Fonts(mandatory for all pages)-->
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />
@@ -18,6 +22,8 @@
 	<!--begin::Global Stylesheets Bundle(mandatory for all pages)-->
 	<link href="/assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
 	<link href="/assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
+	<!-- 모바일 반응형 CSS -->
+	<link href="/assets/css/mobile-responsive.css" rel="stylesheet" type="text/css" />
 	<!-- 교환/반품 관리 스타일 -->
 	<link href="/assets/css/return/return.css" rel="stylesheet" type="text/css" />
 	<script>
@@ -125,11 +131,62 @@
 			margin-top: 0 !important;
 		}
 
+		/* 폰트 크기 조절 */
+		#kt_app_main.font-size-sm { font-size: 12px !important; }
+		#kt_app_main.font-size-sm .fs-1 { font-size: calc(1.2rem + 0.3vw) !important; }
+		#kt_app_main.font-size-sm .fs-2 { font-size: 1.1rem !important; }
+		#kt_app_main.font-size-sm .fs-3 { font-size: 1rem !important; }
+		#kt_app_main.font-size-sm .fs-4 { font-size: 0.9rem !important; }
+		#kt_app_main.font-size-sm .fs-5 { font-size: 0.85rem !important; }
+		#kt_app_main.font-size-sm .fs-6 { font-size: 0.8rem !important; }
+		#kt_app_main.font-size-sm .fs-7 { font-size: 0.75rem !important; }
+		#kt_app_main.font-size-sm .table { font-size: 12px !important; }
+
+		#kt_app_main.font-size-lg { font-size: 16px !important; }
+		#kt_app_main.font-size-lg .fs-1 { font-size: calc(1.6rem + 0.6vw) !important; }
+		#kt_app_main.font-size-lg .fs-2 { font-size: 1.5rem !important; }
+		#kt_app_main.font-size-lg .fs-3 { font-size: 1.35rem !important; }
+		#kt_app_main.font-size-lg .fs-4 { font-size: 1.2rem !important; }
+		#kt_app_main.font-size-lg .fs-5 { font-size: 1.1rem !important; }
+		#kt_app_main.font-size-lg .fs-6 { font-size: 1rem !important; }
+		#kt_app_main.font-size-lg .fs-7 { font-size: 0.9rem !important; }
+		#kt_app_main.font-size-lg .table { font-size: 16px !important; }
+
+		#kt_app_main.font-size-xl { font-size: 18px !important; }
+		#kt_app_main.font-size-xl .fs-1 { font-size: calc(1.8rem + 0.8vw) !important; }
+		#kt_app_main.font-size-xl .fs-2 { font-size: 1.7rem !important; }
+		#kt_app_main.font-size-xl .fs-3 { font-size: 1.5rem !important; }
+		#kt_app_main.font-size-xl .fs-4 { font-size: 1.35rem !important; }
+		#kt_app_main.font-size-xl .fs-5 { font-size: 1.25rem !important; }
+		#kt_app_main.font-size-xl .fs-6 { font-size: 1.15rem !important; }
+		#kt_app_main.font-size-xl .fs-7 { font-size: 1.05rem !important; }
+		#kt_app_main.font-size-xl .table { font-size: 18px !important; }
+
+		/* 모바일 대시보드 카드 최적화 */
+		@media (max-width: 768px) {
+			.card.card-flush.bgi-no-repeat {
+				min-height: auto !important;
+			}
+			
+			.h-md-50 {
+				height: auto !important;
+				min-height: auto !important;
+			}
+			
+			.h-lg-50 {
+				height: auto !important;
+			}
+			
+			#kt_app_toolbar {
+				padding: 8px 0 !important;
+			}
+		}
+
 	</style>
 	<meta name="_csrf" th:if="${_csrf}" th:content="${_csrf.token}"/>
 	<meta name="_csrf" th:unless="${_csrf}" content=""/>
 	<meta name="_csrf_header" th:if="${_csrf}" th:content="${_csrf.headerName}"/>
-	<meta name="_csrf_header" th:unless="${_csrf}" content="X-CSRF-TOKEN"/>
+	<meta name="_csrf_header" th:unless="${_csrf}" content="X-XSRF-TOKEN"/>
 
 
 </head>
@@ -139,6 +196,28 @@
 <!--begin::Theme mode setup on page load-->
 <script src="/assets/js/common/themeMode.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<!-- CSRF 토큰 자동 전달 (모든 AJAX 요청에 CSRF 헤더 자동 포함) -->
+<script>
+(function() {
+    var csrfToken = document.querySelector('meta[name="_csrf"]');
+    var csrfHeader = document.querySelector('meta[name="_csrf_header"]');
+    if (csrfToken && csrfHeader && csrfToken.content) {
+        // jQuery AJAX 전역 설정
+        $.ajaxSetup({
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader(csrfHeader.content, csrfToken.content);
+            }
+        });
+        // fetch API 래퍼 (기존 fetch를 오버라이드하지 않고 전역 함수 제공)
+        window.csrfFetch = function(url, options) {
+            options = options || {};
+            options.headers = options.headers || {};
+            options.headers[csrfHeader.content] = csrfToken.content;
+            return fetch(url, options);
+        };
+    }
+})();
+</script>
 
 <!--end::Theme mode setup on page load-->
 <!--begin::App-->
@@ -208,7 +287,10 @@
 <!--end::Modal - Invite Friend-->
 <!--end::Modals-->
 <!--begin::Javascript-->
-<script>var hostUrl = "/assets/";</script>
+<script>
+var hostUrl = "/assets/";
+// 글꼴 크기 조절 함수(changeFontSize/applyFontSize)는 fragments/head.html 에서 정의됨
+</script>
 <!--begin::Global Javascript Bundle(mandatory for all pages)-->
 
 <script src="/assets/js/scripts.bundle.js"></script>
@@ -230,13 +312,27 @@
 
 <!--end::Custom Javascript-->
 <script>
-	$.ajaxSetup({
-		complete: function(xhr, textStatus) {
-			if (xhr.status === 401) {
-				window.location.href = '/login';
-			}
+	// plugins.bundle.js가 jQuery를 재초기화할 수 있으므로, 
+	// 레이아웃 하단에서 CSRF + 401 처리를 다시 설정
+	(function() {
+		function getCsrfTokenFromCookie() {
+			var match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+			return match ? decodeURIComponent(match[1]) : null;
 		}
-	});
+		$.ajaxSetup({
+			beforeSend: function(xhr) {
+				var token = getCsrfTokenFromCookie();
+				if (token) {
+					xhr.setRequestHeader('X-XSRF-TOKEN', token);
+				}
+			},
+			complete: function(xhr, textStatus) {
+				if (xhr.status === 401) {
+					window.location.href = '/login';
+				}
+			}
+		});
+	})();
 	document.addEventListener('DOMContentLoaded', function() {
 		var downloadButton = document.getElementById('downloadButton');
 		if (downloadButton) {  // 버튼이 존재하는지 확인

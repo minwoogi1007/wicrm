@@ -54,7 +54,8 @@
                         newPassword: newPassword
                     },
                     beforeSend: function(xhr) {
-                        xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+                        var headerName = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+                        xhr.setRequestHeader(headerName, csrfToken);
                     },
                     success: function(response) {
                         alert('비밀번호가 변경되었습니다.');
@@ -112,8 +113,8 @@
                     contentType: 'application/json',
                     data: JSON.stringify(accountData),
                     beforeSend: function(xhr) {
-                        console.log(csrfToken);
-                        xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken); // Ensure this header is being set
+                        var headerName = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+                        xhr.setRequestHeader(headerName, csrfToken);
                     },
                     success: function(response) {
                         //console.log('Update Success:', response);  // 로그 추가

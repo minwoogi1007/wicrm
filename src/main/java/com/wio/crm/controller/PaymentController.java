@@ -102,8 +102,8 @@ public class PaymentController {
     @GetMapping("/api/search-exchange-items")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> searchExchangeItems(
-            @RequestParam String customerName,
-            @RequestParam String customerPhone) {
+            @RequestParam(value = "customerName") String customerName,
+            @RequestParam(value = "customerPhone") String customerPhone) {
         
         Map<String, Object> result = new HashMap<>();
         
@@ -139,13 +139,13 @@ public class PaymentController {
     @GetMapping("/api/list")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> getPaymentList(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate,
-            @RequestParam(required = false) String brand,
-            @RequestParam(required = false) String mappingStatus) {
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "startDate", required = false) String startDate,
+            @RequestParam(value = "endDate", required = false) String endDate,
+            @RequestParam(value = "brand", required = false) String brand,
+            @RequestParam(value = "mappingStatus", required = false) String mappingStatus) {
         
         Map<String, Object> result = new HashMap<>();
         
@@ -187,7 +187,7 @@ public class PaymentController {
      */
     @DeleteMapping("/api/{id}")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> deletePayment(@PathVariable Long id) {
+    public ResponseEntity<Map<String, Object>> deletePayment(@PathVariable("id") Long id) {
         
         Map<String, Object> result = new HashMap<>();
         
@@ -237,7 +237,7 @@ public class PaymentController {
      */
     @GetMapping("/api/{id}")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> getPaymentById(@PathVariable Long id) {
+    public ResponseEntity<Map<String, Object>> getPaymentById(@PathVariable("id") Long id) {
         
         Map<String, Object> result = new HashMap<>();
         
@@ -275,7 +275,7 @@ public class PaymentController {
     @PutMapping("/api/{id}")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> updatePayment(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestBody ShippingPaymentRegisterDTO updateDTO,
             Authentication authentication) {
         
@@ -331,7 +331,7 @@ public class PaymentController {
     @GetMapping("/api/recent")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> getRecentPayments(
-            @RequestParam(defaultValue = "10") int limit) {
+            @RequestParam(value = "limit", defaultValue = "10") int limit) {
         
         Map<String, Object> result = new HashMap<>();
         
@@ -397,7 +397,7 @@ public class PaymentController {
      */
     @GetMapping("/api/sites")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> getSitesByBrand(@RequestParam(required = false) String brand) {
+    public ResponseEntity<Map<String, Object>> getSitesByBrand(@RequestParam(value = "brand", required = false) String brand) {
         
         Map<String, Object> result = new HashMap<>();
         

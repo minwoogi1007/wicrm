@@ -62,14 +62,12 @@ public class BoardController {
 
     private boolean isAuthorizedUser(Authentication authentication) {
         return authentication != null &&
-                authentication.getName().equals("MINWOOGI");
+                authentication.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_EMPLOYEE"));
     }
     @GetMapping("/board")
     public String board(Model model, @RequestParam("category") String category, Authentication authentication) {
         List<Board> posts;
-
-        //System.out.println("Board method called with category: " + category);
-
         boolean canCreatePost = isAuthorizedUser(authentication);
 
         // 현재 로그인한 사용자의 CustomUserDetails 얻기
@@ -80,15 +78,12 @@ public class BoardController {
             if (!"G".equals(category) && userDetails.getTcntUserInfo() != null) {
                 String userCustCode = userDetails.getTcntUserInfo().getCustCode();
                 if (userCustCode != null && !userCustCode.isEmpty()) {
-                    // 사용자 custCode를 사용하여 category 업데이트
                     category = userCustCode;
-                    //System.out.println("Updated category to user's custCode: " + category);
                 }
             }
 
             // 'G' 카테고리인 경우 권한 체크 없이 진행
             if ("G".equals(category)) {
-                //System.out.println("G.equals(category)========");
                 posts = boardService.findPostsByCategory(category);
                 
                 // 데이터 검증 및 로그
@@ -106,9 +101,6 @@ public class BoardController {
             // 외부직원 
             Tcnt01Emp tcntUser = userDetails.getTcntUserInfo();
 
-            //System.out.println("tempUser========" + tempUser);
-            //System.out.println("tcntUser========" + tcntUser);
-
             if (tempUser != null) {     // 내부직원
                 canCreatePost = false;
             } else {                  // 외부직원
@@ -124,46 +116,14 @@ public class BoardController {
 
             model.addAttribute("list", posts);
             model.addAttribute("category", category);
-            //System.out.println("Board method - Category: " + category);
             model.addAttribute("canCreatePost", canCreatePost);
         }
         return "board/board";
     }
     
-    // 게시물 데이터 검증 및 로그 출력
+    // 게시물 데이터 검증 (필요시 로깅)
     private void validateAndLogPosts(List<Board> posts, String category) {
-        //System.out.println("===== 게시물 데이터 검증 (" + category + ") =====");
-        //System.out.println("총 게시물 수: " + (posts != null ? posts.size() : 0));
-        
-        if (posts != null && !posts.isEmpty()) {
-            for (Board post : posts) {
-                // 게시물 데이터 유효성 확인 (로그만 출력)
-                //System.out.println("게시물: GNO=" + post.getGNO() 
-                //    + ", 제목=" + post.getSUBJECT()
-                //    + ", 작성자=" + post.getID() 
-                //    + ", 날짜=" + post.getIN_DATE() 
-                //    + ", 댓글수=" + post.getRE_COUNT()
-                //    + ", 조회수=" + post.getHIT());
-                
-                // 날짜 형식 확인 (기본값 설정 제거, 로그만 남김)
-                if (post.getIN_DATE() == null || post.getIN_DATE().trim().isEmpty()) {
-                    //System.out.println("경고: GNO=" + post.getGNO() + " 게시물의 날짜가 비어있습니다.");
-                }
-                
-                // 댓글 수 확인 (기본값 설정 제거, 로그만 남김)
-                if (post.getRE_COUNT() == null || post.getRE_COUNT().trim().isEmpty()) {
-                    //System.out.println("경고: GNO=" + post.getGNO() + " 게시물의 댓글 수가 비어있습니다.");
-                }
-                
-                // 조회수 확인 (기본값 설정 제거, 로그만 남김)
-                if (post.getHIT() == null || post.getHIT().trim().isEmpty()) {
-                    //System.out.println("경고: GNO=" + post.getGNO() + " 게시물의 조회수가 비어있습니다.");
-                }
-            }
-        } else {
-            //System.out.println("게시물이 없거나 null입니다.");
-        }
-        //System.out.println("===== 검증 완료 =====");
+        // 게시물 유효성 검증 로직 (필요시 구현)
     }
 
     // 글쓰기 폼 페이지로 이동
@@ -243,14 +203,12 @@ public class BoardController {
             board.setEMPNM(empName);
             board.setIN_DATE(formattedDate);
             
-            //System.out.println("저장할 게시물 정보: " + board.getSUBJECT() + ", " + board.getCAT_GROUP() + ", " + board.getID() + ", " + board.getIN_DATE());
-            
             boardService.insertPost(board);
 
             return ResponseEntity.ok("Saved successfully");
         } catch (Exception ex) {
-            ex.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred: " + ex.getMessage());
+            logger.error("게시글 저장 실패: {}", ex.getMessage(), ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("게시글 저장 중 오류가 발생했습니다");
         }
     }
     @PostMapping("/board/uploadImage")
@@ -271,8 +229,8 @@ public class BoardController {
 
             return ResponseEntity.ok(fileUrl);
         } catch (IOException ex) {
-            ex.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while uploading the image");
+            logger.error("이미지 업로드 실패: {}", ex.getMessage(), ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이미지 업로드 중 오류가 발생했습니다");
         }
     }
     // 글 읽기
@@ -282,13 +240,6 @@ public class BoardController {
                            HttpServletRequest request,
                            Model model) {
         Board post;
-
-        System.out.println("Full request URL: " + request.getRequestURL() + "?" + request.getQueryString());
-        System.out.println("id: " + id);
-        System.out.println("category: " + category);
-        System.out.println("All request parameters:");
-        request.getParameterMap().forEach((key, value) ->
-                System.out.println(key + ": " + String.join(", ", value)));
 
             // 일반 게시글인 경우
             post = boardService.selectPostById(id,category);
@@ -324,15 +275,6 @@ public class BoardController {
             @RequestParam("CONTENT") String content,
             @RequestParam(value = "REPLY_DEPTH", required = false) String replyDepth) {
 
-        // 각 파라미터가 잘 넘어오는지 확인
-        System.out.println("=== 댓글 등록 요청 파라미터 ===");
-        System.out.println("GNO: " + gno);
-        System.out.println("UNO: " + uno);
-        System.out.println("CAT_GROUP: " + catGroup);
-        System.out.println("CONTENT: " + content);
-        System.out.println("REPLY_DEPTH: " + replyDepth);
-        System.out.println("=============================");
-        
         // 현재 로그인한 사용자 정보 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = "";
@@ -370,20 +312,12 @@ public class BoardController {
         board.setIN_DATE(formattedDate);
         board.setID(userId);
         board.setEMPNM(empName);
-        
-        System.out.println("=== 댓글 저장 데이터 확인 ===");
-        System.out.println("ID: " + userId);
-        System.out.println("EMPNM: " + empName);
-        System.out.println("IN_DATE: " + formattedDate);
-        System.out.println("===========================");
 
         // 댓글 저장 로직
         try {
             Board savedComment = boardService.saveComment(board);
             return ResponseEntity.ok(savedComment);
         } catch (Exception e) {
-            System.err.println("댓글 저장 중 오류 발생: " + e.getMessage());
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(null);
         }
@@ -458,8 +392,8 @@ public class BoardController {
 
             return ResponseEntity.ok("/board/readBoard?id=" + existingPost.getUNO()+"&category=" + existingPost.getCAT_GROUP());
         } catch (IOException ex) {
-            ex.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while updating the post");
+            logger.error("게시글 수정 실패: {}", ex.getMessage(), ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("게시글 수정 중 오류가 발생했습니다");
         }
     }
 

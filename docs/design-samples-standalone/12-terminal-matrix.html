@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WICRM Design 12 · Terminal Matrix</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=VT323&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; }
+
+        .term-page {
+            --bg: #050b06;
+            --bg-2: #0a1209;
+            --green: #4afa6e;
+            --green-dim: #2c8a3e;
+            --green-deep: #145824;
+            --amber: #ffc04a;
+            --red: #ff4a4a;
+            --cyan: #4afff0;
+            --grid: rgba(74, 250, 110, 0.07);
+
+            background: var(--bg);
+            color: var(--green);
+            font-family: "JetBrains Mono", "Fira Code", monospace;
+            min-height: 100vh;
+            padding: 24px clamp(16px, 3vw, 48px) 80px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        /* CRT scanlines */
+        .term-page::before {
+            content: "";
+            position: fixed; inset: 0; pointer-events: none; z-index: 1;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(74,250,110,0.03) 0px,
+                rgba(74,250,110,0.03) 1px,
+                transparent 1px,
+                transparent 3px
+            );
+        }
+        /* CRT vignette */
+        .term-page::after {
+            content: "";
+            position: fixed; inset: 0; pointer-events: none; z-index: 2;
+            background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.5) 100%);
+        }
+        .term-shell { max-width: 1320px; margin: 0 auto; position: relative; z-index: 3; }
+
+        /* boot bar */
+        .term-bootbar {
+            border: 1px solid var(--green-dim);
+            padding: 8px 14px;
+            font-size: 11px;
+            display: flex; justify-content: space-between; align-items: center;
+            text-shadow: 0 0 6px var(--green);
+            margin-bottom: 18px;
+            background: var(--bg-2);
+        }
+        .term-bootbar .dots { color: var(--green-dim); }
+        .term-bootbar .ok { color: var(--green); }
+        .term-bootbar .warn { color: var(--amber); }
+        .term-bootbar a { color: var(--green); text-decoration: none; border-bottom: 1px dashed var(--green-dim); }
+        @keyframes blink { 50% { opacity: 0; } }
+        .term-cursor { display: inline-block; width: 9px; height: 16px; background: var(--green); animation: blink 1s step-end infinite; vertical-align: text-bottom; box-shadow: 0 0 6px var(--green); }
+
+        /* ascii header */
+        .term-ascii {
+            color: var(--green);
+            text-shadow: 0 0 6px var(--green), 0 0 16px rgba(74,250,110,0.4);
+            font-size: 12px; line-height: 1.05;
+            white-space: pre;
+            margin: 14px 0 6px;
+            overflow-x: auto;
+        }
+        .term-tagline {
+            font-size: 13px; color: var(--green-dim);
+            margin: 0 0 24px;
+        }
+        .term-tagline b { color: var(--green); text-shadow: 0 0 4px var(--green); }
+
+        /* ASCII box helper — uses border + corners via pseudo */
+        .term-box {
+            border: 1px solid var(--green-dim);
+            background: rgba(74,250,110,0.02);
+            padding: 14px 18px 18px;
+            position: relative;
+            margin-bottom: 16px;
+        }
+        .term-box::before {
+            content: "[ " attr(data-title) " ]";
+            position: absolute; top: -10px; left: 14px;
+            background: var(--bg);
+            padding: 0 8px;
+            font-size: 11px; font-weight: 700;
+            color: var(--green);
+            text-shadow: 0 0 6px var(--green);
+            letter-spacing: 0.16em;
+        }
+        .term-box::after {
+            content: "[ " attr(data-meta) " ]";
+            position: absolute; top: -10px; right: 14px;
+            background: var(--bg);
+            padding: 0 8px;
+            font-size: 11px;
+            color: var(--green-dim);
+            letter-spacing: 0.12em;
+        }
+
+        /* 4x KPI grid */
+        .term-kpis {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+            margin-bottom: 18px;
+        }
+        .term-kpi {
+            border: 1px solid var(--green-dim);
+            padding: 14px 16px;
+            background: rgba(20,88,36,0.08);
+            position: relative;
+        }
+        .term-kpi .lbl { font-size: 10px; color: var(--green-dim); letter-spacing: 0.16em; text-transform: uppercase; }
+        .term-kpi .val {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 38px; font-weight: 800; line-height: 1;
+            color: var(--green);
+            text-shadow: 0 0 8px var(--green), 0 0 18px rgba(74,250,110,0.5);
+            margin: 6px 0 4px;
+        }
+        .term-kpi .sub { font-size: 11px; color: var(--green-dim); }
+        .term-kpi.alert { border-color: var(--red); background: rgba(255,74,74,0.08); }
+        .term-kpi.alert .val { color: var(--red); text-shadow: 0 0 8px var(--red); }
+        .term-kpi.alert .lbl { color: var(--red); }
+        .term-kpi.warn { border-color: var(--amber); background: rgba(255,192,74,0.06); }
+        .term-kpi.warn .val { color: var(--amber); text-shadow: 0 0 8px var(--amber); }
+        .term-kpi.warn .lbl { color: var(--amber); }
+
+        /* main grid */
+        .term-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+        .term-stack { display: flex; flex-direction: column; gap: 16px; }
+
+        /* table */
+        table.t-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        table.t-table th, table.t-table td {
+            text-align: left; padding: 6px 10px;
+            border-bottom: 1px dashed var(--green-deep);
+        }
+        table.t-table th {
+            color: var(--green); text-transform: uppercase; letter-spacing: 0.12em;
+            font-weight: 700; font-size: 11px;
+            border-bottom: 1px solid var(--green-dim);
+        }
+        table.t-table td { color: var(--green-dim); }
+        table.t-table td.id { color: var(--cyan); }
+        table.t-table td.lit { color: var(--green); }
+        table.t-table .tag {
+            border: 1px solid currentColor;
+            padding: 1px 6px; font-size: 10px;
+            display: inline-block; letter-spacing: 0.1em;
+        }
+        table.t-table .tag.p1 { color: var(--red); }
+        table.t-table .tag.p2 { color: var(--amber); }
+        table.t-table .tag.p3 { color: var(--cyan); }
+        table.t-table .tag.ok { color: var(--green); }
+
+        /* ascii bar chart */
+        .ascii-bars { font-size: 12px; line-height: 1.5; }
+        .ascii-bars .row { display: grid; grid-template-columns: 130px 1fr 50px; gap: 10px; align-items: center; padding: 3px 0; }
+        .ascii-bars .name { color: var(--green); }
+        .ascii-bars .bar { color: var(--green); letter-spacing: -1px; text-shadow: 0 0 4px var(--green); white-space: nowrap; overflow: hidden; }
+        .ascii-bars .bar.warn { color: var(--amber); text-shadow: 0 0 4px var(--amber); }
+        .ascii-bars .bar.alert { color: var(--red); text-shadow: 0 0 4px var(--red); }
+        .ascii-bars .pct { color: var(--green-dim); text-align: right; }
+
+        /* live log */
+        .live-log { font-size: 12px; line-height: 1.55; max-height: 360px; overflow: hidden; }
+        .live-log .ts { color: var(--green-dim); }
+        .live-log .ok { color: var(--green); text-shadow: 0 0 4px rgba(74,250,110,0.5); }
+        .live-log .wrn { color: var(--amber); }
+        .live-log .err { color: var(--red); }
+        .live-log .dim { color: var(--green-deep); }
+
+        /* status grid */
+        .term-status {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+            font-size: 11px;
+        }
+        .term-status div {
+            border: 1px solid var(--green-deep);
+            padding: 10px 12px;
+        }
+        .term-status div.ok { border-color: var(--green-dim); color: var(--green); }
+        .term-status div.warn { border-color: var(--amber); color: var(--amber); }
+        .term-status div.err { border-color: var(--red); color: var(--red); }
+        .term-status .nm { font-weight: 700; font-size: 12px; }
+        .term-status .ms { font-size: 10px; opacity: 0.7; margin-top: 2px; letter-spacing: 0.1em; }
+
+        /* prompt */
+        .term-prompt {
+            border-top: 1px solid var(--green-dim);
+            padding-top: 14px; margin-top: 18px;
+            font-size: 13px;
+        }
+        .term-prompt .p { color: var(--amber); }
+        .term-prompt .cmd { color: var(--green); text-shadow: 0 0 4px var(--green); }
+
+        @media (max-width: 1024px) {
+            .term-kpis { grid-template-columns: repeat(2, 1fr); }
+            .term-grid { grid-template-columns: 1fr; }
+            .term-status { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 600px) {
+            .term-ascii { font-size: 8px; }
+        }
+    </style>
+</head>
+<body>
+
+<main class="term-page">
+    <div class="term-shell">
+
+        <div class="term-bootbar">
+            <span><a href="index.html">../index.html</a> &nbsp;<span class="dots">$</span> session.attach --user=admin</span>
+            <span><span class="ok">●</span> link OK <span class="dots">·</span> latency 12ms <span class="dots">·</span> 2026-04-28 12:29:14 KST</span>
+        </div>
+
+        <pre class="term-ascii">
+ ██╗    ██╗██╗ ██████╗██████╗ ███╗   ███╗   ██████╗  ██████╗
+ ██║    ██║██║██╔════╝██╔══██╗████╗ ████║  ██╔═══██╗██╔═══██╗
+ ██║ █╗ ██║██║██║     ██████╔╝██╔████╔██║  ██║   ██║██║   ██║
+ ██║███╗██║██║██║     ██╔══██╗██║╚██╔╝██║  ██║   ██║██║   ██║
+ ╚███╔███╔╝██║╚██████╗██║  ██║██║ ╚═╝ ██║  ╚██████╔╝╚██████╔╝
+  ╚══╝╚══╝ ╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝     ╚═╝   ╚═════╝  ╚═════╝
+                  WICRM // OPS TERMINAL  v3.18.2
+        </pre>
+        <p class="term-tagline">[Type 12] <b>TERMINAL MATRIX</b> :: 다크 베이스 + 인광 그린, CRT 스캔라인. 시스템 관리 / 로그 분석 콘솔에 적합.</p>
+
+        <section class="term-kpis">
+            <div class="term-kpi">
+                <div class="lbl">consult.queue</div>
+                <div class="val">17</div>
+                <div class="sub">peak +5 / 1h</div>
+            </div>
+            <div class="term-kpi">
+                <div class="lbl">orders.day</div>
+                <div class="val">8,412</div>
+                <div class="sub">target 96.0%</div>
+            </div>
+            <div class="term-kpi warn">
+                <div class="lbl">refund.sla</div>
+                <div class="val">97.6%</div>
+                <div class="sub">drift -0.4 vs YDA</div>
+            </div>
+            <div class="term-kpi alert">
+                <div class="lbl">incidents.open</div>
+                <div class="val">02</div>
+                <div class="sub">ack required</div>
+            </div>
+        </section>
+
+        <section class="term-grid">
+
+            <div class="term-stack">
+
+                <div class="term-box" data-title="ACTIVE INCIDENTS" data-meta="LIVE / 24H">
+                    <table class="t-table">
+                        <thead>
+                            <tr><th>id</th><th>source</th><th>event</th><th>sev</th><th>owner</th><th>state</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="id">INC-2026-0428-031</td>
+                                <td>logistics.cj</td>
+                                <td class="lit">recall_api timeout @ 4.2s avg</td>
+                                <td><span class="tag p1">P1</span></td>
+                                <td>kim.mw</td>
+                                <td><span class="tag ok">RUN</span></td>
+                            </tr>
+                            <tr>
+                                <td class="id">INC-2026-0428-029</td>
+                                <td>payment.naver</td>
+                                <td class="lit">refund_callback dropped x12</td>
+                                <td><span class="tag p2">P2</span></td>
+                                <td>oh.js</td>
+                                <td><span class="tag ok">RUN</span></td>
+                            </tr>
+                            <tr>
+                                <td class="id">INC-2026-0428-024</td>
+                                <td>crm.consult</td>
+                                <td>chatlog router fallback ok</td>
+                                <td><span class="tag p2">P2</span></td>
+                                <td>han.jm</td>
+                                <td><span class="tag ok">CLR</span></td>
+                            </tr>
+                            <tr>
+                                <td class="id">INC-2026-0428-018</td>
+                                <td>file.upload</td>
+                                <td>5xx 1.4% ratio</td>
+                                <td><span class="tag p3">P3</span></td>
+                                <td>lee.hw</td>
+                                <td><span class="tag ok">CLR</span></td>
+                            </tr>
+                            <tr>
+                                <td class="id">INC-2026-0428-009</td>
+                                <td>db.oracle</td>
+                                <td>long_query &gt; 8s detected</td>
+                                <td><span class="tag p1">P1</span></td>
+                                <td>system</td>
+                                <td><span class="tag ok">CLR</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="term-box" data-title="BRAND THROUGHPUT" data-meta="ASCII / TODAY">
+                    <div class="ascii-bars">
+                        <div class="row"><span class="name">RENOMA / 자사몰</span>     <span class="bar">██████████████████████████████████████████████████████████░░░░</span><span class="pct">88%</span></div>
+                        <div class="row"><span class="name">RENOMA / 29CM</span>        <span class="bar">█████████████████████████████████████████████░░░░░░░░░░░░░░░░</span><span class="pct">74%</span></div>
+                        <div class="row"><span class="name">RENOMA / ZIGZAG</span>      <span class="bar warn">███████████████████████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░</span><span class="pct">58%</span></div>
+                        <div class="row"><span class="name">CORALIQUE / 무신사</span>   <span class="bar alert">████████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░</span><span class="pct">34%</span></div>
+                        <div class="row"><span class="name">CORALIQUE / CJ</span>       <span class="bar warn">████████████████████████████████████░░░░░░░░░░░░░░░░░░░░░░░░</span><span class="pct">62%</span></div>
+                        <div class="row"><span class="name">CORALIQUE / LF</span>       <span class="bar">████████████████████████████████████████████████░░░░░░░░░░░░</span><span class="pct">81%</span></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="term-stack">
+
+                <div class="term-box" data-title="LIVE LOG / TAIL -F" data-meta="STREAMING">
+                    <div class="live-log">
+                        <div><span class="ts">[12:29:14]</span> <span class="ok">OK </span> shipping.batch (873/873)</div>
+                        <div><span class="ts">[12:29:11]</span> <span class="ok">OK </span> auth.session refresh (412 users)</div>
+                        <div><span class="ts">[12:29:02]</span> <span class="wrn">WRN</span> payment.naver retry #2 succeeded</div>
+                        <div><span class="ts">[12:28:55]</span> <span class="ok">OK </span> exchange.save id=ret-2026-3128</div>
+                        <div><span class="ts">[12:28:41]</span> <span class="err">ERR</span> logistics.cj timeout 5000ms</div>
+                        <div><span class="ts">[12:28:33]</span> <span class="ok">OK </span> ai.report scheduled @ 09:00 KST</div>
+                        <div><span class="ts">[12:28:09]</span> <span class="ok">OK </span> crm.consult routed (#a3e2)</div>
+                        <div><span class="ts">[12:27:55]</span> <span class="wrn">WRN</span> consult.queue=17 above threshold</div>
+                        <div><span class="ts">[12:27:30]</span> <span class="ok">OK </span> exchange.save id=ret-2026-3127</div>
+                        <div><span class="ts">[12:27:18]</span> <span class="dim">···</span> heartbeat 30s</div>
+                        <div><span class="ts">[12:26:50]</span> <span class="ok">OK </span> mileage.expire_warn (412 users)</div>
+                    </div>
+                </div>
+
+                <div class="term-box" data-title="EXT SERVICES" data-meta="PROBE 30s">
+                    <div class="term-status">
+                        <div class="ok"><div class="nm">cj-logistics</div><div class="ms">OK · 124ms</div></div>
+                        <div class="ok"><div class="nm">hanjin</div><div class="ms">OK · 88ms</div></div>
+                        <div class="warn"><div class="nm">logen</div><div class="ms">SLOW · 612ms</div></div>
+                        <div class="err"><div class="nm">post-office</div><div class="ms">FAIL · 5/5</div></div>
+                        <div class="ok"><div class="nm">naver-pay</div><div class="ms">OK · 142ms</div></div>
+                        <div class="ok"><div class="nm">kakao-pay</div><div class="ms">OK · 96ms</div></div>
+                        <div class="ok"><div class="nm">toss-pay</div><div class="ms">OK · 110ms</div></div>
+                        <div class="ok"><div class="nm">inicis-pg</div><div class="ms">OK · 88ms</div></div>
+                        <div class="ok"><div class="nm">channel-talk</div><div class="ms">OK · 64ms</div></div>
+                        <div class="warn"><div class="nm">aligo-sms</div><div class="ms">SLOW · 480ms</div></div>
+                        <div class="ok"><div class="nm">aws-mail</div><div class="ms">OK · 102ms</div></div>
+                        <div class="ok"><div class="nm">openai-api</div><div class="ms">OK · 318ms</div></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+        <div class="term-prompt">
+            <span class="p">admin@wicrm:~$</span> <span class="cmd">incident ack INC-2026-0428-031 --owner=kim.mw</span><span class="term-cursor"></span>
+        </div>
+
+    </div>
+</main>
+
+</body>
+</html>

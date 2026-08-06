@@ -38,10 +38,26 @@
             <if test="status != null and status != ''">
                 AND ci.status = #{status}
             </if>
+            <if test="startDate != null and startDate != ''">
+                AND ci.created_date &gt;= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND ci.created_date &lt; TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
+            </if>
         ORDER BY
             <choose>
                 <when test="sortField != null and sortField != ''">
-                    ci.${sortField}
+                    <choose>
+                        <when test="sortField == 'created_date'">ci.created_date</when>
+                        <when test="sortField == 'updated_date'">ci.updated_date</when>
+                        <when test="sortField == 'inquiry_type'">ci.inquiry_type</when>
+                        <when test="sortField == 'status'">ci.status</when>
+                        <when test="sortField == 'customer_name'">ci.customer_name</when>
+                        <when test="sortField == 'phone_number'">ci.phone_number</when>
+                        <when test="sortField == 'order_number'">ci.order_number</when>
+                        <when test="sortField == 'inquiry_id'">ci.inquiry_id</when>
+                        <otherwise>ci.created_date</otherwise>
+                    </choose>
                 </when>
                 <otherwise>
                     ci.created_date
@@ -330,6 +346,13 @@
                     consulting_inquiry ci
                 WHERE 
                     1=1
+                    <if test="keyword != null and keyword != ''">
+                        AND (
+                            ci.customer_name LIKE '%' || #{keyword} || '%'
+                            OR ci.phone_number LIKE '%' || #{keyword} || '%'
+                            OR ci.order_number LIKE '%' || #{keyword} || '%'
+                        )
+                    </if>
                     <if test="customerName != null and customerName != ''">
                         AND ci.customer_name LIKE '%' || #{customerName} || '%'
                     </if>
@@ -345,10 +368,26 @@
                     <if test="status != null and status != ''">
                         AND ci.status = #{status}
                     </if>
+                    <if test="startDate != null and startDate != ''">
+                        AND ci.created_date &gt;= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+                    </if>
+                    <if test="endDate != null and endDate != ''">
+                        AND ci.created_date &lt; TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
+                    </if>
                 ORDER BY
                     <choose>
                         <when test="sortField != null and sortField != ''">
-                            ci.${sortField}
+                            <choose>
+                                <when test="sortField == 'created_date'">ci.created_date</when>
+                                <when test="sortField == 'updated_date'">ci.updated_date</when>
+                                <when test="sortField == 'inquiry_type'">ci.inquiry_type</when>
+                                <when test="sortField == 'status'">ci.status</when>
+                                <when test="sortField == 'customer_name'">ci.customer_name</when>
+                                <when test="sortField == 'phone_number'">ci.phone_number</when>
+                                <when test="sortField == 'order_number'">ci.order_number</when>
+                                <when test="sortField == 'inquiry_id'">ci.inquiry_id</when>
+                                <otherwise>ci.created_date</otherwise>
+                            </choose>
                         </when>
                         <otherwise>
                             ci.created_date
@@ -379,6 +418,13 @@
         SELECT COUNT(*)
         FROM consulting_inquiry ci
         WHERE 1=1
+            <if test="keyword != null and keyword != ''">
+                AND (
+                    ci.customer_name LIKE '%' || #{keyword} || '%'
+                    OR ci.phone_number LIKE '%' || #{keyword} || '%'
+                    OR ci.order_number LIKE '%' || #{keyword} || '%'
+                )
+            </if>
             <if test="customerName != null and customerName != ''">
                 AND ci.customer_name LIKE '%' || #{customerName} || '%'
             </if>
@@ -393,6 +439,12 @@
             </if>
             <if test="status != null and status != ''">
                 AND ci.status = #{status}
+            </if>
+            <if test="startDate != null and startDate != ''">
+                AND ci.created_date &gt;= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND ci.created_date &lt; TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
             </if>
     </select>
     

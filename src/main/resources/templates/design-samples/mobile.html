@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{design-samples/public-layout}">
+<body>
+<div layout:fragment="content">
+    <link href="/assets/css/design-samples/admin-modern.css" rel="stylesheet" type="text/css" />
+    <link href="/assets/css/design-samples/admin-pages.css" rel="stylesheet" type="text/css" />
+
+    <main class="admin-sample-page mobile-page">
+        <header class="sample-page-header">
+            <a href="/design-samples/admin" class="back-link">샘플 목록</a>
+            <span class="sample-kicker">Mobile First</span>
+            <h1>모바일 우선 카드형 관리자 화면</h1>
+            <p>현장 담당자가 태블릿이나 모바일에서 빠르게 확인하기 좋은 카드 중심 디자인입니다.</p>
+        </header>
+
+        <section class="phone-stage">
+            <div class="phone-frame">
+                <div class="phone-top"><b>WICRM</b><span>오늘</span></div>
+                <div class="phone-summary"><span>긴급 처리</span><strong>17건</strong><p>오후 6시 전 확인 권장</p></div>
+                <div class="phone-card"><b>이미지 첨부 문의</b><span>상담팀 / 12분 전</span><em>높음</em></div>
+                <div class="phone-card"><b>직접 회수 배정</b><span>물류팀 / 24분 전</span><em>일반</em></div>
+                <div class="phone-card"><b>입금 확인</b><span>정산팀 / 41분 전</span><em>검토</em></div>
+                <nav class="phone-nav"><span>홈</span><span>업무</span><span>알림</span><span>내정보</span></nav>
+            </div>
+            <div class="mobile-notes">
+                <h2>모바일형 적용 포인트</h2>
+                <p>넓은 테이블 대신 카드, 상태 배지, 큰 터치 영역을 우선합니다. 기존 PC 화면과 별도 CSS로 분리하면 단계적으로 적용하기 좋습니다.</p>
+                <div class="note-grid">
+                    <span>큰 터치 영역</span>
+                    <span>상태 우선 배치</span>
+                    <span>하단 내비게이션</span>
+                    <span>1열 카드 리스트</span>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

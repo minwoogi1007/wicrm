@@ -1,5 +1,8 @@
 package com.wicrm.api;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -13,16 +16,32 @@ import java.net.URL;
 @RequestMapping("/api")
 public class ImageProxyController {
     
-    private static final String EXTERNAL_SERVER = "http://175.119.224.45:8080/uploads/";
+    private static final Logger logger = LoggerFactory.getLogger(ImageProxyController.class);
+
+    @Value("${app.file-server.url}${app.file-server.upload-path}")
+    private String externalServer;
 
     /**
      * 외부 서버에서 이미지를 직접 가져와서 반환하는 단순 프록시
      */
+    private static final java.util.regex.Pattern ALLOWED_PATH_PATTERN =
+            java.util.regex.Pattern.compile("^[a-zA-Z0-9가-힣/_.-]+$");
+
+    private boolean isValidFilePath(String path) {
+        if (path == null || path.isEmpty()) return false;
+        if (path.contains("..") || path.contains("://") || path.contains("\\")) return false;
+        return ALLOWED_PATH_PATTERN.matcher(path).matches();
+    }
+
     @GetMapping("/image-proxy")
     public ResponseEntity<byte[]> proxyImage(@RequestParam("path") String filePath) {
+        if (!isValidFilePath(filePath)) {
+            logger.warn("잘못된 이미지 경로 요청: {}", filePath);
+            return ResponseEntity.badRequest().build();
+        }
+
         try {
-            // 외부 서버 URL 생성
-            URL url = new URL(EXTERNAL_SERVER + filePath);
+            URL url = new URL(externalServer + filePath);
             
             // 연결 설정
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -53,7 +72,7 @@ public class ImageProxyController {
                     .body(imageData);
             
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("이미지 프록시 처리 중 오류 발생 - 경로: {}", filePath, e);
             return ResponseEntity.internalServerError().build();
         }
     }
@@ -63,9 +82,13 @@ public class ImageProxyController {
      */
     @GetMapping("/download")
     public ResponseEntity<byte[]> downloadFile(@RequestParam("path") String filePath) {
+        if (!isValidFilePath(filePath)) {
+            logger.warn("잘못된 다운로드 경로 요청: {}", filePath);
+            return ResponseEntity.badRequest().build();
+        }
+
         try {
-            // 외부 서버 URL 생성
-            URL url = new URL(EXTERNAL_SERVER + filePath);
+            URL url = new URL(externalServer + filePath);
             
             // 연결 설정
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -95,7 +118,7 @@ public class ImageProxyController {
                     .body(fileData);
             
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("파일 다운로드 프록시 처리 중 오류 발생 - 경로: {}", filePath, e);
             return ResponseEntity.internalServerError().build();
         }
     }

@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WICRM Design 14 · Aurora Liquid Gradient</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Instrument+Serif&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; }
+
+        .au-page {
+            --ink: #1c1428;
+            --ink-soft: #4a3a5e;
+            --muted: #7d6d8f;
+            --paper: #fefbff;
+            --line: rgba(60, 30, 90, 0.08);
+            --p1: #ffb6e6;
+            --p2: #b6c4ff;
+            --p3: #c5fff0;
+            --p4: #fff0b8;
+            --p5: #ffc9b6;
+
+            position: relative;
+            min-height: 100vh;
+            padding: 32px clamp(20px, 4vw, 56px) 80px;
+            color: var(--ink);
+            font-family: "Outfit", "Pretendard", system-ui, sans-serif;
+            font-weight: 400;
+            background: var(--paper);
+            overflow: hidden;
+        }
+        /* Animated mesh gradient background */
+        .au-page::before {
+            content: "";
+            position: absolute; inset: -10%;
+            background:
+                radial-gradient(circle at 20% 20%, var(--p1) 0%, transparent 35%),
+                radial-gradient(circle at 80% 30%, var(--p2) 0%, transparent 35%),
+                radial-gradient(circle at 70% 80%, var(--p3) 0%, transparent 38%),
+                radial-gradient(circle at 30% 90%, var(--p4) 0%, transparent 35%),
+                radial-gradient(circle at 50% 50%, var(--p5) 0%, transparent 30%);
+            filter: blur(60px) saturate(120%);
+            opacity: 0.85;
+            animation: drift 28s ease-in-out infinite alternate;
+            z-index: 0;
+        }
+        @keyframes drift {
+            0%   { transform: translate(0, 0) rotate(0deg); }
+            33%  { transform: translate(2%, -1%) rotate(2deg); }
+            66%  { transform: translate(-1%, 2%) rotate(-2deg); }
+            100% { transform: translate(1%, 1%) rotate(1deg); }
+        }
+        .au-shell { max-width: 1280px; margin: 0 auto; position: relative; z-index: 1; }
+
+        /* glass card primitive */
+        .au-card {
+            background: rgba(255,255,255,0.55);
+            backdrop-filter: blur(28px) saturate(180%);
+            -webkit-backdrop-filter: blur(28px) saturate(180%);
+            border: 1px solid rgba(255,255,255,0.7);
+            border-radius: 24px;
+            padding: 24px 28px;
+            box-shadow:
+                0 1px 0 rgba(255,255,255,0.9) inset,
+                0 30px 60px -30px rgba(60, 30, 90, 0.18);
+        }
+
+        /* header */
+        .au-header {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            gap: 24px; flex-wrap: wrap; margin-bottom: 28px;
+        }
+        .au-header .back { color: var(--ink-soft); text-decoration: none; font-size: 13px; font-weight: 500; }
+        .au-header .back:hover { color: var(--ink); }
+        .au-header h1 {
+            margin: 14px 0 6px;
+            font-family: "Instrument Serif", serif;
+            font-size: clamp(40px, 6vw, 76px);
+            font-weight: 400; letter-spacing: -0.02em;
+            line-height: 1;
+        }
+        .au-header h1 i { font-style: italic; color: var(--ink-soft); }
+        .au-header p { margin: 8px 0 0; max-width: 540px; font-size: 14.5px; color: var(--ink-soft); line-height: 1.55; }
+        .au-kicker {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.8);
+            padding: 6px 14px; border-radius: 999px;
+            font-size: 11px; font-weight: 500; letter-spacing: 0.18em;
+            text-transform: uppercase; color: var(--ink-soft);
+        }
+        .au-kicker::before {
+            content: ""; width: 6px; height: 6px; border-radius: 50%;
+            background: linear-gradient(135deg, #ff6cb6, #6c8aff);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse { 50% { opacity: 0.4; transform: scale(0.85); } }
+        .au-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .au-btn {
+            background: rgba(255,255,255,0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.7);
+            padding: 12px 20px; border-radius: 999px;
+            font-family: inherit; font-weight: 500; font-size: 13px;
+            color: var(--ink); cursor: pointer;
+        }
+        .au-btn.primary {
+            background: linear-gradient(135deg, #b196ff, #6c8aff);
+            color: #fff; border-color: transparent;
+            box-shadow: 0 8px 24px rgba(108, 138, 255, 0.4);
+            font-weight: 600;
+        }
+
+        /* hero AI insight */
+        .au-hero {
+            padding: 36px 40px;
+            margin-bottom: 22px;
+            position: relative;
+            overflow: hidden;
+        }
+        .au-hero .badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 6px 12px; border-radius: 999px;
+            background: rgba(177,150,255,0.18);
+            border: 1px solid rgba(177,150,255,0.35);
+            color: #5a3eb8;
+            font-size: 11px; font-weight: 600;
+            letter-spacing: 0.16em; text-transform: uppercase;
+            margin-bottom: 18px;
+        }
+        .au-hero h2 {
+            font-family: "Instrument Serif", serif;
+            font-size: clamp(26px, 3.4vw, 42px);
+            font-weight: 400; line-height: 1.2;
+            letter-spacing: -0.01em;
+            margin: 0 0 22px;
+            max-width: 880px;
+            text-wrap: pretty;
+        }
+        .au-hero h2 em {
+            font-style: italic;
+            background: linear-gradient(120deg, #d56cff, #6c8aff);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+        .au-hero h2 b {
+            font-weight: 600; font-family: "Outfit", sans-serif; font-style: normal;
+            font-size: 0.86em;
+            background: linear-gradient(135deg, #ff8ec8, #ffb46c);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+        .au-hero .meta {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+        .au-hero .meta div {
+            background: rgba(255,255,255,0.55);
+            border: 1px solid rgba(255,255,255,0.7);
+            border-radius: 16px; padding: 16px 18px;
+        }
+        .au-hero .meta strong {
+            display: block;
+            font-family: "Instrument Serif", serif;
+            font-size: 32px; font-weight: 400; margin-top: 4px;
+            background: linear-gradient(135deg, #6c8aff, #d56cff);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+        .au-hero .meta span {
+            font-size: 11px; color: var(--ink-soft); font-weight: 500;
+            text-transform: uppercase; letter-spacing: 0.14em;
+        }
+
+        /* main grid */
+        .au-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 22px; margin-bottom: 22px; }
+        .au-col { display: flex; flex-direction: column; gap: 22px; }
+
+        /* sentiment / mood section */
+        .au-mood h3 {
+            font-family: "Instrument Serif", serif;
+            font-size: 22px; font-weight: 400;
+            margin: 0 0 4px;
+        }
+        .au-mood .sub { color: var(--muted); font-size: 12px; margin: 0 0 18px; }
+        .au-mood .ring {
+            display: grid; grid-template-columns: 160px 1fr; gap: 28px; align-items: center;
+        }
+        .au-mood svg { width: 160px; height: 160px; }
+        .au-mood .scale {
+            display: flex; flex-direction: column; gap: 14px;
+        }
+        .au-mood .scale .row {
+            display: grid; grid-template-columns: 80px 1fr 40px;
+            gap: 12px; align-items: center; font-size: 13px;
+        }
+        .au-mood .scale .row .lab { font-weight: 500; }
+        .au-mood .scale .row .track {
+            height: 8px; border-radius: 999px;
+            background: rgba(255,255,255,0.5);
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.6);
+        }
+        .au-mood .scale .row .track i {
+            display: block; height: 100%;
+            border-radius: 999px;
+        }
+        .au-mood .scale .row.r1 .track i { background: linear-gradient(90deg, #ffb6e6, #d56cff); }
+        .au-mood .scale .row.r2 .track i { background: linear-gradient(90deg, #b6c4ff, #6c8aff); }
+        .au-mood .scale .row.r3 .track i { background: linear-gradient(90deg, #c5fff0, #4ed5b6); }
+        .au-mood .scale .row.r4 .track i { background: linear-gradient(90deg, #fff0b8, #ffba6c); }
+        .au-mood .scale .row .pct { text-align: right; font-weight: 600; color: var(--ink); font-size: 12px; }
+
+        /* trend chart */
+        .au-trend h3 {
+            font-family: "Instrument Serif", serif;
+            font-size: 22px; font-weight: 400;
+            margin: 0 0 4px;
+        }
+        .au-trend .sub { color: var(--muted); font-size: 12px; margin: 0 0 14px; }
+        .au-trend svg { width: 100%; height: 200px; }
+        .au-trend .axis {
+            display: flex; justify-content: space-between;
+            color: var(--muted); font-size: 11px; margin-top: 6px;
+        }
+
+        /* recommendation cards stack */
+        .au-reco h3 {
+            font-family: "Instrument Serif", serif;
+            font-size: 22px; font-weight: 400;
+            margin: 0 0 4px;
+        }
+        .au-reco .sub { color: var(--muted); font-size: 12px; margin: 0 0 14px; }
+        .au-reco .item {
+            display: grid; grid-template-columns: 40px 1fr;
+            gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--line);
+        }
+        .au-reco .item:last-child { border-bottom: none; }
+        .au-reco .item .ic {
+            width: 40px; height: 40px; border-radius: 12px;
+            display: grid; place-items: center;
+            font-family: "Instrument Serif", serif;
+            font-size: 18px; font-weight: 500; color: #fff;
+            box-shadow: 0 8px 16px -4px rgba(60, 30, 90, 0.2);
+        }
+        .au-reco .item.h .ic { background: linear-gradient(135deg, #ff8ec8, #ff5e9e); }
+        .au-reco .item.m .ic { background: linear-gradient(135deg, #b196ff, #6c8aff); }
+        .au-reco .item.l .ic { background: linear-gradient(135deg, #6cd5b6, #4eb8a4); }
+        .au-reco .item .body .title { font-weight: 600; font-size: 14px; }
+        .au-reco .item .body .desc { font-size: 12.5px; color: var(--muted); margin-top: 2px; line-height: 1.5; }
+        .au-reco .item .body .impact {
+            display: inline-block; margin-top: 6px;
+            font-size: 11px; padding: 3px 10px; border-radius: 999px;
+            background: rgba(255,255,255,0.6);
+            border: 1px solid rgba(255,255,255,0.7);
+            font-weight: 500;
+            color: var(--ink-soft);
+        }
+
+        /* delicate pill row */
+        .au-pills {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 14px; margin-bottom: 22px;
+        }
+        .au-pill { padding: 18px 22px; }
+        .au-pill .lbl {
+            font-size: 11px; font-weight: 500;
+            letter-spacing: 0.14em; text-transform: uppercase;
+            color: var(--muted); margin: 0 0 6px;
+        }
+        .au-pill .num {
+            font-family: "Instrument Serif", serif;
+            font-size: 38px; line-height: 1; font-weight: 400;
+            background: linear-gradient(135deg, var(--ink), var(--ink-soft));
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+        .au-pill.feature .num {
+            background: linear-gradient(135deg, #ff6cb6, #6c8aff);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+        .au-pill .delta { font-size: 12px; color: var(--ink-soft); margin-top: 4px; }
+
+        /* mini player / now playing footer */
+        .au-now {
+            display: flex; align-items: center; gap: 18px;
+            padding: 16px 22px;
+        }
+        .au-now .dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            background: #4ed5b6; box-shadow: 0 0 12px #4ed5b6;
+            animation: pulse 1.4s ease-in-out infinite;
+        }
+        .au-now .text { flex: 1; font-size: 13px; }
+        .au-now .text b { font-weight: 600; }
+        .au-now .text small { color: var(--muted); display: block; font-size: 11.5px; margin-top: 2px; }
+        .au-now .ts { font-size: 11px; color: var(--muted); letter-spacing: 0.1em; }
+
+        @media (max-width: 1024px) {
+            .au-grid { grid-template-columns: 1fr; }
+            .au-pills { grid-template-columns: repeat(2, 1fr); }
+            .au-mood .ring { grid-template-columns: 1fr; }
+            .au-mood svg { margin: 0 auto; }
+        }
+    </style>
+</head>
+<body>
+
+<main class="au-page">
+    <div class="au-shell">
+
+        <header class="au-header">
+            <div>
+                <a href="index.html" class="back">← 디자인 샘플 인덱스</a>
+                <div style="margin-top:14px;"><span class="au-kicker">Type 14 · Aurora Liquid</span></div>
+                <h1>오늘의 <i>고객 인사이트</i></h1>
+                <p>흐르는 메시 그라디언트 위 프로스티드 글래스 카드, 세리프 헤드라인. 고객 향 리포트 · 임원 요약 · CX 스토리텔링 화면에 적합합니다.</p>
+            </div>
+            <div class="au-actions">
+                <button class="au-btn">최근 7일</button>
+                <button class="au-btn">전체 사이트</button>
+                <button class="au-btn primary">PDF 내보내기</button>
+            </div>
+        </header>
+
+        <article class="au-card au-hero">
+            <span class="badge">Insight · 2026.04.28</span>
+            <h2>
+                고객은 사이즈에 대해 <em>더 많은 확신</em>을 원하고 있습니다.
+                자사몰 환불의 <b>42%</b>가 사이즈 관련 사유로 모이며, 단 두 품번에 절반 이상이 집중됩니다.
+            </h2>
+            <div class="meta">
+                <div><span>분석된 환불</span><strong>1,238</strong></div>
+                <div><span>월 절감 잠재력</span><strong>₩14.2M</strong></div>
+                <div><span>분석 신뢰도</span><strong>92.4%</strong></div>
+            </div>
+        </article>
+
+        <section class="au-pills">
+            <div class="au-card au-pill">
+                <p class="lbl">전체 환불률</p>
+                <div class="num">14.7%</div>
+                <div class="delta">전월 대비 ▲ 1.8pt</div>
+            </div>
+            <div class="au-card au-pill feature">
+                <p class="lbl">사이즈 사유 환불</p>
+                <div class="num">+34%</div>
+                <div class="delta">전주 대비 급증</div>
+            </div>
+            <div class="au-card au-pill">
+                <p class="lbl">CX 만족도</p>
+                <div class="num">4.78</div>
+                <div class="delta">5점 만점 · 전월 동일</div>
+            </div>
+            <div class="au-card au-pill">
+                <p class="lbl">재구매 의향</p>
+                <div class="num">71%</div>
+                <div class="delta">조사 N = 412</div>
+            </div>
+        </section>
+
+        <section class="au-grid">
+
+            <div class="au-col">
+
+                <article class="au-card au-mood">
+                    <h3>고객 감정 스펙트럼</h3>
+                    <p class="sub">최근 7일 / 상담 트랜스크립트 1,284건 NLP 분석</p>
+                    <div class="ring">
+                        <svg viewBox="0 0 36 36">
+                            <defs>
+                                <linearGradient id="au1" x1="0" x2="1" y1="0" y2="1"><stop offset="0%" stop-color="#ffb6e6"/><stop offset="100%" stop-color="#d56cff"/></linearGradient>
+                                <linearGradient id="au2" x1="0" x2="1" y1="0" y2="1"><stop offset="0%" stop-color="#b6c4ff"/><stop offset="100%" stop-color="#6c8aff"/></linearGradient>
+                                <linearGradient id="au3" x1="0" x2="1" y1="0" y2="1"><stop offset="0%" stop-color="#c5fff0"/><stop offset="100%" stop-color="#4ed5b6"/></linearGradient>
+                                <linearGradient id="au4" x1="0" x2="1" y1="0" y2="1"><stop offset="0%" stop-color="#fff0b8"/><stop offset="100%" stop-color="#ffba6c"/></linearGradient>
+                            </defs>
+                            <circle cx="18" cy="18" r="15.915" fill="none" stroke="rgba(60,30,90,0.06)" stroke-width="3.5"/>
+                            <circle cx="18" cy="18" r="15.915" fill="none" stroke="url(#au3)" stroke-width="3.5" stroke-dasharray="48 52" stroke-dashoffset="25" stroke-linecap="round"/>
+                            <circle cx="18" cy="18" r="15.915" fill="none" stroke="url(#au2)" stroke-width="3.5" stroke-dasharray="22 78" stroke-dashoffset="-23" stroke-linecap="round"/>
+                            <circle cx="18" cy="18" r="15.915" fill="none" stroke="url(#au4)" stroke-width="3.5" stroke-dasharray="18 82" stroke-dashoffset="-45" stroke-linecap="round"/>
+                            <circle cx="18" cy="18" r="15.915" fill="none" stroke="url(#au1)" stroke-width="3.5" stroke-dasharray="12 88" stroke-dashoffset="-63" stroke-linecap="round"/>
+                            <text x="18" y="17" text-anchor="middle" fill="#1c1428" font-size="5" font-weight="500" font-family="Instrument Serif">1,284</text>
+                            <text x="18" y="22" text-anchor="middle" fill="#7d6d8f" font-size="2.4">상담</text>
+                        </svg>
+                        <div class="scale">
+                            <div class="row r3"><span class="lab">긍정</span><span class="track"><i style="width:48%"></i></span><span class="pct">48%</span></div>
+                            <div class="row r2"><span class="lab">중립</span><span class="track"><i style="width:22%"></i></span><span class="pct">22%</span></div>
+                            <div class="row r4"><span class="lab">불편</span><span class="track"><i style="width:18%"></i></span><span class="pct">18%</span></div>
+                            <div class="row r1"><span class="lab">불만</span><span class="track"><i style="width:12%"></i></span><span class="pct">12%</span></div>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="au-card au-trend">
+                    <h3>주간 만족도 흐름</h3>
+                    <p class="sub">CSAT 평균 / 1점–5점</p>
+                    <svg viewBox="0 0 600 200" preserveAspectRatio="none">
+                        <defs>
+                            <linearGradient id="auFill" x1="0" x2="0" y1="0" y2="1">
+                                <stop offset="0%" stop-color="#d56cff" stop-opacity="0.35"/>
+                                <stop offset="100%" stop-color="#d56cff" stop-opacity="0"/>
+                            </linearGradient>
+                            <linearGradient id="auStroke" x1="0" x2="1" y1="0" y2="0">
+                                <stop offset="0%" stop-color="#ff6cb6"/>
+                                <stop offset="50%" stop-color="#b196ff"/>
+                                <stop offset="100%" stop-color="#6c8aff"/>
+                            </linearGradient>
+                        </defs>
+                        <g stroke="rgba(60,30,90,0.05)" stroke-width="1">
+                            <line x1="0" y1="50" x2="600" y2="50"/>
+                            <line x1="0" y1="100" x2="600" y2="100"/>
+                            <line x1="0" y1="150" x2="600" y2="150"/>
+                        </g>
+                        <path d="M0,120 C60,110 90,80 150,90 S 250,140 320,100 S 430,60 500,70 S 580,40 600,50"
+                              fill="none" stroke="url(#auStroke)" stroke-width="3" stroke-linecap="round"/>
+                        <path d="M0,120 C60,110 90,80 150,90 S 250,140 320,100 S 430,60 500,70 S 580,40 600,50 L600,200 L0,200 Z"
+                              fill="url(#auFill)"/>
+                    </svg>
+                    <div class="axis">
+                        <span>월</span><span>화</span><span>수</span><span>목</span>
+                        <span>금</span><span>토</span><span>일</span>
+                    </div>
+                </article>
+
+            </div>
+
+            <div class="au-col">
+
+                <article class="au-card au-reco">
+                    <h3>추천 액션</h3>
+                    <p class="sub">우선순위 기준 상위 4건</p>
+
+                    <div class="item h">
+                        <span class="ic">a</span>
+                        <div class="body">
+                            <div class="title">사이즈 가이드 이미지 보완</div>
+                            <div class="desc">RN-GSZD962 · RN-PT2207 (자사몰) — 모델 신장 / 실측 차이 명시</div>
+                            <span class="impact">High · -18% 환불 예상</span>
+                        </div>
+                    </div>
+                    <div class="item m">
+                        <span class="ic">b</span>
+                        <div class="body">
+                            <div class="title">상담 응대 톤 가이드 업데이트</div>
+                            <div class="desc">"불편" 키워드 인입 시 사과·공감 우선 흐름 강화</div>
+                            <span class="impact">Mid · CSAT +0.12</span>
+                        </div>
+                    </div>
+                    <div class="item m">
+                        <span class="ic">c</span>
+                        <div class="body">
+                            <div class="title">15시 상담사 +2명 배치</div>
+                            <div class="desc">최근 14일 평균 대기 17건 — 피크 흡수</div>
+                            <span class="impact">Mid · 만족도 +6%</span>
+                        </div>
+                    </div>
+                    <div class="item l">
+                        <span class="ic">d</span>
+                        <div class="body">
+                            <div class="title">월간 리포트 · 자동 생성 활성화</div>
+                            <div class="desc">임원 요약 · 매월 1일 09:00 자동 발송</div>
+                            <span class="impact">Low · 운영 자동화</span>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="au-card au-now">
+                    <span class="dot"></span>
+                    <div class="text">
+                        <b>Insight Agent</b>가 다음 7일 환불을 예측 중
+                        <small>예상 완료 12:31 · 신뢰도 ≈ 87%</small>
+                    </div>
+                    <span class="ts">12:29</span>
+                </article>
+
+            </div>
+
+        </section>
+
+    </div>
+</main>
+
+</body>
+</html>

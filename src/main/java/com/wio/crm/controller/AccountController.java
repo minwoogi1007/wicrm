@@ -51,7 +51,6 @@ public class AccountController {
         if (account == null) {
             throw new RuntimeException("Account information is missing!");
         }
-        System.out.println("======================================"+account);
         model.addAttribute("accountInfo", account);
         return "account/accountUpdate";  // 계정 정보 수정 페이지 반환
     }
@@ -61,8 +60,6 @@ public class AccountController {
     public ResponseEntity<String> updateAccount(@RequestBody Account account) {
         try {
             boolean updated = accountService.updateAccount(account);
-
-            System.out.println("account========"+account);
             if (updated) {
                 return ResponseEntity.ok("Account updated successfully");
             } else {

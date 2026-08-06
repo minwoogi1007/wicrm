@@ -87,13 +87,10 @@ public class BoardServiceImpl implements BoardService {
 
         // CAT_GROUP이 null인 경우 처리
         if (board.getCAT_GROUP() == null || board.getCAT_GROUP().trim().isEmpty()) {
-            System.err.println("Warning: CAT_GROUP is null or empty. Setting user's CUST_CODE.");
-            
             // 현재 로그인한 사용자의 CUST_CODE 가져오기
             String custCode = getCurrentCustcode();
             if (custCode != null && !custCode.isEmpty()) {
                 board.setCAT_GROUP(custCode);
-                //System.out.println("CAT_GROUP set from user's CUST_CODE: " + custCode);
             } else {
                 // 로그인한 사용자의 CUST_CODE를 가져올 수 없는 경우 예외 발생
                 throw new IllegalStateException("Cannot set CAT_GROUP: User's CUST_CODE is not available");
@@ -128,11 +125,8 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public void updatePost(Board board) {
         String userId = getCurrentUserId(); // 현재 사용자 ID 조회
-        if("G".equals(board.getCAT_GROUP())){
-            board.setID("MINWOOGI");
-        }else{
-            board.setID(userId);
-        }
+        // G 카테고리(공지사항)든 일반이든 현재 로그인 사용자 ID 사용
+        board.setID(userId);
 
 
         // 기존 게시글 정보 조회

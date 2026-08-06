@@ -5,8 +5,8 @@
     <!--begin::Header container-->
     <div class="app-container container-fluid d-flex align-items-stretch justify-content-between" id="kt_app_header_container">
         <!--begin::sidebar mobile toggle-->
-        <div class="d-flex align-items-center d-lg-none ms-n3 me-2" title="Show sidebar menu">
-            <div class="btn btn-icon btn-active-color-primary w-35px h-35px" id="kt_app_sidebar_mobile_toggle">
+        <div class="d-flex align-items-center d-lg-none ms-n2 me-1" title="Show sidebar menu">
+            <div class="btn btn-icon btn-active-color-primary w-40px h-40px" id="kt_app_sidebar_mobile_toggle">
                 <i class="ki-duotone ki-abstract-14 fs-1">
                     <span class="path1"></span>
                     <span class="path2"></span>
@@ -17,8 +17,8 @@
         <!--begin::Mobile logo-->
         <div class="d-flex align-items-center flex-grow-1 flex-lg-grow-0">
             <a href="/main" class="d-lg-none">
-                <img alt="Logo" src="/assets/media/logos/small.svg" class="theme-light-show h-30px" />
-                <img alt="Logo" src="/assets/media/logos/small.svg" class="theme-dark-show h-30px" />
+                <img alt="Logo" src="/assets/media/logos/small.svg" class="theme-light-show h-25px" />
+                <img alt="Logo" src="/assets/media/logos/small.svg" class="theme-dark-show h-25px" />
             </a>
         </div>
         <!--end::Mobile logo-->
@@ -47,6 +47,21 @@
             <!--end::Menu wrapper-->
             <!--begin::Navbar-->
             <div class="app-navbar flex-shrink-0">
+                <!--begin::Font size control-->
+                <div class="app-navbar-item ms-1 ms-lg-3">
+                    <div class="d-flex align-items-center bg-hover-light rounded p-1" id="fontSizeControl">
+                        <button type="button" class="btn btn-icon btn-sm btn-light-primary w-30px h-30px" onclick="changeFontSize('decrease')" title="글꼴 축소">
+                            <span class="fw-bolder fs-7">A-</span>
+                        </button>
+                        <button type="button" class="btn btn-icon btn-sm btn-light w-30px h-30px mx-1" onclick="changeFontSize('reset')" title="글꼴 초기화">
+                            <span class="fw-bolder fs-7">A</span>
+                        </button>
+                        <button type="button" class="btn btn-icon btn-sm btn-light-primary w-30px h-30px" onclick="changeFontSize('increase')" title="글꼴 확대">
+                            <span class="fw-bolder fs-7">A+</span>
+                        </button>
+                    </div>
+                </div>
+                <!--end::Font size control-->
                 <!--begin::User menu-->
                 <div class="app-navbar-item ms-2 ms-1 ms-lg-3" id="kt_header_user_menu_toggle">
 
@@ -99,6 +114,50 @@
     <script src="/assets/plugins/global/plugins.bundle.js"></script>
     <script src="/assets/js/board/scripts.bundle.js"></script>
     <!--end::Header container-->
+    <script>
+        // 글꼴 크기 조절 (헤더의 A-/A/A+ 버튼에서 사용)
+        // 모든 페이지에서 동작하도록 head fragment 안에 정의
+        (function() {
+            if (typeof window.fontSizeLevels === 'undefined') {
+                window.fontSizeLevels = ['', 'font-size-sm', '', 'font-size-lg', 'font-size-xl'];
+            }
+            if (typeof window.fontSizeIndex === 'undefined') {
+                window.fontSizeIndex = 2;
+                var saved = localStorage.getItem('wicrm-font-size');
+                if (saved !== null) {
+                    var idx = parseInt(saved, 10);
+                    if (!isNaN(idx) && idx >= 0 && idx <= 4) window.fontSizeIndex = idx;
+                }
+            }
+
+            window.applyFontSize = function() {
+                var el = document.getElementById('kt_app_main') || document.body;
+                if (!el) return;
+                el.classList.remove('font-size-sm', 'font-size-lg', 'font-size-xl');
+                var cls = window.fontSizeLevels[window.fontSizeIndex];
+                if (cls) el.classList.add(cls);
+            };
+
+            window.changeFontSize = function(action) {
+                if (action === 'increase' && window.fontSizeIndex < 4) {
+                    window.fontSizeIndex++;
+                } else if (action === 'decrease' && window.fontSizeIndex > 0) {
+                    window.fontSizeIndex--;
+                } else if (action === 'reset') {
+                    window.fontSizeIndex = 2;
+                }
+                localStorage.setItem('wicrm-font-size', window.fontSizeIndex);
+                window.applyFontSize();
+            };
+
+            // DOM 준비 후 저장된 글꼴 크기 적용
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', window.applyFontSize);
+            } else {
+                window.applyFontSize();
+            }
+        })();
+    </script>
 </div>
 
 </html>

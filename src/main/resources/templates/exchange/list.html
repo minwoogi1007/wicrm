@@ -7,7 +7,7 @@
     <meta name="_csrf" th:if="${_csrf}" th:content="${_csrf.token}"/>
     <meta name="_csrf" th:unless="${_csrf}" content=""/>
     <meta name="_csrf_header" th:if="${_csrf}" th:content="${_csrf.headerName}"/>
-    <meta name="_csrf_header" th:unless="${_csrf}" content="X-CSRF-TOKEN"/>
+    <meta name="_csrf_header" th:unless="${_csrf}" content="X-XSRF-TOKEN"/>
     
     <!-- 현대적인 CSS 스타일 -->
     <style>
@@ -1609,7 +1609,7 @@
                                     <div th:if="${item.defectPhotoUrl != null and item.defectPhotoUrl != ''}" class="image-container">
                                         <img th:src="${item.defectPhotoUrl.startsWith('http') ? item.defectPhotoUrl : '/api/image-proxy?path=' + item.defectPhotoUrl}" 
                                              class="thumbnail-image" 
-                                             th:data-image-url="${item.defectPhotoUrl.startsWith('http') ? item.defectPhotoUrl : 'http://175.119.224.45:8080/uploads/' + item.defectPhotoUrl}"
+                                             th:data-image-url="${item.defectPhotoUrl.startsWith('http') ? item.defectPhotoUrl : fileServerUploadUrl + item.defectPhotoUrl}"
                                              onclick="showImageModalFromData(this)"
                                              th:alt="${'첨부이미지-' + item.id}"
                                              title="클릭하면 원본 크기로 보입니다"
@@ -1775,6 +1775,9 @@
         // CSRF 토큰을 전역 변수로 설정
         window.csrfToken = /*[[${_csrf != null ? _csrf.token : ''}]]*/ '';
         window.csrfHeader = /*[[${_csrf != null ? _csrf.headerName : 'X-CSRF-TOKEN'}]]*/ 'X-CSRF-TOKEN';
+        
+        // 파일 서버 URL (설정파일에서 주입)
+        var FILE_SERVER_UPLOAD_URL = /*[[${fileServerUploadUrl}]]*/ 'http://localhost:8080/uploads/';
 
         // 🖼️ 리스트 이미지 로드 에러 처리 함수 (프록시 폴백)
         function handleListImageError(imgElement) {
@@ -1791,7 +1794,7 @@
             // 프록시로 이미 시도했다면 직접 링크 시도
             if (imgElement.src.includes('/api/image-proxy')) {
                 console.log('🔄 리스트: 프록시 실패, HTTP 직접 시도');
-                imgElement.src = `http://175.119.224.45:8080/uploads/${defectUrl}`;
+                imgElement.src = FILE_SERVER_UPLOAD_URL + defectUrl;
                 
                 imgElement.onerror = function() {
                     console.error('❌ 리스트: 모든 이미지 로드 방법 실패');
@@ -1804,7 +1807,7 @@
                 
                 imgElement.onerror = function() {
                     console.warn('🚨 리스트: 프록시도 실패, 직접 링크 시도');
-                    this.src = `http://175.119.224.45:8080/uploads/${defectUrl}`;
+                    this.src = FILE_SERVER_UPLOAD_URL + defectUrl;
                     
                     this.onerror = function() {
                         console.error('❌ 리스트: 모든 이미지 로드 방법 실패');
@@ -1820,7 +1823,7 @@
             const container = imgElement.closest('.image-container');
             
             if (container) {
-                const directLink = `http://175.119.224.45:8080/uploads/${defectUrl}`;
+                const directLink = FILE_SERVER_UPLOAD_URL + defectUrl;
                 
                 container.innerHTML = `
                     <div style="
@@ -3790,7 +3793,7 @@
             const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
             
             fetch(`/exchange/api/delete-image/${selectedItemForImage}`, {
-                method: 'DELETE',
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     [csrfHeader]: csrfToken
@@ -4371,7 +4374,10 @@
            console.log('📥 엑셀 다운로드 시작...');
            
            try {
-               // 🔄 로딩 모달 표시
+               // 🔑 고유 다운로드 토큰 생성 (완료 감지용)
+               const downloadToken = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+               
+               // 🔄 로딩 모달 표시 (닫기 비활성화)
                showExcelLoadingModal();
                
                // 현재 검색 폼의 데이터를 가져와서 POST로 전송
@@ -4460,23 +4466,28 @@
                
                // CSRF 토큰 추가
                const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-               const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
                const csrfInput = document.createElement('input');
                csrfInput.type = 'hidden';
-               csrfInput.name = '_token';
+               csrfInput.name = '_csrf';
                csrfInput.value = csrfToken;
                downloadForm.appendChild(csrfInput);
+               
+               // 🔑 다운로드 토큰 추가 (서버가 완료 쿠키 설정에 사용)
+               const tokenInput = document.createElement('input');
+               tokenInput.type = 'hidden';
+               tokenInput.name = 'downloadToken';
+               tokenInput.value = downloadToken;
+               downloadForm.appendChild(tokenInput);
                
                // 폼 제출
                document.body.appendChild(downloadForm);
                downloadForm.submit();
                document.body.removeChild(downloadForm);
                
-               showToast('📥 엑셀 다운로드가 시작되었습니다.', 'success');
-               console.log('✅ 엑셀 다운로드 요청 완료');
+               console.log('✅ 엑셀 다운로드 요청 완료, 쿠키 폴링 시작: fileDownload_' + downloadToken);
                
-               // 🎯 다운로드 완료 쿠키 확인하여 로딩 모달 자동 닫기
-               checkDownloadComplete();
+               // 🎯 쿠키 폴링으로 다운로드 완료 자동 감지
+               pollDownloadComplete(downloadToken);
                
            } catch (error) {
                console.error('❌ 엑셀 다운로드 실패:', error);
@@ -4492,7 +4503,10 @@
            console.log('📥🖼️ 이미지 포함 엑셀 다운로드 시작...');
            
            try {
-               // 🔄 로딩 모달 표시
+               // 🔑 고유 다운로드 토큰 생성 (완료 감지용)
+               const downloadToken = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+               
+               // 🔄 로딩 모달 표시 (닫기 비활성화)
                showExcelLoadingModal();
                
                // 현재 검색 폼의 데이터를 가져와서 POST로 전송
@@ -4562,23 +4576,28 @@
                
                // CSRF 토큰 추가
                const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-               const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
                const csrfInput = document.createElement('input');
                csrfInput.type = 'hidden';
-               csrfInput.name = '_token';
+               csrfInput.name = '_csrf';
                csrfInput.value = csrfToken;
                downloadForm.appendChild(csrfInput);
+               
+               // 🔑 다운로드 토큰 추가 (서버가 완료 쿠키 설정에 사용)
+               const tokenInput = document.createElement('input');
+               tokenInput.type = 'hidden';
+               tokenInput.name = 'downloadToken';
+               tokenInput.value = downloadToken;
+               downloadForm.appendChild(tokenInput);
                
                // 폼 제출
                document.body.appendChild(downloadForm);
                downloadForm.submit();
                document.body.removeChild(downloadForm);
                
-               showToast('📥🖼️ 이미지 포함 엑셀 다운로드가 시작되었습니다. 처리 시간이 조금 걸릴 수 있습니다.', 'success');
-               console.log('✅ 이미지 포함 엑셀 다운로드 요청 완료');
+               console.log('✅ 이미지 포함 엑셀 다운로드 요청 완료, 쿠키 폴링 시작: fileDownload_' + downloadToken);
                
-               // 🎯 다운로드 완료 쿠키 확인하여 로딩 모달 자동 닫기
-               checkDownloadComplete();
+               // 🎯 쿠키 폴링으로 다운로드 완료 자동 감지
+               pollDownloadComplete(downloadToken);
                
            } catch (error) {
                console.error('❌ 이미지 포함 엑셀 다운로드 실패:', error);
@@ -4659,7 +4678,7 @@
            fetch('/exchange/upload/excel', {
                method: 'POST',
                headers: {
-                   'X-CSRF-TOKEN': csrfToken
+                   [window.csrfHeader]: csrfToken
                },
                body: formData
            })
@@ -4825,8 +4844,8 @@
                console.error('❌ 모달 이미지 로드 실패:', imageUrl);
                
                // HTTP 링크인 경우 프록시로 재시도
-               if (imageUrl.includes('http://175.119.224.45:8080/uploads/')) {
-                   const filePath = imageUrl.replace('http://175.119.224.45:8080/uploads/', '');
+               if (imageUrl.includes(FILE_SERVER_UPLOAD_URL)) {
+                   const filePath = imageUrl.replace(FILE_SERVER_UPLOAD_URL, '');
                    const proxyUrl = `/api/image-proxy?path=${filePath}`;
                    console.log('🔄 모달에서 프록시로 재시도:', proxyUrl);
                    modalImage.src = proxyUrl;
@@ -4866,9 +4885,9 @@
            
            // 🔥 HTTP 직접 링크를 프록시 링크로 변환 (Mixed Content 회피)
            let proxyImageUrl = imageUrl;
-           if (imageUrl.includes('http://175.119.224.45:8080/uploads/')) {
+           if (imageUrl.includes(FILE_SERVER_UPLOAD_URL)) {
                // HTTP 직접 링크에서 파일 경로만 추출
-               const filePath = imageUrl.replace('http://175.119.224.45:8080/uploads/', '');
+               const filePath = imageUrl.replace(FILE_SERVER_UPLOAD_URL, '');
                proxyImageUrl = `/api/image-proxy?path=${filePath}`;
                console.log('🔄 모달 이미지 URL 변환:', imageUrl, '→', proxyImageUrl);
            }
@@ -4913,66 +4932,42 @@
            }
        }
 
-       // 🎯 다운로드 완료 감지 (파일 저장 창 감지 + 타이머 조합)
-       function checkDownloadComplete() {
-           let downloadStarted = false;
-           let focusCheckCount = 0;
-           const maxFocusChecks = 20; // 최대 10초 동안 체크 (0.5초 간격)
+       // 🎯 쿠키 폴링으로 다운로드 완료 자동 감지
+       function pollDownloadComplete(token) {
+           const cookieName = 'fileDownload_' + token;
+           const maxWait = 120000; // 최대 2분 대기
+           const interval = 500;  // 0.5초마다 체크
+           let elapsed = 0;
            
-           // 🔍 윈도우 포커스 변화 감지 (파일 저장 창이 나타날 때)
-           const handleFocusChange = () => {
-               if (!downloadStarted) {
-                   downloadStarted = true;
-                   console.log('📁 파일 다운로드 시작 감지됨');
-                   
-                   // 파일 저장 창이 나타났으므로 2초 후 로딩창 닫기
-                   setTimeout(() => {
-                       hideExcelLoadingModal();
-                       showToast('✅ 엑셀 다운로드가 시작되었습니다.', 'success');
-                       console.log('✅ 파일 저장 창 감지로 로딩 모달 닫기');
-                   }, 2000);
-               }
-           };
-           
-           // 🎯 포커스 이벤트 리스너 등록
-           window.addEventListener('blur', handleFocusChange);
-           window.addEventListener('focus', handleFocusChange);
-           
-           // 🔄 주기적 체크 (포커스 변화가 감지되지 않는 경우 대비)
-           const checkInterval = setInterval(() => {
-               focusCheckCount++;
+           const timer = setInterval(() => {
+               elapsed += interval;
                
-               // 포커스 변화가 감지되지 않았고 일정 시간이 지나면 자동 종료
-               if (focusCheckCount >= maxFocusChecks && !downloadStarted) {
-                   clearInterval(checkInterval);
-                   window.removeEventListener('blur', handleFocusChange);
-                   window.removeEventListener('focus', handleFocusChange);
-                   
+               // 쿠키에서 완료 신호 확인
+               const cookies = document.cookie.split(';').map(c => c.trim());
+               const found = cookies.some(c => c.startsWith(cookieName + '=complete'));
+               
+               if (found) {
+                   clearInterval(timer);
+                   // 완료 쿠키 즉시 삭제
+                   document.cookie = cookieName + '=; Max-Age=0; Path=/';
                    hideExcelLoadingModal();
                    showToast('✅ 엑셀 다운로드가 완료되었습니다.', 'success');
-                   console.log('✅ 타이머 방식으로 로딩 모달 닫기');
-               } else if (downloadStarted) {
-                   // 이미 다운로드가 시작되었으면 체크 중지
-                   clearInterval(checkInterval);
-                   window.removeEventListener('blur', handleFocusChange);
-                   window.removeEventListener('focus', handleFocusChange);
+                   console.log('✅ 쿠키 감지 - 다운로드 완료, 모달 닫기');
+                   return;
                }
-           }, 500); // 0.5초마다 체크
-           
-           // 🚨 안전장치: 15초 후 강제 종료
-           setTimeout(() => {
-               clearInterval(checkInterval);
-               window.removeEventListener('blur', handleFocusChange);
-               window.removeEventListener('focus', handleFocusChange);
                
-               const modal = document.getElementById('excelLoadingModal');
-               if (modal && modal.style.display !== 'none') {
+               // 최대 대기 시간 초과 시 강제 종료
+               if (elapsed >= maxWait) {
+                   clearInterval(timer);
                    hideExcelLoadingModal();
-                   showToast('⚠️ 엑셀 다운로드가 완료되었을 것으로 예상됩니다.', 'warning');
-                   console.log('⚠️ 안전장치 동작 - 강제 종료');
+                   showToast('⚠️ 다운로드가 오래 걸립니다. 브라우저 다운로드 탭을 확인하세요.', 'warning');
+                   console.warn('⚠️ 최대 대기 시간 초과 - 모달 강제 닫기');
                }
-           }, 15000); // 15초 후 강제 종료
+           }, interval);
        }
+       
+       // 하위 호환용 (사용 안 함)
+       function checkDownloadComplete() {}
 
 
 
@@ -5015,22 +5010,17 @@
        }
     </script>
     
-    <!-- 🔄 엑셀 다운로드 로딩 모달 -->
-    <div id="excelLoadingModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; justify-content: center; align-items: center;">
-        <div style="background: white; padding: 2rem; border-radius: 10px; text-align: center; max-width: 400px; margin: 0 auto; position: relative;">
+    <!-- 🔄 엑셀 다운로드 로딩 모달 (다운로드 중 닫기 불가) -->
+    <div id="excelLoadingModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; justify-content: center; align-items: center;">
+        <div style="background: white; padding: 2.5rem 2rem; border-radius: 12px; text-align: center; max-width: 380px; width: 90%; margin: 0 auto; box-shadow: 0 20px 60px rgba(0,0,0,0.4);">
             <div style="margin-bottom: 1.5rem;">
-                <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                <div class="spinner-border text-primary" role="status" style="width: 3.5rem; height: 3.5rem; border-width: 4px;">
                     <span class="visually-hidden">Loading...</span>
                 </div>
             </div>
-            <h4 style="color: #333; margin-bottom: 1rem;">🔄 엑셀 다운로드 처리 중...</h4>
-            <p style="color: #666; margin-bottom: 1rem;">데이터를 수집하고 엑셀 파일을 생성하고 있습니다.</p>
-            <p style="color: #999; font-size: 0.9rem; margin-bottom: 1.5rem;">파일 저장 창이 나타나면 자동으로 닫힙니다.</p>
-            
-            <!-- 🎯 수동으로 닫기 버튼 -->
-            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="hideExcelLoadingModal(); showToast('다운로드 대기를 종료했습니다.', 'info');" style="margin-top: 0.5rem;">
-                <i class="fas fa-times"></i> 닫기
-            </button>
+            <h4 style="color: #1a1a2e; margin-bottom: 0.75rem; font-weight: 700;">엑셀 파일 생성 중...</h4>
+            <p style="color: #555; margin-bottom: 0.5rem; font-size: 0.95rem;">데이터를 수집하고 파일을 준비하고 있습니다.</p>
+            <p style="color: #999; font-size: 0.85rem; margin-bottom: 0;">파일 준비가 완료되면 자동으로 닫힙니다.</p>
         </div>
     </div>
 

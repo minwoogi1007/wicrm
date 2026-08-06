@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{design-samples/public-layout}">
+<body>
+<div layout:fragment="content">
+    <link href="/assets/css/design-samples/admin-modern.css" rel="stylesheet" type="text/css" />
+    <link href="/assets/css/design-samples/admin-pages.css" rel="stylesheet" type="text/css" />
+
+    <main class="admin-sample-page crm-page">
+        <header class="sample-page-header">
+            <a href="/design-samples/admin" class="back-link">샘플 목록</a>
+            <span class="sample-kicker">CRM Workspace</span>
+            <h1>상담 운영 칸반형 화면</h1>
+            <p>상담원이 오늘 처리해야 할 문의를 상태별 컬럼으로 빠르게 파악하는 실무형 UI입니다.</p>
+        </header>
+
+        <section class="agent-strip">
+            <div class="agent-profile"><span>KM</span><b>김민우</b><em>온라인</em></div>
+            <div class="agent-metric"><small>응답 대기</small><strong>28</strong></div>
+            <div class="agent-metric"><small>평균 응답</small><strong>4분</strong></div>
+            <div class="agent-metric"><small>만족도</small><strong>98점</strong></div>
+        </section>
+
+        <section class="kanban-board">
+            <div class="kanban-column">
+                <h2>신규 문의 <span>12</span></h2>
+                <article class="kanban-card high"><b>이미지 첨부 오류</b><p>상담 상세에서 이미지가 열리지 않음</p><small>3분 전</small></article>
+                <article class="kanban-card"><b>회원 정보 변경</b><p>연락처 변경 요청</p><small>9분 전</small></article>
+            </div>
+            <div class="kanban-column">
+                <h2>처리 중 <span>8</span></h2>
+                <article class="kanban-card"><b>배송지 변경</b><p>출고 전 주소 변경 가능 여부 확인</p><small>18분 전</small></article>
+                <article class="kanban-card medium"><b>포인트 문의</b><p>마일리지 차감 내역 확인</p><small>24분 전</small></article>
+            </div>
+            <div class="kanban-column">
+                <h2>고객 확인 <span>5</span></h2>
+                <article class="kanban-card"><b>교환 상품 검수</b><p>사진 추가 요청 후 대기</p><small>41분 전</small></article>
+            </div>
+            <div class="kanban-column">
+                <h2>완료 <span>37</span></h2>
+                <article class="kanban-card done"><b>입금 확인 안내</b><p>고객 안내 완료</p><small>1시간 전</small></article>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

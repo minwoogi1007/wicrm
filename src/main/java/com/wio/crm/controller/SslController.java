@@ -13,27 +13,16 @@ public class SslController {
      * 카페24 SSL 인증을 위한 컨트롤러
      */
     @GetMapping("/.well-known/pki-validation/{filename}")
-    public ResponseEntity<String> sslVerification(@PathVariable String filename) {
+    public ResponseEntity<String> sslVerification(@PathVariable("filename") String filename) {
         
-        // SSL 인증파일 내용
-        String fileContent = "537A01E0CB1E3AE1866CC215230FEB7BF61E01779C0FE17CC5989A5BE24BF946\ncomodoca.com";
-        
+        // SSL 인증파일 내용 (2026-07 갱신분)
+        String fileContent = "D31B4B6012FD52432EC9F85A20C7A983665C50080756B03874A5B552399E98F7\ncomodoca.com";
+
         return ResponseEntity.ok()
                 .contentType(MediaType.TEXT_PLAIN)
                 .body(fileContent);
     }
-    
-    // 특정 파일명으로도 접근 가능하도록
-    @GetMapping("/.well-known/pki-validation/EDBA8B6CCECA0D2D17908BEF168F0C23.txt")
-    public ResponseEntity<String> sslVerificationSpecific() {
-        
-        String fileContent = "537A01E0CB1E3AE1866CC215230FEB7BF61E01779C0FE17CC5989A5BE24BF946\ncomodoca.com";
-        
-        return ResponseEntity.ok()
-                .contentType(MediaType.TEXT_PLAIN)
-                .body(fileContent);
-    }
-    
+
     // 디버깅용
     @GetMapping("/ssl-debug")
     public String debug() {

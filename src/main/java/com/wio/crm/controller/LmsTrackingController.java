@@ -155,7 +155,7 @@ public class LmsTrackingController {
      */
     @GetMapping("/api/call-history/{lmsId}")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> getCallHistory(@PathVariable Long lmsId) {
+    public ResponseEntity<Map<String, Object>> getCallHistory(@PathVariable("lmsId") Long lmsId) {
         
         log.info("LMS 후속 통화 내역 조회 - LMS ID: {}", lmsId);
         

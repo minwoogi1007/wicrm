@@ -1,24 +1,29 @@
 "use strict";
 var KTSearchHorizontal = {
     init: function() {
-        var e, n;
-        e = document.querySelector("#kt_advanced_search_form").querySelector('[name="tags"]');
-        if (e) {
-            new Tagify(e);
+        var advancedSearchForm = document.querySelector("#kt_advanced_search_form");
+        
+        // 해당 요소가 없는 페이지에서는 초기화 스킵
+        if (!advancedSearchForm) {
+            return;
         }
 
-        n = document.querySelector("#kt_horizontal_search_advanced_link");
-        var advancedSearchForm = document.querySelector("#kt_advanced_search_form");
+        var tagsInput = advancedSearchForm.querySelector('[name="tags"]');
+        if (tagsInput && typeof Tagify !== 'undefined') {
+            new Tagify(tagsInput);
+        }
 
-        if (n && advancedSearchForm) {
-            n.addEventListener("click", function(e) {
+        var advancedLink = document.querySelector("#kt_horizontal_search_advanced_link");
+
+        if (advancedLink) {
+            advancedLink.addEventListener("click", function(e) {
                 e.preventDefault();
                 if (advancedSearchForm.style.display === "none" || advancedSearchForm.style.display === "") {
                     advancedSearchForm.style.display = "block";
-                    n.innerHTML = "숨기기";
+                    advancedLink.innerHTML = "숨기기";
                 } else {
                     advancedSearchForm.style.display = "none";
-                    n.innerHTML = "상세조회";
+                    advancedLink.innerHTML = "상세조회";
                 }
             });
         }

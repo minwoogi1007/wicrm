@@ -1,12 +1,14 @@
 package com.wio.crm.config;
 
-import com.wio.crm.model.Menu;
+import com.wio.crm.service.LoginAttemptService;
 import com.wio.crm.service.LoginHistoryService;
 import com.wio.crm.service.MenuService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
@@ -19,70 +21,69 @@ import java.util.Map;
 @Component
 public class CustomSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
+    private static final Logger logger = LoggerFactory.getLogger(CustomSuccessHandler.class);
+
     @Autowired
     private MenuService menuService;
 
     @Autowired
-    private  LoginHistoryService loginHistoryService; // 로그인 이력을 관리하는 서비스
+    private LoginHistoryService loginHistoryService;
 
-
-
+    @Autowired
+    private LoginAttemptService loginAttemptService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws ServletException, IOException {
 
-        // 사용자 정보 조회 및 세션에 저장
+        String clientIp = getClientIp(request);
+        String attemptKey = authentication.getName() + ":" + clientIp;
+        loginAttemptService.loginSucceeded(attemptKey);
+
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        String userId = "";
+        String userId = authentication.getName();
         String userName = "";
         String authority = "";
-        String custCode = ""; // 🆕 custCode 추가
+        String custCode = "";
         
         if (userDetails.getTcntUserInfo() != null) {
-            userId = userDetails.getTcntUserInfo().getUserId();
             userName = userDetails.getTcntUserInfo().getEmp_name();
             authority = userDetails.getTcntUserInfo().getAuthority();
-            custCode = userDetails.getTcntUserInfo().getCustCode(); // 🆕 custCode 가져오기
+            custCode = userDetails.getTcntUserInfo().getCustCode();
         } else {
-            userId = userDetails.getTempUserInfo().getUserId();
             userName = userDetails.getTempUserInfo().getEmp_Name();
             authority = userDetails.getTempUserInfo().getPosition();
-            custCode = "INTERNAL"; // 🆕 내부 직원의 경우 INTERNAL로 설정
+            custCode = "INTERNAL";
         }
 
-        System.out.println("authority========"+authority);
-        System.out.println("custCode========"+custCode); // 🆕 custCode 로그 추가
-        // 사용자 권한에 따른 메뉴 리스트 조회 및 세션 저장 로직
+        logger.debug("로그인 성공 - userId: {}, authority: {}, custCode: {}", userId, authority, custCode);
+
         List<Map<String, Object>> menuList;
         try {
             menuList = menuService.getCompanyUserMenus(authentication.getName(), authority);
-            System.out.println("Fetched menu list: " + menuList);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("메뉴 조회 실패", e);
             throw new ServletException("Failed to fetch user menus", e);
         }
 
-        // 조회된 메뉴 리스트를 세션에 저장
         HttpSession session = request.getSession();
         session.setAttribute("USER_MENUS", menuList);
 
-        // 로그인 이력 기록
         loginHistoryService.recordLoginHistory(authentication.getName());
 
-
-
-
-        System.out.println("loginUserId============================================================"+userId);
-        System.out.println("userName============================================================"+userName);
         session.setAttribute("loginUserAuthority", authority);
         session.setAttribute("loginUserId", userId);
         session.setAttribute("loginUserName", userName);
-        session.setAttribute("custCode", custCode); // 🆕 custCode 세션에 저장
-        System.out.println("sessionloginUserId============================================================"+session.getAttribute("loginUserId"));
-        System.out.println("sessionuserName============================================================"+session.getAttribute("loginUserName"));
-        System.out.println("sessionCustCode============================================================"+session.getAttribute("custCode")); // 🆕 custCode 세션 확인
-        // 마지막에 한 번만 호출하여 리다이렉트 처리
+        session.setAttribute("custCode", custCode);
+
         super.onAuthenticationSuccess(request, response, authentication);
+    }
+
+    private String getClientIp(HttpServletRequest request) {
+        String xForwardedFor = request.getHeader("X-Forwarded-For");
+        if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
+            return xForwardedFor.split(",")[0].trim();
+        }
+        return request.getRemoteAddr();
     }
 }

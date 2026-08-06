@@ -963,12 +963,13 @@
                     showToast('테이블 데이터와 차트가 포함된 엑셀 파일을 생성 중입니다...', 'info');
                     
                     const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+                    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
                     
                     const response = await fetch('/stat/daily/excel-with-data', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': csrfToken
+                            [csrfHeader]: csrfToken
                         },
                         body: JSON.stringify(params)
                     });
@@ -1002,12 +1003,13 @@
                     showToast('이미지가 포함된 엑셀 파일을 생성 중입니다...', 'info');
                     
                     const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+                    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
                     
                     const response = await fetch('/stat/daily/excel-with-images', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': csrfToken
+                            [csrfHeader]: csrfToken
                         },
                         body: JSON.stringify(params)
                     });

@@ -56,4 +56,50 @@
         </if>
         ORDER BY X.IN_DATE DESC
     </select>
+    
+    <select id="getProjectsByCustCode" resultType="map">
+        SELECT PROJECT_CODE, PROJECT_NAME
+        FROM TPRJ01
+        WHERE CUST_CODE = #{custCode}
+        ORDER BY PROJECT_NAME
+    </select>
+    
+    <select id="getRemainingPointSum" resultType="string">
+        SELECT TO_CHAR(NVL(SUM(POINT), 0), '999,999,999,999')
+        FROM TCNT01_POINT
+        WHERE CUST_CODE = #{custCode}
+    </select>
+    
+    <select id="getPointHistory" resultType="map">
+        SELECT b.CUST_CODE,
+               a.CUST_NAME,
+               (SELECT PROJECT_NAME FROM TPRJ01
+                WHERE PROJECT_CODE = b.PROJCT_CODE AND CUST_CODE = b.CUST_CODE) AS PROJECT_NAME,
+               (SELECT ADM_SNAME FROM TSYS01
+                WHERE ADM_GUBN = '4002' AND ADM_CODE = c.CS_TYPE) AS CS_TYPE_NM,
+               c.CS_NOTE,
+               DECODE(b.IO_GUBN, 'I', '충전', 'O', '차감') AS IO_GUBN_NM,
+               b.IO_GUBN,
+               (SELECT SAUP_NAME FROM TSYS00 WHERE SAUP_GUBN = b.SAUP_GUBN) AS SAUP_NAME,
+               b.POINT,
+               c.PRC_NOTE,
+               DECODE(b.IO_GUBN, 'I', '처리완료→처리중', 'O', '처리완료') AS PRC_NAME,
+               TO_CHAR(b.IN_DATE, 'YYYY/MM/DD') AS CON_DATE,
+               TO_CHAR(b.IN_DATE, 'HH24:MI:SS') AS CON_TIME
+        FROM TCNT01_POINT b
+        JOIN TCNT01 a ON a.CUST_CODE = b.CUST_CODE
+        JOIN TBND01 c ON b.CUST_CODE = c.CUST_CODE
+                     AND b.PROJCT_CODE = c.PROJECT_CODE
+                     AND b.CALL_CODE = c.CALL_CODE
+                     AND b.PERSON_CODE = c.PERSON_CODE
+        WHERE a.CUST_CODE = #{custCode}
+        <if test="projectCode != null and projectCode != ''">
+            AND b.PROJCT_CODE = #{projectCode}
+        </if>
+        <if test="ioGubn != null and ioGubn != ''">
+            AND b.IO_GUBN = #{ioGubn}
+        </if>
+        AND b.ISSUE_DATE BETWEEN #{startDate} AND #{endDate}
+        ORDER BY b.IN_DATE DESC
+    </select>
 </mapper>

@@ -6,236 +6,1057 @@
 <div layout:fragment="content">
 
     <style>
-        /* 테이블 셀 내부 여백을 추가하여 가독성 개선 */
-        table td, table th {
-            padding: 16px 12px;
-            vertical-align: middle;
+        /* ===== 전면 개편 스타일 ===== */
+        
+        /* 통계 카드 영역 */
+        .stats-container {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
         }
         
-        /* 컨테이너 스타일 추가 */
-        .app-container {
-            padding: 1rem !important;
-        }
-        
-        /* 테이블 행 간격 및 호버 효과 개선 */
-        tbody tr:hover {
-            background-color: #f8f9fa;
-            transition: background-color 0.3s;
-        }
-
-        /* 구분 셀에 컬러 배지 추가 - 개선된 스타일 */
-        .badge {
-            font-size: 0.8rem;
-            padding: 0.5em 0.8em;
-            border-radius: 0.25rem;
-            font-weight: 500;
-            display: inline-block;
-            white-space: nowrap;
-            text-align: center;
-            margin-right: 5px;
-        }
-
-        .badge-light-danger {
-            background-color: rgba(241, 65, 108, 0.15);
-            color: #f1416c;
-            border: 1px solid rgba(241, 65, 108, 0.3);
-        }
-
-        .badge-light-success {
-            background-color: rgba(80, 205, 137, 0.15);
-            color: #50cd89;
-            border: 1px solid rgba(80, 205, 137, 0.3);
-        }
-
-        .badge-light-warning {
-            background-color: rgba(255, 168, 0, 0.15);
-            color: #ffa800;
-            border: 1px solid rgba(255, 168, 0, 0.3);
-        }
-        
-        .badge-light-secondary {
-            background-color: rgba(181, 181, 195, 0.15);
-            color: #7e8299;
-            border: 1px solid rgba(181, 181, 195, 0.3);
-        }
-
-        /* 카드 스타일 개선 */
-        .card {
-            border: 1px solid #eff2f5;
+        .stat-card {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: white;
             border-radius: 8px;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.04);
-            margin-bottom: 1.5rem;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .card:hover {
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
-        }
-
-        .card-body {
-            padding: 1.7rem;
+            padding: 0.4rem 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            white-space: nowrap;
         }
         
-        /* 정보 내용 카드 스타일 */
-        .info-card {
-            border-left: 4px solid #009ef7;
-            background-color: #f1faff;
-            padding: 1rem;
-            border-radius: 6px;
-            margin-bottom: 1rem;
+        .stat-card:hover {
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            border-color: #93c5fd;
         }
-
-        /* 강조된 텍스트 색상 및 스타일 */
-        .text-gray-800 {
-            color: #3f4254;
+        
+        .stat-card.active {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+        
+        .stat-card .stat-icon {
+            font-size: 1rem;
+        }
+        
+        .stat-card .stat-number {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        
+        .stat-card .stat-label {
+            font-size: 0.85rem;
+            color: #475569;
             font-weight: 500;
         }
-
-        .text-info {
-            color: #009ef7;
+        
+        /* 검색 영역 개선 */
+        .search-card {
+            background: white;
+            border-radius: 8px;
+            padding: 0.85rem 1.1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e7eb;
+            margin-bottom: 0.5rem;
         }
         
-        .text-content {
-            font-size: 0.95rem;
-            line-height: 1.6;
-            color: #5e6278;
-            max-height: none;
-            padding-right: 5px;
-            word-break: break-all;
-        }
-        
-        /* 스크롤바 스타일 */
-        .text-content::-webkit-scrollbar {
-            width: 5px;
-        }
-        
-        .text-content::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-        
-        .text-content::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 10px;
-        }
-        
-        .text-content::-webkit-scrollbar-thumb:hover {
-            background: #a1a1a1;
-        }
-        
-        .text-content-title {
-            font-weight: 600;
-            color: #3f4254;
-            margin-bottom: 0.3rem;
+        .search-card .form-control,
+        .search-card .form-select {
             font-size: 0.9rem;
+            padding: 0.4rem 0.75rem;
+            min-height: unset;
+            height: 36px;
+            color: #1e293b;
         }
-
-        /* 테이블 헤더 디자인 - consulting/list.html과 동일하게 */
-        thead th {
-            background-color: #F3F6F9 !important;
-            color: #3F4254 !important;
-            font-weight: 600 !important;
-            border-bottom: 2px solid #E4E6EF !important;
+        
+        .search-card .btn {
+            font-size: 0.9rem;
+            padding: 0.4rem 1rem;
+            height: 36px;
+        }
+        
+        .search-row {
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+        
+        .search-group {
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .search-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 0.25rem;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+        
+        /* 상태 탭 필터 */
+        .status-tabs {
+            display: flex;
+            gap: 0.35rem;
+            margin-bottom: 0.5rem;
+            background: #f8fafc;
+            padding: 0.3rem;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .status-tab {
+            padding: 0.4rem 0.85rem;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #475569;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        
+        .status-tab:hover {
+            background: white;
+            color: #1e293b;
+        }
+        
+        .status-tab.active {
+            background: white;
+            color: #1e293b;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .status-tab .tab-count {
+            background: #e2e8f0;
+            color: #475569;
+            padding: 0.1rem 0.4rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-tab.active .tab-count {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        /* 상담 카드 리스트 */
+        .consultation-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+        
+        .consultation-card {
+            background: white;
+            border-radius: 8px;
+            padding: 0.7rem 0.9rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .consultation-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-color: #3b82f6;
+            user-select: none;
+        }
+        
+        /* 긴급 건 강조 */
+        .consultation-card.urgent {
+            border-left: 4px solid #ef4444;
+            background: linear-gradient(90deg, #fef2f2 0%, white 5%);
+        }
+        
+        .consultation-card.urgent::before {
+            content: '';
+            display: none;
+        }
+        
+        /* 카드 헤더 */
+        .card-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.35rem;
+        }
+        
+        .customer-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .customer-avatar {
+            display: none;
+        }
+        
+        .customer-details {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .customer-name-row {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+        }
+        
+        .customer-details h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #0f172a;
+            margin: 0;
+            white-space: nowrap;
+        }
+        
+        .customer-details .phone {
+            font-size: 0.9rem;
+            color: #334155;
+            white-space: nowrap;
+        }
+        
+        .card-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+        
+        .datetime {
+            text-align: right;
+            font-size: 0.9rem;
+            color: #334155;
+            white-space: nowrap;
+        }
+        
+        .datetime .date {
+            font-weight: 600;
+            color: #1e293b;
+            margin-right: 0.25rem;
+        }
+        
+        /* 상태 도트 */
+        .status-dot {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-dot::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+        
+        .status-dot.reception {
+            background: #fef3c7;
+            color: #78350f;
+        }
+        .status-dot.reception::before { background: #d97706; }
+        
+        .status-dot.processing {
+            background: #dbeafe;
+            color: #1e3a8a;
+        }
+        .status-dot.processing::before { background: #2563eb; animation: pulse 2s infinite; }
+        
+        .status-dot.completed {
+            background: #d1fae5;
+            color: #064e3b;
+        }
+        .status-dot.completed::before { background: #059669; }
+        
+        .status-dot.none {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+        .status-dot.none::before { background: #94a3b8; }
+        
+        /* 긴급/일반 배지 */
+        .badge-emg {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.15rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+        
+        .badge-emg.urgent {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #b91c1c;
+            border: 1px solid #fca5a5;
+        }
+        
+        .badge-emg.normal {
+            background: #f0fdf4;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* 카드 본문 */
+        .card-body-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-bottom: 0.35rem;
+        }
+        
+        .content-box {
+            background: #f8fafc;
+            border-radius: 6px;
+            padding: 0.4rem 0.6rem;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .content-box .label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.15rem;
+        }
+        
+        .content-box .text {
+            font-size: 0.9rem;
+            color: #1e293b;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .content-box .text.expanded {
+            -webkit-line-clamp: unset;
+        }
+        
+        .expand-btn {
+            font-size: 0.8rem;
+            color: #3b82f6;
+            cursor: pointer;
+            margin-top: 0.2rem;
+            font-weight: 500;
+        }
+        
+        .expand-btn:hover {
+            text-decoration: underline;
+        }
+        
+        /* 카드 푸터 (미사용, 헤더로 통합) */
+        .card-footer-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 0.35rem;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .tags {
+            display: inline-flex;
+            gap: 0.25rem;
+            align-items: center;
+        }
+        
+        .tag {
+            padding: 0.1rem 0.45rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        
+        .tag.type {
+            background: #ede9fe;
+            color: #5b21b6;
+        }
+        
+        .tag.site {
+            background: #e0f2fe;
+            color: #075985;
+        }
+        
+        .tag.mall {
+            background: #fce7f3;
+            color: #9d174d;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .action-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #64748b;
+            font-size: 0.75rem;
+        }
+        
+        .action-btn:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+            color: #1e293b;
+        }
+        
+        .action-btn.primary {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: white;
+        }
+        
+        .action-btn.primary:hover {
+            background: #2563eb;
+        }
+        
+        .comment-count {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.9rem;
+            color: #475569;
+        }
+        
+        .comment-count i {
+            font-size: 0.95rem;
+        }
+        
+        .comment-count.has-comments {
+            color: #3b82f6;
+            font-weight: 600;
+        }
+        
+        /* 로딩 스피너 */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #e2e8f0;
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* 페이지네이션 개선 */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+        
+        .pagination {
+            display: flex;
+            gap: 0.25rem;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .pagination .page-item .page-link {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            color: #64748b;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+        
+        .pagination .page-item .page-link:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+        
+        .pagination .page-item.active .page-link {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: white;
+        }
+        
+        /* 빈 상태 */
+        .empty-state {
             text-align: center;
-            font-size: 13px;
+            padding: 3rem;
+            color: #64748b;
         }
-
-        /* 테이블 행 간격 및 구분선 개선 */
-        tbody tr {
-            border-bottom: 1px solid #eff2f5;
-            transition: background-color 0.3s;
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #cbd5e1;
         }
-
-        tbody tr:last-child {
+        
+        /* 헤더 스타일 */
+        #kt_app_toolbar {
+            padding: 0.75rem 0 !important;
+            min-height: auto !important;
+        }
+        
+        #kt_app_content {
+            padding-top: 1.5rem !important;
+        }
+        
+        /* ===== 모달 스타일 전면 개선 ===== */
+        .modal-large {
+            max-width: 1100px;
+            width: 95%;
+        }
+        
+        .modal-large .modal-content {
+            max-height: 92vh;
+            overflow: hidden;
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        
+        .modal-large .modal-header {
+            border-bottom: none;
+            padding: 0.75rem 1.25rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            position: relative;
+        }
+        
+        .modal-large .modal-header h2 {
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .modal-large .modal-header .btn-close-modal {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .modal-large .modal-header .btn-close-modal:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .modal-large .modal-body {
+            padding: 0;
+            overflow-y: auto;
+            max-height: calc(92vh - 80px);
+        }
+        
+        /* 모달 내부 섹션 */
+        .modal-section {
+            padding: 0.75rem 1.25rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .modal-section:last-child {
             border-bottom: none;
         }
         
-        /* 컨텐츠 구분을 위한 카드 래퍼 */
-        .content-wrapper {
-            background: white;
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.03);
-            border-left: 3px solid #e4e6ef;
-            transition: border-left-color 0.3s;
+        .modal-section-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #1e293b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
         }
         
-        /* 컨텐츠 유형별 커스텀 스타일 */
-        tr:hover .content-wrapper {
-            border-left-color: #009ef7;
+        .modal-section-title i {
+            color: #6366f1;
         }
         
-        /* 테이블 로우 호버 시 배경색 변경 */
-        #kt_project_users_table tbody tr:hover {
-            background-color: #f1faff;
+        /* 고객 정보 그리드 */
+        .customer-info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.4rem;
         }
         
-        /* 컨텐츠 래퍼 안에 있는 텍스트 내용에 기본 여백 제거 */
-        .content-wrapper .text-content {
-            margin: 0;
-            padding: 0.5rem 0;
+        .info-item {
+            background: #f8fafc;
+            border-radius: 6px;
+            padding: 0.35rem 0.6rem;
+            border: 1px solid #e2e8f0;
         }
-
-        /* 카드 내부 요소 간의 간격 */
-        .d-flex.justify-content-between {
+        
+        .info-item .info-label {
+            font-size: 0.6rem;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.1rem;
+        }
+        
+        .info-item .info-value {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        /* 상담/처리 내용 탭 */
+        .content-tabs {
+            display: flex;
+            gap: 0.4rem;
             margin-bottom: 0.5rem;
         }
-
-        /* 버튼 스타일 개선 */
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
-            color: #fff;
-            padding: 0.375rem 0.75rem;
-            font-size: 0.875rem;
-            border-radius: 0.2rem;
-        }
-
-        .btn-primary:hover {
-            background-color: #0056b3;
-            border-color: #0056b3;
-        }
-        .modal-large {
-            max-width: 90%;
-            width: 90%;
-        }
-        .modal-large .modal-content {
-            height: 90vh;
-            overflow-y: auto;
-            border-radius: 10px;
-            border: none;
-        }
-        .modal-large .modal-header {
-            border-bottom: 1px solid #eff2f5;
-            padding: 1.5rem 1.75rem;
-        }
-        .modal-large .modal-body {
-            padding: 1.75rem;
-        }
-        #commentsContainer {
-            width: 90%;
-        }
-        #commentsContainer textarea {
-            width: 100%;
-            border-radius: 8px;
-            border: 1px solid #e4e6ef;
-            padding: 1rem;
-            transition: border-color 0.3s;
-        }
-        #commentsContainer textarea:focus {
-            border-color: #009ef7;
-            box-shadow: 0 0 0 0.2rem rgba(0, 158, 247, 0.15);
-        }
-        .flex-shrink-0 {
-            width: 10%;
-        }
-        #addCommentButton {
-            height: 40px;
-            margin-top: 20px;
+        
+        .content-tab {
+            padding: 0.4rem 0.9rem;
+            border-radius: 6px;
             font-weight: 500;
-            min-width: 80px;
+            font-size: 0.875rem;
+            color: #64748b;
+            background: #f1f5f9;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
+        
+        .content-tab.active {
+            background: #6366f1;
+            color: white;
+        }
+        
+        .content-panel {
+            display: none;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid #e2e8f0;
+            min-height: 200px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .content-panel.active {
+            display: block;
+        }
+        
+        .content-panel textarea {
+            width: 100%;
+            height: 100%;
+            min-height: 180px;
+            border: none;
+            background: transparent;
+            resize: none;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #334155;
+        }
+        
+        /* 댓글 채팅 스타일 */
+        .comments-container {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+        }
+        
+        .comment-bubble {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        
+        .comment-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+        
+        .comment-content {
+            flex: 1;
+            background: #f1f5f9;
+            border-radius: 12px;
+            border-top-left-radius: 4px;
+            padding: 0.875rem 1rem;
+        }
+        
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.375rem;
+        }
+        
+        .comment-author {
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #1e293b;
+        }
+        
+        .comment-date {
+            font-size: 0.7rem;
+            color: #94a3b8;
+        }
+        
+        .comment-text {
+            font-size: 0.875rem;
+            color: #475569;
+            line-height: 1.5;
+        }
+        
+        /* 댓글 입력 */
+        .comment-input-area {
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-end;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1rem;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .comment-input-area textarea {
+            flex: 1;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 0.75rem;
+            font-size: 0.875rem;
+            resize: none;
+            min-height: 60px;
+            transition: border-color 0.2s ease;
+        }
+        
+        .comment-input-area textarea:focus {
+            outline: none;
+            border-color: #6366f1;
+        }
+        
+        .comment-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .comment-actions select {
+            padding: 0.5rem;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            font-size: 0.8rem;
+            background: white;
+        }
+        
+        .comment-actions button {
+            padding: 0.625rem 1.25rem;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .comment-actions button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+        
+        /* 타임라인 히스토리 */
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e2e8f0;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-bottom: 1.5rem;
+        }
+        
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+        
+        .timeline-dot {
+            position: absolute;
+            left: -2rem;
+            top: 0;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #6366f1;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px #e2e8f0;
+        }
+        
+        .timeline-item.sub .timeline-dot {
+            width: 12px;
+            height: 12px;
+            background: #94a3b8;
+            left: calc(-2rem + 3px);
+            top: 3px;
+        }
+        
+        .timeline-content {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1rem;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .timeline-item.sub .timeline-content {
+            background: white;
+            border-left: 3px solid #94a3b8;
+            margin-left: 1rem;
+        }
+        
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .timeline-date {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #6366f1;
+            background: #eef2ff;
+            padding: 0.25rem 0.625rem;
+            border-radius: 6px;
+        }
+        
+        .timeline-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+        }
+        
+        .timeline-text {
+            font-size: 0.875rem;
+            color: #334155;
+            line-height: 1.6;
+        }
+        
+        .timeline-text strong {
+            display: block;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
+        }
+        
+        /* 상태 배지 개선 */
+        .status-badge {
+            padding: 0.375rem 0.875rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .status-badge.urgent {
+            background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
+            color: white;
+        }
+        
+        .status-badge.normal {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-badge.reception {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-badge.processing {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .status-badge.completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 6px;
+            }
+            
+            .stat-card {
+                padding: 6px 10px;
+                font-size: 0.8rem;
+            }
+            
+            .stat-card .stat-number {
+                font-size: 0.9rem;
+            }
+            
+            .stat-card .stat-label {
+                font-size: 0.75rem;
+            }
+            
+            .card-body-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .status-tabs {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+                flex-wrap: nowrap;
+                padding-bottom: 4px;
+            }
+            
+            .status-tabs::-webkit-scrollbar {
+                display: none;
+            }
+            
+            .search-card {
+                padding: 10px 12px;
+            }
+            
+            .search-row {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .search-group {
+                min-width: 100%;
+            }
+            
+            .search-card .form-control,
+            .search-card .form-select {
+                height: 40px;
+                font-size: 14px;
+            }
+            
+            .search-card .btn {
+                width: 100%;
+                height: 40px;
+            }
+            
+            /* 테이블 모바일 처리 */
+            .table-responsive {
+                margin: 0 -12px;
+                padding: 0 12px;
+            }
+            
+            /* 모달 모바일 최적화 */
+            .modal-dialog.modal-xl,
+            .modal-dialog.mw-900px,
+            .modal-dialog.mw-1000px {
+                margin: 8px !important;
+                max-width: calc(100vw - 16px) !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 4px;
+            }
+            
+            .stat-card {
+                padding: 4px 8px;
+                gap: 4px;
+            }
+            
+            .stat-card .stat-icon {
+                font-size: 0.85rem;
+            }
+        }
+        
+        /* 기존 모달 스타일 유지 */
         .history-table {
             width: 100%;
             border-collapse: separate;
@@ -245,10 +1066,6 @@
             padding: 12px 16px;
             border: 1px solid #eff2f5;
             border-radius: 8px;
-            transition: background-color 0.3s;
-        }
-        .history-table tr:hover td {
-            background-color: #f9f9f9;
         }
         .history-table .date-time-column {
             width: 150px;
@@ -262,11 +1079,6 @@
             background-color: #ffffff;
             line-height: 1.6;
         }
-        .history-table .content-column strong {
-            color: #3f4254;
-            display: inline-block;
-            margin-bottom: 4px;
-        }
         .history-table .sub-row td {
             border-top: none;
             padding-top: 0;
@@ -275,470 +1087,353 @@
             color: #7e8299;
             border-left: 3px solid #b5b5c3;
         }
-        .history-table .sub-row:hover td {
-            background-color: #f9f9f9;
-        }
-
-        /* 헤더 정렬 스타일 - exchange/list.html과 동일하게 */
-        #kt_app_toolbar {
-            padding: 0.75rem 0 !important;
-            min-height: auto !important;
-        }
         
-        #kt_app_toolbar_container {
-            padding-left: 1rem !important;
-            margin-left: 0 !important;
-        }
-        
-        .page-title {
-            margin: 0 !important;
-            padding: 0 !important;
-            margin-left: 0 !important;
-        }
-        
-        .page-heading {
-            margin: 0 !important;
-        }
-        
-        .breadcrumb {
-            margin: 0 !important;
-            padding-top: 0.25rem !important;
-        }
-        
-        #kt_app_content {
-            padding-top: 2.5rem !important;
-            margin-top: 0 !important;
-        }
-        
-        /* 컨텐츠 영역 - exchange/list.html과 동일하게 */
-        #kt_app_content_container.app-container {
-            padding-left: 1rem !important;
-            padding-right: 1rem !important;
-        }
-        
-        .d-flex.flex-column.flex-column-fluid {
-            gap: 0 !important;
-        }
-        
-        /* 카드 통계 영역 - exchange/list.html과 동일하게 */
-        .stats-card {
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            margin-top: 0;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-        
-        .stat-item {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
+        #commentsContainer textarea {
+            width: 100%;
             border-radius: 8px;
-            padding: 1.5rem;
-            text-align: center;
-            transition: all 0.2s ease;
+            border: 1px solid #e4e6ef;
+            padding: 1rem;
         }
         
-        .stat-item:hover {
-            background: #f1f5f9;
-            border-color: #cbd5e1;
+        .comment-item {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 3px solid #009ef7;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
         }
-        
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: #1e293b;
-        }
-        
-        .stat-label {
-            font-size: 0.875rem;
-            color: #64748b;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
     </style>
+    
     <script src="/assets/plugins/global/plugins.bundle.js"></script>
+    
     <div class="app-main flex-column flex-row-fluid" id="kt_app_main">
-        <!--begin::Content wrapper-->
         <div class="d-flex flex-column flex-column-fluid">
-            <!--begin::Toolbar-->
-            <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
-                <!--begin::Toolbar container-->
+            <!-- 헤더 -->
+            <div id="kt_app_toolbar" class="app-toolbar py-2 py-lg-3">
                 <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
-                    <!--begin::Page title-->
                     <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
-                        <!--begin::Title-->
                         <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">상담 조회</h1>
-                        <!--end::Title-->
-                        <!--begin::Breadcrumb-->
                         <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
-                            <!--begin::Item-->
                             <li class="breadcrumb-item text-muted">
                                 <a href="/main" class="text-muted text-hover-primary">Home</a>
                             </li>
-                            <!--end::Item-->
-                            <!--begin::Item-->
                             <li class="breadcrumb-item">
                                 <span class="bullet bg-gray-500 w-5px h-2px"></span>
                             </li>
-                            <!--end::Item-->
-                            <!--begin::Item-->
                             <li class="breadcrumb-item text-muted">상담 관리</li>
-                            <!--end::Item-->
-                            <!--begin::Item-->
                             <li class="breadcrumb-item">
                                 <span class="bullet bg-gray-500 w-5px h-2px"></span>
                             </li>
-                            <!--end::Item-->
-                            <!--begin::Item-->
-                            <li class="breadcrumb-item text-muted">상담</li>
-                            <!--end::Item-->
+                            <li class="breadcrumb-item text-muted">상담 조회</li>
                         </ul>
-                        <!--end::Breadcrumb-->
                     </div>
-                    <!--end::Page title-->
-                    <!--begin::Actions-->
                     <div class="d-flex align-items-center gap-2 gap-lg-3">
-                        <!-- 액션 버튼들을 검색 영역으로 이동 -->
+                        <button type="button" id="downloadExcelButton" class="btn btn-sm btn-light-primary">
+                            <i class="ki-duotone ki-exit-up fs-4 me-1">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                            </i>엑셀 다운로드
+                        </button>
                     </div>
-                    <!--end::Actions-->
                 </div>
-                <!--end::Toolbar container-->
             </div>
-            <!--end::Toolbar-->
-            <!--begin::Content-->
+            
+            <!-- 콘텐츠 -->
             <div id="kt_app_content" class="app-content flex-column-fluid">
-                <!--begin::Content container-->
-                <div id="kt_app_content_container" class="app-container container-fluid px-2">
-
-                    <!--begin::Form-->
-
-                    <!--begin::Card-->
-                    <div class="card mb-7">
-                        <!--begin::Card body-->
-                        <div class="card-body">
-                            <!--begin::Compact form-->
-                            <div class="d-flex align-items-center">
-                                <!--begin::Input group-->
-                                <div class="position-relative w-md-400px me-md-2">
+                <div id="kt_app_content_container" class="app-container container-xxl">
+                    
+                    <!-- 검색 영역 -->
+                    <div class="search-card">
+                        <div class="search-row">
+                            <div class="search-group" style="flex: 2;">
+                                <label>검색</label>
+                                <div class="position-relative">
                                     <i class="ki-duotone ki-magnifier fs-3 text-gray-500 position-absolute top-50 translate-middle ms-6">
                                         <span class="path1"></span>
                                         <span class="path2"></span>
                                     </i>
-                                    <input type="text" class="form-control form-control-solid ps-10" id="searchKeyword" name="search" value="" placeholder="Search" />
-                                </div>
-                                <!--end::Input group-->
-                                <!--begin:Action-->
-                                <div class="d-flex align-items-center">
-                                    <button type="button" id="searchButton" class="btn btn-primary me-5">조회</button>
-
-                                    <a href="#" id="kt_horizontal_search_advanced_link" class="btn btn-link">상세조회</a>
-
-                                </div>
-                                <!--end:Action-->
-                            </div>
-                            <!--end::Compact form-->
-                            <!--begin::Advance form-->
-                            <div class="collapse" id="kt_advanced_search_form" style="display: none;">
-                                <!--begin::Separator-->
-                                <div class="separator separator-dashed mt-9 mb-6"></div>
-                                <!--end::Separator-->
-                                <!--begin::Row-->
-                                <div class="row g-8 mb-8">
-                                    <div class="col-xxl-12">
-                                        <div class="row g-8">
-                                            <div class="col-lg-3">
-                                                <label class="fs-6 form-label fw-bold text-gray-900">상담일</label>
-                                                <div class="position-relative w-md-260px me-md-2">
-                                                    <input type="hidden" id="hidden_start_date" name="hidden_start_date" th:value="${hidden_start_date}">
-                                                    <input type="hidden" id="hidden_end_date" name="hidden_end_date" th:value="${hidden_end_date}">
-                                                    <input class="form-control form-control-solid w-100 mw-250px" placeholder="Pick date range" id="kt_ecommerce_report_customer_orders_daterangepicker" readonly />
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-3">
-                                                <label class="fs-6 form-label fw-bold text-gray-900">처리상태</label>
-                                                <select id="status" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Status" data-hide-search="true">
-                                                    <option value="all" th:selected="true" th:text="'전체'"></option>
-                                                    <option th:each="constat : ${constat}" th:value="${constat.admCode}" th:text="${constat.admSname}"></option>
-                                                </select>
-                                            </div>
-                                            <div class="col-lg-3">
-                                                <label class="fs-6 form-label fw-bold text-gray-900">상담유형</label>
-                                                <select id="type" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Status" data-hide-search="true">
-                                                    <option value="all" th:selected="true" th:text="'전체'"></option>
-                                                    <option th:each="contype : ${contype}" th:value="${contype.admCode}" th:text="${contype.admSname}"></option>
-                                                </select>
-                                            </div>
-                                            <div class="col-lg-3">
-                                                <label class="fs-6 form-label fw-bold text-gray-900">구매몰</label>
-                                                <select id="mall" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Status" data-hide-search="true">
-                                                    <option value="all" th:selected="true" th:text="'전체'"></option>
-                                                    <option th:each="conbuy : ${conbuy}" th:value="${conbuy.admCode}" th:text="${conbuy.admSname}"></option>
-                                                </select>
-                                            </div>
-
-
-                                        </div>
-                                    </div>
-                                </div>
-                                <!--end::Row-->
-                                <!--begin::Row-->
-                                <div class="row g-8">
-                                    <div class="col-xxl-12">
-                                        <div class="row g-8">
-                                            <div class="col-lg-6">
-                                                <label class="fs-6 form-label fw-bold text-gray-900">기타</label>
-                                                <div class="nav-group nav-group-fluid">
-                                                    <label>
-                                                        <input type="radio" class="btn-check" name="filter" value="all" checked="checked" />
-                                                        <span class="btn btn-sm btn-color-muted btn-active btn-active-primary fw-bold px-4">전체</span>
-                                                    </label>
-                                                    <label>
-                                                        <input type="radio" class="btn-check" name="filter" value="emergency" />
-                                                        <span class="btn btn-sm btn-color-muted btn-active btn-active-primary fw-bold px-4">긴급</span>
-                                                    </label>
-                                                    <label>
-                                                        <input type="radio" class="btn-check" name="filter" value="claim" />
-                                                        <span class="btn btn-sm btn-color-muted btn-active btn-active-primary fw-bold px-4">클레임</span>
-                                                    </label>
-                                                    <label>
-                                                        <input type="radio" class="btn-check" name="filter" value="normal" />
-                                                        <span class="btn btn-sm btn-color-muted btn-active btn-active-primary fw-bold px-4">일반</span>
-                                                    </label>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-3">
-                                                <label class="fs-6 form-label fw-bold text-gray-900">담당자 처리</label>
-                                                <select id="custStat" class="form-select form-select-solid" data-control="select2" data-placeholder="Select Status" data-hide-search="true">
-                                                    <option value="all" th:selected="true" th:text="'전체'"></option>
-                                                    <option th:each="custStat : ${custStat}" th:value="${custStat.admCode}" th:text="${custStat.admSname}"></option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!--end::Row-->
-                            </div>
-                            <!--end::Advance form-->
-                        </div>
-                        <!--end::Card body-->
-                    </div>
-                    <!--end::Card-->
-
-                    <!--end::Form-->
-                    <!--begin::Toolbar-->
-                    <div class="d-flex flex-wrap flex-stack pb-7">
-                        <div class="d-flex flex-wrap align-items-center my-1">
-                            <h3 class="fw-bold me-5 my-1">총 <span id="totalRecords"></span> 건</h3>
-
-                        </div>
-                        <div class="d-flex flex-wrap my-1">
-                            <div class="d-flex my-0">
-                                <button type="button" id="downloadExcelButton" class="btn btn-light-primary" data-kt-menu-placement="bottom-end">
-                                <i class="ki-duotone ki-exit-up fs-2">
-                                    <span class="path1"></span>
-                                    <span class="path2"></span>
-                                </i>다운로드</button>
-
-                            </div>
-                        </div>
-                    </div>
-                    <!--end::Toolbar-->
-                    <!--begin::Tab Content-->
-                    <div class="tab-content">
-                        <div id="kt_project_users_table_pane" class="tab-pane show active">
-                            <div class="card card-flush">
-                                <div class="card-body pt-8">
-                                    <div class="table-responsive">
-                                        <div class="page-loader flex-column bg-dark bg-opacity-25">
-                                            <span class="spinner-border text-primary" role="status"></span>
-                                            <span class="text-gray-800 fs-6 fw-semibold mt-5">Loading...</span>
-                                        </div>
-                                        <table id="kt_project_users_table" class="table table-striped table-bordered gy-5 gs-7 border rounded w-100">
-                                            <thead>
-                                            <tr class="fw-bold fs-6 text-gray-800">
-                                                <th style="width: 6%">구분/처리상태</th>
-                                                <th style="width: 6%">일자/시간</th>
-                                                <th style="width: 12%">고객정보</th>
-                                                <th style="width: 8%">사이트/구매몰</th>
-                                                <th style="width: 30%">상담유형/상담내용</th>
-                                                <th style="width: 30%">처리내용</th>
-                                                <th style="width: 4%">댓글</th>
-                                                <th style="width: 4%">관리</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody class="fs-6">
-                                            <!-- Content will be populated via AJAX -->
-                                            </tbody>
-
-                                        </table>
-                                        <ul class="pagination" id="pagination">
-                                            <input type="hidden" id="currentPage" name="currentPage" >
-                                        </ul>
-
-
-                                    </div>
+                                    <input type="text" class="form-control form-control-solid ps-10" id="searchKeyword" placeholder="고객명, 전화번호, 내용 검색..." />
                                 </div>
                             </div>
-                        </div>
-
-                    </div>
-                    <!--end::Tab Content-->
-                </div>
-            </div>
-            <div class="modal fade" id="kt_modal_new_address" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-large" role="document">
-                    <div class="modal-content">
-                        <form class="form" action="#" id="kt_modal_new_address_form">
-                            <div class="modal-header" id="kt_modal_new_address_header">
-                                <h2>상담 내역 상세</h2>
-                                <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
-                                    <i class="ki-duotone ki-cross fs-1">
+                            <div class="search-group">
+                                <label>상담일</label>
+                                <input type="hidden" id="hidden_start_date" name="hidden_start_date" th:value="${hidden_start_date}">
+                                <input type="hidden" id="hidden_end_date" name="hidden_end_date" th:value="${hidden_end_date}">
+                                <input class="form-control form-control-solid" placeholder="날짜 범위 선택" id="kt_ecommerce_report_customer_orders_daterangepicker" readonly />
+                            </div>
+                            <div class="search-group">
+                                <label>상담유형</label>
+                                <select id="type" class="form-select form-select-solid" data-control="select2" data-placeholder="전체" data-hide-search="true">
+                                    <option value="all">전체</option>
+                                    <option th:each="contype : ${contype}" th:value="${contype.admCode}" th:text="${contype.admSname}"></option>
+                                </select>
+                            </div>
+                            <div class="search-group">
+                                <label>구매몰</label>
+                                <select id="mall" class="form-select form-select-solid" data-control="select2" data-placeholder="전체" data-hide-search="true">
+                                    <option value="all">전체</option>
+                                    <option th:each="conbuy : ${conbuy}" th:value="${conbuy.admCode}" th:text="${conbuy.admSname}"></option>
+                                </select>
+                            </div>
+                            <div style="flex-shrink: 0;">
+                                <label>&nbsp;</label>
+                                <button type="button" id="searchButton" class="btn btn-primary">
+                                    <i class="ki-duotone ki-magnifier fs-4">
                                         <span class="path1"></span>
                                         <span class="path2"></span>
                                     </i>
+                                    조회
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- 추가 필터 (숨김) -->
+                        <div class="collapse mt-4" id="advancedFilters">
+                            <div class="separator separator-dashed mb-4"></div>
+                            <div class="search-row">
+                                <div class="search-group">
+                                    <label>처리상태</label>
+                                    <select id="status" class="form-select form-select-solid" data-control="select2" data-placeholder="전체" data-hide-search="true">
+                                        <option value="all">전체</option>
+                                        <option th:each="constat : ${constat}" th:value="${constat.admCode}" th:text="${constat.admSname}"></option>
+                                    </select>
+                                </div>
+                                <div class="search-group">
+                                    <label>담당자 처리</label>
+                                    <select id="custStat" class="form-select form-select-solid" data-control="select2" data-placeholder="전체" data-hide-search="true">
+                                        <option value="all">전체</option>
+                                        <option th:each="custStat : ${custStat}" th:value="${custStat.admCode}" th:text="${custStat.admSname}"></option>
+                                    </select>
+                                </div>
+                                <div class="search-group">
+                                    <label>구분</label>
+                                    <div class="nav-group nav-group-fluid">
+                                        <label>
+                                            <input type="radio" class="btn-check" name="filter" value="all" checked="checked" />
+                                            <span class="btn btn-sm btn-color-muted btn-active btn-active-primary fw-bold px-4">전체</span>
+                                        </label>
+                                        <label>
+                                            <input type="radio" class="btn-check" name="filter" value="emergency" />
+                                            <span class="btn btn-sm btn-color-muted btn-active btn-active-primary fw-bold px-4">긴급</span>
+                                        </label>
+                                        <label>
+                                            <input type="radio" class="btn-check" name="filter" value="normal" />
+                                            <span class="btn btn-sm btn-color-muted btn-active btn-active-primary fw-bold px-4">일반</span>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="modal-body py-10 px-lg-17">
-                                <div class="scroll-y me-n7 pe-7" id="kt_modal_new_address_scroll" data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_new_address_header" data-kt-scroll-wrappers="#kt_modal_new_address_scroll" data-kt-scroll-offset="300px">
-                                    <!-- 고객 정보 컨텐츠 카드 -->
-                                    <div class="card card-flush mb-6">
-                                        <div class="card-header">
-                                            <h3 class="card-title fw-semibold text-gray-800">고객 정보</h3>
-                                        </div>
-                                        <div class="card-body pt-0">
-                                            <div class="table-responsive">
-                                                <table class="table table-bordered table-hover">
-                                                    <tbody>
-                                                    <tr>
-                                                        <td class="fw-semibold bg-light-primary text-primary" style="width: 16.66%">상담일</td>
-                                                        <td id="inDate" style="width: 16.66%"></td>
-                                                        <td class="fw-semibold bg-light-primary text-primary" style="width: 16.66%">고객명</td>
-                                                        <td id="empNo" style="width: 16.66%"></td>
-                                                        <td class="fw-semibold bg-light-primary text-primary" style="width: 16.66%">전화번호</td>
-                                                        <td id="custTell" style="width: 16.66%"></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="fw-semibold bg-light-primary text-primary">상담유형</td>
-                                                        <td id="csType"></td>
-                                                        <td class="fw-semibold bg-light-primary text-primary">처리유형</td>
-                                                        <td id="prcGubn"></td>
-                                                        <td class="fw-semibold bg-light-primary text-primary">구매몰</td>
-                                                        <td id="buyGubn"></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="fw-semibold bg-light-primary text-primary">입금일</td>
-                                                        <td id="csDate"></td>
-                                                        <td class="fw-semibold bg-light-primary text-primary">입금은행</td>
-                                                        <td id="csBank"></td>
-                                                        <td class="fw-semibold bg-light-primary text-primary">입금액</td>
-                                                        <td id="csCash"></td>
-                                                    </tr>
-
-                                                    <input type="hidden" id="hcallCode">
-                                                    <input type="hidden" id="hpersonCode">
-                                                    <input type="hidden" id="hprojectCode">
-                                                    <input type="hidden" id="hcustCode">
-                                                    <input type="hidden" id="originalCompletionCode" name="originalCompletionCode" value="">
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- 상담/처리 내용 카드 -->
-                                    <div class="row mb-6">
-                                        <div class="col-md-6">
-                                            <div class="card card-flush h-100">
-                                                <div class="card-header">
-                                                    <h3 class="card-title fw-semibold text-gray-800">상담내용</h3>
-                                                </div>
-                                                <div class="card-body pt-0">
-                                                    <div class="content-wrapper" style="height: 250px; overflow-y: auto;">
-                                                        <textarea class="form-control form-control-solid border-0 bg-transparent p-0" name="csNote" rows="10" readonly style="height: 100%; resize: none;"></textarea>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="card card-flush h-100">
-                                                <div class="card-header">
-                                                    <h3 class="card-title fw-semibold text-gray-800">처리내용</h3>
-                                                </div>
-                                                <div class="card-body pt-0">
-                                                    <div class="content-wrapper" style="height: 250px; overflow-y: auto;">
-                                                        <textarea class="form-control form-control-solid border-0 bg-transparent p-0" name="prcNote" rows="10" readonly style="height: 100%; resize: none;"></textarea>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- 댓글 섹션 카드 -->
-                                    <div class="card card-flush mb-6">
-                                        <div class="card-header">
-                                            <h3 class="card-title fw-semibold text-gray-800">댓글 리스트</h3>
-                                        </div>
-                                        <div class="card-body pt-0">
-                                            <div class="comment-list mt-3 mb-5">
-                                                <div id="commentsList" class="py-2">
-                                                    <!-- 댓글 항목이 여기 추가됩니다 -->
-                                                </div>
-                                            </div>
-                                            
-                                            <!-- 댓글 입력 문 -->
-                                            <div class="d-flex mt-3">
-                                                <div class="form-floating flex-grow-1 me-3" id="commentsContainer">
-                                                    <textarea class="form-control" placeholder="댓글을 입력하세요" name="newComment" id="floatingTextarea2" style="height: 78px;"></textarea>
-                                                    <label for="floatingTextarea2">댓글 작성</label>
-                                                </div>
-                                                <div class="flex-shrink-0 d-flex flex-column">
-                                                    <div class="d-flex flex-column mb-2 comment-status-select">
-                                                        <!-- 셀렉트 박스가 여기에 동적으로 추가됩니다 -->
-                                                    </div>
-                                                    <button type="button" id="addCommentButton" class="btn btn-primary px-4">
-                                                        <i class="ki-duotone ki-check-circle fs-7 me-1"></i>
-                                                        등록
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- 상담 히스토리 카드 -->
-                                    <div class="card card-flush mb-6">
-                                        <div class="card-header">
-                                            <div class="card-title">
-                                                <h3 class="fw-semibold text-gray-800">고객 상담 히스토리</h3>
-                                            </div>
-                                            <div class="card-toolbar">
-                                                <span class="badge badge-light-primary">총 히스토리 <span id="historyCount">0</span>건</span>
-                                            </div>
-                                        </div>
-                                        <div class="card-body pt-0">
-                                            <div class="table-responsive">
-                                                <table id="historyTable" class="history-table w-100">
-                                                    <tbody>
-                                                    <!-- 히스토리 항목이 여기 추가됩니다 -->
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
+                        </div>
+                        
+                        <div class="text-center mt-2">
+                            <a href="#" class="text-primary fw-semibold" style="font-size: 0.75rem;" data-bs-toggle="collapse" data-bs-target="#advancedFilters">
+                                <span class="show-text">상세 필터 보기 ▼</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- 상태 탭 (상단 카드와 동일 기준) -->
+                    <div class="status-tabs">
+                        <button class="status-tab active" data-filter="all">
+                            📊 전체 <span class="tab-count" id="tab-all">0</span>
+                        </button>
+                        <button class="status-tab" data-filter="hasComment">
+                            💬 댓글 있음 <span class="tab-count" id="tab-hasComment">0</span>
+                        </button>
+                        <button class="status-tab" data-filter="completed">
+                            ✅ 처리완료 <span class="tab-count" id="tab-completed">0</span>
+                        </button>
+                        <button class="status-tab" data-filter="urgent">
+                            🚨 긴급 <span class="tab-count" id="tab-urgent">0</span>
+                        </button>
+                    </div>
+                    
+                    <!-- 결과 헤더 -->
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold" style="font-size: 0.9rem; color: #1e293b;">
+                            총 <span id="totalRecords" class="text-primary">0</span> 건
+                        </span>
+                    </div>
+                    
+                    <!-- 상담 리스트 -->
+                    <div class="consultation-list" id="consultationList">
+                        <!-- 데이터가 여기에 동적으로 추가됩니다 -->
+                    </div>
+                    
+                    <!-- 페이지네이션 -->
+                    <div class="pagination-container">
+                        <ul class="pagination" id="pagination">
+                            <input type="hidden" id="currentPage" name="currentPage">
+                        </ul>
+                    </div>
+                    
+                </div>
+            </div>
+            
+            <!-- 상세 모달 (개선) -->
+            <div class="modal fade" id="kt_modal_new_address" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-large modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <form class="form" action="#" id="kt_modal_new_address_form">
+                            <!-- 헤더 -->
+                            <div class="modal-header" id="kt_modal_new_address_header">
+                                <h2>📋 상담 내역 상세</h2>
+                                <button type="button" class="btn-close-modal" data-bs-dismiss="modal">
+                                    <i class="ki-duotone ki-cross fs-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                </button>
                             </div>
+                            
+                            <!-- 바디 -->
+                            <div class="modal-body">
+                                <!-- Hidden fields -->
+                                <input type="hidden" id="hcallCode">
+                                <input type="hidden" id="hpersonCode">
+                                <input type="hidden" id="hprojectCode">
+                                <input type="hidden" id="hcustCode">
+                                <input type="hidden" id="originalCompletionCode" name="originalCompletionCode" value="">
+                                
+                                <!-- 고객 정보 섹션 -->
+                                <div class="modal-section">
+                                    <div class="modal-section-title">
+                                        <i class="ki-duotone ki-profile-user fs-4"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                                        고객 정보
+                                    </div>
+                                    <div class="customer-info-grid">
+                                        <div class="info-item">
+                                            <div class="info-label">상담일</div>
+                                            <div class="info-value" id="inDate">-</div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">고객명</div>
+                                            <div class="info-value" id="empNo">-</div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">전화번호</div>
+                                            <div class="info-value" id="custTell">-</div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">상담유형</div>
+                                            <div class="info-value" id="csType">-</div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">처리유형</div>
+                                            <div class="info-value" id="prcGubn">-</div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">구매몰</div>
+                                            <div class="info-value" id="buyGubn">-</div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">입금일</div>
+                                            <div class="info-value" id="csDate">-</div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">입금은행</div>
+                                            <div class="info-value" id="csBank">-</div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">입금액</div>
+                                            <div class="info-value" id="csCash">-</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 상담/처리 내용 섹션 -->
+                                <div class="modal-section">
+                                    <div class="modal-section-title">
+                                        <i class="ki-duotone ki-document fs-4"><span class="path1"></span><span class="path2"></span></i>
+                                        상담 내용
+                                    </div>
+                                    <div class="content-tabs">
+                                        <button type="button" class="content-tab active" data-tab="consult">상담내용</button>
+                                        <button type="button" class="content-tab" data-tab="process">처리내용</button>
+                                    </div>
+                                    <div class="content-panel active" id="panel-consult">
+                                        <textarea name="csNote" readonly placeholder="상담 내용이 없습니다."></textarea>
+                                    </div>
+                                    <div class="content-panel" id="panel-process">
+                                        <textarea name="prcNote" readonly placeholder="처리 내용이 없습니다."></textarea>
+                                    </div>
+                                </div>
+                                
+                                <!-- 댓글 섹션 -->
+                                <div class="modal-section">
+                                    <div class="modal-section-title">
+                                        <i class="ki-duotone ki-message-text-2 fs-4"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
+                                        댓글
+                                        <span class="badge badge-light-primary ms-2" id="commentCount">0</span>
+                                    </div>
+                                    <div class="comments-container" id="commentsList">
+                                        <!-- 댓글이 여기에 추가됩니다 -->
+                                    </div>
+                                    <!-- 처리상태 변경 영역 -->
+                                    <div class="status-change-area" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; margin-bottom: 1rem;">
+                                        <span style="font-size: 0.85rem; font-weight: 600; color: #92400e; white-space: nowrap;">처리상태</span>
+                                        <div class="comment-status-select" style="flex: 1;"></div>
+                                        <button type="button" id="changeStatusButton" style="padding: 0.5rem 1rem; border-radius: 8px; background: #f59e0b; color: white; border: none; font-weight: 600; cursor: pointer; white-space: nowrap; font-size: 0.85rem;">상태 변경</button>
+                                    </div>
+                                    <!-- 댓글 입력 영역 -->
+                                    <div class="comment-input-area">
+                                        <textarea name="newComment" placeholder="댓글을 입력하세요..." rows="2"></textarea>
+                                        <div class="comment-actions">
+                                            <button type="button" id="addCommentButton">등록</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 히스토리 섹션 -->
+                                <div class="modal-section">
+                                    <div class="modal-section-title">
+                                        <i class="ki-duotone ki-time fs-4"><span class="path1"></span><span class="path2"></span></i>
+                                        상담 히스토리
+                                        <span class="badge badge-light-primary ms-2" id="historyCount">0</span>
+                                    </div>
+                                    <div class="timeline" id="historyTimeline">
+                                        <!-- 히스토리가 여기에 추가됩니다 -->
+                                    </div>
+                                </div>
+                                
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
-
-
+            
             <script>
+                // ============================================
+                // CSRF 토큰 설정 (plugins.bundle.js가 jQuery를 재초기화하므로 여기서 다시 설정)
+                // CookieCsrfTokenRepository 사용 → XSRF-TOKEN 쿠키에서 직접 읽음
+                // ============================================
+                function getCsrfTokenFromCookie() {
+                    var match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+                    return match ? decodeURIComponent(match[1]) : null;
+                }
+                
+                function csrfHeaders() {
+                    var headers = {};
+                    var token = getCsrfTokenFromCookie();
+                    if (token) {
+                        headers['X-XSRF-TOKEN'] = token;
+                    }
+                    return headers;
+                }
+                
+                // plugins.bundle.js가 jQuery를 덮어쓰므로, 모든 AJAX 요청에 CSRF 토큰 자동 포함
+                $.ajaxSetup({
+                    beforeSend: function(xhr) {
+                        var token = getCsrfTokenFromCookie();
+                        if (token) {
+                            xhr.setRequestHeader('X-XSRF-TOKEN', token);
+                        }
+                    }
+                });
+                
                 $(document).ready(function() {
-
+                    let currentCardFilter = 'all'; // all, hasComment, completed, urgent
+                    
                     function getToday() {
                         var today = new Date();
                         var year = today.getFullYear();
@@ -746,56 +1441,96 @@
                         var day = ('0' + today.getDate()).slice(-2);
                         return year + month + day;
                     }
-
+                    
+                    // 통계 카드 클릭
+                    $('.stat-card').click(function() {
+                        var filter = $(this).data('filter');
+                        currentCardFilter = filter;
+                        updateActiveStates();
+                        loadPage(1);
+                    });
+                    
+                    // 상태 탭 클릭
+                    $('.status-tab').click(function() {
+                        currentCardFilter = $(this).data('filter');
+                        updateActiveStates();
+                        loadPage(1);
+                    });
+                    
+                    function updateActiveStates() {
+                        // 카드 활성화 상태
+                        $('.stat-card').removeClass('active');
+                        $(`.stat-card[data-filter="${currentCardFilter}"]`).addClass('active');
+                        // 탭 활성화 상태
+                        $('.status-tab').removeClass('active');
+                        $(`.status-tab[data-filter="${currentCardFilter}"]`).addClass('active');
+                    }
+                    
                     function updatePagination(total, pageSize, currentPage) {
                         var pageCount = Math.ceil(total / pageSize);
                         var pagination = $('#pagination');
                         pagination.empty();
                         $('#currentPage').val(currentPage);
-                        // Previous button
+                        
                         if (currentPage > 1) {
-                            pagination.append(`<li class="page-item"><a href="#" class="page-link" onclick="loadPage(${currentPage - 1})"><i class="previous"></i></a></li>`);
-                        } else {
-                            pagination.append('<li class="page-item disabled"><a href="#" class="page-link"><i class="previous"></i></a></li>');
+                            pagination.append(`<li class="page-item"><a href="#" class="page-link" onclick="loadPage(${currentPage - 1})">‹</a></li>`);
                         }
-
-                        // Page numbers with "..."
+                        
                         var displayPages = 5;
                         var startPage = Math.max(1, currentPage - Math.floor(displayPages / 2));
                         var endPage = Math.min(pageCount, startPage + displayPages - 1);
-
+                        
                         if (startPage > 1) {
                             pagination.append('<li class="page-item"><a class="page-link" href="#" onclick="loadPage(1)">1</a></li>');
                             if (startPage > 2) {
                                 pagination.append('<li class="page-item disabled"><a class="page-link">...</a></li>');
                             }
                         }
-
+                        
                         for (let i = startPage; i <= endPage; i++) {
                             if (i === currentPage) {
-                                pagination.append(`<li class="page-item active"><a class="page-link" href="#" onclick="loadPage(${i})">${i}</a></li>`);
+                                pagination.append(`<li class="page-item active"><a class="page-link" href="#">${i}</a></li>`);
                             } else {
                                 pagination.append(`<li class="page-item"><a class="page-link" href="#" onclick="loadPage(${i})">${i}</a></li>`);
                             }
                         }
-
+                        
                         if (endPage < pageCount) {
                             if (endPage < pageCount - 1) {
                                 pagination.append('<li class="page-item disabled"><a class="page-link">...</a></li>');
                             }
                             pagination.append(`<li class="page-item"><a class="page-link" href="#" onclick="loadPage(${pageCount})">${pageCount}</a></li>`);
                         }
-
-                        // Next button
+                        
                         if (currentPage < pageCount) {
-                            pagination.append(`<li class="page-item"><a href="#" class="page-link" onclick="loadPage(${currentPage + 1})"><i class="next"></i></a></li>`);
-                        } else {
-                            pagination.append('<li class="page-item disabled"><a href="#" class="page-link"><i class="next"></i></a></li>');
+                            pagination.append(`<li class="page-item"><a href="#" class="page-link" onclick="loadPage(${currentPage + 1})">›</a></li>`);
                         }
                     }
-
+                    
+                    function getStatusClass(code) {
+                        switch(code) {
+                            case '1': return 'reception';
+                            case '2': return 'processing';
+                            case '3': return 'completed';
+                            default: return 'none';
+                        }
+                    }
+                    
+                    function getStatusText(code) {
+                        switch(code) {
+                            case '1': return 'CS 접수';
+                            case '2': return '처리중';
+                            case '3': return '처리완료';
+                            default: return '미설정';
+                        }
+                    }
+                    
+                    function truncateText(text, maxLength) {
+                        if (!text) return '';
+                        return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+                    }
+                    
                     window.loadPage = function(page) {
-
                         var hiddenStartDate = $('input[name="hidden_start_date"]').val() || getToday();
                         var hiddenEndDate = $('input[name="hidden_end_date"]').val() || getToday();
                         var status = $('#status').val();
@@ -803,14 +1538,16 @@
                         var mall = $('#mall').val();
                         var custStat = $('#custStat').val();
                         var keyword = $('#searchKeyword').val();
-
                         var filter = $('input[name="filter"]:checked').val();
-                        // Convert "all" to null
+                        
                         status = (status === "all") ? null : status;
                         type = (type === "all") ? null : type;
                         mall = (mall === "all") ? null : mall;
                         custStat = (custStat === "all") ? null : custStat;
-
+                        
+                        // 카드 필터에 따른 추가 조건
+                        var cardFilter = currentCardFilter;
+                        
                         var formData = {
                             startDate: hiddenStartDate,
                             endDate: hiddenEndDate,
@@ -820,498 +1557,463 @@
                             custStat: custStat,
                             filter: filter,
                             keyword: keyword,
+                            cardFilter: cardFilter,  // 카드 필터 추가
                             page: page,
-                            pageSize: 25
+                            pageSize: 15
                         };
-
-                        const loadingEl = document.createElement("div");
-                        document.body.prepend(loadingEl);
-                        loadingEl.classList.add("page-loader");
-                        loadingEl.classList.add("flex-column");
-                        loadingEl.classList.add("bg-dark");
-                        loadingEl.classList.add("bg-opacity-25");
-                        loadingEl.innerHTML = `<span class="spinner-border text-primary" role="status"></span><span class="text-gray-800 fs-6 fw-semibold mt-5">Loading...</span>`;
-
-                        // Show page loading
-                        KTApp.showPageLoading();
-
+                        
+                        if (typeof KTApp !== 'undefined' && KTApp.showPageLoading) {
+                            KTApp.showPageLoading();
+                        }
+                        
+                        // 통계 API 호출
+                        $.ajax({
+                            url: '/api/consultations/stats',
+                            type: 'GET',
+                            dataType: 'json',
+                            data: {
+                                startDate: hiddenStartDate,
+                                endDate: hiddenEndDate,
+                                status: status,
+                                type: type,
+                                mall: mall,
+                                keyword: keyword
+                            },
+                            success: function(stats) {
+                                console.log('통계 응답:', stats);
+                                var total = stats.TOTALCOUNT || 0;
+                                var hasComment = stats.HASCOMMENTCOUNT || 0;
+                                var completed = stats.COMPLETEDCOUNT || 0;
+                                var urgent = stats.URGENTCOUNT || 0;
+                                
+                                // 카드 업데이트
+                                $('#stat-total').text(total);
+                                $('#stat-hasComment').text(hasComment);
+                                $('#stat-completed').text(completed);
+                                $('#stat-urgent').text(urgent);
+                                
+                                // 탭 카운트 업데이트
+                                $('#tab-all').text(total);
+                                $('#tab-hasComment').text(hasComment);
+                                $('#tab-completed').text(completed);
+                                $('#tab-urgent').text(urgent);
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('통계 API 오류:', status, error);
+                            }
+                        });
+                        
                         $.ajax({
                             url: '/api/consultations',
                             type: 'GET',
+                            dataType: 'json',
                             data: formData,
                             success: function(response) {
-                                //console.log(response);
-                                var tbody = $('#kt_project_users_table tbody');
-                                tbody.empty();
-                                response.data.forEach(function(data) {
-
-                                    var csNoteFormatted = data.csNote ? data.csNote.replace(/\n/g, '<br>') : '';
-                                    var prcNoteFormatted = data.prcNote ? data.prcNote.replace(/\n/g, '<br>') : '';
-
-                                    var emgGubnBadge = data.emgGubn == '1' ?
-                                        '<span class="badge badge-light-danger">긴급</span>' :
-                                        '<span class="badge badge-light-success">일반</span>';
-                                    var completionCode;
-                                    if (data.completionCode === null || data.completionCode === undefined) {
-                                        completionCode = '';
-                                    } else {
-                                        switch(data.completionCode) {
-                                            case '1':
-                                                completionCode = '<span class="badge badge-light-warning">CS 접수</span>';
-                                                break;
-                                            case '2':
-                                                completionCode = '<span class="badge badge-light-warning">처리중</span>';
-                                                break;
-                                            case '3':
-                                                completionCode = '<span class="badge badge-light-success">처리완료</span>';
-                                                break;
-                                            default:
-                                                completionCode = '<span class="badge badge-light-secondary"></span>';
-                                                break;
-                                        }
-                                    }
-                                    tbody.append(
-                                        '<tr class="fs-6">' +
-                                        // 구분/처리상태
-                                        '<td class="align-middle">' +
-                                        '  <div class="d-flex flex-column">' +
-                                        '    <div class="mb-1">' + emgGubnBadge + '</div>' +
-                                        '    <div>' + completionCode + '</div>' +
-                                        '  </div>' +
-                                        '</td>' +
-                                        // 일자/시간
-                                        '<td class="align-middle">' +
-                                        '  <div class="d-flex flex-column">' +
-                                        '    <span class="fw-semibold text-gray-800">' + data.inDate + '</span>' +
-                                        '    <span class="text-muted">' + data.inTime + '</span>' +
-                                        '  </div>' +
-                                        '</td>' +
-                                        // 고객정보
-                                        '<td class="align-middle">' +
-                                        '  <div class="d-flex flex-column">' +
-                                        '    <span class="fw-semibold text-gray-800">' + data.empNo + '</span>' +
-                                        '    <span class="text-muted">' + data.custTell + '</span>' +
-                                        '  </div>' +
-                                        '</td>' +
-                                        // 사이트/구매몰
-                                        '<td class="align-middle">' +
-                                        '  <div class="d-flex flex-column">' +
-                                        '    <span class="text-gray-800">' + data.projectName + '</span>' +
-                                        '    <span class="badge badge-light-primary mt-1">' + data.buyGubn + '</span>' +
-                                        '  </div>' +
-                                        '</td>' +
-                                        // 상담유형/상담내용
-                                        '<td class="align-middle">' +
-                                        '  <div class="d-flex flex-column">' +
-                                        '    <div class="mb-1">' +
-                                        '      <span class="badge badge-light-info">' + data.csType + '</span>' +
-                                        '      <span class="ms-1">' + data.prcGubn + '</span>' +
-                                        '    </div>' +
-                                        '    <div class="content-wrapper" style="height: auto; max-height: 150px; overflow-y: auto; word-break: break-all;">' +
-                                        '      <div class="text-content-title">상담내용</div>' +
-                                        '      <div class="text-content">' + csNoteFormatted + '</div>' +
-                                        '    </div>' +
-                                        '  </div>' +
-                                        '</td>' +
-                                        // 처리내용
-                                        '<td class="align-middle">' +
-                                        '  <div class="content-wrapper" style="height: auto; max-height: 150px; overflow-y: auto; word-break: break-all;">' +
-                                        '    <div class="text-content-title">처리내용</div>' +
-                                        '    <div class="text-content">' + prcNoteFormatted + '</div>' +
-                                        '  </div>' +
-                                        '</td>' +
-                                        // 댓글
-                                        '<td class="align-middle text-center">' +
-                                        '  <span class="badge badge-circle badge-light-' + (data.countRe > 0 ? 'primary' : 'secondary') + ' fw-bold">' + data.countRe + '</span>' +
-                                        '</td>' +
-                                        // 관리
-                                        '<td class="align-middle text-center">' +
-                                        '  <a href="#" class="btn btn-sm btn-primary btn-icon view-button" data-call-code="' + data.callCode + '" data-person-code="' + data.personCode + '" data-project-code="' + data.projectCode + '" data-cust-code="' + data.custCode + '" data-bs-target="#kt_modal_new_address" data-bs-toggle="modal">' +
-                                        '    <i class="ki-duotone ki-eye">' +
-                                        '      <span class="path1"></span>' +
-                                        '      <span class="path2"></span>' +
-                                        '      <span class="path3"></span>' +
-                                        '    </i>' +
-                                        '  </a>' +
-                                        '</td>' +
-                                        '</tr>'
-                                    );
-
-
-
-                                });
+                              try {
+                                var list = $('#consultationList');
+                                list.empty();
+                                
+                                console.log('API 응답:', response);
+                                console.log('데이터 건수:', response.data ? response.data.length : 'data 없음', '총 건수:', response.total);
+                                
+                                if (!response.data || response.data.length === 0) {
+                                    list.html('<div class="empty-state"><i class="ki-duotone ki-document fs-1"><span class="path1"></span><span class="path2"></span></i><p>조회된 상담이 없습니다.</p></div>');
+                                } else {
+                                    response.data.forEach(function(data) {
+                                        var isUrgent = data.emgGubn === '1';
+                                        var statusClass = getStatusClass(data.completionCode);
+                                        var statusText = getStatusText(data.completionCode);
+                                        var customerInitial = data.empNo ? data.empNo.charAt(0) : '?';
+                                        
+                                        var card = `
+                                            <div class="consultation-card ${isUrgent ? 'urgent' : ''}" 
+                                                 data-call-code="${data.callCode}" 
+                                                 data-person-code="${data.personCode}" 
+                                                 data-project-code="${data.projectCode}" 
+                                                 data-cust-code="${data.custCode}">
+                                                <div class="card-header-row">
+                                                    <div class="customer-info">
+                                                        <div class="customer-avatar">${customerInitial}</div>
+                                                        <div class="customer-details">
+                                                            <div class="customer-name-row">
+                                                                <h4>${data.empNo || '-'}</h4>
+                                                                <span class="phone">${data.custTell || '-'}</span>
+                                                                <div class="tags">
+                                                                    ${data.csType ? `<span class="tag type">${data.csType}</span>` : ''}
+                                                                    ${data.projectName ? `<span class="tag site">${data.projectName}</span>` : ''}
+                                                                    ${data.buyGubn ? `<span class="tag mall">${data.buyGubn}</span>` : ''}
+                                                                </div>
+                                                                ${isUrgent ? '<span class="badge-emg urgent">긴급</span>' : ''}
+                                                                <span class="status-dot ${statusClass}">${statusText}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-meta">
+                                                        <div class="d-flex align-items-center gap-2">
+                                                            <div class="comment-count ${data.countRe > 0 ? 'has-comments' : ''}">
+                                                                <i class="ki-duotone ki-message-text-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
+                                                                ${data.countRe || 0}
+                                                            </div>
+                                                            <div class="datetime">
+                                                                <span class="date">${data.inDate || '-'}</span>
+                                                                <span>${data.inTime || ''}</span>
+                                                            </div>
+                                                            <button class="action-btn primary view-button" 
+                                                                    data-call-code="${data.callCode}" 
+                                                                    data-person-code="${data.personCode}" 
+                                                                    data-project-code="${data.projectCode}" 
+                                                                    data-cust-code="${data.custCode}">
+                                                                <i class="ki-duotone ki-eye"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="card-body-row">
+                                                    <div class="content-box">
+                                                        <div class="label">상담내용</div>
+                                                        <div class="text">${data.csNote || '-'}</div>
+                                                    </div>
+                                                    <div class="content-box">
+                                                        <div class="label">처리내용</div>
+                                                        <div class="text">${data.prcNote || '-'}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        `;
+                                        list.append(card);
+                                    });
+                                }
+                                
                                 $('#totalRecords').text(response.total);
-                                KTApp.hidePageLoading();
                                 updatePagination(response.total, formData.pageSize, page);
+                              } catch(e) {
+                                console.error('렌더링 오류:', e);
+                                var list = $('#consultationList');
+                                if (list.children().length === 0) {
+                                    list.html('<div class="empty-state"><p>렌더링 중 오류가 발생했습니다: ' + e.message + '</p></div>');
+                                }
+                              } finally {
+                                if (typeof KTApp !== 'undefined' && KTApp.hidePageLoading) {
+                                    KTApp.hidePageLoading();
+                                }
+                              }
                             },
-                            error: function(error) {
-                                KTApp.hidePageLoading();
-                                console.log('Error fetching data:', error);
+                            error: function(xhr, status, error) {
+                                if (typeof KTApp !== 'undefined' && KTApp.hidePageLoading) {
+                                    KTApp.hidePageLoading();
+                                }
+                                console.error('AJAX Error:', status, error);
+                                console.error('Response:', xhr.responseText);
+                                var list = $('#consultationList');
+                                list.html('<div class="empty-state"><i class="ki-duotone ki-document fs-1"><span class="path1"></span><span class="path2"></span></i><p>데이터 로딩 중 오류가 발생했습니다. (상태: ' + status + ')</p></div>');
                             }
                         });
                     }
-
+                    
                     $('#searchButton').click(function() {
-                        loadPage(1); // Load first page on search
+                        loadPage(1);
                     });
-
-                    // View button click handler
-                    $(document).on('click', '.view-button', function() {
+                    
+                    // 엔터 키 검색
+                    $('#searchKeyword').keypress(function(e) {
+                        if (e.which === 13) {
+                            loadPage(1);
+                        }
+                    });
+                    
+                    // 탭 전환
+                    $(document).on('click', '.content-tab', function() {
+                        var tab = $(this).data('tab');
+                        $('.content-tab').removeClass('active');
+                        $(this).addClass('active');
+                        $('.content-panel').removeClass('active');
+                        $('#panel-' + tab).addClass('active');
+                    });
+                    
+                    // 카드 더블클릭으로 상세 모달 열기
+                    $(document).on('dblclick', '.consultation-card', function(e) {
                         var callCode = $(this).data('call-code');
                         var personCode = $(this).data('person-code');
                         var projectCode = $(this).data('project-code');
                         var custCode = $(this).data('cust-code');
+                        openDetailModal(callCode, personCode, projectCode, custCode);
+                    });
 
+                    // 상세 보기 버튼
+                    $(document).on('click', '.view-button', function(e) {
+                        e.stopPropagation();
+                        var callCode = $(this).data('call-code');
+                        var personCode = $(this).data('person-code');
+                        var projectCode = $(this).data('project-code');
+                        var custCode = $(this).data('cust-code');
+                        openDetailModal(callCode, personCode, projectCode, custCode);
+                    });
+
+                    function openDetailModal(callCode, personCode, projectCode, custCode) {
                         $.ajax({
                             url: '/api/consultations/details',
                             type: 'GET',
-                            data: {
-                                callCode: callCode,
-                                personCode: personCode,
-                                projectCode: projectCode,
-                                custCode: custCode
-                            },
+                            data: { callCode, personCode, projectCode, custCode },
                             success: function(response) {
                                 var data = response.data;
-                                var comments = response.total;
                                 var history = response.history;
-
-                                function formatText(text) {
-                                    return text.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>');
-                                }
+                                
                                 function decodeHtml(html) {
                                     var txt = document.createElement("textarea");
                                     txt.innerHTML = html;
                                     return txt.value;
                                 }
+                                
                                 function safeValue(value) {
-                                    if (!value) return '';
-                                    // HTML 엔티티 디코딩
-                                    var decodedValue = decodeHtml(value);
-                                    // 이미 <br> 태그가 있는 경우 그대로 유지, 없는 경우 줄바꿈을 <br>로 변환
-                                    return decodedValue.replace(/(?!\<br\>)\n/g, '<br>');
+                                    if (!value) return '-';
+                                    return decodeHtml(value);
                                 }
-
+                                
                                 function safeValueText(value) {
                                     if (!value) return '';
-                                    var decodedValue = decodeHtml(value);
-                                    return decodedValue.replace(/<br\s*\/?>/gi, '\n');
+                                    var decoded = decodeHtml(value);
+                                    return decoded.replace(/<br\s*\/?>/gi, '\n');
                                 }
-                                // Generate badge for emgGubn
-                                var emgGubnBadge = data.emgGubn == '1' ?'<span class="badge badge-light-danger fw-bold px-4 py-3">긴급</span>' : '<span class="badge badge-light-success fw-bold px-4 py-3">일반</span>';
-                                var completionCode;
+                                
+                                // 헤더 업데이트 (새로운 스타일)
+                                var emgBadge = data.emgGubn == '1' 
+                                    ? '<span class="status-badge urgent">🚨 긴급</span>' 
+                                    : '<span class="status-badge normal">일반</span>';
+                                var statusBadge = '';
                                 switch(data.completionCode) {
-                                    case '1':
-                                        completionCode = '<span class="badge badge-light-warning fw-bold px-4 py-3">CS 접수</span>';
-                                        break;
-                                    case '2':
-                                        completionCode = '<span class="badge badge-light-secondary fw-bold px-4 py-3">처리중</span>';
-                                        break;
-                                    case '3':
-                                        completionCode = '<span class="badge badge-light-success fw-bold px-4 py-3">처리완료</span>';
-                                        break;
-                                    default:
-                                        completionCode = '<span class="badge badge-light-secondary fw-bold px-4 py-3"></span>';
-                                        break;
+                                    case '1': statusBadge = '<span class="status-badge reception">CS 접수</span>'; break;
+                                    case '2': statusBadge = '<span class="status-badge processing">처리중</span>'; break;
+                                    case '3': statusBadge = '<span class="status-badge completed">처리완료</span>'; break;
                                 }
-                                // Set modal header with badge
+                                
                                 $('#kt_modal_new_address_header').html(
-                                    '<h2>상담 내역 상세 ' + emgGubnBadge +' '+ completionCode+'</h2>' +
-                                    '<div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">' +
-                                    '<i class="ki-duotone ki-cross fs-1">' +
-                                    '<span class="path1"></span>' +
-                                    '<span class="path2"></span>' +
-                                    '</i>' +
-                                    '</div>'
+                                    '<h2>📋 상담 내역 상세 ' + emgBadge + ' ' + statusBadge + '</h2>' +
+                                    '<button type="button" class="btn-close-modal" data-bs-dismiss="modal">' +
+                                    '<i class="ki-duotone ki-cross fs-2"><span class="path1"></span><span class="path2"></span></i></button>'
                                 );
-
-                                $('#kt_modal_new_address').find('#inDate').text( safeValue(data.inDate));
-                                $('#kt_modal_new_address').find('#empNo').text(safeValue(data.empNo));
-                                $('#kt_modal_new_address').find('#custTell').text( safeValue(data.custTell));
-                                $('#kt_modal_new_address').find('#csType').text(safeValue(data.csType));
-                                $('#kt_modal_new_address').find('#prcGubn').text( safeValue(data.prcGubn));
-                                $('#kt_modal_new_address').find('#buyGubn').text(safeValue(data.buyGubn));
-                                $('#kt_modal_new_address').find('#csBank').text(safeValue(data.csBank));
-                                $('#kt_modal_new_address').find('#csDate').text( safeValue(data.csDate));
-                                $('#kt_modal_new_address').find('#csCash').text(safeValue(data.csCash));
-                                // Set the select value for completionCode
-
-
-                                $('#kt_modal_new_address').find('textarea[name="csNote"]').val(safeValueText(data.csNote));
-                                $('#kt_modal_new_address').find('textarea[name="prcNote"]').val(safeValueText(data.prcNote));
-
-                                $('#kt_modal_new_address').find('#hcallCode').val(data.callCode);
-                                $('#kt_modal_new_address').find('#hpersonCode').val(data.personCode);
-                                $('#kt_modal_new_address').find('#hprojectCode').val(data.projectCode);
-                                $('#kt_modal_new_address').find('#hcustCode').val(data.custCode);
-                                $('#kt_modal_new_address').find('#completionCode').val(data.custCode);
-                                $('#kt_modal_new_address').find('#originalCompletionCode').val(response.completionCode);
-                                // Fill comments list
-                                var commentsList = $('#kt_modal_new_address').find('#commentsList');
+                                
+                                // 고객 정보 업데이트
+                                $('#inDate').text(safeValue(data.inDate));
+                                $('#empNo').text(safeValue(data.empNo));
+                                $('#custTell').text(safeValue(data.custTell));
+                                $('#csType').text(safeValue(data.csType));
+                                $('#prcGubn').text(safeValue(data.prcGubn));
+                                $('#buyGubn').text(safeValue(data.buyGubn));
+                                $('#csBank').text(safeValue(data.csBank));
+                                $('#csDate').text(safeValue(data.csDate));
+                                $('#csCash').text(safeValue(data.csCash));
+                                
+                                // 상담/처리 내용
+                                $('textarea[name="csNote"]').val(safeValueText(data.csNote));
+                                $('textarea[name="prcNote"]').val(safeValueText(data.prcNote));
+                                
+                                // 탭 초기화
+                                $('.content-tab').removeClass('active');
+                                $('.content-tab[data-tab="consult"]').addClass('active');
+                                $('.content-panel').removeClass('active');
+                                $('#panel-consult').addClass('active');
+                                
+                                // Hidden 필드
+                                $('#hcallCode').val(data.callCode);
+                                $('#hpersonCode').val(data.personCode);
+                                $('#hprojectCode').val(data.projectCode);
+                                $('#hcustCode').val(data.custCode);
+                                $('#originalCompletionCode').val(response.completionCode);
+                                
+                                // 댓글 (채팅 스타일)
+                                var commentsList = $('#commentsList');
                                 commentsList.empty();
-                                response.total.forEach(function(comment) {
-                                    var commentItem = '<div class="comment-item p-3 mb-3" style="background-color: #f8f9fa; border-radius: 8px; border-left: 3px solid #009ef7;">' +
-                                                 '<div class="d-flex justify-content-between align-items-center mb-2">' +
-                                                 '<span class="fw-semibold text-gray-800">' + comment.userId + '</span>' +
-                                                 '<span class="text-muted fs-7">' + comment.inDate + '</span>' +
-                                                 '</div>' +
-                                                 '<div class="text-gray-700">' + safeValue(comment.conText) + '</div>' +
-                                                 '</div>';
-
-                                    commentsList.append(commentItem);
-                                });
-
-                                // Fill history list
-                                var historyTableBody = $('#historyTable tbody');
-                                historyTableBody.empty();
-                                history.forEach(function(historyItem) {
-                                    var historyRow = '';
-                                    // 히스토리 개수 업데이트
-                                    $('#historyCount').text(history.length);
-                                    if(historyItem.gubn === '1'){
-                                        historyRow = `
-                                             <tr>
-                                            <td class="date-time-column">${historyItem.inDate}<br>${historyItem.inTime}</td>
-                                            <td class="content-column">
-                                                <strong>상담내용:</strong><br>
-                                                ${safeValue(historyItem.csNote)}
-                                                ${historyItem.prcNote ? `
-                                                    <br><br>
-                                                    <strong>처리내용:</strong><br>
-                                                    ${safeValue(historyItem.prcNote)}
-                                                ` : ''}
-                                            </td>
-                                        </tr>`;
-                                    } else {
-                                        historyRow = `
-                                            <tr class="sub-row">
-                                                <td></td>
-                                                <td class="content-column">
-                                                    ㄴ ${safeValue(historyItem.csNote)}
-                                                    <br>
-                                                    <small>${historyItem.inDate} ${historyItem.inTime}</small>
-                                                </td>
-                                            </tr>`;
-                                    }
-
-
-                                    historyTableBody.append(historyRow);
-                                });
-
-                                // COMPLETION_CODE에 따라 셀렉트 박스 표시 여부 결정
-                                console.log("Completion Code:", response.completionCode);
-
-                                // COMPLETION_CODE에 따라 셀렉트 박스 생성 또는 제거
-                                var completionCodeContainer = $('.comment-status-select');
-                                completionCodeContainer.empty(); // 기존 내용 제거
-
-                                if (response.completionCode !== null && response.completionCode !== undefined && response.completionCode !== '') {
-                                    var select = $('<select>', {
-                                        id: 'completionCodeSelect',
-                                        class: 'form-select form-select-solid  custom-select',
-                                        'data-control': 'select2',
-                                        'data-placeholder': 'Select Status',
-                                        'data-hide-search': 'true'
+                                $('#commentCount').text(response.total.length);
+                                
+                                if (response.total.length === 0) {
+                                    commentsList.html('<div class="text-center text-muted py-4">등록된 댓글이 없습니다.</div>');
+                                } else {
+                                    response.total.forEach(function(comment) {
+                                        var initial = comment.userId ? comment.userId.charAt(0).toUpperCase() : '?';
+                                        commentsList.append(
+                                            '<div class="comment-bubble">' +
+                                            '<div class="comment-avatar">' + initial + '</div>' +
+                                            '<div class="comment-content">' +
+                                            '<div class="comment-header">' +
+                                            '<span class="comment-author">' + comment.userId + '</span>' +
+                                            '<span class="comment-date">' + comment.inDate + '</span>' +
+                                            '</div>' +
+                                            '<div class="comment-text">' + safeValue(comment.conText) + '</div>' +
+                                            '</div></div>'
+                                        );
                                     });
-
-                                    var options = [
-                                        {value: '1', text: 'CS 접수'},
-                                        {value: '2', text: '처리중'},
-                                        {value: '3', text: '처리완료'}
-                                    ];
-
-                                    options.forEach(function(option) {
-                                        select.append($('<option>', {
-                                            value: option.value,
-                                            text: option.text
-                                        }));
-                                    });
-
-                                    select.val(response.completionCode);
-                                    // 원래의 completionCode 값을 hidden input에 저장
-                                    $('#originalCompletionCode').val(response.completionCode);
-                                    completionCodeContainer.append(select);
-
-                                    // Select2 초기화 (필요한 경우)
-                                    select.select2();
-
-                                    $('<style>')
-                                    .prop('type', 'text/css')
-                                        .html(`
-                                        .custom-select {
-                                            background-color: #FFD700 !important; /* 밝은 노란색 */
-                                            color: #000000 !important; /* 검은색 텍스트 */
-                                            font-weight: bold !important;
-                                            border: 2px solid #FFA500 !important; /* 주황색 테두리 */
-                                            padding: 0.25rem 0.5rem !important; /* 상하 패딩 줄임 */
-                                            font-size: 1.0rem !important; /* 폰트 사이즈 줄임 */
-                                            height: auto !important; /* 높이 자동 조절 */
-                                            line-height: 1.2 !important; /* 줄 간격 줄임 */
-                                            width: 20px !important; /* 너비 자동 조절 (또는 특정 값 지정) */
-                                            min-width: min-content !important; /* 최소 너비를 내용에 맞춤 */
-                                            max-width: max-content !important; /* 최대 너비를 내용에 맞춤 */
-                                        }
-                                        .custom-select:focus {
-                                            box-shadow: 0 0 0 0.2rem rgba(255, 165, 0, 0.5) !important; /* 포커스 시 주황색 그림자 */
-                                        }
-                                    `)
-                                        .appendTo('head');
                                 }
+                                
+                                // 히스토리 (타임라인 스타일)
+                                var timeline = $('#historyTimeline');
+                                timeline.empty();
+                                $('#historyCount').text(history.length);
+                                
+                                if (history.length === 0) {
+                                    timeline.html('<div class="text-center text-muted py-4">상담 히스토리가 없습니다.</div>');
+                                } else {
+                                    history.forEach(function(item) {
+                                        if (item.gubn === '1') {
+                                            timeline.append(
+                                                '<div class="timeline-item">' +
+                                                '<div class="timeline-dot"></div>' +
+                                                '<div class="timeline-content">' +
+                                                '<div class="timeline-header">' +
+                                                '<span class="timeline-date">' + item.inDate + ' ' + item.inTime + '</span>' +
+                                                '</div>' +
+                                                '<div class="timeline-text">' +
+                                                '<strong>상담내용</strong>' + safeValue(item.csNote) +
+                                                (item.prcNote ? '<br><br><strong>처리내용</strong>' + safeValue(item.prcNote) : '') +
+                                                '</div></div></div>'
+                                            );
+                                        } else {
+                                            timeline.append(
+                                                '<div class="timeline-item sub">' +
+                                                '<div class="timeline-dot"></div>' +
+                                                '<div class="timeline-content">' +
+                                                '<div class="timeline-text">' + safeValue(item.csNote) + '</div>' +
+                                                '<small class="text-muted">' + item.inDate + ' ' + item.inTime + '</small>' +
+                                                '</div></div>'
+                                            );
+                                        }
+                                    });
+                                }
+                                
+                                // 상태 셀렉트 (항상 표시)
+                                var selectContainer = $('.comment-status-select');
+                                selectContainer.empty();
+                                var currentCode = response.completionCode || '1';
+                                var select = $('<select id="completionCodeSelect" style="background-color: #FFF3CD; color: #856404; font-weight: bold; border: 2px solid #FFC107; padding: 0.5rem; border-radius: 8px; font-size: 0.85rem;">' +
+                                    '<option value="1">CS 접수</option>' +
+                                    '<option value="2">처리중</option>' +
+                                    '<option value="3">처리완료</option></select>');
+                                select.val(currentCode);
+                                $('#originalCompletionCode').val(currentCode);
+                                selectContainer.append(select);
+                                $('#kt_modal_new_address').modal('show');
+                            }
+                        });
+                    }
+                    
+                    // 처리상태만 변경 (댓글 없이)
+                    $('#changeStatusButton').click(function() {
+                        var callCode = $('#hcallCode').val();
+                        var personCode = $('#hpersonCode').val();
+                        var projectCode = $('#hprojectCode').val();
+                        var custCode = $('#hcustCode').val();
+                        var completionCode = $('#completionCodeSelect').val();
+                        var originalCode = $('#originalCompletionCode').val();
+                        
+                        if (completionCode === originalCode) {
+                            alert('처리상태가 변경되지 않았습니다.');
+                            return;
+                        }
+                        
+                        $.ajax({
+                            url: '/api/consultations/updateCompletionCode',
+                            type: 'POST',
+                            headers: csrfHeaders(),
+                            contentType: 'application/json',
+                            data: JSON.stringify({ callCode, personCode, projectCode, custCode, completionCode }),
+                            success: function(response) {
+                                if (response === 'NO_RECORD') {
+                                    alert('이 상담건에 대한 고객처리 레코드가 아직 없어 처리상태를 변경할 수 없습니다.');
+                                    return;
+                                }
+                                $('#originalCompletionCode').val(completionCode);
+                                loadPage($('#currentPage').val() || 1);
+                                alert('처리상태가 변경되었습니다.');
                             },
-                            error: function(error) {
-                                console.log('Error fetching data:', error);
+                            error: function() {
+                                alert('처리상태 변경 중 오류가 발생했습니다.');
                             }
                         });
                     });
-                    // Add comment button click handler
+                    
+                    // 댓글 추가
                     $('#addCommentButton').click(function() {
-                        var callCode = $('#kt_modal_new_address').find('#hcallCode').val();
-                        var personCode = $('#kt_modal_new_address').find('#hpersonCode').val();
-                        var projectCode = $('#kt_modal_new_address').find('#hprojectCode').val();
-                        var custCode = $('#kt_modal_new_address').find('#hcustCode').val();
-                        var newComment = $('textarea[name="newComment"]').val();
-
-                        var completionCode = $('#kt_modal_new_address').find('#completionCodeSelect').val();
-                        var originalCompletionCode = $('#kt_modal_new_address').find('#originalCompletionCode').val();
-
-                        var newComment = $('#kt_modal_new_address').find('textarea[name="newComment"]').val().trim();
-                        if (newComment === '') {
+                        var callCode = $('#hcallCode').val();
+                        var personCode = $('#hpersonCode').val();
+                        var projectCode = $('#hprojectCode').val();
+                        var custCode = $('#hcustCode').val();
+                        var newComment = $('textarea[name="newComment"]').val().trim();
+                        var completionCode = $('#completionCodeSelect').val();
+                        
+                        if (!newComment) {
                             alert('댓글을 입력하세요.');
                             return;
                         }
-
-                        //console.log(callCode + ' ' + personCode + ' ' + projectCode + ' ' + custCode + ' ' + newComment);
-
-                        var formData = {
-                            callCode: callCode,
-                            personCode: personCode,
-                            projectCode: projectCode,
-                            custCode: custCode,
-                            conText: newComment,
-                            completionCode: completionCode
-                        };
-
+                        
                         $.ajax({
-
                             url: '/api/consultations/addComment',
                             type: 'POST',
-                            contentType: 'application/json', // Set Content-Type to application/json
-                            data: JSON.stringify(formData), // Convert formData to JSON string
-                            success: function(response) {
-                                console.log('completionCode:', completionCode);
-                                console.log('originalCompletionCode:', originalCompletionCode);
-
-                                // Refresh comments list
-                                if (completionCode !== originalCompletionCode) {
-                                    $.ajax({
-                                        url: '/api/consultations/updateCompletionCode',
-                                        type: 'POST',
-                                        contentType: 'application/json',
-                                        data: JSON.stringify({
-                                            callCode: callCode,
-                                            personCode: personCode,
-                                            projectCode: projectCode,
-                                            custCode: custCode,
-                                            completionCode: completionCode
-                                        }),
-                                        success: function(updateResponse) {
-                                        console.log('TBND01_CUST updated successfully');
-                                        $('#kt_modal_new_address').find('#originalCompletionCode').val(completionCode);
-                                        var currentPage = $('#currentPage').val() || 1; // 현재 페이지 번호 가져오기
-                                        loadPage(currentPage); // 현재 페이지 번호로 loadPage 호출
-                                        refreshComments(callCode, personCode, projectCode, custCode);
-                                            alert('등록완료');
-                                        },
-                                        error: function(updateError) {
-                                            console.log('Error updating TBND01_CUST:', updateError);
-                                        }
-                                    });
-                                }
-
+                            headers: csrfHeaders(),
+                            contentType: 'application/json',
+                            data: JSON.stringify({ callCode, personCode, projectCode, custCode, conText: newComment, completionCode }),
+                            success: function() {
                                 refreshComments(callCode, personCode, projectCode, custCode);
-                            },
-                            error: function(error) {
-                                console.log('Error adding comment:', error);
                             }
                         });
                     });
-
-
-
-                    $('#downloadExcelButton').click(function() {
-                        var hiddenStartDate = $('input[name="hidden_start_date"]').val() || getToday();
-                        var hiddenEndDate = $('input[name="hidden_end_date"]').val() || getToday();
-                        var status = $('#status').val();
-                        var type = $('#type').val();
-                        var mall = $('#mall').val();
-                        var keyword = $('#searchKeyword').val();
-                        var filter = $('input[name="filter"]:checked').val();
-
-                        // Convert "all" to null
-                        status = (status === "all") ? null : status;
-                        type = (type === "all") ? null : type;
-                        mall = (mall === "all") ? null : mall;
-
-                        var formData = $.param({
-                            startDate: hiddenStartDate,
-                            endDate: hiddenEndDate,
-                            status: status,
-                            type: type,
-                            mall: mall,
-                            filter: filter,
-                            keyword: keyword
+                    
+                    function refreshComments(callCode, personCode, projectCode, custCode) {
+                        $.ajax({
+                            url: '/api/consultations/details',
+                            type: 'GET',
+                            data: { callCode, personCode, projectCode, custCode },
+                            success: function(response) {
+                                var commentsList = $('#commentsList');
+                                commentsList.empty();
+                                $('#commentCount').text(response.total.length);
+                                
+                                if (response.total.length === 0) {
+                                    commentsList.html('<div class="text-center text-muted py-4">등록된 댓글이 없습니다.</div>');
+                                } else {
+                                    response.total.forEach(function(comment) {
+                                        var initial = comment.userId ? comment.userId.charAt(0).toUpperCase() : '?';
+                                        commentsList.append(
+                                            '<div class="comment-bubble">' +
+                                            '<div class="comment-avatar">' + initial + '</div>' +
+                                            '<div class="comment-content">' +
+                                            '<div class="comment-header">' +
+                                            '<span class="comment-author">' + comment.userId + '</span>' +
+                                            '<span class="comment-date">' + comment.inDate + '</span>' +
+                                            '</div>' +
+                                            '<div class="comment-text">' + comment.conText + '</div>' +
+                                            '</div></div>'
+                                        );
+                                    });
+                                }
+                                $('textarea[name="newComment"]').val('');
+                            }
                         });
-                        window.location.href = '/api/consultations/excel?' +formData;
+                    }
+                    
+                    // 엑셀 다운로드
+                    $('#downloadExcelButton').click(function() {
+                        var params = $.param({
+                            startDate: $('input[name="hidden_start_date"]').val() || getToday(),
+                            endDate: $('input[name="hidden_end_date"]').val() || getToday(),
+                            status: $('#status').val() === 'all' ? null : $('#status').val(),
+                            type: $('#type').val() === 'all' ? null : $('#type').val(),
+                            mall: $('#mall').val() === 'all' ? null : $('#mall').val(),
+                            filter: $('input[name="filter"]:checked').val(),
+                            keyword: $('#searchKeyword').val()
+                        });
+                        window.location.href = '/api/consultations/excel?' + params;
                     });
-
-                    /* 모달 닫힘 이벤트 리스너 추가
-                    $('#kt_modal_new_address').on('hidden.bs.modal', function () {
-
-                    });*/
+                    
+                    // 페이지 로드 시 자동 조회
+                    loadPage(1);
                 });
-
-
-                function refreshComments(callCode, personCode, projectCode, custCode) {
-                    $.ajax({
-                        url: '/api/consultations/details',
-                        type: 'GET',
-                        data: {
-                            callCode: callCode,
-                            personCode: personCode,
-                            projectCode: projectCode,
-                            custCode: custCode
-                        },
-                        success: function(response) {
-                            var comments = response.total;
-                            var commentsList = $('#kt_modal_new_address').find('#commentsList');
-                            commentsList.empty();
-                            comments.forEach(function(comment) {
-                                var commentItem = '<div class="comment-item p-3 mb-3" style="background-color: #f8f9fa; border-radius: 8px; border-left: 3px solid #009ef7;">' +
-                                                 '<div class="d-flex justify-content-between align-items-center mb-2">' +
-                                                 '<span class="fw-semibold text-gray-800">' + comment.userId + '</span>' +
-                                                 '<span class="text-muted fs-7">' + comment.inDate + '</span>' +
-                                                 '</div>' +
-                                                 '<div class="text-gray-700">' + comment.conText + '</div>' +
-                                                 '</div>';
-
-                                commentsList.append(commentItem);
-                            });
-                            $('textarea[name="newComment"]').val('');
-                        },
-                        error: function(error) {
-                            console.log('Error refreshing comments:', error);
-                        }
-                    });
-                }
             </script>
-
+            
         </div>
-        <!--end::Content wrapper-->
-        <!--begin::Footer-->
+        
         <script src="/assets/js/board/scripts.bundle.js"></script>
         <script src="/assets/js/common/date.js"></script>
         <script src="/assets/js/custom/utilities/search/horizontal.js"></script>
-        <!--end::Footer-->
     </div>
 </div>
 </html>

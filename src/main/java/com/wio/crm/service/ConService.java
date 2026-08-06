@@ -44,8 +44,8 @@ public class ConService {
         return userDetails.getTcntUserInfo() != null ? userDetails.getTcntUserInfo().getCustCode() : "";
     }
 
-    public List<Consultation> getConsultations(int page, int pageSize, String startDate, String endDate, String status, String type, String mall ,String custStat, String  keyword,String filter) {
-        int offset = (page - 1) * pageSize+ 1;
+    public List<Consultation> getConsultations(int page, int pageSize, String startDate, String endDate, String status, String type, String mall, String custStat, String keyword, String filter, String cardFilter) {
+        int offset = (page - 1) * pageSize + 1;
         int limit = page * pageSize;
         Map<String, Object> params = new HashMap<>();
         params.put("custCode", getCurrentCustcode());
@@ -57,14 +57,14 @@ public class ConService {
         params.put("custStat", custStat);
         params.put("keyword", keyword);
         params.put("filter", filter);
+        params.put("cardFilter", cardFilter);
         params.put("offset", offset);
         params.put("limit", limit);
-
 
         return consMapper.selectList("selectList", params);
     }
 
-    public int countTotal(String startDate, String endDate, String status, String type, String mall,String custStat, String  keyword,String filter) {
+    public int countTotal(String startDate, String endDate, String status, String type, String mall, String custStat, String keyword, String filter, String cardFilter) {
         Map<String, Object> params = new HashMap<>();
         params.put("custCode", getCurrentCustcode());
         params.put("startDate", startDate);
@@ -75,6 +75,7 @@ public class ConService {
         params.put("type", type);
         params.put("mall", mall);
         params.put("custStat", custStat);
+        params.put("cardFilter", cardFilter);
         return consMapper.countTotal(params);
     }
     public List<Consultation> getConsultationsForExcel(String startDate, String endDate, String status, String type, String mall,String custStat, String filter, String keyword) {
@@ -134,8 +135,20 @@ public class ConService {
         consMapper.insertComment(comment);
     }
 
-    public void updateCompletionCode(CompletionCode request) {
-        consMapper.updateCompletionCode(request);
+    public int updateCompletionCode(CompletionCode request) {
+        return consMapper.updateCompletionCode(request);
+    }
+
+    public Map<String, Object> getConsultationStats(String startDate, String endDate, String status, String type, String mall, String keyword) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("custCode", getCurrentCustcode());
+        params.put("startDate", startDate);
+        params.put("endDate", endDate);
+        params.put("status", status);
+        params.put("type", type);
+        params.put("mall", mall);
+        params.put("keyword", keyword);
+        return consMapper.getConsultationStats(params);
     }
 }
 

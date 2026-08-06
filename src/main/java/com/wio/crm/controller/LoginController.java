@@ -51,7 +51,6 @@ public class LoginController {
     @PostMapping("/apply-userid")
     public ResponseEntity<?> applyUserId(@RequestBody UserInfo userInfo) {
         loginService.applyUserId(userInfo);
-        //System.out.println(userInfo);
         return ResponseEntity.ok().build();
     }
 

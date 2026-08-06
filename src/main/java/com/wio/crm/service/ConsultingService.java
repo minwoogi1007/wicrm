@@ -5,6 +5,7 @@ import com.wio.crm.model.ConsultingInquiry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,6 +19,9 @@ import java.util.Map;
 public class ConsultingService {
 
     private final Logger logger = LoggerFactory.getLogger(ConsultingService.class);
+
+    @Value("${app.file-server.url}${app.file-server.upload-path}")
+    private String fileServerUploadUrl;
 
     @Autowired
     private ConsultingMapper consultingMapper;
@@ -82,16 +86,27 @@ public class ConsultingService {
     /**
      * 상태별 상담 문의 건수 조회
      */
-    public Map<String, Long> getStatusCounts(String customerName, String phoneNumber, String orderNumber, String inquiryType) {
+    public Map<String, Long> getStatusCounts(String keyword, String customerName, String phoneNumber, String orderNumber, String inquiryType) {
+        return getStatusCounts(keyword, customerName, phoneNumber, orderNumber, inquiryType, null, null);
+    }
+
+    /**
+     * 상태별 상담 문의 건수 조회 (날짜 범위 포함)
+     */
+    public Map<String, Long> getStatusCounts(String keyword, String customerName, String phoneNumber, String orderNumber, String inquiryType,
+                                              String startDate, String endDate) {
         Map<String, Long> statusCounts = new HashMap<>();
         
         try {
             // 기본 파라미터 셋업
             Map<String, Object> baseParams = new HashMap<>();
+            baseParams.put("keyword", keyword);
             baseParams.put("customerName", customerName);
             baseParams.put("phoneNumber", phoneNumber);
             baseParams.put("orderNumber", orderNumber);
             baseParams.put("inquiryType", inquiryType);
+            baseParams.put("startDate", startDate);
+            baseParams.put("endDate", endDate);
             
             // 대기중 건수 조회
             Map<String, Object> pendingParams = new HashMap<>(baseParams);
@@ -323,8 +338,7 @@ public class ConsultingService {
             // 전체 URL 구성
             String filePath = (String) processed.get("file_path");
             if (filePath != null) {
-                String serverUrl = "http://175.119.224.45:8080/uploads/";
-                String fullUrl = serverUrl + filePath;
+                String fullUrl = fileServerUploadUrl + filePath;
                 processed.put("full_url", fullUrl);
                 logger.info("[첨부파일 #{}] 전체 URL: {}", i+1, fullUrl);
             }
@@ -528,23 +542,28 @@ public class ConsultingService {
     /**
      * 페이징이 추가된 상담 문의 목록 조회
      */
-    public Map<String, Object> getConsultingInquiriesWithPaging(String customerName, String phoneNumber,
-            String orderNumber, String inquiryType, String status, String sortField, String sortDirection,
+    public Map<String, Object> getConsultingInquiriesWithPaging(String keyword, String customerName, String phoneNumber,
+            String orderNumber, String inquiryType, String status, 
+            String startDate, String endDate,
+            String sortField, String sortDirection,
             int offset, int limit) {
 
         Map<String, Object> params = new HashMap<>();
+        params.put("keyword", keyword);
         params.put("customerName", customerName);
         params.put("phoneNumber", phoneNumber);
         params.put("orderNumber", orderNumber);
         params.put("inquiryType", inquiryType);
         params.put("status", status);
+        params.put("startDate", startDate);
+        params.put("endDate", endDate);
         params.put("sortField", sortField);
         params.put("sortDirection", sortDirection);
         params.put("offset", offset);
         params.put("limit", limit);
 
-        logger.info("페이징 조회 파라미터: offset={}, limit={}, sortField={}, sortDirection={}",
-                 offset, limit, sortField, sortDirection);
+        logger.info("페이징 조회 파라미터: keyword={}, offset={}, limit={}, sortField={}, sortDirection={}",
+                 keyword, offset, limit, sortField, sortDirection);
 
         // 총 건수 조회
         long totalCount = 0;

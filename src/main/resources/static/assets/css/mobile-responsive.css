@@ -1,0 +1,493 @@
+/* ============================================
+   WICRM 전역 모바일 반응형 CSS
+   Metronic 테마 기반 모바일 UX 최적화
+   ============================================ */
+
+/* ===== 모바일 기본 (768px 이하) ===== */
+@media (max-width: 768px) {
+
+    /* --- 전역 터치 친화적 설정 --- */
+    body {
+        -webkit-text-size-adjust: 100%;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* --- 헤더 최적화 --- */
+    #kt_app_header .app-container {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+    }
+
+    #kt_app_header {
+        height: 50px !important;
+        min-height: 50px !important;
+    }
+
+    .app-navbar-item {
+        margin-left: 4px !important;
+    }
+
+    /* 모바일 사이드바 토글 버튼 확대 */
+    #kt_app_sidebar_mobile_toggle {
+        width: 40px !important;
+        height: 40px !important;
+    }
+
+    #kt_app_sidebar_mobile_toggle i {
+        font-size: 1.4rem !important;
+    }
+
+    /* --- 콘텐츠 영역 --- */
+    .app-main {
+        padding: 0 !important;
+    }
+
+    #kt_app_content_container.container-fluid,
+    #kt_app_content_container.container-xxl {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+
+    .app-container.container-fluid,
+    .app-container.container-xxl {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+
+    /* --- 카드 최적화 --- */
+    .card {
+        border-radius: 8px !important;
+        margin-bottom: 12px !important;
+    }
+
+    .card-header {
+        padding: 12px 16px !important;
+        min-height: auto !important;
+    }
+
+    .card-body {
+        padding: 12px 16px !important;
+    }
+
+    .card-title {
+        font-size: 14px !important;
+    }
+
+    /* --- 테이블 반응형 --- */
+    .table-responsive {
+        -webkit-overflow-scrolling: touch;
+        border: 1px solid #E5E7EB;
+        border-radius: 8px;
+    }
+
+    table.table {
+        font-size: 12px !important;
+    }
+
+    table.table th,
+    table.table td {
+        padding: 8px 10px !important;
+        white-space: nowrap;
+        font-size: 11px !important;
+    }
+
+    table.table th {
+        font-size: 11px !important;
+        font-weight: 600 !important;
+    }
+
+    /* 모든 테이블에 기본 반응형 스크롤 적용 */
+    .card-body > table,
+    .card-body > .table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* --- 버튼 터치 최적화 --- */
+    .btn {
+        min-height: 40px;
+        min-width: 40px;
+        font-size: 13px !important;
+    }
+
+    .btn-sm {
+        min-height: 34px;
+        min-width: 34px;
+        font-size: 12px !important;
+        padding: 6px 12px !important;
+    }
+
+    .btn-icon {
+        width: 40px !important;
+        height: 40px !important;
+    }
+
+    .btn-icon.btn-sm {
+        width: 34px !important;
+        height: 34px !important;
+    }
+
+    /* --- 폼 요소 터치 최적화 --- */
+    .form-control,
+    .form-select {
+        min-height: 40px !important;
+        font-size: 14px !important;
+        padding: 8px 12px !important;
+        border-radius: 6px !important;
+    }
+
+    .form-check-input {
+        width: 20px !important;
+        height: 20px !important;
+    }
+
+    select.form-select {
+        background-size: 16px 12px !important;
+    }
+
+    /* --- 검색 영역 --- */
+    .d-flex.flex-stack {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    /* --- 툴바 최적화 --- */
+    #kt_app_toolbar {
+        padding: 8px 0 !important;
+    }
+
+    .page-title h1,
+    .page-title .page-heading {
+        font-size: 16px !important;
+    }
+
+    .breadcrumb {
+        font-size: 11px !important;
+    }
+
+    /* --- 그리드 레이아웃 모바일 --- */
+    .row.g-5,
+    .row.g-xl-10 {
+        --bs-gutter-x: 12px !important;
+        --bs-gutter-y: 12px !important;
+    }
+
+    .col-md-6,
+    .col-lg-6,
+    .col-xl-6,
+    .col-xxl-3,
+    .col-xxl-4,
+    .col-xxl-6,
+    .col-xxl-8 {
+        width: 100% !important;
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+    }
+
+    /* 대시보드 2x2 그리드만 유지 */
+    .row.g-3.g-lg-6 > .col-6 {
+        width: 50% !important;
+        flex: 0 0 50% !important;
+        max-width: 50% !important;
+    }
+
+    /* --- 모달 최적화 --- */
+    .modal-dialog {
+        margin: 8px !important;
+        max-width: calc(100vw - 16px) !important;
+    }
+
+    .modal-content {
+        border-radius: 12px !important;
+    }
+
+    .modal-header {
+        padding: 16px !important;
+    }
+
+    .modal-body {
+        padding: 16px !important;
+    }
+
+    .modal-footer {
+        padding: 12px 16px !important;
+    }
+
+    /* --- 차트 영역 모바일 최적화 --- */
+    .min-h-auto[style*="height: 300px"],
+    div[style*="height: 300px"] {
+        height: 220px !important;
+    }
+
+    .min-h-auto[style*="height: 350px"],
+    div[style*="height: 350px"] {
+        height: 250px !important;
+    }
+
+    .h-325px {
+        height: 230px !important;
+    }
+
+    /* --- DataTables 모바일 최적화 --- */
+    div.dataTables_wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    div.dataTables_wrapper .dataTables_length,
+    div.dataTables_wrapper .dataTables_filter,
+    div.dataTables_wrapper .dataTables_info,
+    div.dataTables_wrapper .dataTables_paginate {
+        text-align: center !important;
+        float: none !important;
+        margin: 8px 0 !important;
+    }
+
+    div.dataTables_wrapper .dataTables_filter input {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    div.dataTables_wrapper .dataTables_paginate .paginate_button {
+        padding: 6px 10px !important;
+        min-width: 34px !important;
+    }
+
+    /* --- 스크롤탑 버튼 --- */
+    #kt_scrolltop {
+        bottom: 20px !important;
+        right: 12px !important;
+        width: 40px !important;
+        height: 40px !important;
+    }
+
+    /* --- 푸터 --- */
+    #kt_app_footer {
+        padding: 12px 16px !important;
+    }
+
+    #kt_app_footer .app-container {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+        font-size: 11px !important;
+    }
+
+    /* --- 뱃지 크기 최적화 --- */
+    .badge {
+        font-size: 10px !important;
+        padding: 4px 8px !important;
+    }
+
+    /* --- 마일리지/통계 카드 --- */
+    .fs-2hx {
+        font-size: 1.5rem !important;
+    }
+
+    .fs-2qx {
+        font-size: 1.3rem !important;
+    }
+
+    .fs-2x {
+        font-size: 1.2rem !important;
+    }
+
+    /* --- 토스트/알림 --- */
+    .swal2-popup {
+        width: calc(100vw - 32px) !important;
+        font-size: 14px !important;
+    }
+
+    /* --- 진행바 크기 --- */
+    .h-8px {
+        height: 6px !important;
+    }
+
+    /* --- 통계 카드 내부 --- */
+    .bg-gray-100.bg-opacity-70.rounded-2 {
+        padding: 12px 10px !important;
+    }
+
+    /* --- 날짜/시간 컬럼 --- */
+    .date-time-column {
+        width: 120px !important;
+        min-width: 60px !important;
+        max-width: 120px !important;
+        font-size: 11px !important;
+    }
+
+    /* --- 유저 메뉴 --- */
+    .menu-sub-dropdown {
+        width: calc(100vw - 32px) !important;
+        max-width: 275px !important;
+    }
+}
+
+/* ===== 소형 모바일 (480px 이하) ===== */
+@media (max-width: 480px) {
+
+    #kt_app_content_container.container-fluid,
+    #kt_app_content_container.container-xxl {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+    }
+
+    .card-header {
+        padding: 10px 12px !important;
+    }
+
+    .card-body {
+        padding: 10px 12px !important;
+    }
+
+    .card-title {
+        font-size: 13px !important;
+    }
+
+    /* 폰트 크기 조정 */
+    .fs-2hx {
+        font-size: 1.2rem !important;
+    }
+
+    .fs-2qx {
+        font-size: 1.1rem !important;
+    }
+
+    .fs-6 {
+        font-size: 0.85rem !important;
+    }
+
+    /* 대시보드 카드 높이 줄이기 */
+    .h-md-50 {
+        min-height: auto !important;
+    }
+
+    .h-xl-100 {
+        height: auto !important;
+    }
+
+    .h-lg-100 {
+        height: auto !important;
+    }
+
+    .h-md-100 {
+        height: auto !important;
+    }
+
+    /* 차트 높이 더 줄이기 */
+    .min-h-auto[style*="height: 300px"],
+    div[style*="height: 300px"] {
+        height: 180px !important;
+    }
+
+    .h-325px {
+        height: 200px !important;
+    }
+
+    /* 대시보드 통계 블록 */
+    .h-250px {
+        height: 180px !important;
+    }
+
+    /* 버튼 그룹 세로 배치 */
+    .d-flex.flex-stack {
+        flex-direction: column;
+        align-items: stretch !important;
+    }
+}
+
+/* ===== 태블릿 (769px ~ 1024px) ===== */
+@media (min-width: 769px) and (max-width: 1024px) {
+
+    /* 컨텐츠 영역 패딩 */
+    #kt_app_content_container.container-fluid,
+    #kt_app_content_container.container-xxl {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
+
+    /* 2열 그리드 유지 */
+    .col-xxl-3 {
+        width: 50% !important;
+        flex: 0 0 50% !important;
+        max-width: 50% !important;
+    }
+
+    .col-xxl-4 {
+        width: 50% !important;
+        flex: 0 0 50% !important;
+        max-width: 50% !important;
+    }
+
+    .col-xxl-6 {
+        width: 100% !important;
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+    }
+
+    .col-xxl-8 {
+        width: 100% !important;
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+    }
+
+    /* 테이블 최적화 */
+    table.table th,
+    table.table td {
+        padding: 8px 12px !important;
+        font-size: 12px !important;
+    }
+}
+
+/* ===== 사이드바 모바일 오버레이 개선 ===== */
+@media (max-width: 991.98px) {
+
+    /* 사이드바 드로어 개선 */
+    #kt_app_sidebar {
+        z-index: 1050 !important;
+    }
+
+    #kt_app_sidebar .app-sidebar-menu {
+        padding-bottom: 80px !important;
+    }
+
+    /* 사이드바 메뉴 터치 영역 확대 */
+    #kt_app_sidebar .menu-link {
+        padding: 10px 16px !important;
+        min-height: 44px !important;
+    }
+
+    #kt_app_sidebar .menu-title {
+        font-size: 13px !important;
+    }
+
+    #kt_app_sidebar .menu-bullet .bullet {
+        width: 6px !important;
+        height: 6px !important;
+    }
+
+    /* 사이드바 배너 숨기기 */
+    .sidebar-banners {
+        display: none !important;
+    }
+
+    /* 쿠팡 배너 숨기기 */
+    #kt_app_sidebar iframe[src*="coupa.ng"] {
+        display: none !important;
+    }
+
+    /* 사이드바 하단 여백 */
+    #kt_app_sidebar_menu_scroll {
+        padding-bottom: 20px !important;
+    }
+}
+
+/* ===== 인쇄 시 모바일 스타일 제외 ===== */
+@media print {
+    .floating-action-bar,
+    #kt_scrolltop,
+    #kt_app_sidebar_mobile_toggle {
+        display: none !important;
+    }
+}
