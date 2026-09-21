@@ -4,6 +4,8 @@
 
 ## 문서 목록 (현재 저장소 기준)
 
+- `SOURCE_ANALYSIS.md`: 공개 CRM 포털 아키텍처 분석(스택, 인증, 실시간 데이터 경로, 외부 WIO 관계, 배포, 리스크)
+- `MODULE_INDEX.md`: 컨트롤러/서비스/매퍼/템플릿 파일 인덱스
 - `project_plan.md`: 프로젝트 마스터 문서(구조/기능/변경이력 포함)
 - `project_personas.md`: 프로젝트 의사결정 페르소나(상세)
 - `ai_report_service.md`: AI 상담 분석 리포트(유료 서비스) 설계/구현/운영 가이드
