@@ -841,6 +841,12 @@ logging.level.org.hibernate.stat=DEBUG
 
 ## 📈 12. 개발 이력 (Development Changelog)
 
+### 📘 **2026년 9월 21일 - 소스 아키텍처 분석 문서**
+
+- 추가: `docs/SOURCE_ANALYSIS.md` (스택, 인증, 실시간 CRM 경로, WIO 관계, 배포, 리스크)
+- 추가: `docs/MODULE_INDEX.md` (모듈/파일 인덱스)
+- 런타임 코드 변경 없음
+
 ### 🚀 **2025년 7월 16일 - 물류센터 직접입고 관리 시스템 완성**
 
 #### **📦 물류센터 직접입고 관리 기능 완료**

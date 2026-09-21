@@ -26,6 +26,8 @@
 
 ## 📚 **문서**
 - **문서 인덱스(권장 진입점)**: [docs/README.md](docs/README.md)
+- **소스 아키텍처 분석**: [docs/SOURCE_ANALYSIS.md](docs/SOURCE_ANALYSIS.md)
+- **모듈 인덱스**: [docs/MODULE_INDEX.md](docs/MODULE_INDEX.md)
 - **프로젝트 계획서(마스터)**: [docs/project_plan.md](docs/project_plan.md)
 - **페르소나(요약)**: [PERSONAS.md](PERSONAS.md)
 - **페르소나(상세)**: [docs/project_personas.md](docs/project_personas.md)
